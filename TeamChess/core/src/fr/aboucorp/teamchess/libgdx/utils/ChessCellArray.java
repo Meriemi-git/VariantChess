@@ -6,12 +6,13 @@ import java.util.Iterator;
 
 import fr.aboucorp.teamchess.libgdx.exceptions.CellNotFoundException;
 import fr.aboucorp.teamchess.libgdx.models.ChessCell;
+import fr.aboucorp.teamchess.libgdx.models.ChessModel;
 
-public class ChessCellArray extends Array<ChessCell> {
+public class ChessCellArray extends Array<ChessModel> {
 
     public ChessCell getPieceByLocation(int x , int y, int z) throws CellNotFoundException {
-        for (Iterator<ChessCell> iter = this.iterator(); iter.hasNext(); ) {
-            ChessCell cell = iter.next();
+        for (Iterator<ChessModel> iter = this.iterator(); iter.hasNext(); ) {
+            ChessCell cell = (ChessCell) iter.next();
            if(cell.isLocatedIn(x,y,z)){
                return cell;
            }

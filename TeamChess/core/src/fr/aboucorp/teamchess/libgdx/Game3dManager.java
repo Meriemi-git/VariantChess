@@ -4,13 +4,10 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputMultiplexer;
-
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
-
 import com.badlogic.gdx.graphics.g3d.Environment;
-
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
@@ -19,13 +16,13 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.input.GestureDetector;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 
-
 import fr.aboucorp.teamchess.libgdx.exceptions.CellNotFoundException;
-
+import fr.aboucorp.teamchess.libgdx.models.ChessCell;
+import fr.aboucorp.teamchess.libgdx.models.ChessModel;
 import fr.aboucorp.teamchess.libgdx.models.ChessPiece;
-
 import fr.aboucorp.teamchess.libgdx.utils.ChessCellArray;
 
 
@@ -44,6 +41,8 @@ public class Game3dManager extends ApplicationAdapter {
 	private GestureDetector.GestureListener androidListener;
 
 	private BoardManager boardManager;
+
+	private ChessPiece selectedPiece;
 
 	public Game3dManager(){
 	}
@@ -94,12 +93,18 @@ public class Game3dManager extends ApplicationAdapter {
 	}
 
 	public void selectPiece(ChessPiece piece){
+		if(selectedPiece != null){
+			Material oldMat = selectedPiece.materials.get(0);
+			oldMat.clear();
+			oldMat.set(piece.getOriginalMaterial());
+		}
 		Material newMat = new Material();
 		newMat.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, 0.3f));
 		newMat.set(ColorAttribute.createDiffuse(Color.ROYAL));
 		Material oldMat = piece.materials.get(0);
 		oldMat.clear();
 		oldMat.set(newMat);
+		selectedPiece = piece;
 	}
 
 	/**
@@ -132,11 +137,11 @@ public class Game3dManager extends ApplicationAdapter {
 		return this.boardManager.getChessCells();
 	}
 
-	public Array<ChessPiece> getBlackPieces() {
+	public Array<ChessModel> getBlackPieces() {
 		return this.boardManager.getBlackPieces();
 	}
 
-	public Array<ChessPiece> getWhitePieces() {
+	public Array<ChessModel> getWhitePieces() {
 		return this.boardManager.getWhitePieces();
 	}
 
@@ -146,5 +151,9 @@ public class Game3dManager extends ApplicationAdapter {
 
 	public void setAndroidListener(GestureDetector.GestureListener androidListener) {
 		this.androidListener = androidListener;
+	}
+
+	public void movePieceIntoCell(ChessCell cell) {
+		this.selectedPiece.transform.setTranslation(cell.getBoundingBox().getCenter(new Vector3()));
 	}
 }

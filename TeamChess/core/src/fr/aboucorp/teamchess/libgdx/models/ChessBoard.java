@@ -9,8 +9,8 @@ import fr.aboucorp.teamchess.libgdx.utils.ChessCellArray;
 
 public class ChessBoard extends Board {
     private ChessCellArray chessCells ;
-    private Array<ChessPiece> blackPieces ;
-    private Array<ChessPiece> whitePieces ;
+    private Array<ChessModel> blackPieces ;
+    private Array<ChessModel> whitePieces ;
     private Array<ModelInstance> devStuff ;
 
     public ChessBoard() {
@@ -24,11 +24,11 @@ public class ChessBoard extends Board {
         return chessCells;
     }
 
-    public Array<ChessPiece> getBlackPieces() {
+    public Array<ChessModel> getBlackPieces() {
         return blackPieces;
     }
 
-    public Array<ChessPiece> getWhitePieces() {
+    public Array<ChessModel> getWhitePieces() {
         return whitePieces;
     }
 

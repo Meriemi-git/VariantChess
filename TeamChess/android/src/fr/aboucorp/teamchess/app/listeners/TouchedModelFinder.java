@@ -8,7 +8,7 @@ import com.badlogic.gdx.math.collision.Ray;
 import com.badlogic.gdx.utils.Array;
 
 import fr.aboucorp.teamchess.app.GameManager;
-import fr.aboucorp.teamchess.libgdx.models.ChessPiece;
+import fr.aboucorp.teamchess.libgdx.models.ChessModel;
 
 /**
  * Permet de trouver quel modèle 3D a été sélectionné en fonction des coordonnées du clic sur l'écran
@@ -24,13 +24,13 @@ public class TouchedModelFinder {
     }
 
 
-    public ChessPiece getTouchedPiece(float screenX, float screenY, Array<ChessPiece> pieces) {
+    public ChessModel getTouchedModel(float screenX, float screenY, Array<ChessModel> models) {
         Ray ray = this.gameManager.getGame3dManager().getCamera().getPickRay(screenX, screenY);
         double distance = -1;
         int result = -1;
         Vector3 position = new Vector3();
-        for (int i = 0; i < pieces.size; i++) {
-            final ChessPiece piece = pieces.get(i);
+        for (int i = 0; i < models.size; i++) {
+            final ChessModel piece = models.get(i);
             piece.transform.getTranslation(position);
             BoundingBox box = piece.calculateBoundingBox(new BoundingBox()).mul(piece.transform);
             position.add(box.getCenter(new Vector3()));
@@ -44,6 +44,6 @@ public class TouchedModelFinder {
         if (result == -1) {
             return null;
         }
-        return pieces.get(result);
+        return models.get(result);
     }
 }

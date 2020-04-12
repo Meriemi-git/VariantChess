@@ -5,16 +5,19 @@ import com.badlogic.gdx.utils.Array;
 import java.util.LinkedList;
 
 import fr.aboucorp.generic.model.Team;
+import fr.aboucorp.generic.model.enums.Color;
 import fr.aboucorp.teamchess.app.models.enums.GameState;
 import fr.aboucorp.teamchess.libgdx.Game3dManager;
+import fr.aboucorp.teamchess.libgdx.models.ChessCell;
+import fr.aboucorp.teamchess.libgdx.models.ChessModel;
 import fr.aboucorp.teamchess.libgdx.models.ChessPiece;
 import fr.aboucorp.teamchess.libgdx.models.ChessTurn;
-import fr.aboucorp.generic.model.enums.Color;
 
 public class GameManager {
     private GameState gameState;
     private Game3dManager game3dManager;
     private LinkedList<ChessTurn> turns;
+    private ChessPiece selectedPiece;
 
     public GameManager(Game3dManager game3dManager) {
         this.game3dManager = game3dManager;
@@ -30,7 +33,7 @@ public class GameManager {
         this.turns.add(firstTurn);
     }
 
-    public Array<ChessPiece> getPiecesFromActualTurn(){
+    public Array<ChessModel> getPiecesFromActualTurn(){
         if(this.turns.getLast().getTeam().getColor() == Color.BLACK){
             return this.game3dManager.getBlackPieces();
         }else {
@@ -48,5 +51,11 @@ public class GameManager {
 
     public void selectPiece(ChessPiece piece) {
         this.game3dManager.selectPiece(piece);
+        this.gameState = GameState.SelectCase;
+    }
+
+    public void selectCell(ChessCell cell) {
+        // TODO Check move validity
+        this.game3dManager.movePieceIntoCell(cell);
     }
 }

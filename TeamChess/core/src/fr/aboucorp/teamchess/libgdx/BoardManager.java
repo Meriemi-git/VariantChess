@@ -12,13 +12,12 @@ import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 
-import fr.aboucorp.generic.model.Board;
 import fr.aboucorp.generic.model.Location;
 import fr.aboucorp.generic.model.enums.Color;
 import fr.aboucorp.teamchess.libgdx.exceptions.CellNotFoundException;
 import fr.aboucorp.teamchess.libgdx.models.ChessBoard;
 import fr.aboucorp.teamchess.libgdx.models.ChessCell;
-import fr.aboucorp.teamchess.libgdx.models.ChessPiece;
+import fr.aboucorp.teamchess.libgdx.models.ChessModel;
 import fr.aboucorp.teamchess.libgdx.models.pieces.Bishop;
 import fr.aboucorp.teamchess.libgdx.models.pieces.King;
 import fr.aboucorp.teamchess.libgdx.models.pieces.Knight;
@@ -114,7 +113,9 @@ public class BoardManager {
             this.chessBoard.getWhitePieces().add( new Pawn(pawnModel,this.chessBoard.getChessCells().getPieceByLocation(i,0,1), Color.WHITE));
         }
         // Apply material color
-        for (ModelInstance whitePiece : chessBoard.getWhitePieces()) {
+        for (ChessModel whitePiece : chessBoard.getWhitePieces()) {
+            Material whiteMaterial = new Material(ColorAttribute.createDiffuse(com.badlogic.gdx.graphics.Color.WHITE));
+            whitePiece.setOriginalMaterial(whiteMaterial);
             whitePiece.materials.get(0).set(ColorAttribute.createDiffuse(com.badlogic.gdx.graphics.Color.WHITE));
         }
 
@@ -150,8 +151,10 @@ public class BoardManager {
             this.chessBoard.getBlackPieces().add( new Pawn(pawnModel,this.chessBoard.getChessCells().getPieceByLocation(i,0,6), Color.BLACK));
         }
         // Apply material color
-        for (ModelInstance blackPiece : this.chessBoard.getBlackPieces()
+        for (ChessModel blackPiece : this.chessBoard.getBlackPieces()
         ) {
+            Material blackMaterial = new Material(ColorAttribute.createDiffuse(com.badlogic.gdx.graphics.Color.GRAY));
+            blackPiece.setOriginalMaterial(blackMaterial);
             blackPiece.materials.get(0).set(ColorAttribute.createDiffuse(com.badlogic.gdx.graphics.Color.GRAY));
         }
         this.boardIsLoading = false;
@@ -176,11 +179,11 @@ public class BoardManager {
         return chessBoard.getChessCells();
     }
 
-    public Array<ChessPiece> getBlackPieces() {
+    public Array<ChessModel> getBlackPieces() {
         return this.chessBoard.getBlackPieces();
     }
 
-    public Array<ChessPiece> getWhitePieces() {
+    public Array<ChessModel> getWhitePieces() {
         return this.chessBoard.getWhitePieces();
     }
 
