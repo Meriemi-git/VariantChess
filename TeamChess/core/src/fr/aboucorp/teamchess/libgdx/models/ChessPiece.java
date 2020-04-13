@@ -9,21 +9,23 @@ import fr.aboucorp.generic.model.enums.Color;
 
 public abstract class ChessPiece extends ChessModel implements IPiece {
 
-    public ChessCell cell;
-
+    private ChessCell cell;
 
     public ChessPiece(Model model, ChessCell cell, Color color){
         super(model,cell.location,color);
         this.cell = cell;
+        cell.setPiece(this);
     }
 
     @Override
     public void move(Cell cell) {
-        Vector3 coordinates = new Vector3();
-        coordinates.x = cell.location.x;
-        coordinates.y = cell.location.y;
-        coordinates.z = cell.location.z;
-        this.transform.translate(coordinates);
+        ((ChessCell)this.cell).setPiece(null);
+        ((ChessCell)cell).setPiece(this);
+        this.cell = (ChessCell) cell;
+        this.transform.setTranslation(((ChessCell)cell).getBoundingBox().getCenter(new Vector3()));
     }
 
+    public ChessCell getCell() {
+        return cell;
+    }
 }

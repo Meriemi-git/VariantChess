@@ -4,20 +4,17 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputMultiplexer;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g3d.Environment;
-import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
-import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.input.GestureDetector;
-import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.Array;
+
+import java.util.ArrayList;
 
 import fr.aboucorp.teamchess.libgdx.exceptions.CellNotFoundException;
 import fr.aboucorp.teamchess.libgdx.models.ChessCell;
@@ -42,7 +39,6 @@ public class Game3dManager extends ApplicationAdapter {
 
 	private BoardManager boardManager;
 
-	private ChessPiece selectedPiece;
 
 	public Game3dManager(){
 	}
@@ -69,43 +65,33 @@ public class Game3dManager extends ApplicationAdapter {
 				Gdx.app.log("fr.aboucorp.teamchess","Unable to Load pieces on cells",ex);
 			}
 		}
-			this.camController.update();
-			Gdx.gl.glClearColor(135 / 255f, 206 / 255f, 235 / 255f, 1);
-			Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-			Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-			this.modelBatch.begin(camera);
-			for (ModelInstance instance : this.boardManager.getChessCells()) {
-				modelBatch.render(instance, this.environment);
-			}
-			for (ModelInstance instance :  this.boardManager.getWhitePieces()) {
-				modelBatch.render(instance, this.environment);
-			}
-			for (ModelInstance instance : this.boardManager.getBlackPieces()) {
-				modelBatch.render(instance, this.environment);
-			}
-			this.modelBatch.end();
+		this.camController.update();
+		Gdx.gl.glClearColor(135 / 255f, 206 / 255f, 235 / 255f, 1);
+		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+		this.modelBatch.begin(camera);
+		for (ChessModel cell : this.boardManager.getFlattenCells()) {
+			modelBatch.render(cell, this.environment);
+		}
+		for (ModelInstance instance :  this.boardManager.getWhitePieces()) {
+			modelBatch.render(instance, this.environment);
+		}
+		for (ModelInstance instance : this.boardManager.getBlackPieces()) {
+			modelBatch.render(instance, this.environment);
+		}
+		this.modelBatch.end();
 	}
-
 
 	@Override
 	public void dispose () {
 		modelBatch.dispose();
 	}
 
+
 	public void selectPiece(ChessPiece piece){
-		if(selectedPiece != null){
-			Material oldMat = selectedPiece.materials.get(0);
-			oldMat.clear();
-			oldMat.set(piece.getOriginalMaterial());
-		}
-		Material newMat = new Material();
-		newMat.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, 0.3f));
-		newMat.set(ColorAttribute.createDiffuse(Color.ROYAL));
-		Material oldMat = piece.materials.get(0);
-		oldMat.clear();
-		oldMat.set(newMat);
-		selectedPiece = piece;
+		boardManager.selectPiece(piece);
 	}
+
 
 	/**
 	 * Initialisation de l'environnement 3D
@@ -134,14 +120,14 @@ public class Game3dManager extends ApplicationAdapter {
 	}
 
 	public ChessCellArray getChessCells() {
-		return this.boardManager.getChessCells();
+		return this.boardManager.getChessCellArray();
 	}
 
-	public Array<ChessModel> getBlackPieces() {
+	public ArrayList<ChessModel> getBlackPieces() {
 		return this.boardManager.getBlackPieces();
 	}
 
-	public Array<ChessModel> getWhitePieces() {
+	public ArrayList<ChessModel> getWhitePieces() {
 		return this.boardManager.getWhitePieces();
 	}
 
@@ -154,6 +140,10 @@ public class Game3dManager extends ApplicationAdapter {
 	}
 
 	public void movePieceIntoCell(ChessCell cell) {
-		this.selectedPiece.transform.setTranslation(cell.getBoundingBox().getCenter(new Vector3()));
+		this.boardManager.moveSelectedPieceIntoCell(cell);
 	}
+
+    public void resetSelection() {
+		this.boardManager.resetSelection();
+    }
 }

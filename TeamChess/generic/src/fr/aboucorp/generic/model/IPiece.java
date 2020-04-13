@@ -1,5 +1,9 @@
 package fr.aboucorp.generic.model;
 
+import java.util.List;
+
 public interface IPiece {
-    public void move(Cell cell);
+    void move(Cell cell);
+    List<Cell> getPossibleMoves(IPiece piece,Board board);
+
 }

@@ -8,7 +8,7 @@ import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 
 import fr.aboucorp.teamchess.R;
-import fr.aboucorp.teamchess.app.GameManager;
+import fr.aboucorp.teamchess.app.PartyManager;
 import fr.aboucorp.teamchess.app.listeners.GDXGestureListener;
 import fr.aboucorp.teamchess.app.listeners.GDXInputAdapter;
 import fr.aboucorp.teamchess.libgdx.Game3dManager;
@@ -17,7 +17,7 @@ public class BoardActivity extends AndroidApplication {
 
     public FrameLayout boardPanel;
 
-    private GameManager gameManager;
+    private PartyManager partyManager;
     @Override
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,10 +30,10 @@ public class BoardActivity extends AndroidApplication {
     private void initializeBoard(){
 
         Game3dManager game3dManager = new Game3dManager();
-        this.gameManager = new GameManager(game3dManager);
+        this.partyManager = new PartyManager(game3dManager);
         InputAdapter inputAdapter = new GDXInputAdapter();
         game3dManager.setAndroidInputAdapter(inputAdapter);
-        GDXGestureListener gestureListener = new GDXGestureListener(gameManager);
+        GDXGestureListener gestureListener = new GDXGestureListener(partyManager);
         game3dManager.setAndroidListener(gestureListener);
         this.bindViews();
         AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();

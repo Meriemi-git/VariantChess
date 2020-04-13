@@ -10,20 +10,25 @@ import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.Array;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import fr.aboucorp.generic.model.Cell;
 import fr.aboucorp.generic.model.Location;
 import fr.aboucorp.generic.model.enums.Color;
 import fr.aboucorp.teamchess.libgdx.exceptions.CellNotFoundException;
 import fr.aboucorp.teamchess.libgdx.models.ChessBoard;
 import fr.aboucorp.teamchess.libgdx.models.ChessCell;
 import fr.aboucorp.teamchess.libgdx.models.ChessModel;
-import fr.aboucorp.teamchess.libgdx.models.pieces.Bishop;
-import fr.aboucorp.teamchess.libgdx.models.pieces.King;
-import fr.aboucorp.teamchess.libgdx.models.pieces.Knight;
-import fr.aboucorp.teamchess.libgdx.models.pieces.Pawn;
-import fr.aboucorp.teamchess.libgdx.models.pieces.Queen;
-import fr.aboucorp.teamchess.libgdx.models.pieces.Rook;
+import fr.aboucorp.teamchess.libgdx.models.ChessPiece;
+import fr.aboucorp.teamchess.libgdx.models.pieces.impl.Bishop;
+import fr.aboucorp.teamchess.libgdx.models.pieces.impl.King;
+import fr.aboucorp.teamchess.libgdx.models.pieces.impl.Knight;
+import fr.aboucorp.teamchess.libgdx.models.pieces.impl.Pawn;
+import fr.aboucorp.teamchess.libgdx.models.pieces.impl.Queen;
+import fr.aboucorp.teamchess.libgdx.models.pieces.impl.Rook;
 import fr.aboucorp.teamchess.libgdx.utils.ChessCellArray;
 
 public class BoardManager {
@@ -32,11 +37,14 @@ public class BoardManager {
     private ModelBuilder modelBuilder;
     private AssetManager assets;
     private boolean boardIsLoading;
+    private ChessPiece selectedPiece;
+    private MaterialManager materialManager;
 
 
     public BoardManager() {
         this.assets = new AssetManager(new InternalFileHandleResolver());
         this.chessBoard = new ChessBoard();
+        this.materialManager = new MaterialManager();
     }
 
     public void initBoard(){
@@ -53,12 +61,16 @@ public class BoardManager {
                 ChessCell cell = null;
                 if(x % 2 == 0 && z % 2 != 0 || x % 2 != 0 && z % 2 == 0 ){
                     cell = new ChessCell(model, new Location(x, 0, z), Color.WHITE);
-                    cell.materials.get(0).set(ColorAttribute.createDiffuse(com.badlogic.gdx.graphics.Color.WHITE));
+                    Material material = new Material(ColorAttribute.createDiffuse(com.badlogic.gdx.graphics.Color.WHITE));
+                    cell.setOriginalMaterial(material);
+                    cell.materials.get(0).set(material);
                 }else{
                     cell = new ChessCell(model, new Location(x, 0, z), Color.BLACK);
-                    cell.materials.get(0).set(ColorAttribute.createDiffuse(com.badlogic.gdx.graphics.Color.BLACK));
+                    Material material = new Material(ColorAttribute.createDiffuse(com.badlogic.gdx.graphics.Color.BLACK));
+                    cell.setOriginalMaterial(material);
+                    cell.materials.get(0).set(material);
                 }
-                this.chessBoard.getChessCells().add(cell);
+                this.chessBoard.getChessCellArray().add(cell);
             }
         }
     }
@@ -82,35 +94,35 @@ public class BoardManager {
         Model rookModel = this.assets.get("data/rook.g3db", Model.class);
 
         // Load black pieces
-        Knight whiteRightKnight = new Knight(knightModel,this.chessBoard.getChessCells().getPieceByLocation(6,0,0), Color.WHITE);
+        Knight whiteRightKnight = new Knight(knightModel,this.chessBoard.getChessCellArray().getPieceByLocation(6,0), Color.WHITE);
         whiteRightKnight.transform.rotate(Vector3.Y, -90);
         this.chessBoard.getWhitePieces().add(whiteRightKnight);
 
-        Knight whiteLeftKnight =  new Knight(knightModel,this.chessBoard.getChessCells().getPieceByLocation(1,0,0), Color.WHITE);
+        Knight whiteLeftKnight =  new Knight(knightModel,this.chessBoard.getChessCellArray().getPieceByLocation(1,0), Color.WHITE);
         whiteLeftKnight.transform.rotate(Vector3.Y, -90);
         this.chessBoard.getWhitePieces().add(whiteLeftKnight);
 
-        Bishop whiteRightBishop = new Bishop(bishopModel,this.chessBoard.getChessCells().getPieceByLocation(5,0,0), Color.WHITE);
+        Bishop whiteRightBishop = new Bishop(bishopModel,this.chessBoard.getChessCellArray().getPieceByLocation(5,0), Color.WHITE);
         whiteRightBishop.transform.rotate(Vector3.Y, -90);
         this.chessBoard.getWhitePieces().add(whiteRightBishop);
 
-        Bishop whiteLeftBishop = new Bishop(bishopModel,this.chessBoard.getChessCells().getPieceByLocation(2,0,0), Color.WHITE);
+        Bishop whiteLeftBishop = new Bishop(bishopModel,this.chessBoard.getChessCellArray().getPieceByLocation(2,0), Color.WHITE);
         whiteLeftBishop.transform.rotate(Vector3.Y, -90);
         this.chessBoard.getWhitePieces().add(whiteLeftBishop);
 
-        this.chessBoard.getWhitePieces().add( new Queen(queenModel,this.chessBoard.getChessCells().getPieceByLocation(4,0,0), Color.WHITE));
-        this.chessBoard.getWhitePieces().add( new King(kingModel,this.chessBoard.getChessCells().getPieceByLocation(3,0,0), Color.WHITE));
+        this.chessBoard.getWhitePieces().add( new Queen(queenModel,this.chessBoard.getChessCellArray().getPieceByLocation(4,0), Color.WHITE));
+        this.chessBoard.getWhitePieces().add( new King(kingModel,this.chessBoard.getChessCellArray().getPieceByLocation(3,0), Color.WHITE));
 
-        Rook whiteLeftRook = new Rook(rookModel,this.chessBoard.getChessCells().getPieceByLocation(7,0,0), Color.WHITE);
+        Rook whiteLeftRook = new Rook(rookModel,this.chessBoard.getChessCellArray().getPieceByLocation(7,0), Color.WHITE);
         whiteLeftRook.transform.rotate(Vector3.Y, -90);
         this.chessBoard.getWhitePieces().add(whiteLeftRook);
 
-       Rook whiteRightRook =  new Rook(rookModel,this.chessBoard.getChessCells().getPieceByLocation(0,0,0), Color.WHITE);
+       Rook whiteRightRook =  new Rook(rookModel,this.chessBoard.getChessCellArray().getPieceByLocation(0,0), Color.WHITE);
         whiteRightRook.transform.rotate(Vector3.Y, -90);
         this.chessBoard.getWhitePieces().add(whiteRightRook);
 
         for(int  i = 0 ; i < 8 ; i++){
-            this.chessBoard.getWhitePieces().add( new Pawn(pawnModel,this.chessBoard.getChessCells().getPieceByLocation(i,0,1), Color.WHITE));
+            this.chessBoard.getWhitePieces().add( new Pawn(pawnModel,this.chessBoard.getChessCellArray().getPieceByLocation(i,1), Color.WHITE));
         }
         // Apply material color
         for (ChessModel whitePiece : chessBoard.getWhitePieces()) {
@@ -120,35 +132,35 @@ public class BoardManager {
         }
 
         // Load white pieces
-        Knight blackRightKnight = new Knight(knightModel,this.chessBoard.getChessCells().getPieceByLocation(6,0,7), Color.BLACK);
+        Knight blackRightKnight = new Knight(knightModel,this.chessBoard.getChessCellArray().getPieceByLocation(6,7), Color.BLACK);
         blackRightKnight.transform.rotate(Vector3.Y, 90);
         this.chessBoard.getBlackPieces().add(blackRightKnight);
 
-        Knight blackLeftKnight = new Knight(knightModel,this.chessBoard.getChessCells().getPieceByLocation(1,0,7), Color.BLACK);
+        Knight blackLeftKnight = new Knight(knightModel,this.chessBoard.getChessCellArray().getPieceByLocation(1,7), Color.BLACK);
         blackLeftKnight.transform.rotate(Vector3.Y, 90);
         this.chessBoard.getBlackPieces().add( blackLeftKnight);
 
-        Bishop blackLeftBishop = new Bishop(bishopModel,this.chessBoard.getChessCells().getPieceByLocation(5,0,7), Color.BLACK);
+        Bishop blackLeftBishop = new Bishop(bishopModel,this.chessBoard.getChessCellArray().getPieceByLocation(5,7), Color.BLACK);
         blackLeftBishop.transform.rotate(Vector3.Y, 90);
         this.chessBoard.getBlackPieces().add(blackLeftBishop);
 
-       Bishop blackRightBishop =  new Bishop(bishopModel,this.chessBoard.getChessCells().getPieceByLocation(2,0,7), Color.BLACK);
+       Bishop blackRightBishop =  new Bishop(bishopModel,this.chessBoard.getChessCellArray().getPieceByLocation(2,7), Color.BLACK);
         blackRightBishop.transform.rotate(Vector3.Y, 90);
         this.chessBoard.getBlackPieces().add(blackRightBishop);
 
-        this.chessBoard.getBlackPieces().add( new Queen(queenModel,this.chessBoard.getChessCells().getPieceByLocation(4,0,7), Color.BLACK));
-        this.chessBoard.getBlackPieces().add( new King(kingModel,this.chessBoard.getChessCells().getPieceByLocation(3,0,7), Color.BLACK));
+        this.chessBoard.getBlackPieces().add( new Queen(queenModel,this.chessBoard.getChessCellArray().getPieceByLocation(4,7), Color.BLACK));
+        this.chessBoard.getBlackPieces().add( new King(kingModel,this.chessBoard.getChessCellArray().getPieceByLocation(3,7), Color.BLACK));
 
-       Rook blackLeftRook =  new Rook(rookModel,this.chessBoard.getChessCells().getPieceByLocation(7,0,7), Color.BLACK);
+       Rook blackLeftRook =  new Rook(rookModel,this.chessBoard.getChessCellArray().getPieceByLocation(7,7), Color.BLACK);
         blackLeftRook.transform.rotate(Vector3.Y, 90);
         this.chessBoard.getBlackPieces().add(blackLeftRook );
 
-        Rook blackRightRook =  new Rook(rookModel,this.chessBoard.getChessCells().getPieceByLocation(0,0,7), Color.BLACK);
+        Rook blackRightRook =  new Rook(rookModel,this.chessBoard.getChessCellArray().getPieceByLocation(0,7), Color.BLACK);
         blackRightRook.transform.rotate(Vector3.Y, 90);
         this.chessBoard.getBlackPieces().add( blackRightRook);
 
         for(int  i = 0 ; i < 8 ; i++){
-            this.chessBoard.getBlackPieces().add( new Pawn(pawnModel,this.chessBoard.getChessCells().getPieceByLocation(i,0,6), Color.BLACK));
+            this.chessBoard.getBlackPieces().add( new Pawn(pawnModel,this.chessBoard.getChessCellArray().getPieceByLocation(i,6), Color.BLACK));
         }
         // Apply material color
         for (ChessModel blackPiece : this.chessBoard.getBlackPieces()
@@ -175,27 +187,56 @@ public class BoardManager {
         chessBoard.getDevStuff().add(new ModelInstance(arrowZ));
     }
 
-    public ChessCellArray getChessCells() {
-        return chessBoard.getChessCells();
+    public void moveSelectedPieceIntoCell(ChessCell cell) {
+        this.selectedPiece.move(cell);
     }
 
-    public Array<ChessModel> getBlackPieces() {
+    public void selectPiece(ChessPiece piece) {
+        if(this.selectedPiece != null){
+            this.materialManager.resetMaterial(this.selectedPiece);
+        }
+        this.materialManager.setSelectedMaterial(piece);
+        this.selectedPiece = piece;
+        highLightPossibleMoves(piece);
+    }
+
+    public void highLightPossibleMoves(ChessPiece piece) {
+        List<Cell> possiblesMoves = piece.getPossibleMoves(piece,this.chessBoard);
+        if(possiblesMoves != null) {
+            for (Iterator iter = possiblesMoves.iterator(); iter.hasNext(); ) {
+                this.materialManager.setSelectedMaterial((ChessModel) iter.next());
+            }
+        }
+    }
+
+    public void resetSelection() {
+        if(selectedPiece != null){
+            this.materialManager.resetMaterial(this.selectedPiece);
+        }
+        this.selectedPiece = null;
+        for (Iterator iter = this.chessBoard.getFlattenCells().iterator();iter.hasNext();){
+            ChessCell cell = (ChessCell) iter.next();
+            this.materialManager.resetMaterial(cell);
+        }
+    }
+
+    public ChessCellArray getChessCellArray() {
+        return chessBoard.getChessCellArray();
+    }
+    public List<ChessModel> getFlattenCells() {
+        return chessBoard.getFlattenCells();
+    }
+    public ArrayList<ChessModel> getBlackPieces() {
         return this.chessBoard.getBlackPieces();
     }
-
-    public Array<ChessModel> getWhitePieces() {
+    public ArrayList<ChessModel> getWhitePieces() {
         return this.chessBoard.getWhitePieces();
     }
-
-    public Array<ModelInstance> getDevStuff() {
-        return this.chessBoard.getDevStuff();
-    }
-
     public boolean isBoardIsLoading() {
         return boardIsLoading;
     }
-
     public AssetManager getAssets() {
         return assets;
     }
+
 }

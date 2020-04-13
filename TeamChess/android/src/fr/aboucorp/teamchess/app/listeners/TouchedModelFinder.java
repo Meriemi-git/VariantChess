@@ -1,13 +1,13 @@
 package fr.aboucorp.teamchess.app.listeners;
 
-
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.math.collision.Ray;
-import com.badlogic.gdx.utils.Array;
 
-import fr.aboucorp.teamchess.app.GameManager;
+import java.util.ArrayList;
+
+import fr.aboucorp.teamchess.app.PartyManager;
 import fr.aboucorp.teamchess.libgdx.models.ChessModel;
 
 /**
@@ -17,19 +17,19 @@ import fr.aboucorp.teamchess.libgdx.models.ChessModel;
 
 public class TouchedModelFinder {
 
-    private GameManager gameManager;
+    private PartyManager partyManager;
 
-    public TouchedModelFinder(GameManager gameManager) {
-        this.gameManager = gameManager;
+    public TouchedModelFinder(PartyManager partyManager) {
+        this.partyManager = partyManager;
     }
 
 
-    public ChessModel getTouchedModel(float screenX, float screenY, Array<ChessModel> models) {
-        Ray ray = this.gameManager.getGame3dManager().getCamera().getPickRay(screenX, screenY);
+    public ChessModel getTouchedModel(float screenX, float screenY, ArrayList<ChessModel> models) {
+        Ray ray = this.partyManager.getGame3dManager().getCamera().getPickRay(screenX, screenY);
         double distance = -1;
         int result = -1;
         Vector3 position = new Vector3();
-        for (int i = 0; i < models.size; i++) {
+        for (int i = 0; i < models.size(); i++) {
             final ChessModel piece = models.get(i);
             piece.transform.getTranslation(position);
             BoundingBox box = piece.calculateBoundingBox(new BoundingBox()).mul(piece.transform);
