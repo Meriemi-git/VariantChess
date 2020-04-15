@@ -8,9 +8,9 @@ import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 
 import fr.aboucorp.teamchess.R;
-import fr.aboucorp.teamchess.app.PartyManager;
 import fr.aboucorp.teamchess.app.listeners.GDXGestureListener;
 import fr.aboucorp.teamchess.app.listeners.GDXInputAdapter;
+import fr.aboucorp.teamchess.app.managers.PartyManager;
 import fr.aboucorp.teamchess.libgdx.Game3dManager;
 
 public class BoardActivity extends AndroidApplication {

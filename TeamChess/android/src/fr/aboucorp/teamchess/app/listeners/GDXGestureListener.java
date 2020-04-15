@@ -3,9 +3,9 @@ package fr.aboucorp.teamchess.app.listeners;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
 
-import fr.aboucorp.teamchess.app.PartyManager;
-import fr.aboucorp.teamchess.libgdx.models.ChessCell;
-import fr.aboucorp.teamchess.libgdx.models.ChessPiece;
+import fr.aboucorp.entities.model.ChessCell;
+import fr.aboucorp.entities.model.ChessPiece;
+import fr.aboucorp.teamchess.app.managers.PartyManager;
 
 
 public class GDXGestureListener implements GestureDetector.GestureListener {

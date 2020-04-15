@@ -1,0 +1,259 @@
+@startuml
+
+title __CORE's Class Diagram__\n
+
+  namespace fr.aboucorp.teamchess.libgdx {
+    class fr.aboucorp.teamchess.libgdx.Board3dManager {
+    }
+  }
+  
+
+  namespace fr.aboucorp.teamchess.libgdx {
+    class fr.aboucorp.teamchess.libgdx.Game3dManager {
+    }
+  }
+  
+
+  namespace fr.aboucorp.teamchess.libgdx {
+    class fr.aboucorp.teamchess.libgdx.Material3dManager {
+    }
+  }
+  
+
+  namespace fr.aboucorp.teamchess.libgdx {
+    namespace exceptions {
+      class fr.aboucorp.teamchess.libgdx.exceptions.CellNotFoundException {
+      }
+    }
+  }
+  
+
+  namespace fr.aboucorp.teamchess.libgdx {
+    namespace models {
+      class fr.aboucorp.teamchess.libgdx.models.ChessBoard3d {
+      }
+    }
+  }
+  
+
+  namespace fr.aboucorp.teamchess.libgdx {
+    namespace models {
+      class fr.aboucorp.entities.model.ChessCell {
+      }
+    }
+  }
+  
+
+  namespace fr.aboucorp.teamchess.libgdx {
+    namespace models {
+      class fr.aboucorp.teamchess.libgdx.models.ChessModel {
+      }
+    }
+  }
+  
+
+  namespace fr.aboucorp.teamchess.libgdx {
+    namespace models {
+      abstract class fr.aboucorp.entities.model.ChessPiece {
+      }
+    }
+  }
+  
+
+  namespace fr.aboucorp.teamchess.libgdx {
+    namespace models {
+      class fr.aboucorp.entities.model.ChessTurn {
+      }
+    }
+  }
+  
+
+  namespace fr.aboucorp.teamchess.libgdx {
+    namespace models {
+      namespace moves {
+        abstract class fr.aboucorp.entities.model.moves.AbstractMoveSet {
+        }
+      }
+    }
+  }
+  
+
+  namespace fr.aboucorp.teamchess.libgdx {
+    namespace models {
+      namespace moves {
+        interface fr.aboucorp.entities.model.moves.BishopMoveSet {
+        }
+      }
+    }
+  }
+  
+
+  namespace fr.aboucorp.teamchess.libgdx {
+    namespace models {
+      namespace moves {
+        interface fr.aboucorp.entities.model.moves.KingMoveSet {
+        }
+      }
+    }
+  }
+  
+
+  namespace fr.aboucorp.teamchess.libgdx {
+    namespace models {
+      namespace moves {
+        interface fr.aboucorp.entities.model.moves.RookMoveSet {
+        }
+      }
+    }
+  }
+  
+
+  namespace fr.aboucorp.teamchess.libgdx {
+    namespace models {
+      namespace moves {
+        class fr.aboucorp.entities.model.moves.MoveChecker {
+        }
+      }
+    }
+  }
+  
+
+  namespace fr.aboucorp.teamchess.libgdx {
+    namespace models {
+      namespace pieces {
+        interface fr.aboucorp.teamchess.libgdx.models.ChessPiece {
+        }
+      }
+    }
+  }
+  
+
+  namespace fr.aboucorp.teamchess.libgdx {
+    namespace models {
+      namespace pieces {
+        namespace impl {
+          class fr.aboucorp.entities.model.pieces.Bishop {
+          }
+        }
+      }
+    }
+  }
+  
+
+  namespace fr.aboucorp.teamchess.libgdx {
+    namespace models {
+      namespace pieces {
+        namespace impl {
+          class fr.aboucorp.entities.model.pieces.KingMoveSet {
+          }
+        }
+      }
+    }
+  }
+  
+
+  namespace fr.aboucorp.teamchess.libgdx {
+    namespace models {
+      namespace pieces {
+        namespace impl {
+          class fr.aboucorp.entities.model.pieces.Knight {
+          }
+        }
+      }
+    }
+  }
+  
+
+  namespace fr.aboucorp.teamchess.libgdx {
+    namespace models {
+      namespace pieces {
+        namespace impl {
+          class fr.aboucorp.entities.model.pieces.Pawn {
+          }
+        }
+      }
+    }
+  }
+  
+
+  namespace fr.aboucorp.teamchess.libgdx {
+    namespace models {
+      namespace pieces {
+        namespace impl {
+          class fr.aboucorp.entities.model.pieces.Queen {
+          }
+        }
+      }
+    }
+  }
+  
+
+  namespace fr.aboucorp.teamchess.libgdx {
+    namespace models {
+      namespace pieces {
+        namespace impl {
+          class fr.aboucorp.entities.model.pieces.Rook {
+          }
+        }
+      }
+    }
+  }
+  
+
+  namespace fr.aboucorp.teamchess.libgdx {
+    namespace services {
+      class fr.aboucorp.teamchess.libgdx.services.ChessPiecesService {
+      }
+    }
+  }
+  
+
+  namespace fr.aboucorp.teamchess.libgdx {
+    namespace utils {
+      class fr.aboucorp.teamchess.libgdx.utils.ChessCellArray {
+      }
+    }
+  }
+  
+
+  fr.aboucorp.teamchess.libgdx.Board3dManager o-- fr.aboucorp.teamchess.libgdx.models.ChessBoard3d : chessBoard
+  fr.aboucorp.teamchess.libgdx.Board3dManager o-- fr.aboucorp.teamchess.libgdx.Material3dManager : materialManager
+  fr.aboucorp.teamchess.libgdx.Board3dManager o-- fr.aboucorp.entities.model.ChessPiece : selectedPiece
+  fr.aboucorp.teamchess.libgdx.Game3dManager -up-|> com.badlogic.gdx.ApplicationAdapter
+  fr.aboucorp.teamchess.libgdx.Game3dManager o-- fr.aboucorp.teamchess.libgdx.Board3dManager : boardManager
+  fr.aboucorp.teamchess.libgdx.models.ChessBoard3d -up-|> fr.aboucorp.generic.model.Board
+  fr.aboucorp.teamchess.libgdx.models.ChessBoard3d o-- fr.aboucorp.teamchess.libgdx.utils.ChessCellArray : chessCells
+  fr.aboucorp.entities.model.ChessCell .up.|> fr.aboucorp.generic.model.Cell
+  fr.aboucorp.entities.model.ChessCell -up-|> fr.aboucorp.teamchess.libgdx.models.ChessModel
+  fr.aboucorp.entities.model.ChessCell o-- fr.aboucorp.generic.model.Location : location
+  fr.aboucorp.entities.model.ChessCell o-- fr.aboucorp.entities.model.ChessPiece : piece
+  fr.aboucorp.teamchess.libgdx.models.ChessModel -up-|> com.badlogic.gdx.graphics.g3d.ModelInstance
+  fr.aboucorp.teamchess.libgdx.models.ChessModel o-- fr.aboucorp.entities.model.enums.Color : chessColor
+  fr.aboucorp.teamchess.libgdx.models.ChessModel o-- fr.aboucorp.generic.model.Location : location
+  fr.aboucorp.entities.model.ChessPiece .up.|> fr.aboucorp.generic.model.Piece
+  fr.aboucorp.entities.model.ChessPiece -up-|> fr.aboucorp.teamchess.libgdx.models.ChessModel
+  fr.aboucorp.entities.model.ChessPiece o-- fr.aboucorp.entities.model.ChessCell : cell
+  fr.aboucorp.entities.model.ChessTurn -up-|> fr.aboucorp.generic.model.Turn
+  fr.aboucorp.entities.model.ChessTurn o-- fr.aboucorp.entities.model.ChessPiece : DeadPiece
+  fr.aboucorp.entities.model.pieces.Bishop .up.|> fr.aboucorp.entities.model.moves.BishopMoveSet
+  fr.aboucorp.entities.model.pieces.Bishop -up-|> fr.aboucorp.entities.model.ChessPiece
+  fr.aboucorp.entities.model.pieces.KingMoveSet .up.|> fr.aboucorp.entities.model.moves.KingMoveSet
+  fr.aboucorp.entities.model.pieces.KingMoveSet -up-|> fr.aboucorp.entities.model.ChessPiece
+  fr.aboucorp.entities.model.pieces.Knight -up-|> fr.aboucorp.entities.model.ChessPiece
+  fr.aboucorp.entities.model.pieces.Pawn -up-|> fr.aboucorp.entities.model.ChessPiece
+  fr.aboucorp.entities.model.pieces.Queen .up.|> fr.aboucorp.entities.model.moves.BishopMoveSet
+  fr.aboucorp.entities.model.pieces.Queen .up.|> fr.aboucorp.entities.model.moves.RookMoveSet
+  fr.aboucorp.entities.model.pieces.Queen -up-|> fr.aboucorp.entities.model.ChessPiece
+  fr.aboucorp.entities.model.pieces.Rook .up.|> fr.aboucorp.entities.model.moves.RookMoveSet
+  fr.aboucorp.entities.model.pieces.Rook -up-|> fr.aboucorp.entities.model.ChessPiece
+  fr.aboucorp.teamchess.libgdx.utils.ChessCellArray -up-|> java.util.ArrayList
+
+
+right footer
+
+
+PlantUML diagram generated by SketchIt! (https://bitbucket.org/pmesmeur/sketch.it)
+For more information about this tool, please contact philippe.mesmeur@gmail.com
+endfooter
+
+@enduml

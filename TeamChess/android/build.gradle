@@ -90,7 +90,7 @@ task run(type: Exec) {
 }
 
 dependencies {
-    implementation project(path: ':generic')
+
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
 }
 

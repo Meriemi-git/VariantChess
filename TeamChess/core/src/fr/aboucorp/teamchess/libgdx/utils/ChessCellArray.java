@@ -3,17 +3,17 @@ package fr.aboucorp.teamchess.libgdx.utils;
 import java.util.ArrayList;
 
 import fr.aboucorp.teamchess.libgdx.exceptions.CellNotFoundException;
-import fr.aboucorp.teamchess.libgdx.models.ChessCell;
+import fr.aboucorp.teamchess.libgdx.models.ChessCellModel;
 import fr.aboucorp.teamchess.libgdx.models.ChessModel;
 
 public class ChessCellArray extends ArrayList {
 
-    private ArrayList<ArrayList<ChessCell>> cells;
+    private ArrayList<ArrayList<ChessCellModel>> cells;
 
     public ChessCellArray() {
         this.cells = new ArrayList<>(8);
         for (int i = 0; i < 8; i++) {
-            ArrayList<ChessCell> column = new ArrayList<>(8);
+            ArrayList<ChessCellModel> column = new ArrayList<>(8);
             cells.add(column);
             for (int j = 0 ; j < 8 ; j++){
                 column.add(null);
@@ -24,30 +24,30 @@ public class ChessCellArray extends ArrayList {
 
     @Override
     public boolean add(Object o) {
-        ChessCell cell = (ChessCell)o;
-        int x = cell.getLocation().x;
-        int z = cell.getLocation().z;
+        ChessCellModel cell = (ChessCellModel)o;
+        int x = cell.getLocation().getX();
+        int z = cell.getLocation().getZ();
         if(x < 0 || x >= 8 || z < 0 || z >= 8){
             return false;
         }
-        ArrayList<ChessCell> column = cells.get(x);
+        ArrayList<ChessCellModel> column = cells.get(x);
         if(column == null){
             column = new ArrayList<>();
-            column.set(z, (ChessCell) o);
+            column.set(z, (ChessCellModel) o);
             cells.set(x, column);
         }else{
-            column.set(z, (ChessCell) o);
+            column.set(z, (ChessCellModel) o);
         }
         return true;
     }
 
-    public ChessCell getPieceByLocation(int x , int z) throws CellNotFoundException {
-        ArrayList<ChessCell> column = this.cells.get(x);
+    public ChessCellModel getPieceByLocation(int x , int z) throws CellNotFoundException {
+        ArrayList<ChessCellModel> column = this.cells.get(x);
         if(column == null){
             throw new CellNotFoundException(String.format("No cell found for coordinates x:%s; z:%s;", x,z));
         }
         try{
-            ChessCell cell = column.get(z);
+            ChessCellModel cell = column.get(z);
             if(cell == null){
                 throw new CellNotFoundException(String.format("No cell found for coordinates x:%s; z:%s;",x,z));
             }
@@ -59,7 +59,7 @@ public class ChessCellArray extends ArrayList {
 
     public ArrayList<ChessModel> getFlattenCells() {
         ArrayList<ChessModel> flattenCells = new ArrayList();
-        for(ArrayList<ChessCell> columns : this.cells){
+        for(ArrayList<ChessCellModel> columns : this.cells){
             flattenCells.addAll(columns);
         }
         return flattenCells;

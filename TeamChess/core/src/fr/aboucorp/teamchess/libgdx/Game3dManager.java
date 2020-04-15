@@ -8,19 +8,14 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
-import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.input.GestureDetector;
 
-import java.util.ArrayList;
-
-import fr.aboucorp.teamchess.libgdx.exceptions.CellNotFoundException;
-import fr.aboucorp.teamchess.libgdx.models.ChessCell;
+import fr.aboucorp.entities.model.ChessCell;
+import fr.aboucorp.entities.model.ChessPiece;
 import fr.aboucorp.teamchess.libgdx.models.ChessModel;
-import fr.aboucorp.teamchess.libgdx.models.ChessPiece;
-import fr.aboucorp.teamchess.libgdx.utils.ChessCellArray;
 
 
 public class Game3dManager extends ApplicationAdapter {
@@ -37,7 +32,7 @@ public class Game3dManager extends ApplicationAdapter {
 	private InputAdapter androidInputAdapter;
 	private GestureDetector.GestureListener androidListener;
 
-	private BoardManager boardManager;
+	private Board3dManager board3dManager;
 
 
 	public Game3dManager(){
@@ -51,33 +46,21 @@ public class Game3dManager extends ApplicationAdapter {
 		InputMultiplexer multiplexer = new InputMultiplexer(new GestureDetector(androidListener), camController);
 		multiplexer.addProcessor(androidInputAdapter);
 		Gdx.input.setInputProcessor(multiplexer);
-		this.boardManager = new BoardManager();
-		this.boardManager.initBoard();
+		this.board3dManager = Board3dManager.getInstance();
 	}
 
 	@Override
 	public void render () {
-		if (this.boardManager.isBoardIsLoading() && this.boardManager.getAssets().update()) {
-			try {
-				this.boardManager.doneLoading();
-			}
-			catch(CellNotFoundException ex){
-				Gdx.app.log("fr.aboucorp.teamchess","Unable to Load pieces on cells",ex);
-			}
+		if (this.board3dManager.isBoardIsLoading() && this.board3dManager.getAssets().update()) {
+				this.board3dManager.doneLoading();
 		}
 		this.camController.update();
 		Gdx.gl.glClearColor(135 / 255f, 206 / 255f, 235 / 255f, 1);
 		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 		this.modelBatch.begin(camera);
-		for (ChessModel cell : this.boardManager.getFlattenCells()) {
+		for (ChessModel cell : this.board3dManager.getChessCells()) {
 			modelBatch.render(cell, this.environment);
-		}
-		for (ModelInstance instance :  this.boardManager.getWhitePieces()) {
-			modelBatch.render(instance, this.environment);
-		}
-		for (ModelInstance instance : this.boardManager.getBlackPieces()) {
-			modelBatch.render(instance, this.environment);
 		}
 		this.modelBatch.end();
 	}
@@ -89,7 +72,7 @@ public class Game3dManager extends ApplicationAdapter {
 
 
 	public void selectPiece(ChessPiece piece){
-		boardManager.selectPiece(piece);
+		board3dManager.selectPiece(piece);
 	}
 
 
@@ -119,17 +102,6 @@ public class Game3dManager extends ApplicationAdapter {
 		return camera;
 	}
 
-	public ChessCellArray getChessCells() {
-		return this.boardManager.getChessCellArray();
-	}
-
-	public ArrayList<ChessModel> getBlackPieces() {
-		return this.boardManager.getBlackPieces();
-	}
-
-	public ArrayList<ChessModel> getWhitePieces() {
-		return this.boardManager.getWhitePieces();
-	}
 
 	public void setAndroidInputAdapter(InputAdapter androidInputAdapter) {
 		this.androidInputAdapter = androidInputAdapter;
@@ -140,10 +112,10 @@ public class Game3dManager extends ApplicationAdapter {
 	}
 
 	public void movePieceIntoCell(ChessCell cell) {
-		this.boardManager.moveSelectedPieceIntoCell(cell);
+		this.board3dManager.moveSelectedPieceToLocation(cell.getLocation());
 	}
 
     public void resetSelection() {
-		this.boardManager.resetSelection();
+		this.board3dManager.resetSelection();
     }
 }

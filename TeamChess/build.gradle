@@ -46,6 +46,7 @@ project(":android") {
 
     dependencies {
         implementation project(":core")
+        implementation project(":entities")
         api "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi"
         natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
@@ -59,14 +60,15 @@ project(":android") {
 project(":core") {
     apply plugin: "java-library"
     dependencies {
-        implementation project(":generic")
+        implementation project(":entities")
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
         api "net.dermetfan.libgdx-utils:libgdx-utils:0.13.4"
     }
 }
 
-project(":generic") {
+project(":entities") {
     apply plugin: "java-library"
     dependencies {
+
     }
 }

@@ -3,30 +3,45 @@ package fr.aboucorp.teamchess.libgdx.models;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.math.collision.BoundingBox;
 
-import fr.aboucorp.generic.model.Location;
-import fr.aboucorp.generic.model.enums.Color;
+import fr.aboucorp.entities.model.GameElement;
+import fr.aboucorp.entities.model.Location;
 
-public class ChessModel extends ModelInstance {
-    protected Color color;
-    protected Location location;
+
+public abstract class ChessModel extends ModelInstance {
+    private GameElement gameElement;
+    private Location location;
     private Material originalMaterial;
+    private BoundingBox boundingBox;
 
-    public ChessModel(Model model, Location location, Color color) {
-        super(model,location.x,location.y,location.z);
-        this.color = color;
+    public ChessModel(Model model, Location location, Material originalMaterial, GameElement gameElement) {
+        super(model,location.getX(),location.getY(),location.getZ());
+        this.originalMaterial = originalMaterial;
+        this.materials.get(0).set(originalMaterial);
         this.location = location;
+        this.boundingBox = calculateBoundingBox(new BoundingBox()).mul(transform);
+        this.gameElement = gameElement;
     }
 
-    public boolean isLocatedIn(int x, int y, int z){
-        return x == location.x && y == location.y && z == location.z;
+    public void move(Location location) {
+        this.transform.setTranslation(new Vector3(location.getX(),location.getY(),location.getZ()));
     }
 
     public Material getOriginalMaterial() {
         return originalMaterial;
     }
 
-    public void setOriginalMaterial(Material originalMaterial) {
-        this.originalMaterial = originalMaterial;
+    public Location getLocation() {
+        return location;
+    }
+
+    public BoundingBox getBoundingBox() {
+        return boundingBox;
+    }
+
+    public GameElement getGameElement() {
+        return gameElement;
     }
 }

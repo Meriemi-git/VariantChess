@@ -2,9 +2,9 @@ package fr.aboucorp.teamchess.app;
 
 import java.util.LinkedList;
 
+import fr.aboucorp.entities.model.ChessTurn;
+import fr.aboucorp.generic.model.Color;
 import fr.aboucorp.generic.model.Team;
-import fr.aboucorp.generic.model.enums.Color;
-import fr.aboucorp.teamchess.libgdx.models.ChessTurn;
 
 public class TurnManager {
     private LinkedList<ChessTurn> turns;
@@ -21,6 +21,6 @@ public class TurnManager {
     }
 
     public Color getTurnColor(){
-        return this.turns.getLast().getTeam().getColor();
+        return this.turns.getLast().getTeam().getChessColor();
     }
 }

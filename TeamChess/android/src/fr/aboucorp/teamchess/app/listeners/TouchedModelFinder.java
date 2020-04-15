@@ -7,7 +7,7 @@ import com.badlogic.gdx.math.collision.Ray;
 
 import java.util.ArrayList;
 
-import fr.aboucorp.teamchess.app.PartyManager;
+import fr.aboucorp.teamchess.app.managers.PartyManager;
 import fr.aboucorp.teamchess.libgdx.models.ChessModel;
 
 /**
