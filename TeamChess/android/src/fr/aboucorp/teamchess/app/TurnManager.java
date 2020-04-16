@@ -2,9 +2,9 @@ package fr.aboucorp.teamchess.app;
 
 import java.util.LinkedList;
 
+import fr.aboucorp.entities.model.ChessColor;
 import fr.aboucorp.entities.model.ChessTurn;
-import fr.aboucorp.generic.model.Color;
-import fr.aboucorp.generic.model.Team;
+import fr.aboucorp.entities.model.Team;
 
 public class TurnManager {
     private LinkedList<ChessTurn> turns;
@@ -15,12 +15,12 @@ public class TurnManager {
 
     public void startParty(){
         Team one = new Team("Team white");
-        one.setColor(Color.BLACK);
+        one.setChessColor(ChessColor.BLACK);
         ChessTurn firstTurn = new ChessTurn(1,one);
         this.turns.add(firstTurn);
     }
 
-    public Color getTurnColor(){
+    public ChessColor getTurnColor(){
         return this.turns.getLast().getTeam().getChessColor();
     }
 }

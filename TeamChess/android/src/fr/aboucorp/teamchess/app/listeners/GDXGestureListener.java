@@ -5,40 +5,48 @@ import com.badlogic.gdx.math.Vector2;
 
 import fr.aboucorp.entities.model.ChessCell;
 import fr.aboucorp.entities.model.ChessPiece;
-import fr.aboucorp.teamchess.app.managers.PartyManager;
+import fr.aboucorp.teamchess.app.managers.BoardManager;
+import fr.aboucorp.teamchess.libgdx.models.ChessModel;
 
 
 public class GDXGestureListener implements GestureDetector.GestureListener {
 
-    private PartyManager partyManager;
+    private BoardManager boardManager;
     private TouchedModelFinder touchedModelFinder;
-    public GDXGestureListener(PartyManager partyManager) {
-        this.partyManager = partyManager;
-        this.touchedModelFinder = new TouchedModelFinder(partyManager);
+    public GDXGestureListener(BoardManager boardManager) {
+        this.boardManager = boardManager;
+        this.touchedModelFinder = new TouchedModelFinder(boardManager);
     }
 
     @Override
     public boolean touchDown(float screenX, float screenY, int pointer, int button) {
-        switch(partyManager.getGameState()){
+        switch(boardManager.getGameState()){
             case SelectPiece:
-                ChessPiece piece = (ChessPiece) touchedModelFinder.getTouchedModel(screenX, screenY,this.partyManager.getPiecesFromActualTurn());
-                if (piece != null) {
-                    this.partyManager.selectPiece(piece);
-                }else{
-                    this.partyManager.resetSelection();
+                ChessModel touchedModel = touchedModelFinder.getTouchedModel(screenX, screenY,this.boardManager.getPiecesModelsFromActualTurn());
+                if(touchedModel != null) {
+                    ChessPiece touchedPiece = this.boardManager.getPieceFromLocation(touchedModel.getLocation());
+                    if (touchedPiece != null) {
+                        this.boardManager.selectPiece(touchedPiece);
+                    } else {
+                        this.boardManager.resetSelection();
+                    }
                 }
                 break;
             case SelectCase:
-                ChessPiece otherPiece = (ChessPiece) touchedModelFinder.getTouchedModel(screenX, screenY,this.partyManager.getPiecesFromActualTurn());
-                if (otherPiece != null) {
-                    this.partyManager.resetSelection();
-                    this.partyManager.selectPiece(otherPiece);
-                }else{
-                    ChessCell cell = (ChessCell)  touchedModelFinder.getTouchedModel(screenX, screenY,this.partyManager.getGame3dManager().getChessCells().getFlattenCells());
-                    if (cell != null) {
-                        this.partyManager.selectCell(cell);
-                    }else{
-                        this.partyManager.resetSelection();
+                ChessModel otherModel = touchedModelFinder.getTouchedModel(screenX, screenY,this.boardManager.getPiecesModelsFromActualTurn());
+                if(otherModel != null) {
+                    ChessPiece otherTouchedPiece = this.boardManager.getPieceFromLocation(otherModel.getLocation());
+                    if (otherTouchedPiece != null) {
+                        this.boardManager.resetSelection();
+                        this.boardManager.selectPiece(otherTouchedPiece);
+                    } else {
+                        ChessModel cellModel = touchedModelFinder.getTouchedModel(screenX, screenY, this.boardManager.getChessCellModels());
+                        ChessCell chessCell = this.boardManager.getCellFromLocation(cellModel.getLocation());
+                        if (chessCell != null) {
+                            this.boardManager.selectCell(chessCell);
+                        } else {
+                            this.boardManager.resetSelection();
+                        }
                     }
                 }
                 break;

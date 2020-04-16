@@ -8,9 +8,12 @@ public abstract class GameElement {
         this.location = location;
         this.chessColor = chessColor;
     }
-
     public Location getLocation() {
         return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
     }
 
     public ChessColor getChessColor() {

@@ -1,20 +1,10 @@
 package fr.aboucorp.entities.model.moves;
 
-import java.util.ArrayList;
-import java.util.List;
 
-import fr.aboucorp.generic.model.Board;
-import fr.aboucorp.generic.model.Cell;
-import fr.aboucorp.generic.model.Location;
-import fr.aboucorp.generic.model.Piece;
-import fr.aboucorp.teamchess.libgdx.models.ChessBoard3d;
-import fr.aboucorp.teamchess.libgdx.models.ChessCell;
-import fr.aboucorp.teamchess.libgdx.models.ChessPiece;
-import fr.aboucorp.teamchess.libgdx.utils.ChessCellArray;
 
-public interface KingMoveSet extends ChessPiece {
+public interface KingMoveSet  {
 
-    @Override
+   /* @Override
     default List<Cell> getPossibleMoves(Piece piece, Board board) {
         ChessCellArray allCells = ((ChessBoard3d)board).getChessCellArray();
         List<Cell> possibleCells = new ArrayList<Cell>();
@@ -53,5 +43,5 @@ public interface KingMoveSet extends ChessPiece {
         }
         return possibleCells;
     }
-
+*/
 }

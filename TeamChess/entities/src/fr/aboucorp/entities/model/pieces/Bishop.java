@@ -7,6 +7,7 @@ import fr.aboucorp.entities.model.Location;
 
 public class Bishop extends ChessPiece {
 
+
     public Bishop(Location location, ChessColor chessColor) {
         super(location, chessColor);
     }

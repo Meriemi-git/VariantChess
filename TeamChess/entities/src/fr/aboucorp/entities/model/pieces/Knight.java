@@ -7,8 +7,8 @@ import fr.aboucorp.entities.model.Location;
 
 public class Knight extends ChessPiece {
 
-    public Knight(Location location, ChessColor color) {
-        super(location,color);
-    }
 
+    public Knight(Location location, ChessColor chessColor) {
+        super(location, chessColor);
+    }
 }

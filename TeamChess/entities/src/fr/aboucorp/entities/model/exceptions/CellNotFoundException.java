@@ -1,4 +1,4 @@
-package fr.aboucorp.teamchess.libgdx.exceptions;
+package fr.aboucorp.entities.model.exceptions;
 
 public class CellNotFoundException extends Exception {
     public CellNotFoundException(String s) {

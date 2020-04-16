@@ -7,7 +7,7 @@ import com.badlogic.gdx.math.collision.Ray;
 
 import java.util.ArrayList;
 
-import fr.aboucorp.teamchess.app.managers.PartyManager;
+import fr.aboucorp.teamchess.app.managers.BoardManager;
 import fr.aboucorp.teamchess.libgdx.models.ChessModel;
 
 /**
@@ -17,15 +17,15 @@ import fr.aboucorp.teamchess.libgdx.models.ChessModel;
 
 public class TouchedModelFinder {
 
-    private PartyManager partyManager;
+    private BoardManager boardManager;
 
-    public TouchedModelFinder(PartyManager partyManager) {
-        this.partyManager = partyManager;
+    public TouchedModelFinder(BoardManager boardManager) {
+        this.boardManager = boardManager;
     }
 
 
     public ChessModel getTouchedModel(float screenX, float screenY, ArrayList<ChessModel> models) {
-        Ray ray = this.partyManager.getGame3dManager().getCamera().getPickRay(screenX, screenY);
+        Ray ray = this.boardManager.getBoard3dManager().getCamera().getPickRay(screenX, screenY);
         double distance = -1;
         int result = -1;
         Vector3 position = new Vector3();

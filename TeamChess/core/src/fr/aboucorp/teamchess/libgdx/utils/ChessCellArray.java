@@ -2,7 +2,7 @@ package fr.aboucorp.teamchess.libgdx.utils;
 
 import java.util.ArrayList;
 
-import fr.aboucorp.teamchess.libgdx.exceptions.CellNotFoundException;
+import fr.aboucorp.entities.model.exceptions.CellNotFoundException;
 import fr.aboucorp.teamchess.libgdx.models.ChessCellModel;
 import fr.aboucorp.teamchess.libgdx.models.ChessModel;
 

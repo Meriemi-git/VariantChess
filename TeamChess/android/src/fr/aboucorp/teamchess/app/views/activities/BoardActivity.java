@@ -10,14 +10,14 @@ import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import fr.aboucorp.teamchess.R;
 import fr.aboucorp.teamchess.app.listeners.GDXGestureListener;
 import fr.aboucorp.teamchess.app.listeners.GDXInputAdapter;
-import fr.aboucorp.teamchess.app.managers.PartyManager;
-import fr.aboucorp.teamchess.libgdx.Game3dManager;
+import fr.aboucorp.teamchess.app.managers.BoardManager;
+import fr.aboucorp.teamchess.libgdx.Board3dManager;
 
 public class BoardActivity extends AndroidApplication {
 
     public FrameLayout boardPanel;
 
-    private PartyManager partyManager;
+    private BoardManager boardManager;
     @Override
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,16 +28,16 @@ public class BoardActivity extends AndroidApplication {
     }
 
     private void initializeBoard(){
-
-        Game3dManager game3dManager = new Game3dManager();
-        this.partyManager = new PartyManager(game3dManager);
+        Board3dManager board3dManager = new Board3dManager();
+        this.boardManager = new BoardManager(board3dManager);
         InputAdapter inputAdapter = new GDXInputAdapter();
-        game3dManager.setAndroidInputAdapter(inputAdapter);
-        GDXGestureListener gestureListener = new GDXGestureListener(partyManager);
-        game3dManager.setAndroidListener(gestureListener);
+        board3dManager.setAndroidInputAdapter(inputAdapter);
+        GDXGestureListener gestureListener = new GDXGestureListener(this.boardManager);
+        board3dManager.setAndroidListener(gestureListener);
         this.bindViews();
         AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
-        boardPanel.addView(initializeForView(game3dManager, config));
+        boardPanel.addView(initializeForView(board3dManager, config));
+        this.boardManager.startGame();
     }
 
     public void bindViews() {

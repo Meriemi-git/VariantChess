@@ -1,39 +1,78 @@
 package fr.aboucorp.teamchess.app.managers;
 
+import com.badlogic.gdx.Gdx;
+
 import java.util.ArrayList;
 
 import fr.aboucorp.entities.model.ChessCell;
 import fr.aboucorp.entities.model.ChessColor;
 import fr.aboucorp.entities.model.ChessPiece;
 import fr.aboucorp.entities.model.Location;
+import fr.aboucorp.entities.model.enums.GameState;
 import fr.aboucorp.entities.model.pieces.Bishop;
 import fr.aboucorp.entities.model.pieces.King;
 import fr.aboucorp.entities.model.pieces.Knight;
 import fr.aboucorp.entities.model.pieces.Pawn;
 import fr.aboucorp.entities.model.pieces.Queen;
 import fr.aboucorp.entities.model.pieces.Rook;
+import fr.aboucorp.teamchess.app.TurnManager;
 import fr.aboucorp.teamchess.libgdx.Board3dManager;
+import fr.aboucorp.teamchess.libgdx.models.ChessModel;
 
 
-public class BoardManager {
-
+public class BoardManager  {
     private Board3dManager board3dManager;
+    private GameState gameState;
+    private TurnManager turnManager;
+    private ChessPiece selectedPiece;
 
-    private ArrayList chessCells;
-    private ArrayList<ChessPiece> blackPieces ;
-    private ArrayList<ChessPiece> whitePieces ;
+    private ArrayList<ChessCell> chessCells;
+    private ArrayList<ChessPiece> blackPieces;
+    private ArrayList<ChessPiece> whitePieces;
 
-    public BoardManager() {
-        this.board3dManager = Board3dManager.getInstance();
+    public BoardManager(Board3dManager board3dManager) {
+        this.board3dManager = board3dManager;
         this.blackPieces = new ArrayList<>();
         this.whitePieces = new ArrayList<>();
         this.chessCells = new ArrayList<>();
+        this.gameState = GameState.SelectPiece;
+        this.turnManager = new TurnManager();
     }
 
+    public void startGame(){
+        this.turnManager.startParty();
+        this.createBoard();
+    }
+
+    public void selectPiece(ChessPiece touched) {
+        this.gameState = GameState.SelectCase;
+        this.board3dManager.selectPiece(touched);
+    }
+
+    public void resetSelection() {
+        this.gameState = GameState.SelectPiece;
+        this.board3dManager.resetSelection();
+    }
+
+    public ArrayList<ChessModel> getPiecesModelsFromActualTurn(){
+        if( this.turnManager.getTurnColor() == ChessColor.BLACK){
+            return this.getBlackPieceModels();
+        }else {
+            return this.getWhitePieceModels();
+        }
+    }
+
+    public void movePieceIntoCell(ChessCell cell) {
+        this.board3dManager.moveSelectedPieceToLocation(cell.getLocation());
+    }
+
+    public void selectCell(ChessCell chessCell) {
+
+    }
 
     public void createBoard() {
        createCells();
-        createPieces();
+       createPieces();
     }
 
     private void createCells(){
@@ -48,10 +87,27 @@ public class BoardManager {
                 this.chessCells.add(cell);
             }
         }
-        this.board3dManager.createCells(this.chessCells);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Gdx.app.postRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        BoardManager.this.board3dManager.createCells(BoardManager.this.chessCells);
+                    }
+                });
+            }
+        }).start();
     }
 
     private void createPieces(){
+    this.createWhitePieces();
+    this.createBlackPieces();
+    this.board3dManager.createPieces(this.whitePieces);
+    this.board3dManager.createPieces(this.blackPieces);
+    }
+
+    private void createWhitePieces(){
         Knight whiteRightKnight = new Knight(new Location(6,0,0), ChessColor.WHITE);
         Knight whiteLeftKnight =  new Knight(new Location(1,0,0), ChessColor.WHITE);
         Bishop whiteRightBishop = new Bishop(new Location(5,0,0), ChessColor.WHITE);
@@ -72,7 +128,9 @@ public class BoardManager {
         this.whitePieces.add(whiteKing);
         this.whitePieces.add(whiteLeftRook);
         this.whitePieces.add(whiteRightRook);
+    }
 
+    private void createBlackPieces(){
         Knight blackRightKnight = new Knight(new Location(6,0,7), ChessColor.BLACK);
         Knight blackLeftKnight = new Knight(new Location(1,0,7), ChessColor.BLACK);
         Bishop blackLeftBishop = new Bishop(new Location(5,0,7), ChessColor.BLACK);
@@ -81,6 +139,7 @@ public class BoardManager {
         King blackKing = new King(new Location(3,0,7), ChessColor.BLACK);
         Rook blackLeftRook =  new Rook(new Location(7,0,7), ChessColor.BLACK);
         Rook blackRightRook =  new Rook(new Location(0,0,7), ChessColor.BLACK);
+
         for(int  i = 0 ; i < 8 ; i++){
             Pawn blackPawn = new Pawn(new Location(i,0,6),ChessColor.BLACK);
             this.blackPieces.add(blackPawn);
@@ -93,6 +152,54 @@ public class BoardManager {
         this.blackPieces.add(blackKing);
         this.blackPieces.add(blackLeftRook);
         this.blackPieces.add(blackRightRook);
+    }
 
+    public ArrayList<ChessModel> getBlackPieceModels() {
+        return this.board3dManager.getBlackPieceModels();
+    }
+
+    public ArrayList<ChessModel> getWhitePieceModels() {
+        return  this.board3dManager.getWhitePieceModels();
+    }
+
+    public ChessPiece getPieceFromLocation(Location location) {
+
+        ArrayList<ChessPiece> arrayList = null;
+        if(this.turnManager.getTurnColor() == ChessColor.BLACK){
+            arrayList = this.blackPieces;
+        }else{
+            arrayList = this.whitePieces;
+        }
+        for (ChessPiece piece : arrayList){
+            if(piece.getLocation().equals(location)){
+                return piece;
+            }
+        }
+      return null;
+    }
+
+    public ChessCell getCellFromLocation(Location location) {
+        for (ChessCell cell : this.chessCells){
+            if(cell.getLocation().equals(location)){
+                return cell;
+            }
+        }
+        return null;
+    }
+
+    public GameState getGameState() {
+        return gameState;
+    }
+
+    public void setGameState(GameState gameState) {
+        this.gameState = gameState;
+    }
+
+    public Board3dManager getBoard3dManager() {
+        return board3dManager;
+    }
+
+    public ArrayList<ChessModel> getChessCellModels() {
+        return this.board3dManager.getChessCellModels();
     }
 }
