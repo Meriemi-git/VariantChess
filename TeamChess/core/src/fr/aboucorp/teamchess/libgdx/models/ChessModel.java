@@ -1,30 +1,37 @@
 package fr.aboucorp.teamchess.libgdx.models;
 
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 
-import fr.aboucorp.entities.model.Location;
+import fr.aboucorp.teamchess.entities.model.Location;
 
 
 public abstract class ChessModel extends ModelInstance {
     private Location location;
     private Material originalMaterial;
     private BoundingBox boundingBox;
+    private Vector3 position = new Vector3();
 
     public ChessModel(Model model, Location location, Material originalMaterial) {
         super(model,location.getX(),location.getY(),location.getZ());
         this.originalMaterial = originalMaterial;
         this.materials.get(0).set(originalMaterial);
         this.location = location;
-        this.boundingBox = calculateBoundingBox(new BoundingBox()).mul(transform);
+        this.boundingBox = calculateBoundingBox(new BoundingBox());
     }
 
     public void move(Location location) {
         this.location = location;
         this.transform.setTranslation(new Vector3(location.getX(),location.getY(),location.getZ()));
+    }
+
+    protected boolean isVisible(final Camera cam, final ModelInstance instance) {
+        instance.transform.getTranslation(position);
+        return cam.frustum.pointInFrustum(position);
     }
 
     public Material getOriginalMaterial() {
@@ -37,5 +44,9 @@ public abstract class ChessModel extends ModelInstance {
 
     public BoundingBox getBoundingBox() {
         return boundingBox;
+    }
+
+    public void setBoundingBox(BoundingBox boundingBox) {
+        this.boundingBox = boundingBox;
     }
 }

@@ -3,7 +3,7 @@ package fr.aboucorp.teamchess.libgdx.utils;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import fr.aboucorp.entities.model.Location;
+import fr.aboucorp.teamchess.entities.model.Location;
 import fr.aboucorp.teamchess.libgdx.models.ChessModel;
 
 public class ChessModelList extends ArrayList<ChessModel> {

@@ -210,7 +210,7 @@ title __CORE's Class Diagram__\n
 
   namespace fr.aboucorp.teamchess.libgdx {
     namespace utils {
-      class fr.aboucorp.teamchess.libgdx.utils.ChessCellArray {
+      class fr.aboucorp.teamchess.libgdx.utils.ChessCellList {
       }
     }
   }
@@ -220,9 +220,9 @@ title __CORE's Class Diagram__\n
   fr.aboucorp.teamchess.libgdx.Board3dManager o-- fr.aboucorp.teamchess.libgdx.Material3dManager : materialManager
   fr.aboucorp.teamchess.libgdx.Board3dManager o-- fr.aboucorp.entities.model.ChessPiece : selectedPiece
   fr.aboucorp.teamchess.libgdx.Game3dManager -up-|> com.badlogic.gdx.ApplicationAdapter
-  fr.aboucorp.teamchess.libgdx.Game3dManager o-- fr.aboucorp.teamchess.libgdx.Board3dManager : boardManager
+  fr.aboucorp.teamchess.libgdx.Game3dManager o-- fr.aboucorp.teamchess.libgdx.Board3dManager : partyManager
   fr.aboucorp.teamchess.libgdx.models.ChessBoard3d -up-|> fr.aboucorp.generic.model.Board
-  fr.aboucorp.teamchess.libgdx.models.ChessBoard3d o-- fr.aboucorp.teamchess.libgdx.utils.ChessCellArray : chessCells
+  fr.aboucorp.teamchess.libgdx.models.ChessBoard3d o-- fr.aboucorp.teamchess.libgdx.utils.ChessCellList : chessCells
   fr.aboucorp.entities.model.ChessCell .up.|> fr.aboucorp.generic.model.Cell
   fr.aboucorp.entities.model.ChessCell -up-|> fr.aboucorp.teamchess.libgdx.models.ChessModel
   fr.aboucorp.entities.model.ChessCell o-- fr.aboucorp.generic.model.Location : location
@@ -246,7 +246,7 @@ title __CORE's Class Diagram__\n
   fr.aboucorp.entities.model.pieces.Queen -up-|> fr.aboucorp.entities.model.ChessPiece
   fr.aboucorp.entities.model.pieces.Rook .up.|> fr.aboucorp.entities.model.moves.RookMoveSet
   fr.aboucorp.entities.model.pieces.Rook -up-|> fr.aboucorp.entities.model.ChessPiece
-  fr.aboucorp.teamchess.libgdx.utils.ChessCellArray -up-|> java.util.ArrayList
+  fr.aboucorp.teamchess.libgdx.utils.ChessCellList -up-|> java.util.ArrayList
 
 
 right footer

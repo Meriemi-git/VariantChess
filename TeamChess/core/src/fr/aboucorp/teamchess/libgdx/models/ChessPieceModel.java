@@ -3,7 +3,7 @@ package fr.aboucorp.teamchess.libgdx.models;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
 
-import fr.aboucorp.entities.model.Location;
+import fr.aboucorp.teamchess.entities.model.Location;
 
 public class ChessPieceModel extends ChessModel {
 
