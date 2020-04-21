@@ -1,6 +1,6 @@
 package fr.aboucorp.teamchess.entities.model.events;
 
-public class GameEvent {
+public abstract class GameEvent {
     public String eventMessage;
 
     public GameEvent(String eventMessage) {

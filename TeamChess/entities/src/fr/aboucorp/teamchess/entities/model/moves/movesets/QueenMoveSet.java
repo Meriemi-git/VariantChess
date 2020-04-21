@@ -1,9 +1,9 @@
 package fr.aboucorp.teamchess.entities.model.moves.movesets;
 
 import fr.aboucorp.teamchess.entities.model.Board;
-import fr.aboucorp.teamchess.entities.model.ChessCell;
+import fr.aboucorp.teamchess.entities.model.ChessColor;
 import fr.aboucorp.teamchess.entities.model.ChessPiece;
-import fr.aboucorp.teamchess.entities.model.utils.ChessList;
+import fr.aboucorp.teamchess.entities.model.utils.ChessCellList;
 
 public class QueenMoveSet extends AbstractMoveSet {
 
@@ -16,10 +16,10 @@ public class QueenMoveSet extends AbstractMoveSet {
     }
 
     @Override
-    public ChessList<ChessCell> getMoves(ChessPiece piece, Board board) {
-        ChessList<ChessCell> cells = new  ChessList<ChessCell>();
-        ChessList<ChessCell> rookMoves  = rookMoveSet.getMoves(piece,board);
-        ChessList<ChessCell> bishopMoves = bishopMoveSet.getMoves(piece, board);
+    public ChessCellList getMoves(ChessPiece piece, Board board, ChessColor turnColor) {
+        ChessCellList cells = new  ChessCellList();
+        ChessCellList rookMoves  = rookMoveSet.getMoves(piece,board,turnColor);
+        ChessCellList bishopMoves = bishopMoveSet.getMoves(piece, board,turnColor);
         if(rookMoves != null){
             cells.addAll(rookMoves);
         }

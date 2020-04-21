@@ -6,10 +6,11 @@ import java.util.List;
 public class Team {
     private String name;
     private List<Player> players;
-    private fr.aboucorp.teamchess.entities.model.ChessColor chessColor;
+    private final ChessColor chessColor;
 
-    public Team(String name) {
+    public Team(String name,ChessColor color) {
         this.name = name;
+        this.chessColor = color;
     }
 
     public String getName() {
@@ -30,9 +31,5 @@ public class Team {
 
     public fr.aboucorp.teamchess.entities.model.ChessColor getChessColor() {
         return chessColor;
-    }
-
-    public void setChessColor(ChessColor chessColor) {
-        this.chessColor = chessColor;
     }
 }

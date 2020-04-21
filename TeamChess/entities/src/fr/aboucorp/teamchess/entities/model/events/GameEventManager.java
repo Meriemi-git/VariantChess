@@ -5,16 +5,16 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
-public class ChessEventManager {
-    private static ChessEventManager INSTANCE;
+public class GameEventManager {
+    private static GameEventManager INSTANCE;
     private static Hashtable<Class, List<GameEventSubscriber>> SUBSCRIBERS;
-    private ChessEventManager(){
+    private GameEventManager(){
 
     }
 
-    public static ChessEventManager getINSTANCE() {
+    public static GameEventManager getINSTANCE() {
         if(INSTANCE == null){
-            INSTANCE = new ChessEventManager();
+            INSTANCE = new GameEventManager();
             SUBSCRIBERS = new Hashtable<Class, List<GameEventSubscriber>>();
         }
         return INSTANCE;

@@ -2,7 +2,7 @@ package fr.aboucorp.teamchess.entities.model;
 
 public class Turn {
     private int turnNumber;
-    private fr.aboucorp.teamchess.entities.model.Team team;
+    private Team team;
 
     public Turn(int turnNumber, fr.aboucorp.teamchess.entities.model.Team team) {
         this.turnNumber = turnNumber;
@@ -23,5 +23,9 @@ public class Turn {
 
     public void setTeam(Team team) {
         this.team = team;
+    }
+
+    public ChessColor getTurnColor(){
+        return this.team.getChessColor();
     }
 }

@@ -8,9 +8,10 @@ import fr.aboucorp.teamchess.entities.model.ChessCell;
 import fr.aboucorp.teamchess.entities.model.ChessColor;
 import fr.aboucorp.teamchess.entities.model.ChessPiece;
 import fr.aboucorp.teamchess.entities.model.Location;
+import fr.aboucorp.teamchess.entities.model.Team;
 import fr.aboucorp.teamchess.entities.model.enums.GameState;
-import fr.aboucorp.teamchess.entities.model.events.ChessEventManager;
 import fr.aboucorp.teamchess.entities.model.events.GameEvent;
+import fr.aboucorp.teamchess.entities.model.events.GameEventManager;
 import fr.aboucorp.teamchess.entities.model.events.GameEventSubscriber;
 import fr.aboucorp.teamchess.entities.model.events.PartyEvent;
 import fr.aboucorp.teamchess.libgdx.models.ChessModel;
@@ -20,21 +21,23 @@ public class PartyManager implements GameEventSubscriber {
     private final BoardManager boardManager;
     private GameState gameState;
     private final TurnManager turnManager;
-    private ChessEventManager eventManager;
+    private GameEventManager eventManager;
 
 
 
     public PartyManager(BoardManager boardManager) {
+        Team white = new Team("white",ChessColor.WHITE);
+        Team black = new Team("white",ChessColor.BLACK);
         this.boardManager = boardManager;
         this.gameState = GameState.SelectPiece;
-        this.turnManager = new TurnManager();
-        this.eventManager = ChessEventManager.getINSTANCE();
+        this.turnManager = new TurnManager(white,black);
+        this.eventManager = GameEventManager.getINSTANCE();
         this.eventManager.subscribe(PartyEvent.class,this);
     }
 
     public void startGame(){
-        this.turnManager.startParty();
         this.boardManager.createBoard();
+        this.turnManager.nextTurn();
     }
 
 
@@ -57,7 +60,7 @@ public class PartyManager implements GameEventSubscriber {
     }
 
     public void selectCell(ChessCell chessCell) {
-        this.boardManager.selectCell(chessCell);
+        this.boardManager.moveSelectedPieceToCell(chessCell);
     }
 
 
@@ -97,5 +100,9 @@ public class PartyManager implements GameEventSubscriber {
 
     public BoardManager getBoardManager() {
         return boardManager;
+    }
+
+    public ArrayList<ChessModel> getPossibleCellModels() {
+        return this.boardManager.getPossibleCellModels();
     }
 }

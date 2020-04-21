@@ -7,18 +7,19 @@ import fr.aboucorp.teamchess.entities.model.pieces.Knight;
 import fr.aboucorp.teamchess.entities.model.pieces.Pawn;
 import fr.aboucorp.teamchess.entities.model.pieces.Queen;
 import fr.aboucorp.teamchess.entities.model.pieces.Rook;
-import fr.aboucorp.teamchess.entities.model.utils.ChessList;
+import fr.aboucorp.teamchess.entities.model.utils.ChessCellList;
+import fr.aboucorp.teamchess.entities.model.utils.ChessPieceList;
 
 public class Board {
 
-    private ChessList<ChessCell> chessCells;
-    private ChessList<ChessPiece> blackPieces;
-    private ChessList<ChessPiece> whitePieces;
+    private ChessCellList chessCells;
+    private ChessPieceList blackPieces;
+    private ChessPieceList whitePieces;
 
     public Board(){
-        this.chessCells = new ChessList<ChessCell>();
-        this.blackPieces = new ChessList<ChessPiece>();
-        this.whitePieces = new ChessList<ChessPiece>();
+        this.chessCells = new ChessCellList();
+        this.blackPieces = new ChessPieceList();
+        this.whitePieces = new ChessPieceList();
     }
 
 
@@ -99,15 +100,15 @@ public class Board {
         return false;
     }
 
-    public ChessList<ChessCell> getChessCells() {
+    public ChessCellList getChessCells() {
         return chessCells;
     }
 
-    public ChessList<ChessPiece> getBlackPieces() {
+    public ChessPieceList getBlackPieces() {
         return blackPieces;
     }
 
-    public ChessList<ChessPiece> getWhitePieces() {
+    public ChessPieceList getWhitePieces() {
         return whitePieces;
     }
 }

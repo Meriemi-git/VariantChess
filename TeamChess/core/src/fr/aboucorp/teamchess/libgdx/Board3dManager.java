@@ -6,7 +6,6 @@ import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
-import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
@@ -44,6 +43,7 @@ import fr.aboucorp.teamchess.entities.model.pieces.Knight;
 import fr.aboucorp.teamchess.entities.model.pieces.Pawn;
 import fr.aboucorp.teamchess.entities.model.pieces.Queen;
 import fr.aboucorp.teamchess.entities.model.pieces.Rook;
+import fr.aboucorp.teamchess.entities.model.utils.ChessCellList;
 import fr.aboucorp.teamchess.libgdx.models.ChessCellModel;
 import fr.aboucorp.teamchess.libgdx.models.ChessModel;
 import fr.aboucorp.teamchess.libgdx.models.pieces.BishopModel;
@@ -127,13 +127,19 @@ public class Board3dManager extends ApplicationAdapter {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         this.modelBatch.begin(camera);
         for (ChessModel cellModel : this.chessCellModels) {
-            modelBatch.render(cellModel, this.environment);
+            if(cellModel.isVisible(this.camera)){
+                modelBatch.render(cellModel, this.environment);
+            }
         }
         for (ChessModel piece : this.whitePieceModels) {
-            modelBatch.render(piece, this.environment);
+            if(piece.isVisible(this.camera)) {
+                modelBatch.render(piece, this.environment);
+            }
         }
         for (ChessModel piece : this.blackPieceModels) {
+            if(piece.isVisible(this.camera)){
             modelBatch.render(piece, this.environment);
+            }
         }
         for (ModelInstance stuff : this.devStuff) {
             modelBatch.render(stuff, this.environment);
@@ -285,10 +291,6 @@ public class Board3dManager extends ApplicationAdapter {
         this.devStuff.add(new ModelInstance(arrowZ));
     }
 
-    public void moveSelectedModelToLocation(Location location) {
-        this.selectedModel.move(location);
-    }
-
     public void selectPiece(ChessPiece touched) {
         if(this.selectedModel != null){
             this.material3dManager.resetMaterial(this.selectedModel);
@@ -315,13 +317,6 @@ public class Board3dManager extends ApplicationAdapter {
         }
     }
 
-    protected boolean isVisible(final Camera cam, final ChessModel model) {
-        Vector3 position = new Vector3();
-        model.transform.getTranslation(position);
-        position.add(model.getCenter());
-        return cam.frustum.boundsInFrustum(position, model.getDimensions());
-    }
-
     public ChessModelList getWhitePieceModels() {
         return whitePieceModels;
     }
@@ -330,7 +325,7 @@ public class Board3dManager extends ApplicationAdapter {
         return blackPieceModels;
     }
 
-    public ArrayList<ChessModel> getChessCellModels() {
+    public ChessModelList getChessCellModels() {
         return this.chessCellModels;
     }
 
@@ -370,11 +365,39 @@ public class Board3dManager extends ApplicationAdapter {
         this.androidListener = androidListener;
     }
 
-    public void movePieceIntoCell(ChessCell cell) {
-        this.moveSelectedModelToLocation(cell.getLocation());
+    public void moveSelectedPieceIntoCell(ChessCell cell) {
+        this.selectedModel.move(cell.getLocation());
     }
 
     public void highlightedCellFromLocation(Location location) {
         this.material3dManager.setSelectedMaterial(this.chessCellModels.getByLocation(location));
+    }
+
+    public void moveToCell(ChessPiece piece, ChessCell cell) {
+        if(piece.getChessColor() == ChessColor.WHITE){
+            this.getWhitePieceModels().getByLocation(piece.getLocation()).move(cell.getLocation());
+        }else{
+            this.getBlackPieceModels().getByLocation(piece.getLocation()).move(cell.getLocation());
+        }
+    }
+
+    public ArrayList<ChessModel> getCellModelsFromPossibleMoves(ChessCellList possiblesMoves) {
+        ArrayList<ChessModel> possibleCells = new ArrayList<>();
+        if(possiblesMoves  != null) {
+            for (ChessModel cellModel : getChessCellModels()) {
+                for (ChessCell cell : possiblesMoves) {
+                    if (cellModel.getLocation().equals(cell.getLocation())) {
+                        possibleCells.add(cellModel);
+                    }
+                }
+            }
+        }
+        return possibleCells;
+    }
+
+    public void resetHighlitedCells(ChessCellList possiblesMoves) {
+        for (ChessCell cell: possiblesMoves) {
+            this.material3dManager.resetMaterial(getChessCellModels().getByLocation(cell.getLocation()));
+        }
     }
 }

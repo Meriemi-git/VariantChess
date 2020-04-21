@@ -28,4 +28,9 @@ public class ChessCell extends GameElement {
     public String getCellLabel() {
         return cellLabel;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof ChessCell && ((ChessCell) obj).getLocation().equals(getLocation());
+    }
 }

@@ -1,10 +1,10 @@
 package fr.aboucorp.teamchess.entities.model.moves.movesets;
 
 import fr.aboucorp.teamchess.entities.model.Board;
-import fr.aboucorp.teamchess.entities.model.ChessCell;
+import fr.aboucorp.teamchess.entities.model.ChessColor;
 import fr.aboucorp.teamchess.entities.model.ChessPiece;
-import fr.aboucorp.teamchess.entities.model.utils.ChessList;
+import fr.aboucorp.teamchess.entities.model.utils.ChessCellList;
 
 public abstract class AbstractMoveSet {
-    public abstract ChessList<ChessCell> getMoves(ChessPiece piece, Board board);
+    public abstract ChessCellList getMoves(ChessPiece piece, Board board, ChessColor turnColor);
 }

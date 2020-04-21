@@ -1,5 +1,6 @@
 package fr.aboucorp.teamchess.libgdx.models;
 
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
@@ -29,6 +30,13 @@ public abstract class ChessModel extends ModelInstance {
     public void move(Location location) {
         this.location = location;
         this.transform.setTranslation(new Vector3(location.getX(),location.getY(),location.getZ()));
+    }
+
+    public boolean isVisible(final Camera cam) {
+        Vector3 position = new Vector3();
+        transform.getTranslation(position);
+        position.add(this.center);
+        return cam.frustum.boundsInFrustum(position,this.dimensions);
     }
 
 

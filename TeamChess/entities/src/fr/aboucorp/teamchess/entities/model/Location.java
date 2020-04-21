@@ -2,9 +2,9 @@ package fr.aboucorp.teamchess.entities.model;
 
 public class Location {
 
-    private int x;
-    private int y;
-    private int z;
+    private final int x;
+    private final int y;
+    private final int z;
 
     public Location(int x, int y, int z) {
         this.x = x;
@@ -21,23 +21,14 @@ public class Location {
         return x;
     }
 
-    public void setX(int x) {
-        this.x = x;
-    }
 
     public int getY() {
         return y;
     }
 
-    public void setY(int y) {
-        this.y = y;
-    }
 
     public int getZ() {
         return z;
     }
 
-    public void setZ(int z) {
-        this.z = z;
-    }
 }

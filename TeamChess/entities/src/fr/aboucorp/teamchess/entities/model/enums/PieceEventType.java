@@ -4,6 +4,6 @@ public enum PieceEventType {
     MOVE,
     DEATH,
     EAT,
-    CASTLING_RIGHT,
-    CASTLING_LEFT
+    LITTLE_CASTLING,
+    BIG_CASTLING
 }

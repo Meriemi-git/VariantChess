@@ -41,7 +41,7 @@ public class GDXGestureListener implements GestureDetector.GestureListener {
                         this.partyManager.selectPiece(otherTouchedPiece);
                     }
                 } else {
-                    ChessModel cellModel = touchedModelFinder.getTouchedModel(screenX, screenY, this.partyManager.getChessCellModels());
+                    ChessModel cellModel = touchedModelFinder.getTouchedModel(screenX, screenY, this.partyManager.getPossibleCellModels());
                     if(cellModel != null) {
                         ChessCell chessCell = this.partyManager.getCellFromLocation(cellModel.getLocation());
                         if (chessCell != null) {

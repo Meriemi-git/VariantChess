@@ -7,101 +7,109 @@ import fr.aboucorp.teamchess.entities.model.ChessPiece;
 import fr.aboucorp.teamchess.entities.model.Location;
 import fr.aboucorp.teamchess.entities.model.enums.PieceEventType;
 import fr.aboucorp.teamchess.entities.model.enums.PieceId;
-import fr.aboucorp.teamchess.entities.model.events.ChessEventManager;
 import fr.aboucorp.teamchess.entities.model.events.GameEvent;
+import fr.aboucorp.teamchess.entities.model.events.GameEventManager;
 import fr.aboucorp.teamchess.entities.model.events.GameEventSubscriber;
 import fr.aboucorp.teamchess.entities.model.events.PieceEvent;
+import fr.aboucorp.teamchess.entities.model.utils.ChessCellList;
 import fr.aboucorp.teamchess.entities.model.utils.ChessList;
 
 public class KingMoveSet extends AbstractMoveSet implements GameEventSubscriber {
 
-    private ChessEventManager eventManager;
-    private boolean kingFirstMove = true;
-    private boolean rookLeftFirstMove = true;
-    private boolean rookRightFirstMove = true;
+    private GameEventManager eventManager;
 
     public KingMoveSet() {
-        this.eventManager =  ChessEventManager.getINSTANCE();
-        this.eventManager.subscribe(PieceEvent.class,this);
+        this.eventManager =  GameEventManager.getINSTANCE();
     }
 
     @Override
-    public  ChessList<ChessCell> getMoves(ChessPiece piece, Board board) {
-        ChessList<ChessCell> validCells = getClassicMoves(piece, board);
-        if(piece.getChessColor() == ChessColor.WHITE) {
-            if(kingFirstMove && rookLeftFirstMove && isPossibleLittleCastling(piece, board)) {
-                Location g1 = new Location(5,0,0);
-                validCells.add((ChessCell) board.getChessCells().getItemByLocation(g1));
-            }
-            if(kingFirstMove && rookRightFirstMove && isPossibleBigCastling(piece, board)) {
-                Location c1 = new Location(1,0,0);
-                validCells.add((ChessCell) board.getChessCells().getItemByLocation(c1));
-            }
-        }else {
-            if(kingFirstMove && rookRightFirstMove && isPossibleLittleCastling(piece, board)) {
-                Location g8 = new Location(1,0,7);
-                validCells.add((ChessCell) board.getChessCells().getItemByLocation(g8));
-            }
-            if(kingFirstMove && rookLeftFirstMove && isPossibleBigCastling(piece, board)) {
-                Location c8 = new Location(5,0,7);
-                validCells.add((ChessCell) board.getChessCells().getItemByLocation(c8));
+    public ChessCellList getMoves(ChessPiece piece, Board board, ChessColor turnColor) {
+        ChessCellList validCells = getClassicMoves(piece, board,turnColor);
+        if(piece.getChessColor() == turnColor) {
+            if (turnColor == ChessColor.WHITE) {
+                if (board.getWhitePieces().getPieceById(PieceId.WK).isFirstMove()
+                        && board.getWhitePieces().getPieceById(PieceId.WLR).isFirstMove()
+                        && isPossibleBigCastling( board,turnColor)) {
+                    validCells.add(board.getChessCells().getChessCellByLabel("C1"));
+                    this.eventManager.sendMessage(new PieceEvent("Waiting for littleCastle", PieceEventType.BIG_CASTLING,piece));
+                }
+                if (board.getWhitePieces().getPieceById(PieceId.WK).isFirstMove()
+                        && board.getWhitePieces().getPieceById(PieceId.WRR).isFirstMove()
+                        && isPossibleLittleCastling( board,turnColor)) {
+                    validCells.add(board.getChessCells().getChessCellByLabel("G1"));
+                    this.eventManager.sendMessage(new PieceEvent("Waiting for bigCastle", PieceEventType.LITTLE_CASTLING,piece));
+
+                }
+            } else {
+                if (board.getWhitePieces().getPieceById(PieceId.BK).isFirstMove()
+                        && board.getWhitePieces().getPieceById(PieceId.BRR).isFirstMove()
+                        && isPossibleBigCastling( board,turnColor)) {
+                    validCells.add( board.getChessCells().getChessCellByLabel("C8"));
+                    this.eventManager.sendMessage(new PieceEvent("Waiting for littleCastle", PieceEventType.BIG_CASTLING,piece));
+                }
+                if (board.getWhitePieces().getPieceById(PieceId.BK).isFirstMove()
+                        && board.getWhitePieces().getPieceById(PieceId.BLR).isFirstMove()
+                        && isPossibleLittleCastling( board,turnColor)) {
+                    validCells.add( board.getChessCells().getChessCellByLabel("G8"));
+                    this.eventManager.sendMessage(new PieceEvent("Waiting for littleCastle", PieceEventType.LITTLE_CASTLING,piece));
+                }
             }
         }
         return validCells;
     }
 
-    private boolean isPossibleLittleCastling(ChessPiece piece, Board board) {
-        if(piece.getChessColor() == ChessColor.WHITE){
-            ChessCell b8 = new ChessCell(new Location(6,0,0),ChessColor.WHITE);
-            ChessCell c8 = new ChessCell(new Location(5,0,0),ChessColor.WHITE);
-            ChessCell d8 = new ChessCell(new Location(4,0,0),ChessColor.WHITE);
-            return board.isCellFree(b8)
-                    && board.isCellFree(c8)
-                    && board.isCellFree(d8)
-                    && isLocationSafe(b8,board,piece.getChessColor())
-                    && isLocationSafe(c8,board,piece.getChessColor())
-                    && isLocationSafe(d8,board,piece.getChessColor());
+    private boolean isPossibleBigCastling(Board board, ChessColor turnColor) {
+        if(turnColor == ChessColor.WHITE){
+            ChessCell b1 = board.getChessCells().getChessCellByLabel("B1");
+            ChessCell c1 = board.getChessCells().getChessCellByLabel("C1");
+            ChessCell d1 = board.getChessCells().getChessCellByLabel("D1");
+            return  b1.getPiece() == null
+                    && c1.getPiece() == null
+                    && d1.getPiece() == null
+                    && isLocationSafe(b1,board,turnColor)
+                    && isLocationSafe(c1,board,turnColor)
+                    && isLocationSafe(d1,board,turnColor);
         }else{
-            ChessCell b1 = new ChessCell(new Location(6,0,0),ChessColor.BLACK);
-            ChessCell c1 = new ChessCell(new Location(5,0,0),ChessColor.BLACK);
-            ChessCell d1 = new ChessCell(new Location(4,0,0),ChessColor.BLACK);
-            return board.isCellFree(b1)
-                    && board.isCellFree(c1)
-                    && board.isCellFree(d1)
-                    && isLocationSafe(b1,board,piece.getChessColor())
-                    && isLocationSafe(c1,board,piece.getChessColor())
-                    && isLocationSafe(d1,board,piece.getChessColor());
+            ChessCell b8 = board.getChessCells().getChessCellByLabel("B8");
+            ChessCell c8 = board.getChessCells().getChessCellByLabel("C8");
+            ChessCell d8 = board.getChessCells().getChessCellByLabel("D8");
+            return b8.getPiece() == null
+                    && c8.getPiece() == null
+                    && d8.getPiece() == null
+                    && isLocationSafe(b8,board,turnColor)
+                    && isLocationSafe(c8,board,turnColor)
+                    && isLocationSafe(d8,board,turnColor);
         }
     }
 
 
-    private boolean isPossibleBigCastling(ChessPiece piece, Board board) {
-        if(piece.getChessColor() == ChessColor.WHITE){
-            ChessCell f8 = new ChessCell(new Location(2,0,0),ChessColor.WHITE);
-            ChessCell g8 = new ChessCell(new Location(1,0,0),ChessColor.WHITE);
+    private boolean isPossibleLittleCastling(Board board, ChessColor turnColor) {
+        if(turnColor == ChessColor.WHITE){
+            ChessCell f1 = board.getChessCells().getChessCellByLabel("F1");
+            ChessCell g1 = board.getChessCells().getChessCellByLabel("G1");
+            return f1.getPiece() == null
+                    && g1.getPiece() == null
+                    && isLocationSafe(f1,board,turnColor)
+                    && isLocationSafe(g1,board,turnColor);
+        }else{
+            ChessCell f8 = board.getChessCells().getChessCellByLabel("F8");
+            ChessCell g8 = board.getChessCells().getChessCellByLabel("G8");
             return board.isCellFree(f8)
                     && board.isCellFree(g8)
-                    && isLocationSafe(f8,board,piece.getChessColor())
-                    && isLocationSafe(g8,board,piece.getChessColor());
-        }else{
-            ChessCell f1 = new ChessCell(new Location(2,0,7),ChessColor.BLACK);
-            ChessCell g1 = new ChessCell(new Location(1,0,7),ChessColor.BLACK);
-            return board.isCellFree(f1)
-                    && board.isCellFree(g1)
-                    && isLocationSafe(f1,board,piece.getChessColor())
-                    && isLocationSafe(g1,board,piece.getChessColor());
+                    && isLocationSafe(f8,board,turnColor)
+                    && isLocationSafe(g8,board,turnColor);
         }
     }
 
-    private boolean isLocationSafe(ChessCell cell,Board board,ChessColor color) {
+    private boolean isLocationSafe(ChessCell cell,Board board,ChessColor turnColor) {
         ChessList<ChessPiece> pieces;
-        if(color == ChessColor.BLACK) {
+        if(turnColor == ChessColor.BLACK) {
             pieces = board.getWhitePieces();
         }else {
             pieces = board.getBlackPieces();
         }
         for (ChessPiece piece: pieces) {
-            ChessList<ChessCell> cells = piece.getNextMoves(piece,board);
+            ChessList<ChessCell> cells = piece.getNextMoves(piece,board,turnColor);
             if(cells != null && cells.getItemByLocation(cell.getLocation()) != null){
                 return false;
             }
@@ -110,40 +118,40 @@ public class KingMoveSet extends AbstractMoveSet implements GameEventSubscriber 
     }
 
 
-    public  ChessList<ChessCell> getClassicMoves(ChessPiece piece, Board board){
-        ChessList<ChessCell> allCells = board.getChessCells();
-        ChessList<ChessCell> validCells = new  ChessList<ChessCell>();
+    public  ChessCellList getClassicMoves(ChessPiece piece, Board board,ChessColor turnColor){
+        ChessCellList allCells = board.getChessCells();
+        ChessCellList validCells = new ChessCellList();
         Location start = piece.getLocation();
         ChessCell up = (ChessCell) allCells.getItemByLocation(new Location(start.getX()+1,0,start.getZ()));
-        if(up != null && up.getPiece() == null){
+        if(up != null && up.getPiece() == null && isLocationSafe(up,board,turnColor)){
             validCells.add(up);
         }
         ChessCell  upRight = (ChessCell) allCells.getItemByLocation(new Location(start.getX()+1,0,start.getZ()-1));
-        if(upRight != null && upRight.getPiece() == null){
+        if(upRight != null && upRight.getPiece() == null && isLocationSafe(upRight,board,turnColor)){
             validCells.add(upRight);
         }
         ChessCell  upLeft = (ChessCell) allCells.getItemByLocation(new Location(start.getX()+1,0,start.getZ()+1));
-        if(upLeft != null && upLeft.getPiece() == null){
+        if(upLeft != null && upLeft.getPiece() == null && isLocationSafe(upLeft,board,turnColor)){
             validCells.add(upLeft);
         }
         ChessCell down = (ChessCell) allCells.getItemByLocation(new Location(start.getX()-1,0,start.getZ()));
-        if(down != null && down.getPiece() == null){
+        if(down != null && down.getPiece() == null && isLocationSafe(down,board,turnColor)){
             validCells.add(down);
         }
         ChessCell  downLeft = (ChessCell) allCells.getItemByLocation(new Location(start.getX()-1,0,start.getZ()+1));
-        if(downLeft != null && downLeft.getPiece() == null){
+        if(downLeft != null && downLeft.getPiece() == null && isLocationSafe(downLeft,board,turnColor)) {
             validCells.add(downLeft);
         }
         ChessCell  downRight = (ChessCell) allCells.getItemByLocation(new Location(start.getX()-1,0,start.getZ()-1));
-        if(downRight != null && downRight.getPiece() == null){
+        if(downRight != null && downRight.getPiece() == null && isLocationSafe(downRight,board,turnColor)){
             validCells.add(downRight);
         }
         ChessCell  left = (ChessCell) allCells.getItemByLocation(new Location(start.getX(),0,start.getZ()+1));
-        if(left != null && left.getPiece() == null){
+        if(left != null && left.getPiece() == null && isLocationSafe(left,board,turnColor)){
             validCells.add(left);
         }
         ChessCell  right = (ChessCell) allCells.getItemByLocation(new Location(start.getX(),0,start.getZ()-1));
-        if(right != null && right.getPiece() == null){
+        if(right != null && right.getPiece() == null && isLocationSafe(right,board,turnColor)){
             validCells.add(right);
         }
         return validCells;
@@ -151,30 +159,6 @@ public class KingMoveSet extends AbstractMoveSet implements GameEventSubscriber 
 
     @Override
     public void receiveGameEvent(GameEvent event) {
-        if(event instanceof PieceEvent && ((PieceEvent) event).type == PieceEventType.MOVE){
-            ChessPiece movedPiece =  ((PieceEvent) event).pieceConcerned;
-            if(movedPiece.getChessColor() == ChessColor.BLACK){
-                if(kingFirstMove){
-                    this.kingFirstMove = !(movedPiece.getPieceId() == PieceId.BK);
-                }
-                if(rookLeftFirstMove){
-                    this.rookLeftFirstMove = !(movedPiece.getPieceId() == PieceId.BLR);
-                }
-                if(this.rookRightFirstMove) {
-                    this.rookRightFirstMove = !(movedPiece.getPieceId() == PieceId.BRR);
-                }
-            }else{
-                if(kingFirstMove){
-                    this.kingFirstMove = !(movedPiece.getPieceId() == PieceId.WK);
-                }
-                if(rookLeftFirstMove){
-                    this.rookLeftFirstMove = !(movedPiece.getPieceId() == PieceId.WLR);
-                }
-                if(this.rookRightFirstMove) {
-                    this.rookRightFirstMove = !(movedPiece.getPieceId() == PieceId.WRR);
-                }
 
-            }
-        }
     }
 }
