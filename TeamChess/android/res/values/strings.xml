@@ -3,5 +3,6 @@
 
     <string name="app_name">TeamChess</string>
     <string name="btn_launch_game">Launch</string>
+    <string name="btn_end_turn">End turn</string>
 
 </resources>

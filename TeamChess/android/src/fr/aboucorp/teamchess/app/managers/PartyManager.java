@@ -40,7 +40,13 @@ public class PartyManager implements GameEventSubscriber {
         this.turnManager.nextTurn();
     }
 
+    public void endTurn() {
+        this.turnManager.nextTurn();
+    }
 
+    public String getPartyInfos(){
+        return this.turnManager.getTurnColor().name();
+    }
     public void selectPiece(ChessPiece touched) {
         this.gameState = GameState.SelectCase;
         this.boardManager.selectPiece(touched);
@@ -105,4 +111,5 @@ public class PartyManager implements GameEventSubscriber {
     public ArrayList<ChessModel> getPossibleCellModels() {
         return this.boardManager.getPossibleCellModels();
     }
+
 }

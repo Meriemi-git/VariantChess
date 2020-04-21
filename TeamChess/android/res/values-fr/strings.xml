@@ -2,4 +2,5 @@
 <resources>
     <string name="app_name">TeamChess</string>
     <string name="btn_launch_game">Démarrer</string>
+    <string name="btn_end_turn">Fin du tour</string>
 </resources>
