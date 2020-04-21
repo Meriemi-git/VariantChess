@@ -30,11 +30,11 @@ public class KingMoveSet extends AbstractMoveSet implements GameEventSubscriber 
         ChessList<ChessCell> validCells = getClassicMoves(piece, board);
         if(piece.getChessColor() == ChessColor.WHITE) {
             if(kingFirstMove && rookLeftFirstMove && isPossibleLittleCastling(piece, board)) {
-                Location g1 = new Location(1,0,0);
+                Location g1 = new Location(5,0,0);
                 validCells.add((ChessCell) board.getChessCells().getItemByLocation(g1));
             }
             if(kingFirstMove && rookRightFirstMove && isPossibleBigCastling(piece, board)) {
-                Location c1 = new Location(5,0,0);
+                Location c1 = new Location(1,0,0);
                 validCells.add((ChessCell) board.getChessCells().getItemByLocation(c1));
             }
         }else {

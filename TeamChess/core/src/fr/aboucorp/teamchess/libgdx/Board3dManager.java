@@ -6,6 +6,7 @@ import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
@@ -112,7 +113,7 @@ public class Board3dManager extends ApplicationAdapter {
         this.loadModels();
         font = new BitmapFont();
         font.setColor(Color.RED);
-        createAxis();
+        //createAxis();
     }
 
     @Override
@@ -153,7 +154,6 @@ public class Board3dManager extends ApplicationAdapter {
             spriteBatch.setProjectionMatrix(tmpMat4.set(camera.combined).mul(textTransform));
             font.draw(spriteBatch, ((ChessCellModel)cellModel).getLabel(), 0, 0);
         }
-
         spriteBatch.end();
 
     }
@@ -313,6 +313,13 @@ public class Board3dManager extends ApplicationAdapter {
             ChessModel cell = iter.next();
             this.material3dManager.resetMaterial(cell);
         }
+    }
+
+    protected boolean isVisible(final Camera cam, final ChessModel model) {
+        Vector3 position = new Vector3();
+        model.transform.getTranslation(position);
+        position.add(model.getCenter());
+        return cam.frustum.boundsInFrustum(position, model.getDimensions());
     }
 
     public ChessModelList getWhitePieceModels() {

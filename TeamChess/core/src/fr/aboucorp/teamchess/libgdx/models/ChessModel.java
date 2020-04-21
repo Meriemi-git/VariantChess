@@ -1,6 +1,5 @@
 package fr.aboucorp.teamchess.libgdx.models;
 
-import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
@@ -13,15 +12,18 @@ import fr.aboucorp.teamchess.entities.model.Location;
 public abstract class ChessModel extends ModelInstance {
     private Location location;
     private Material originalMaterial;
-    private BoundingBox boundingBox;
-    private Vector3 position = new Vector3();
+    private BoundingBox boundingBox = new BoundingBox();
+    private Vector3 center = new Vector3();
+    private Vector3 dimensions = new Vector3();
 
     public ChessModel(Model model, Location location, Material originalMaterial) {
         super(model,location.getX(),location.getY(),location.getZ());
         this.originalMaterial = originalMaterial;
         this.materials.get(0).set(originalMaterial);
         this.location = location;
-        this.boundingBox = calculateBoundingBox(new BoundingBox());
+        calculateBoundingBox(boundingBox);
+        this.boundingBox.getCenter(center);
+        this.boundingBox.getDimensions(dimensions);
     }
 
     public void move(Location location) {
@@ -29,10 +31,6 @@ public abstract class ChessModel extends ModelInstance {
         this.transform.setTranslation(new Vector3(location.getX(),location.getY(),location.getZ()));
     }
 
-    protected boolean isVisible(final Camera cam, final ModelInstance instance) {
-        instance.transform.getTranslation(position);
-        return cam.frustum.pointInFrustum(position);
-    }
 
     public Material getOriginalMaterial() {
         return originalMaterial;
@@ -48,5 +46,13 @@ public abstract class ChessModel extends ModelInstance {
 
     public void setBoundingBox(BoundingBox boundingBox) {
         this.boundingBox = boundingBox;
+    }
+
+    public Vector3 getCenter() {
+        return center;
+    }
+
+    public Vector3 getDimensions() {
+        return dimensions;
     }
 }
