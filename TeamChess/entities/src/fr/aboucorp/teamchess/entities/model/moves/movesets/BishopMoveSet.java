@@ -10,7 +10,7 @@ import fr.aboucorp.teamchess.entities.model.utils.ChessCellList;
 public class BishopMoveSet extends AbstractMoveSet{
 
     @Override
-    public ChessCellList getMoves(ChessPiece piece, Board board, ChessColor turnColor) {
+    public ChessCellList getPossibleMoves(ChessPiece piece, Board board, ChessColor turnColor) {
         ChessCellList allCells = board.getChessCells();
         ChessCellList validCells = new  ChessCellList();
         Location start = piece.getLocation();
@@ -63,5 +63,10 @@ public class BishopMoveSet extends AbstractMoveSet{
             }
         }
         return validCells;
+    }
+
+    @Override
+    public ChessCellList getThreats(ChessPiece piece, Board board, ChessColor turnColor) {
+        return getPossibleMoves(piece, board, turnColor);
     }
 }

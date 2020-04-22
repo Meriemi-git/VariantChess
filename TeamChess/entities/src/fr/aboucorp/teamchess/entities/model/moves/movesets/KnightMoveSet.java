@@ -9,7 +9,7 @@ import fr.aboucorp.teamchess.entities.model.utils.ChessCellList;
 
 public class KnightMoveSet extends AbstractMoveSet {
     @Override
-    public ChessCellList getMoves(ChessPiece piece, Board board, ChessColor turnColor) {
+    public ChessCellList getPossibleMoves(ChessPiece piece, Board board, ChessColor turnColor) {
         ChessCellList validCells = new ChessCellList();
         Location start = piece.getLocation();
 
@@ -45,5 +45,10 @@ public class KnightMoveSet extends AbstractMoveSet {
             }
         }
         return  validCells;
+    }
+
+    @Override
+    public ChessCellList getThreats(ChessPiece piece, Board board, ChessColor turnColor) {
+        return getPossibleMoves(piece,board,turnColor);
     }
 }

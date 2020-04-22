@@ -4,7 +4,6 @@ package fr.aboucorp.teamchess.entities.model;
 import fr.aboucorp.teamchess.entities.model.enums.PieceId;
 import fr.aboucorp.teamchess.entities.model.moves.Movable;
 import fr.aboucorp.teamchess.entities.model.moves.movesets.AbstractMoveSet;
-import fr.aboucorp.teamchess.entities.model.utils.ChessCellList;
 
 public abstract class ChessPiece extends GameElement implements Movable {
     protected AbstractMoveSet moveSet;
@@ -28,14 +27,6 @@ public abstract class ChessPiece extends GameElement implements Movable {
         this.isFirstMove = false;
     }
 
-    @Override
-    public ChessCellList getNextMoves(ChessPiece piece, Board board, ChessColor turnColor) {
-        if(moveSet != null){
-            return this.moveSet.getMoves(piece,board,turnColor);
-        }
-        return null;
-    }
-
     public PieceId getPieceId(){
         return this.pieceId;
     }
@@ -57,5 +48,9 @@ public abstract class ChessPiece extends GameElement implements Movable {
     @Override
     public String toString() {
         return this.pieceId.toString() + " [" + this.actualCell != null ? this.actualCell.getCellLabel() : "EVEN" + "]";
+    }
+
+    public AbstractMoveSet getMoveSet() {
+        return moveSet;
     }
 }

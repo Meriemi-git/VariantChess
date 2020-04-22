@@ -9,20 +9,17 @@ import fr.aboucorp.teamchess.entities.model.utils.ChessCellList;
 
 public class PawnMoveSet extends AbstractMoveSet {
     @Override
-    public ChessCellList getMoves(ChessPiece piece, Board board, ChessColor turnColor) {
+    public ChessCellList getPossibleMoves(ChessPiece piece, Board board, ChessColor turnColor) {
         ChessCellList validCells = new  ChessCellList();
         Location start = piece.getLocation();
         ChessCell simpleMove;
-        ChessCell diagRight;
-        ChessCell diagLeft;
+
         if(piece.getChessColor() == ChessColor.WHITE) {
             simpleMove = (ChessCell) board.getChessCells().getItemByLocation(new Location(start.getX(), 0, start.getZ() + 1));
-            diagRight = (ChessCell) board.getChessCells().getItemByLocation(new Location(start.getX()-1,0,start.getZ() + 1));
-            diagLeft = (ChessCell) board.getChessCells().getItemByLocation(new Location(start.getX()+1,0,start.getZ() + 1));
+
         }else{
             simpleMove = (ChessCell) board.getChessCells().getItemByLocation(new Location(start.getX(), 0, start.getZ() - 1));
-            diagRight = (ChessCell) board.getChessCells().getItemByLocation(new Location(start.getX()+1,0,start.getZ() - 1));
-            diagLeft = (ChessCell) board.getChessCells().getItemByLocation(new Location(start.getX()-1,0,start.getZ() - 1));
+
         }
         if(simpleMove != null && simpleMove.getPiece() == null ){
             validCells.add(simpleMove);
@@ -38,14 +35,35 @@ public class PawnMoveSet extends AbstractMoveSet {
                 }
             }
         }
-        if(diagRight != null && diagRight.getPiece() != null && diagRight.getPiece().getChessColor() != turnColor){
-            validCells.add(diagRight);
-        }
-        if(diagLeft != null && diagLeft.getPiece() != null && diagLeft.getPiece().getChessColor() != turnColor){
-            validCells.add(diagLeft);
-        }
+        validCells.addAll(getEatingMoves(piece,board,turnColor,false));
         checkEnPassant();
         return  validCells;
+    }
+
+    private ChessCellList getEatingMoves(ChessPiece piece, Board board, ChessColor turnColor , boolean isThreat){
+        Location start = piece.getLocation();
+        ChessCellList validCells = new  ChessCellList();
+        ChessCell diagRight;
+        ChessCell diagLeft;
+        if(piece.getChessColor() == ChessColor.WHITE) {
+            diagRight = (ChessCell) board.getChessCells().getItemByLocation(new Location(start.getX()-1,0,start.getZ() + 1));
+            diagLeft = (ChessCell) board.getChessCells().getItemByLocation(new Location(start.getX()+1,0,start.getZ() + 1));
+        }else{
+            diagRight = (ChessCell) board.getChessCells().getItemByLocation(new Location(start.getX()+1,0,start.getZ() - 1));
+            diagLeft = (ChessCell) board.getChessCells().getItemByLocation(new Location(start.getX()-1,0,start.getZ() - 1));
+        }
+        if(diagRight != null && isThreat && !(diagRight.getPiece() != null && diagRight.getPiece().getChessColor() != turnColor)){
+            validCells.add(diagRight);
+        }
+        if(diagLeft != null &&  isThreat && !(diagLeft.getPiece() != null && diagLeft.getPiece().getChessColor() != turnColor)){
+            validCells.add(diagLeft);
+        }
+        return  validCells;
+    }
+
+    @Override
+    public ChessCellList getThreats(ChessPiece piece, Board board, ChessColor turnColor) {
+        return getEatingMoves(piece,board,turnColor,true);
     }
 
     private void checkEnPassant() {

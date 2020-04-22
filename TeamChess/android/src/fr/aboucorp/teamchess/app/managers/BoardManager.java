@@ -148,7 +148,7 @@ public class BoardManager implements GameEventSubscriber {
     public void selectPiece(ChessPiece touched) {
         this.selectedPiece = touched;
         this.board3dManager.selectPiece(touched);
-        this.possiblesMoves = touched.getNextMoves(touched,this.board,this.actualTurn.getTurnColor());
+        this.possiblesMoves = touched.getMoveSet().getPossibleMoves(touched,this.board,this.actualTurn.getTurnColor());
         this.hightLightPossibleMoves(this.possiblesMoves);
     }
 

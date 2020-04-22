@@ -23,7 +23,7 @@ public class KingMoveSet extends AbstractMoveSet implements GameEventSubscriber 
     }
 
     @Override
-    public ChessCellList getMoves(ChessPiece piece, Board board, ChessColor turnColor) {
+    public ChessCellList getPossibleMoves(ChessPiece piece, Board board, ChessColor turnColor) {
         ChessCellList validCells = getClassicMoves(piece, board,turnColor);
         if(piece.getChessColor() == turnColor) {
             if (turnColor == ChessColor.WHITE) {
@@ -41,14 +41,14 @@ public class KingMoveSet extends AbstractMoveSet implements GameEventSubscriber 
 
                 }
             } else {
-                if (board.getWhitePieces().getPieceById(PieceId.BK).isFirstMove()
-                        && board.getWhitePieces().getPieceById(PieceId.BRR).isFirstMove()
+                if (board.getBlackPieces().getPieceById(PieceId.BK).isFirstMove()
+                        && board.getBlackPieces().getPieceById(PieceId.BRR).isFirstMove()
                         && isPossibleBigCastling( board,turnColor)) {
                     validCells.add( board.getChessCells().getChessCellByLabel("C8"));
                     this.eventManager.sendMessage(new PieceEvent("Waiting for littleCastle", PieceEventType.BIG_CASTLING,piece));
                 }
-                if (board.getWhitePieces().getPieceById(PieceId.BK).isFirstMove()
-                        && board.getWhitePieces().getPieceById(PieceId.BLR).isFirstMove()
+                if (board.getBlackPieces().getPieceById(PieceId.BK).isFirstMove()
+                        && board.getBlackPieces().getPieceById(PieceId.BLR).isFirstMove()
                         && isPossibleLittleCastling( board,turnColor)) {
                     validCells.add( board.getChessCells().getChessCellByLabel("G8"));
                     this.eventManager.sendMessage(new PieceEvent("Waiting for littleCastle", PieceEventType.LITTLE_CASTLING,piece));
@@ -56,6 +56,11 @@ public class KingMoveSet extends AbstractMoveSet implements GameEventSubscriber 
             }
         }
         return validCells;
+    }
+
+    @Override
+    public ChessCellList getThreats(ChessPiece piece, Board board, ChessColor turnColor) {
+        return getClassicMoves(piece, board,turnColor);
     }
 
     private boolean isPossibleBigCastling(Board board, ChessColor turnColor) {
@@ -81,7 +86,6 @@ public class KingMoveSet extends AbstractMoveSet implements GameEventSubscriber 
                     && isLocationSafe(d8,board,turnColor);
         }
     }
-
 
     private boolean isPossibleLittleCastling(Board board, ChessColor turnColor) {
         if(turnColor == ChessColor.WHITE){
@@ -109,7 +113,7 @@ public class KingMoveSet extends AbstractMoveSet implements GameEventSubscriber 
             pieces = board.getBlackPieces();
         }
         for (ChessPiece piece: pieces) {
-            ChessList<ChessCell> cells = piece.getNextMoves(piece,board,turnColor);
+            ChessList<ChessCell> cells = piece.getMoveSet().getThreats(piece,board,turnColor);
             if(cells != null && cells.getItemByLocation(cell.getLocation()) != null){
                 return false;
             }
@@ -117,41 +121,56 @@ public class KingMoveSet extends AbstractMoveSet implements GameEventSubscriber 
         return true;
     }
 
-
     public  ChessCellList getClassicMoves(ChessPiece piece, Board board,ChessColor turnColor){
         ChessCellList allCells = board.getChessCells();
         ChessCellList validCells = new ChessCellList();
         Location start = piece.getLocation();
         ChessCell up = (ChessCell) allCells.getItemByLocation(new Location(start.getX()+1,0,start.getZ()));
-        if(up != null && up.getPiece() == null && isLocationSafe(up,board,turnColor)){
+        if(up != null
+                && (up.getPiece() == null || up.getPiece().getChessColor() != turnColor)
+                && (turnColor != piece.getChessColor() || isLocationSafe(up,board,turnColor))){
             validCells.add(up);
         }
         ChessCell  upRight = (ChessCell) allCells.getItemByLocation(new Location(start.getX()+1,0,start.getZ()-1));
-        if(upRight != null && upRight.getPiece() == null && isLocationSafe(upRight,board,turnColor)){
+        if(upRight != null
+                && (upRight.getPiece() == null || upRight.getPiece().getChessColor() != turnColor)
+                && (turnColor != piece.getChessColor() || isLocationSafe(upRight,board,turnColor))){
             validCells.add(upRight);
         }
         ChessCell  upLeft = (ChessCell) allCells.getItemByLocation(new Location(start.getX()+1,0,start.getZ()+1));
-        if(upLeft != null && upLeft.getPiece() == null && isLocationSafe(upLeft,board,turnColor)){
+        if(upLeft != null
+                && (upLeft.getPiece() == null || upLeft.getPiece().getChessColor() != turnColor)
+                && (turnColor != piece.getChessColor() || isLocationSafe(upLeft,board,turnColor))){
             validCells.add(upLeft);
         }
         ChessCell down = (ChessCell) allCells.getItemByLocation(new Location(start.getX()-1,0,start.getZ()));
-        if(down != null && down.getPiece() == null && isLocationSafe(down,board,turnColor)){
+        if(down != null
+                && (down.getPiece() == null || down.getPiece().getChessColor() != turnColor)
+                && (turnColor != piece.getChessColor() || isLocationSafe(down,board,turnColor))){
             validCells.add(down);
         }
         ChessCell  downLeft = (ChessCell) allCells.getItemByLocation(new Location(start.getX()-1,0,start.getZ()+1));
-        if(downLeft != null && downLeft.getPiece() == null && isLocationSafe(downLeft,board,turnColor)) {
+        if(downLeft != null
+                && (downLeft.getPiece() == null || downLeft.getPiece().getChessColor() != turnColor)
+                && (turnColor != piece.getChessColor() || isLocationSafe(downLeft,board,turnColor))) {
             validCells.add(downLeft);
         }
         ChessCell  downRight = (ChessCell) allCells.getItemByLocation(new Location(start.getX()-1,0,start.getZ()-1));
-        if(downRight != null && downRight.getPiece() == null && isLocationSafe(downRight,board,turnColor)){
+        if(downRight != null
+                && (downRight.getPiece() == null || downRight.getPiece().getChessColor() != turnColor)
+                && (turnColor != piece.getChessColor() || isLocationSafe(downRight,board,turnColor))){
             validCells.add(downRight);
         }
         ChessCell  left = (ChessCell) allCells.getItemByLocation(new Location(start.getX(),0,start.getZ()+1));
-        if(left != null && left.getPiece() == null && isLocationSafe(left,board,turnColor)){
+        if(left != null
+                && (left.getPiece() == null || left.getPiece().getChessColor() != turnColor)
+                && (turnColor != piece.getChessColor() || isLocationSafe(left,board,turnColor))){
             validCells.add(left);
         }
         ChessCell  right = (ChessCell) allCells.getItemByLocation(new Location(start.getX(),0,start.getZ()-1));
-        if(right != null && right.getPiece() == null && isLocationSafe(right,board,turnColor)){
+        if(right != null
+                && (right.getPiece() == null || right.getPiece().getChessColor() != turnColor)
+                && (turnColor != piece.getChessColor() || isLocationSafe(right,board,turnColor))){
             validCells.add(right);
         }
         return validCells;

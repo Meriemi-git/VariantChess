@@ -16,10 +16,10 @@ public class QueenMoveSet extends AbstractMoveSet {
     }
 
     @Override
-    public ChessCellList getMoves(ChessPiece piece, Board board, ChessColor turnColor) {
+    public ChessCellList getPossibleMoves(ChessPiece piece, Board board, ChessColor turnColor) {
         ChessCellList cells = new  ChessCellList();
-        ChessCellList rookMoves  = rookMoveSet.getMoves(piece,board,turnColor);
-        ChessCellList bishopMoves = bishopMoveSet.getMoves(piece, board,turnColor);
+        ChessCellList rookMoves  = rookMoveSet.getPossibleMoves(piece,board,turnColor);
+        ChessCellList bishopMoves = bishopMoveSet.getPossibleMoves(piece, board,turnColor);
         if(rookMoves != null){
             cells.addAll(rookMoves);
         }
@@ -27,5 +27,10 @@ public class QueenMoveSet extends AbstractMoveSet {
             cells.addAll(bishopMoves);
         }
         return cells;
+    }
+
+    @Override
+    public ChessCellList getThreats(ChessPiece piece, Board board, ChessColor turnColor) {
+        return getPossibleMoves(piece,board,turnColor);
     }
 }
