@@ -5,6 +5,7 @@ import fr.aboucorp.teamchess.entities.model.ChessCell;
 import fr.aboucorp.teamchess.entities.model.ChessColor;
 import fr.aboucorp.teamchess.entities.model.ChessPiece;
 import fr.aboucorp.teamchess.entities.model.Location;
+import fr.aboucorp.teamchess.entities.model.events.GameEvent;
 import fr.aboucorp.teamchess.entities.model.utils.ChessCellList;
 
 public class RookMoveSet extends AbstractMoveSet{
@@ -67,5 +68,10 @@ public class RookMoveSet extends AbstractMoveSet{
     @Override
     public ChessCellList getThreats(ChessPiece piece, Board board, ChessColor turnColor) {
         return getPossibleMoves(piece,board,turnColor);
+    }
+
+    @Override
+    public void receiveGameEvent(GameEvent event) {
+
     }
 }

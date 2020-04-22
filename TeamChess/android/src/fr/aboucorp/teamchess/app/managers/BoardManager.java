@@ -14,6 +14,7 @@ import fr.aboucorp.teamchess.entities.model.Location;
 import fr.aboucorp.teamchess.entities.model.enums.PieceEventType;
 import fr.aboucorp.teamchess.entities.model.enums.PieceId;
 import fr.aboucorp.teamchess.entities.model.events.BoardEvent;
+import fr.aboucorp.teamchess.entities.model.events.CheckEvent;
 import fr.aboucorp.teamchess.entities.model.events.GameEvent;
 import fr.aboucorp.teamchess.entities.model.events.GameEventManager;
 import fr.aboucorp.teamchess.entities.model.events.GameEventSubscriber;
@@ -96,6 +97,13 @@ public class BoardManager implements GameEventSubscriber {
         }
         resetHighlited();
         this.eventManager.sendMessage(moveEvent);
+        kingIsInCheck();
+    }
+
+    private void kingIsInCheck() {
+        if(this.selectedPiece.getMoveSet().isInCheck(this.selectedPiece,board,actualTurn.getTurnColor())){
+            this.eventManager.sendMessage(new CheckEvent("King is in check",actualTurn.getTurnColor()));
+        }
     }
 
     public void eatPiece(ChessPiece piece){
@@ -107,8 +115,7 @@ public class BoardManager implements GameEventSubscriber {
         this.board3dManager.moveToEven(piece);
         piece.die();
     }
-
-
+    
     private void resetHighlited() {
         this.board3dManager.unHighlightCells(this.possiblesMoves);
         this.board3dManager.resetSelection();
