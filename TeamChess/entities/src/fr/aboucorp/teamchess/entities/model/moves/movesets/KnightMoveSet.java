@@ -14,26 +14,32 @@ public class KnightMoveSet extends AbstractMoveSet {
         Location start = piece.getLocation();
 
         for (ChessCell cell : board.getChessCells()) {
-            if(cell.getPiece() == null) {
-                Location end = cell.getLocation();
-                if (end.getX() == start.getX() + 2
-                        && (end.getZ() == start.getZ() + 1
-                        || end.getZ() == start.getZ() - 1)) {
+            Location end = cell.getLocation();
+            if (end.getX() == start.getX() + 2
+                    && (end.getZ() == start.getZ() + 1
+                    || end.getZ() == start.getZ() - 1)) {
+                if(cell.getPiece() == null ||  cell.getPiece().getChessColor() != turnColor) {
                     validCells.add(cell);
                 }
-                if (end.getX() == start.getX() - 2
-                        && (end.getZ() == start.getZ() + 1
-                        || end.getZ() == start.getZ() - 1)) {
+            }
+            if (end.getX() == start.getX() - 2
+                    && (end.getZ() == start.getZ() + 1
+                    || end.getZ() == start.getZ() - 1)) {
+                if(cell.getPiece() == null || cell.getPiece().getChessColor() != turnColor) {
                     validCells.add(cell);
                 }
-                if (end.getZ() == start.getZ() + 2
-                        && (end.getX() == start.getX() + 1
-                        || end.getX() == start.getX() - 1)) {
+            }
+            if (end.getZ() == start.getZ() + 2
+                    && (end.getX() == start.getX() + 1
+                    || end.getX() == start.getX() - 1)) {
+                if(cell.getPiece() == null || cell.getPiece().getChessColor() != turnColor) {
                     validCells.add(cell);
                 }
-                if (end.getZ() == start.getZ() - 2
-                        && (end.getX() == start.getX() + 1
-                        || end.getX() == start.getX() - 1)) {
+            }
+            if (end.getZ() == start.getZ() - 2
+                    && (end.getX() == start.getX() + 1
+                    || end.getX() == start.getX() - 1)) {
+                if(cell.getPiece() == null || cell.getPiece().getChessColor() != turnColor) {
                     validCells.add(cell);
                 }
             }

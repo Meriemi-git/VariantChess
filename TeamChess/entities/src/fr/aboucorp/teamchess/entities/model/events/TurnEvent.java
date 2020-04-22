@@ -1,10 +1,11 @@
 package fr.aboucorp.teamchess.entities.model.events;
 
-import fr.aboucorp.teamchess.entities.model.Turn;
+import fr.aboucorp.teamchess.entities.model.ChessTurn;
 
-public class TurnEvent extends GameEvent {
-    public final Turn turn;
-    public TurnEvent(String eventMessage,Turn turn) {
+public abstract class TurnEvent extends GameEvent {
+    public final ChessTurn turn;
+
+    public TurnEvent(String eventMessage, ChessTurn turn) {
         super(eventMessage);
         this.turn = turn;
     }

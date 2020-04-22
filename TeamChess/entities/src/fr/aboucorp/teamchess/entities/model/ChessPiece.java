@@ -44,8 +44,18 @@ public abstract class ChessPiece extends GameElement implements Movable {
         return isFirstMove;
     }
 
+    public ChessCell getActualCell() {
+        return actualCell;
+    }
+
+    public void die(){
+        this.actualCell.setPiece(null);
+        this.actualCell = null;
+        this.setLocation(null);
+    }
+
     @Override
     public String toString() {
-        return this.pieceId.toString() + " [" + this.actualCell.getCellLabel() + "]";
+        return this.pieceId.toString() + " [" + this.actualCell != null ? this.actualCell.getCellLabel() : "EVEN" + "]";
     }
 }

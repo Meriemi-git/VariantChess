@@ -14,12 +14,16 @@ public class Board {
 
     private ChessCellList chessCells;
     private ChessPieceList blackPieces;
+    private ChessPieceList blackDeadPieces;
     private ChessPieceList whitePieces;
+    private ChessPieceList whiteDeadPieces;
 
     public Board(){
         this.chessCells = new ChessCellList();
         this.blackPieces = new ChessPieceList();
         this.whitePieces = new ChessPieceList();
+        this.blackDeadPieces = new ChessPieceList();
+        this.whiteDeadPieces = new ChessPieceList();
     }
 
 
@@ -110,5 +114,13 @@ public class Board {
 
     public ChessPieceList getWhitePieces() {
         return whitePieces;
+    }
+
+    public ChessPieceList getBlackDeadPieces() {
+        return blackDeadPieces;
+    }
+
+    public ChessPieceList getWhiteDeadPieces() {
+        return whiteDeadPieces;
     }
 }

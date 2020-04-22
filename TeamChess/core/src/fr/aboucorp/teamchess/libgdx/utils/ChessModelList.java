@@ -11,11 +11,26 @@ public class ChessModelList extends ArrayList<ChessModel> {
 
     public ChessModel getByLocation(Location location) {
         for (Iterator<ChessModel> iter = this.iterator(); iter.hasNext();){
-            ChessModel piece = iter.next();
-            if(piece.getLocation().equals(location)){
-               return  piece;
+            ChessModel model = iter.next();
+            if(model.getLocation().equals(location)){
+               return  model;
             }
         }
         return null;
     }
+
+    public ChessModel removeByLocation(Location location) {
+        ChessModel removed;
+        for (Iterator<ChessModel> iter = this.iterator(); iter.hasNext();){
+            ChessModel model = iter.next();
+            if(model.getLocation().equals(location)){
+                removed = model;
+                iter.remove();
+                return removed;
+            }
+        }
+        return null;
+    }
+
+
 }

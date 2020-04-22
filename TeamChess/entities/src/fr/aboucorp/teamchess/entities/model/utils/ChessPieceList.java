@@ -12,4 +12,5 @@ public class ChessPieceList extends ChessList<ChessPiece> {
         }
         return null;
     }
+
 }

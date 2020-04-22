@@ -8,7 +8,6 @@ import fr.aboucorp.teamchess.entities.model.ChessCell;
 import fr.aboucorp.teamchess.entities.model.ChessColor;
 import fr.aboucorp.teamchess.entities.model.ChessPiece;
 import fr.aboucorp.teamchess.entities.model.Location;
-import fr.aboucorp.teamchess.entities.model.Team;
 import fr.aboucorp.teamchess.entities.model.enums.GameState;
 import fr.aboucorp.teamchess.entities.model.events.GameEvent;
 import fr.aboucorp.teamchess.entities.model.events.GameEventManager;
@@ -26,35 +25,35 @@ public class PartyManager implements GameEventSubscriber {
 
 
     public PartyManager(BoardManager boardManager) {
-        Team white = new Team("white",ChessColor.WHITE);
-        Team black = new Team("white",ChessColor.BLACK);
+
         this.boardManager = boardManager;
         this.gameState = GameState.SelectPiece;
-        this.turnManager = new TurnManager(white,black);
+        this.turnManager = TurnManager.getINSTANCE();
         this.eventManager = GameEventManager.getINSTANCE();
         this.eventManager.subscribe(PartyEvent.class,this);
     }
 
     public void startGame(){
         this.boardManager.createBoard();
-        this.turnManager.nextTurn();
+        this.turnManager.startTurn();
     }
 
     public void endTurn() {
-        this.turnManager.nextTurn();
+        this.turnManager.endTurn();
     }
 
     public String getPartyInfos(){
         return this.turnManager.getTurnColor().name();
     }
+
     public void selectPiece(ChessPiece touched) {
         this.gameState = GameState.SelectCase;
         this.boardManager.selectPiece(touched);
     }
 
-    public void resetSelection() {
+    public void unHightlight() {
         this.gameState = GameState.SelectPiece;
-        this.boardManager.resetSelection();
+        this.boardManager.unHighlight();
     }
 
     public ArrayList<ChessModel> getPiecesModelsFromActualTurn(){

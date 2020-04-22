@@ -28,7 +28,7 @@ public class GDXGestureListener implements GestureDetector.GestureListener {
                     if (touchedPiece != null) {
                         this.partyManager.selectPiece(touchedPiece);
                     } else {
-                        this.partyManager.resetSelection();
+                        this.partyManager.unHightlight();
                     }
                 }
                 break;
@@ -37,7 +37,7 @@ public class GDXGestureListener implements GestureDetector.GestureListener {
                 if (otherModel != null) {
                     ChessPiece otherTouchedPiece = this.partyManager.getPieceFromLocation(otherModel.getLocation());
                     if (otherTouchedPiece != null) {
-                        this.partyManager.resetSelection();
+                        this.partyManager.unHightlight();
                         this.partyManager.selectPiece(otherTouchedPiece);
                     }
                 } else {
@@ -48,7 +48,7 @@ public class GDXGestureListener implements GestureDetector.GestureListener {
                             this.partyManager.selectCell(chessCell);
                         }
                     }else {
-                        this.partyManager.resetSelection();
+                        this.partyManager.unHightlight();
                     }
                 }
                 break;

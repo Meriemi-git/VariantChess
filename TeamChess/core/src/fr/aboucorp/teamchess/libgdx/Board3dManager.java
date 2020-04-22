@@ -72,6 +72,8 @@ public class Board3dManager extends ApplicationAdapter {
     private final ChessModelList chessCellModels;
     private final ChessModelList whitePieceModels;
     private final ChessModelList blackPieceModels;
+    private final ChessModelList whiteDeadPieceModels;
+    private final ChessModelList blackDeadPieceModels;
     private final ArrayList<ChessPiece> loadingPieces;
 
 
@@ -93,7 +95,9 @@ public class Board3dManager extends ApplicationAdapter {
         this.assets = new AssetManager(new InternalFileHandleResolver());
         this.material3dManager = Material3dManager.getInstance();
         this.whitePieceModels = new ChessModelList();
+        this.whiteDeadPieceModels = new ChessModelList();
         this.blackPieceModels = new ChessModelList();
+        this.blackDeadPieceModels = new ChessModelList();
         this.chessCellModels = new ChessModelList();
         this.loadingPieces = new ArrayList<ChessPiece>();
 
@@ -136,16 +140,29 @@ public class Board3dManager extends ApplicationAdapter {
                 modelBatch.render(piece, this.environment);
             }
         }
+        for (ChessModel deadPiece : this.whiteDeadPieceModels) {
+            if(deadPiece.isVisible(this.camera)) {
+                modelBatch.render(deadPiece, this.environment);
+            }
+        }
         for (ChessModel piece : this.blackPieceModels) {
             if(piece.isVisible(this.camera)){
             modelBatch.render(piece, this.environment);
+            }
+        }
+        for (ChessModel deadPiece : this.blackDeadPieceModels) {
+            if(deadPiece.isVisible(this.camera)) {
+                modelBatch.render(deadPiece, this.environment);
             }
         }
         for (ModelInstance stuff : this.devStuff) {
             modelBatch.render(stuff, this.environment);
         }
         this.modelBatch.end();
+        //renderNumbers();
+    }
 
+    private void renderNumbers() {
         this.spriteBatch.begin();
         for (ChessModel cellModel : this.chessCellModels) {
             Matrix4 tmpMat4 = new Matrix4();
@@ -161,7 +178,6 @@ public class Board3dManager extends ApplicationAdapter {
             font.draw(spriteBatch, ((ChessCellModel)cellModel).getLabel(), 0, 0);
         }
         spriteBatch.end();
-
     }
 
     @Override
@@ -169,8 +185,6 @@ public class Board3dManager extends ApplicationAdapter {
         this.modelBatch.dispose();
         this.font.dispose();
     }
-
-
 
     private void setModelsPath() {
         modelsPath.put(Knight.class,"data/knight.g3db");
@@ -329,7 +343,6 @@ public class Board3dManager extends ApplicationAdapter {
         return this.chessCellModels;
     }
 
-
     /**
      * Initialisation de l'environnement 3D
      */
@@ -369,8 +382,17 @@ public class Board3dManager extends ApplicationAdapter {
         this.selectedModel.move(cell.getLocation());
     }
 
-    public void highlightedCellFromLocation(Location location) {
-        this.material3dManager.setSelectedMaterial(this.chessCellModels.getByLocation(location));
+    public void highlightEmptyCellFromLocation(ChessCell cell) {
+        this.material3dManager.setSelectedMaterial(this.chessCellModels.getByLocation(cell.getLocation()));
+    }
+
+    public void highlightOccupiedCellFromLocation(ChessCell cell) {
+        this.material3dManager.setOccupiedMaterial(this.chessCellModels.getByLocation(cell.getLocation()));
+        if(cell.getPiece().getChessColor() == ChessColor.WHITE){
+            this.material3dManager.setOccupiedMaterial(this.getWhitePieceModels().getByLocation(cell.getPiece().getLocation()));
+        }else{
+            this.material3dManager.setOccupiedMaterial(this.getBlackPieceModels().getByLocation(cell.getPiece().getLocation()));
+        }
     }
 
     public void moveToCell(ChessPiece piece, ChessCell cell) {
@@ -395,9 +417,35 @@ public class Board3dManager extends ApplicationAdapter {
         return possibleCells;
     }
 
-    public void resetHighlitedCells(ChessCellList possiblesMoves) {
+    public void unHighlightCells(ChessCellList possiblesMoves) {
         for (ChessCell cell: possiblesMoves) {
             this.material3dManager.resetMaterial(getChessCellModels().getByLocation(cell.getLocation()));
+            if(cell.getPiece() !=null){
+                if(cell.getPiece().getChessColor() == ChessColor.WHITE){
+                    this.material3dManager.resetMaterial(getWhitePieceModels().getByLocation(cell.getPiece().getLocation()));
+                }else{
+                    this.material3dManager.resetMaterial(getBlackPieceModels().getByLocation(cell.getPiece().getLocation()));
+                }
+            }
         }
+    }
+
+    public void moveToEven(ChessPiece piece) {
+        ChessModel eatenPiece;
+        if(piece.getChessColor() == ChessColor.WHITE){
+            eatenPiece = getWhitePieceModels().removeByLocation(piece.getLocation());
+            int xpos = 7 + (whiteDeadPieceModels.size() < 8 ? 1 : 2);
+            int zpos = whiteDeadPieceModels.size() < 8 ? 7 - whiteDeadPieceModels.size() : 7 - (whiteDeadPieceModels.size() - 8);
+            eatenPiece.move(new Location(xpos,0, zpos));
+            this.whiteDeadPieceModels.add(eatenPiece);
+        }else{
+            eatenPiece = getBlackPieceModels().removeByLocation(piece.getLocation());
+            int xpos = 0 - (blackDeadPieceModels.size() < 8 ? 1 : 2);
+            int zpos = blackDeadPieceModels.size() < 8 ? blackDeadPieceModels.size() : blackDeadPieceModels.size() - 8;
+            eatenPiece.move(new Location(xpos,0, zpos));
+            this.blackDeadPieceModels.add(eatenPiece);
+        }
+        this.material3dManager.resetMaterial(eatenPiece);
+        eatenPiece.transform.rotate(Vector3.Y, 180);
     }
 }

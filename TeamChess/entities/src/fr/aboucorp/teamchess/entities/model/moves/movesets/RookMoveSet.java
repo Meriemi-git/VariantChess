@@ -18,6 +18,9 @@ public class RookMoveSet extends AbstractMoveSet{
             ChessCell validCell = (ChessCell) board.getChessCells().getItemByLocation(new Location(x,0,start.getZ()));
             if(validCell != null && validCell.getPiece() == null){
                 validCells.add(validCell);
+            }else if(validCell.getPiece().getChessColor() != turnColor){
+                validCells.add(validCell);
+                break;
             }else{
                 break;
             }
@@ -27,6 +30,9 @@ public class RookMoveSet extends AbstractMoveSet{
             ChessCell validCell = (ChessCell) board.getChessCells().getItemByLocation(new Location(x,0,start.getZ()));
             if(validCell != null && validCell.getPiece() == null){
                 validCells.add(validCell);
+            }else if(validCell.getPiece().getChessColor() != turnColor){
+                validCells.add(validCell);
+                break;
             }else{
                 break;
             }
@@ -36,6 +42,9 @@ public class RookMoveSet extends AbstractMoveSet{
             ChessCell validCell = (ChessCell) board.getChessCells().getItemByLocation(new Location(start.getX(),0,z));
             if(validCell != null && validCell.getPiece() == null){
                 validCells.add(validCell);
+            }else if(validCell.getPiece().getChessColor() != turnColor){
+                validCells.add(validCell);
+                break;
             }else{
                 break;
             }
@@ -45,6 +54,9 @@ public class RookMoveSet extends AbstractMoveSet{
             ChessCell validCell = (ChessCell) board.getChessCells().getItemByLocation(new Location(start.getX(),0,z));
             if(validCell != null && validCell.getPiece() == null){
                 validCells.add(validCell);
+            }else if(validCell.getPiece().getChessColor() != turnColor){
+                validCells.add(validCell);
+                break;
             }else{
                 break;
             }
