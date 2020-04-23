@@ -41,7 +41,7 @@ public class TurnManager implements GameEventSubscriber {
             }
         }
         this.turns.add(nextTurn);
-        String eventMessage = String.format("Next turn, color : %s;",nextTurn.getTurnColor());
+        String eventMessage = String.format("Next turn, color : %s",nextTurn.getTurnColor());
         this.eventManager.sendMessage(new TurnStartEvent(eventMessage,nextTurn));
     }
 

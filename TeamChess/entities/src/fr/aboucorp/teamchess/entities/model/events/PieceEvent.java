@@ -4,11 +4,11 @@ import fr.aboucorp.teamchess.entities.model.ChessPiece;
 import fr.aboucorp.teamchess.entities.model.enums.PieceEventType;
 
 public class PieceEvent extends BoardEvent {
-    public ChessPiece pieceConcerned;
+    public ChessPiece piece;
     public PieceEventType type;
-    public PieceEvent(String eventMessage, PieceEventType type, ChessPiece pieceConcerned) {
+    public PieceEvent(String eventMessage, PieceEventType type, ChessPiece piece) {
         super(eventMessage);
         this.type = type;
-        this.pieceConcerned = pieceConcerned;
+        this.piece = piece;
     }
 }

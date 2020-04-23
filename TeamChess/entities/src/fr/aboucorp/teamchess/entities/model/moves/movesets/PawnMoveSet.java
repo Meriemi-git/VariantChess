@@ -13,13 +13,10 @@ public class PawnMoveSet extends AbstractMoveSet {
         ChessCellList validCells = new  ChessCellList();
         Location start = piece.getLocation();
         ChessCell simpleMove;
-
         if(piece.getChessColor() == ChessColor.WHITE) {
             simpleMove = (ChessCell) board.getChessCells().getItemByLocation(new Location(start.getX(), 0, start.getZ() + 1));
-
         }else{
             simpleMove = (ChessCell) board.getChessCells().getItemByLocation(new Location(start.getX(), 0, start.getZ() - 1));
-
         }
         if(simpleMove != null && simpleMove.getPiece() == null ){
             validCells.add(simpleMove);
@@ -52,10 +49,10 @@ public class PawnMoveSet extends AbstractMoveSet {
             diagRight = (ChessCell) board.getChessCells().getItemByLocation(new Location(start.getX()+1,0,start.getZ() - 1));
             diagLeft = (ChessCell) board.getChessCells().getItemByLocation(new Location(start.getX()-1,0,start.getZ() - 1));
         }
-        if(diagRight != null && isThreat && !(diagRight.getPiece() != null && diagRight.getPiece().getChessColor() != turnColor)){
+        if(diagRight != null && (isThreat || (diagRight.getPiece() != null && diagRight.getPiece().getChessColor() != turnColor))){
             validCells.add(diagRight);
         }
-        if(diagLeft != null &&  isThreat && !(diagLeft.getPiece() != null && diagLeft.getPiece().getChessColor() != turnColor)){
+        if(diagLeft != null && (isThreat || (diagLeft.getPiece() != null && diagLeft.getPiece().getChessColor() != turnColor))){
             validCells.add(diagLeft);
         }
         return  validCells;

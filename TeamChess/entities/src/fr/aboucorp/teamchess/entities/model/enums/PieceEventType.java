@@ -5,5 +5,7 @@ public enum PieceEventType {
     DEATH,
     EAT,
     LITTLE_CASTLING,
-    BIG_CASTLING
+    BIG_CASTLING,
+    CHECK,
+    CHECKMATE
 }

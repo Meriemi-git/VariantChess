@@ -19,7 +19,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="fr.aboucorp.teamchess.app.views.activities.BoardActivity"/>
+        <activity android:name="fr.aboucorp.teamchess.app.views.BoardActivity"/>
     </application>
 
 </manifest>

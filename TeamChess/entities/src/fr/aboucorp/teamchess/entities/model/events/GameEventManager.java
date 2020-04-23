@@ -36,10 +36,11 @@ public class GameEventManager {
     }
 
     public  List<GameEventSubscriber> getSubscribersRec(Class eventClass,List<GameEventSubscriber> subscribers) {
-        if(eventClass.getSuperclass().equals(Object.class)){
-            subscribers.addAll(SUBSCRIBERS.get(eventClass));
-        }else{
-            subscribers.addAll(SUBSCRIBERS.get(eventClass));
+        List<GameEventSubscriber> subs = SUBSCRIBERS.get(eventClass);
+        if(subs != null){
+            subscribers.addAll(subs);
+        }
+        if(!eventClass.getSuperclass().equals(Object.class)){
             getSubscribersRec(eventClass.getSuperclass(),subscribers);
         }
         return subscribers;

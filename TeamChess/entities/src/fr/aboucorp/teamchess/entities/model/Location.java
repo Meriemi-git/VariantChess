@@ -21,7 +21,6 @@ public class Location {
         return x;
     }
 
-
     public int getY() {
         return y;
     }
@@ -31,4 +30,8 @@ public class Location {
         return z;
     }
 
+    @Override
+    public String toString() {
+        return "[" + (char) (65 + (7 - x)) + (z+1) + "]";
+    }
 }

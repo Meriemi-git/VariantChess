@@ -14,7 +14,6 @@ import fr.aboucorp.teamchess.entities.model.Location;
 import fr.aboucorp.teamchess.entities.model.enums.PieceEventType;
 import fr.aboucorp.teamchess.entities.model.enums.PieceId;
 import fr.aboucorp.teamchess.entities.model.events.BoardEvent;
-import fr.aboucorp.teamchess.entities.model.events.CheckEvent;
 import fr.aboucorp.teamchess.entities.model.events.GameEvent;
 import fr.aboucorp.teamchess.entities.model.events.GameEventManager;
 import fr.aboucorp.teamchess.entities.model.events.GameEventSubscriber;
@@ -82,27 +81,28 @@ public class BoardManager implements GameEventSubscriber {
     }
 
     public void moveSelectedPieceToCell(ChessCell cell) {
-        String eventMessage =  String.format("Move %s: from %s; to %s",
+        String eventMessage =  String.format("Move %s from %s to %s",
                 selectedPiece.getPieceId().name(),
                 selectedPiece.getActualCell(),
                 cell);
+        MoveEvent moveEvent = new MoveEvent(eventMessage,selectedPiece.getActualCell(),cell,selectedPiece, cell.getPiece());
+        this.eventManager.sendMessage(moveEvent);
         if(cell.getPiece() != null){
             eatPiece(cell.getPiece());
         }
-        MoveEvent moveEvent = new MoveEvent(eventMessage,selectedPiece.getActualCell(),cell,selectedPiece, cell.getPiece());
         this.selectedPiece.move(cell);
         this.board3dManager.moveSelectedPieceIntoCell(cell);
         if(this.waitingForBigCastle || this.waitingForLittleCastle){
             checkIfCastling(cell);
         }
         resetHighlited();
-        this.eventManager.sendMessage(moveEvent);
         kingIsInCheck();
     }
 
     private void kingIsInCheck() {
-        if(this.selectedPiece.getMoveSet().isInCheck(this.selectedPiece,board,actualTurn.getTurnColor())){
-            this.eventManager.sendMessage(new CheckEvent("King is in check",actualTurn.getTurnColor()));
+        ChessPiece kingInCheck = this.selectedPiece.getMoveSet().isInCheck(this.selectedPiece,board,actualTurn.getTurnColor());
+        if(kingInCheck != null){
+            this.eventManager.sendMessage(new PieceEvent("King is in check",PieceEventType.CHECK,kingInCheck));
         }
     }
 
@@ -113,6 +113,8 @@ public class BoardManager implements GameEventSubscriber {
             this.board.getBlackPieces().removeByLocation(piece.getLocation());
         }
         this.board3dManager.moveToEven(piece);
+        String eventMessage = String.format("Piece %s die on %s",piece.getPieceId().name(),piece.getLocation());
+        this.eventManager.sendMessage(new PieceEvent(eventMessage,PieceEventType.DEATH,piece));
         piece.die();
     }
     
