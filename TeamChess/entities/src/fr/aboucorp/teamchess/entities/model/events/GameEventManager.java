@@ -2,7 +2,10 @@ package fr.aboucorp.teamchess.entities.model.events;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
+
+import fr.aboucorp.teamchess.entities.model.events.models.GameEvent;
 
 public class GameEventManager {
     private static GameEventManager INSTANCE;
@@ -25,6 +28,20 @@ public class GameEventManager {
         }
         subsribers.add(subscriber);
         SUBSCRIBERS.put(gameEventType,subsribers);
+    }
+
+    public void unSubscribe(Class gameEventType, GameEventSubscriber subscriber){
+        for (Class aClass: SUBSCRIBERS.keySet()) {
+            if(gameEventType.isAssignableFrom(aClass)){
+                List<GameEventSubscriber> subsribers = SUBSCRIBERS.get(aClass);
+                for(Iterator<GameEventSubscriber> iter = subsribers.iterator();iter.hasNext();){
+                    GameEventSubscriber sub = iter.next();
+                    if(sub == subscriber){
+                        iter.remove();
+                    }
+                }
+            }
+        }
     }
 
     public void sendMessage(GameEvent event){

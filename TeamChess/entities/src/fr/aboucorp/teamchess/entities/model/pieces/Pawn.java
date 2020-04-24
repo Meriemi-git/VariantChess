@@ -1,5 +1,6 @@
 package fr.aboucorp.teamchess.entities.model.pieces;
 
+import fr.aboucorp.teamchess.entities.model.Board;
 import fr.aboucorp.teamchess.entities.model.ChessCell;
 import fr.aboucorp.teamchess.entities.model.ChessColor;
 import fr.aboucorp.teamchess.entities.model.ChessPiece;
@@ -10,9 +11,9 @@ public class Pawn extends ChessPiece {
 
     private boolean isFirstMove = true;
 
-    public Pawn(ChessCell cell, ChessColor chessColor, PieceId pieceId) {
+    public Pawn(ChessCell cell, ChessColor chessColor, PieceId pieceId, Board board) {
         super(cell, chessColor,pieceId);
-        this.moveSet = new PawnMoveSet();
+        this.moveSet = new PawnMoveSet(this,board);
     }
 
     @Override

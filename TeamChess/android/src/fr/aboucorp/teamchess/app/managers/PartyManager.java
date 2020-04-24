@@ -9,10 +9,10 @@ import fr.aboucorp.teamchess.entities.model.ChessColor;
 import fr.aboucorp.teamchess.entities.model.ChessPiece;
 import fr.aboucorp.teamchess.entities.model.Location;
 import fr.aboucorp.teamchess.entities.model.enums.GameState;
-import fr.aboucorp.teamchess.entities.model.events.GameEvent;
 import fr.aboucorp.teamchess.entities.model.events.GameEventManager;
 import fr.aboucorp.teamchess.entities.model.events.GameEventSubscriber;
-import fr.aboucorp.teamchess.entities.model.events.PartyEvent;
+import fr.aboucorp.teamchess.entities.model.events.models.GameEvent;
+import fr.aboucorp.teamchess.entities.model.events.models.PartyEvent;
 import fr.aboucorp.teamchess.libgdx.models.ChessModel;
 
 
@@ -40,7 +40,14 @@ public class PartyManager implements GameEventSubscriber {
 
     public void endTurn() {
         this.turnManager.endTurn();
+        this.turnManager.startTurn();
+        if(this.boardManager.isGameFinished()){
+            ChessColor winner = boardManager.getWinner();
+            this.eventManager.sendMessage(new PartyEvent(String.format("Game finished ! Winner : %s",winner != null ? winner.name() : "EQUALITY")));
+        }
     }
+
+
 
     public String getPartyInfos(){
         return this.turnManager.getTurnColor().name();
@@ -66,6 +73,7 @@ public class PartyManager implements GameEventSubscriber {
 
     public void selectCell(ChessCell chessCell) {
         this.boardManager.moveSelectedPieceToCell(chessCell);
+        this.turnManager.endTurn();
     }
 
 

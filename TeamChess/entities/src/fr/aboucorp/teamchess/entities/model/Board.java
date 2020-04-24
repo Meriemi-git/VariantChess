@@ -50,16 +50,16 @@ public class Board {
     }
 
     private void createWhitePieces(){
-        Knight whiteRightKnight = new Knight((ChessCell) this.chessCells.getItemByLocation(new Location(6,0,0)), ChessColor.WHITE, PieceId.WRN);
-        Knight whiteLeftKnight =  new Knight((ChessCell) this.chessCells.getItemByLocation(new Location(1,0,0)), ChessColor.WHITE, PieceId.WLN);
-        Bishop whiteRightBishop = new Bishop((ChessCell) this.chessCells.getItemByLocation(new Location(5,0,0)), ChessColor.WHITE, PieceId.WRB);
-        Bishop whiteLeftBishop = new Bishop((ChessCell) this.chessCells.getItemByLocation( new Location(2,0,0)), ChessColor.WHITE, PieceId.WLB);
-        Queen whiteQueen = new Queen((ChessCell) this.chessCells.getItemByLocation(new Location(4,0,0)), ChessColor.WHITE,PieceId.WQ);
-        King whiteKing = new King((ChessCell) this.chessCells.getItemByLocation(new Location(3,0,0)), ChessColor.WHITE,PieceId.WK);
-        Rook whiteLeftRook = new Rook((ChessCell) this.chessCells.getItemByLocation(new Location(7,0,0)), ChessColor.WHITE,PieceId.WLR);
-        Rook whiteRightRook =  new Rook((ChessCell) this.chessCells.getItemByLocation(new Location(0,0,0)), ChessColor.WHITE,PieceId.WRR);
+        Knight whiteRightKnight = new Knight((ChessCell) this.chessCells.getItemByLocation(new Location(6,0,0)), ChessColor.WHITE, PieceId.WRN,this);
+        Knight whiteLeftKnight =  new Knight((ChessCell) this.chessCells.getItemByLocation(new Location(1,0,0)), ChessColor.WHITE, PieceId.WLN,this);
+        Bishop whiteRightBishop = new Bishop((ChessCell) this.chessCells.getItemByLocation(new Location(5,0,0)), ChessColor.WHITE, PieceId.WRB,this);
+        Bishop whiteLeftBishop = new Bishop((ChessCell) this.chessCells.getItemByLocation( new Location(2,0,0)), ChessColor.WHITE, PieceId.WLB,this);
+        Queen whiteQueen = new Queen((ChessCell) this.chessCells.getItemByLocation(new Location(4,0,0)), ChessColor.WHITE,PieceId.WQ,this);
+        King whiteKing = new King((ChessCell) this.chessCells.getItemByLocation(new Location(3,0,0)), ChessColor.WHITE,PieceId.WK,this);
+        Rook whiteLeftRook = new Rook((ChessCell) this.chessCells.getItemByLocation(new Location(7,0,0)), ChessColor.WHITE,PieceId.WLR,this);
+        Rook whiteRightRook =  new Rook((ChessCell) this.chessCells.getItemByLocation(new Location(0,0,0)), ChessColor.WHITE,PieceId.WRR,this);
         for(int  i = 0 ; i < 8 ; i++){
-            Pawn whitePawn =  new Pawn((ChessCell) this.chessCells.getItemByLocation(new Location(i,0,1)), ChessColor.WHITE,PieceId.WP);
+            Pawn whitePawn =  new Pawn((ChessCell) this.chessCells.getItemByLocation(new Location(i,0,1)), ChessColor.WHITE,PieceId.WP,this);
             this.whitePieces.add(whitePawn);
         }
         this.whitePieces.add(whiteRightKnight);
@@ -73,17 +73,17 @@ public class Board {
     }
 
     private void createBlackPieces(){
-        Knight blackRightKnight = new Knight((ChessCell) this.chessCells.getItemByLocation(new Location(6,0,7)), ChessColor.BLACK,PieceId.BRN);
-        Knight blackLeftKnight = new Knight((ChessCell) this.chessCells.getItemByLocation(new Location(1,0,7)), ChessColor.BLACK,PieceId.BLN);
-        Bishop blackLeftBishop = new Bishop((ChessCell) this.chessCells.getItemByLocation(new Location(5,0,7)), ChessColor.BLACK,PieceId.BLB);
-        Bishop blackRightBishop =  new Bishop((ChessCell) this.chessCells.getItemByLocation(new Location(2,0,7)), ChessColor.BLACK,PieceId.BRB);
-        Queen blackQueen = new Queen((ChessCell) this.chessCells.getItemByLocation(new Location(4,0,7)), ChessColor.BLACK,PieceId.BQ);
-        King blackKing = new King((ChessCell) this.chessCells.getItemByLocation(new Location(3,0,7)), ChessColor.BLACK,PieceId.BK);
-        Rook blackLeftRook =  new Rook((ChessCell) this.chessCells.getItemByLocation(new Location(7,0,7)), ChessColor.BLACK,PieceId.BLR);
-        Rook blackRightRook =  new Rook((ChessCell) this.chessCells.getItemByLocation(new Location(0,0,7)), ChessColor.BLACK,PieceId.BRR);
+        Knight blackRightKnight = new Knight((ChessCell) this.chessCells.getItemByLocation(new Location(6,0,7)), ChessColor.BLACK,PieceId.BRN,this);
+        Knight blackLeftKnight = new Knight((ChessCell) this.chessCells.getItemByLocation(new Location(1,0,7)), ChessColor.BLACK,PieceId.BLN,this);
+        Bishop blackLeftBishop = new Bishop((ChessCell) this.chessCells.getItemByLocation(new Location(5,0,7)), ChessColor.BLACK,PieceId.BLB,this);
+        Bishop blackRightBishop =  new Bishop((ChessCell) this.chessCells.getItemByLocation(new Location(2,0,7)), ChessColor.BLACK,PieceId.BRB,this);
+        Queen blackQueen = new Queen((ChessCell) this.chessCells.getItemByLocation(new Location(4,0,7)), ChessColor.BLACK,PieceId.BQ,this);
+        King blackKing = new King((ChessCell) this.chessCells.getItemByLocation(new Location(3,0,7)), ChessColor.BLACK,PieceId.BK,this);
+        Rook blackLeftRook =  new Rook((ChessCell) this.chessCells.getItemByLocation(new Location(7,0,7)), ChessColor.BLACK,PieceId.BLR,this);
+        Rook blackRightRook =  new Rook((ChessCell) this.chessCells.getItemByLocation(new Location(0,0,7)), ChessColor.BLACK,PieceId.BRR,this);
 
         for(int  i = 0 ; i < 8 ; i++){
-            Pawn blackPawn = new Pawn((ChessCell) this.chessCells.getItemByLocation(new Location(i,0,6)),ChessColor.BLACK,PieceId.BP);
+            Pawn blackPawn = new Pawn((ChessCell) this.chessCells.getItemByLocation(new Location(i,0,6)),ChessColor.BLACK,PieceId.BP,this);
             this.blackPieces.add(blackPawn);
         }
         this.blackPieces.add(blackRightKnight);
@@ -116,6 +116,9 @@ public class Board {
         return whitePieces;
     }
 
+    public ChessPieceList getPieceByColor(ChessColor color){
+        return color == ChessColor.WHITE ? getWhitePieces() : getBlackPieces();
+    }
     public ChessPieceList getBlackDeadPieces() {
         return blackDeadPieces;
     }
@@ -123,4 +126,7 @@ public class Board {
     public ChessPieceList getWhiteDeadPieces() {
         return whiteDeadPieces;
     }
+
+
+
 }

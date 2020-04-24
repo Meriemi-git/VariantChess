@@ -1,4 +1,4 @@
-package fr.aboucorp.teamchess.entities.model.events;
+package fr.aboucorp.teamchess.entities.model.events.models;
 
 import fr.aboucorp.teamchess.entities.model.ChessTurn;
 

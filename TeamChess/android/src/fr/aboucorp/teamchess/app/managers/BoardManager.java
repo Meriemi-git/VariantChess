@@ -13,17 +13,19 @@ import fr.aboucorp.teamchess.entities.model.ChessTurn;
 import fr.aboucorp.teamchess.entities.model.Location;
 import fr.aboucorp.teamchess.entities.model.enums.PieceEventType;
 import fr.aboucorp.teamchess.entities.model.enums.PieceId;
-import fr.aboucorp.teamchess.entities.model.events.BoardEvent;
-import fr.aboucorp.teamchess.entities.model.events.GameEvent;
 import fr.aboucorp.teamchess.entities.model.events.GameEventManager;
 import fr.aboucorp.teamchess.entities.model.events.GameEventSubscriber;
-import fr.aboucorp.teamchess.entities.model.events.MoveEvent;
-import fr.aboucorp.teamchess.entities.model.events.PartyEvent;
-import fr.aboucorp.teamchess.entities.model.events.PieceEvent;
-import fr.aboucorp.teamchess.entities.model.events.TurnEndEvent;
-import fr.aboucorp.teamchess.entities.model.events.TurnEvent;
-import fr.aboucorp.teamchess.entities.model.events.TurnStartEvent;
+import fr.aboucorp.teamchess.entities.model.events.models.BoardEvent;
+import fr.aboucorp.teamchess.entities.model.events.models.CheckEvent;
+import fr.aboucorp.teamchess.entities.model.events.models.GameEvent;
+import fr.aboucorp.teamchess.entities.model.events.models.MoveEvent;
+import fr.aboucorp.teamchess.entities.model.events.models.PartyEvent;
+import fr.aboucorp.teamchess.entities.model.events.models.PieceEvent;
+import fr.aboucorp.teamchess.entities.model.events.models.TurnEndEvent;
+import fr.aboucorp.teamchess.entities.model.events.models.TurnEvent;
+import fr.aboucorp.teamchess.entities.model.events.models.TurnStartEvent;
 import fr.aboucorp.teamchess.entities.model.utils.ChessCellList;
+import fr.aboucorp.teamchess.entities.model.utils.ChessPieceList;
 import fr.aboucorp.teamchess.libgdx.Board3dManager;
 import fr.aboucorp.teamchess.libgdx.models.ChessModel;
 
@@ -100,9 +102,9 @@ public class BoardManager implements GameEventSubscriber {
     }
 
     private void kingIsInCheck() {
-        ChessPiece kingInCheck = this.selectedPiece.getMoveSet().isInCheck(this.selectedPiece,board,actualTurn.getTurnColor());
+        ChessPiece kingInCheck = this.selectedPiece.getMoveSet().pieceMoveCauseCheck(this.selectedPiece,board,actualTurn.getTurnColor());
         if(kingInCheck != null){
-            this.eventManager.sendMessage(new PieceEvent("King is in check",PieceEventType.CHECK,kingInCheck));
+            this.eventManager.sendMessage(new CheckEvent("King is in check",PieceEventType.CHECK,kingInCheck, this.selectedPiece));
         }
     }
 
@@ -157,7 +159,7 @@ public class BoardManager implements GameEventSubscriber {
     public void selectPiece(ChessPiece touched) {
         this.selectedPiece = touched;
         this.board3dManager.selectPiece(touched);
-        this.possiblesMoves = touched.getMoveSet().getPossibleMoves(touched,this.board,this.actualTurn.getTurnColor());
+        this.possiblesMoves = touched.getMoveSet().getNextMoves();
         this.hightLightPossibleMoves(this.possiblesMoves);
     }
 
@@ -242,5 +244,36 @@ public class BoardManager implements GameEventSubscriber {
 
     public ChessPiece getSelectedPiece() {
         return selectedPiece;
+    }
+
+    public boolean isGameFinished() {
+        boolean cantMove = true;
+        for (ChessPiece piece:board.getPieceByColor(this.actualTurn.getTurnColor())) {
+            if(piece.getMoveSet().getNextMoves().size() > 0){
+                cantMove = false;
+            }
+        }
+        return cantMove;
+    }
+
+    public ChessColor getWinner() {
+        ChessPieceList opposites;
+        ChessColor oppositeColor = actualTurn.getTurnColor() == ChessColor.WHITE ? ChessColor.BLACK : ChessColor.WHITE;
+        if(actualTurn.getTurnColor() == ChessColor.WHITE){
+           opposites = this.board.getBlackPieces();
+        }else{
+            opposites = this.board.getWhitePieces();
+        }
+        boolean canMove = false;
+        for(ChessPiece piece : opposites){
+            piece.getMoveSet().calculateNextMoves(this.board,oppositeColor );
+            if(piece.getMoveSet().getNextMoves().size() > 0){
+                canMove = true;
+            }
+        }
+        if(canMove){
+            return oppositeColor;
+        }
+        return null;
     }
 }

@@ -16,11 +16,10 @@ import fr.aboucorp.teamchess.app.listeners.GDXGestureListener;
 import fr.aboucorp.teamchess.app.listeners.GDXInputAdapter;
 import fr.aboucorp.teamchess.app.managers.BoardManager;
 import fr.aboucorp.teamchess.app.managers.PartyManager;
-import fr.aboucorp.teamchess.entities.model.events.BoardEvent;
-import fr.aboucorp.teamchess.entities.model.events.GameEvent;
 import fr.aboucorp.teamchess.entities.model.events.GameEventManager;
 import fr.aboucorp.teamchess.entities.model.events.GameEventSubscriber;
-import fr.aboucorp.teamchess.entities.model.events.TurnEvent;
+import fr.aboucorp.teamchess.entities.model.events.models.GameEvent;
+import fr.aboucorp.teamchess.entities.model.events.models.LogEvent;
 import fr.aboucorp.teamchess.libgdx.Board3dManager;
 
 public class BoardActivity extends AndroidApplication implements GameEventSubscriber {
@@ -34,8 +33,7 @@ public class BoardActivity extends AndroidApplication implements GameEventSubscr
 
     public BoardActivity(){
         this.eventManager = GameEventManager.getINSTANCE();
-        this.eventManager.subscribe(BoardEvent.class,this);
-        this.eventManager.subscribe(TurnEvent.class,this);
+        this.eventManager.subscribe(GameEvent.class,this);
     }
 
     @Override
@@ -45,7 +43,6 @@ public class BoardActivity extends AndroidApplication implements GameEventSubscr
         bindViews();
         bindListeners();
         this.initializeBoard();
-
     }
 
     private void initializeBoard(){
@@ -74,7 +71,7 @@ public class BoardActivity extends AndroidApplication implements GameEventSubscr
         btn_end_turn.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
                BoardActivity.this.party_manager.endTurn();
-                BoardActivity.this.lbl_turn.setText("Turn of " + BoardActivity.this.party_manager.getPartyInfos());
+               BoardActivity.this.lbl_turn.setText("Turn of " + BoardActivity.this.party_manager.getPartyInfos());
             }
         });
     }
@@ -83,8 +80,13 @@ public class BoardActivity extends AndroidApplication implements GameEventSubscr
     public void receiveGameEvent(final GameEvent event) {
         this.runOnUiThread(new Runnable() {
             public void run() {
-                BoardActivity.this.party_logs.setText( BoardActivity.this.party_logs.getText() + "\n" + event.eventMessage);
-                Log.i("fr.aboucorp.teamchess", String.format("BoardActivity : Event of type %s Message : %s;",event.getClass().getSimpleName(),event.eventMessage));
+                if(event instanceof LogEvent){
+                    BoardActivity.this.party_logs.setText( BoardActivity.this.party_logs.getText() + "\nLOG :" + event.eventMessage);
+                }else{
+                    BoardActivity.this.party_logs.setText( BoardActivity.this.party_logs.getText() + "\n" + event.eventMessage);
+                }
+                BoardActivity.this.lbl_turn.setText("Turn of " + BoardActivity.this.party_manager.getPartyInfos());
+                Log.i("fr.aboucorp.teamchess",event.eventMessage);
             }
         });
     }

@@ -1,6 +1,7 @@
 package fr.aboucorp.teamchess.entities.model.pieces;
 
 
+import fr.aboucorp.teamchess.entities.model.Board;
 import fr.aboucorp.teamchess.entities.model.ChessCell;
 import fr.aboucorp.teamchess.entities.model.ChessColor;
 import fr.aboucorp.teamchess.entities.model.ChessPiece;
@@ -9,8 +10,8 @@ import fr.aboucorp.teamchess.entities.model.moves.movesets.BishopMoveSet;
 
 public class Bishop extends ChessPiece {
 
-    public Bishop(ChessCell cell, ChessColor chessColor, PieceId pieceId) {
+    public Bishop(ChessCell cell, ChessColor chessColor, PieceId pieceId, Board board) {
         super(cell, chessColor,pieceId);
-        this.moveSet = new BishopMoveSet();
+        this.moveSet = new BishopMoveSet(this,board);
     }
 }

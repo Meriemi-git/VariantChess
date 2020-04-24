@@ -2,8 +2,8 @@ package fr.aboucorp.teamchess.entities.model;
 
 
 import fr.aboucorp.teamchess.entities.model.enums.PieceId;
+import fr.aboucorp.teamchess.entities.model.moves.AbstractMoveSet;
 import fr.aboucorp.teamchess.entities.model.moves.Movable;
-import fr.aboucorp.teamchess.entities.model.moves.movesets.AbstractMoveSet;
 
 public abstract class ChessPiece extends GameElement implements Movable {
     protected AbstractMoveSet moveSet;

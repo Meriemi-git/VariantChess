@@ -5,12 +5,12 @@ import java.util.LinkedList;
 import fr.aboucorp.teamchess.entities.model.ChessColor;
 import fr.aboucorp.teamchess.entities.model.ChessTurn;
 import fr.aboucorp.teamchess.entities.model.Team;
-import fr.aboucorp.teamchess.entities.model.events.GameEvent;
 import fr.aboucorp.teamchess.entities.model.events.GameEventManager;
 import fr.aboucorp.teamchess.entities.model.events.GameEventSubscriber;
-import fr.aboucorp.teamchess.entities.model.events.MoveEvent;
-import fr.aboucorp.teamchess.entities.model.events.TurnEndEvent;
-import fr.aboucorp.teamchess.entities.model.events.TurnStartEvent;
+import fr.aboucorp.teamchess.entities.model.events.models.GameEvent;
+import fr.aboucorp.teamchess.entities.model.events.models.MoveEvent;
+import fr.aboucorp.teamchess.entities.model.events.models.TurnEndEvent;
+import fr.aboucorp.teamchess.entities.model.events.models.TurnStartEvent;
 
 public class TurnManager implements GameEventSubscriber {
 

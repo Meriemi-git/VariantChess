@@ -7,23 +7,19 @@ import fr.aboucorp.teamchess.entities.model.ChessPiece;
 import fr.aboucorp.teamchess.entities.model.Location;
 import fr.aboucorp.teamchess.entities.model.enums.PieceEventType;
 import fr.aboucorp.teamchess.entities.model.enums.PieceId;
-import fr.aboucorp.teamchess.entities.model.events.GameEvent;
-import fr.aboucorp.teamchess.entities.model.events.GameEventManager;
-import fr.aboucorp.teamchess.entities.model.events.GameEventSubscriber;
-import fr.aboucorp.teamchess.entities.model.events.PieceEvent;
+import fr.aboucorp.teamchess.entities.model.events.models.PieceEvent;
+import fr.aboucorp.teamchess.entities.model.moves.AbstractMoveSet;
 import fr.aboucorp.teamchess.entities.model.utils.ChessCellList;
 import fr.aboucorp.teamchess.entities.model.utils.ChessList;
 
-public class KingMoveSet extends AbstractMoveSet implements GameEventSubscriber {
+public class KingMoveSet extends AbstractMoveSet {
 
-    private GameEventManager eventManager;
-
-    public KingMoveSet() {
-        this.eventManager =  GameEventManager.getINSTANCE();
+    public KingMoveSet(ChessPiece thisPiece, Board board) {
+        super(thisPiece, board);
     }
 
     @Override
-    public ChessCellList getPossibleMoves(ChessPiece piece, Board board, ChessColor turnColor) {
+    protected ChessCellList getPossibleMoves(ChessPiece piece, Board board, ChessColor turnColor) {
         ChessCellList validCells = getClassicMoves(piece, board,turnColor);
         if(piece.getChessColor() == turnColor) {
             if (turnColor == ChessColor.WHITE) {
@@ -176,8 +172,4 @@ public class KingMoveSet extends AbstractMoveSet implements GameEventSubscriber 
         return validCells;
     }
 
-    @Override
-    public void receiveGameEvent(GameEvent event) {
-
-    }
 }

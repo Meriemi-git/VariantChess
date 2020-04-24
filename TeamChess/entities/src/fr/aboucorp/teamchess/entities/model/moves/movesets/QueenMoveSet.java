@@ -3,6 +3,7 @@ package fr.aboucorp.teamchess.entities.model.moves.movesets;
 import fr.aboucorp.teamchess.entities.model.Board;
 import fr.aboucorp.teamchess.entities.model.ChessColor;
 import fr.aboucorp.teamchess.entities.model.ChessPiece;
+import fr.aboucorp.teamchess.entities.model.moves.AbstractMoveSet;
 import fr.aboucorp.teamchess.entities.model.utils.ChessCellList;
 
 public class QueenMoveSet extends AbstractMoveSet {
@@ -10,13 +11,14 @@ public class QueenMoveSet extends AbstractMoveSet {
     private RookMoveSet rookMoveSet;
     private  BishopMoveSet bishopMoveSet;
 
-    public QueenMoveSet() {
-        this.rookMoveSet = new RookMoveSet();
-        this.bishopMoveSet = new BishopMoveSet();
+    public QueenMoveSet(ChessPiece thisPiece, Board board) {
+        super(thisPiece,board);
+        this.rookMoveSet = new RookMoveSet(thisPiece,board);
+        this.bishopMoveSet = new BishopMoveSet(thisPiece,board);
     }
 
     @Override
-    public ChessCellList getPossibleMoves(ChessPiece piece, Board board, ChessColor turnColor) {
+    protected ChessCellList getPossibleMoves(ChessPiece piece, Board board, ChessColor turnColor) {
         ChessCellList cells = new  ChessCellList();
         ChessCellList rookMoves  = rookMoveSet.getPossibleMoves(piece,board,turnColor);
         ChessCellList bishopMoves = bishopMoveSet.getPossibleMoves(piece, board,turnColor);

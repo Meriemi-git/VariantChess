@@ -5,12 +5,17 @@ import fr.aboucorp.teamchess.entities.model.ChessCell;
 import fr.aboucorp.teamchess.entities.model.ChessColor;
 import fr.aboucorp.teamchess.entities.model.ChessPiece;
 import fr.aboucorp.teamchess.entities.model.Location;
+import fr.aboucorp.teamchess.entities.model.moves.AbstractMoveSet;
 import fr.aboucorp.teamchess.entities.model.utils.ChessCellList;
 
-public class RookMoveSet extends AbstractMoveSet{
+public class RookMoveSet extends AbstractMoveSet {
+
+    public RookMoveSet(ChessPiece thisPiece, Board board) {
+        super(thisPiece, board);
+    }
 
     @Override
-    public ChessCellList getPossibleMoves(ChessPiece piece, Board board, ChessColor turnColor) {
+    protected ChessCellList getPossibleMoves(ChessPiece piece, Board board, ChessColor turnColor) {
         ChessCellList validCells = new ChessCellList();
         Location start = piece.getLocation();
         for(int x = start.getX()+1; x < 8 ; x++){
