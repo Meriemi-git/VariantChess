@@ -159,7 +159,7 @@ public class Board3dManager extends ApplicationAdapter {
             modelBatch.render(stuff, this.environment);
         }
         this.modelBatch.end();
-        //renderNumbers();
+        renderNumbers();
     }
 
     private void renderNumbers() {

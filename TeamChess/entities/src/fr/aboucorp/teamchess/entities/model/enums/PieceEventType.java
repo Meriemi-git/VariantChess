@@ -6,5 +6,6 @@ public enum PieceEventType {
     LITTLE_CASTLING,
     BIG_CASTLING,
     CHECK,
-    CHECKMATE
+    CHECKMATE,
+    EN_PASSANT
 }

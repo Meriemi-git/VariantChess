@@ -47,7 +47,7 @@ public abstract class ChessPiece extends GameElement implements Movable {
 
     @Override
     public String toString() {
-        return this.pieceId.toString() + " [" + this.actualCell != null ? this.actualCell.getCellLabel() : "EVEN" + "]";
+        return this.pieceId.toString() + " [" + (this.actualCell != null ? this.actualCell.getCellLabel() : "EVEN") + "]";
     }
 
     public AbstractMoveSet getMoveSet() {

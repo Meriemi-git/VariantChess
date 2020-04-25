@@ -59,7 +59,7 @@ public class Board {
         Rook whiteLeftRook = new Rook((ChessCell) this.chessCells.getItemByLocation(new Location(7,0,0)), ChessColor.WHITE,PieceId.WLR,this);
         Rook whiteRightRook =  new Rook((ChessCell) this.chessCells.getItemByLocation(new Location(0,0,0)), ChessColor.WHITE,PieceId.WRR,this);
         for(int  i = 0 ; i < 8 ; i++){
-            Pawn whitePawn =  new Pawn((ChessCell) this.chessCells.getItemByLocation(new Location(i,0,1)), ChessColor.WHITE,PieceId.WP,this);
+            Pawn whitePawn =  new Pawn((ChessCell) this.chessCells.getItemByLocation(new Location(i,0,1)), ChessColor.WHITE,PieceId.get(i),this);
             this.whitePieces.add(whitePawn);
         }
         this.whitePieces.add(whiteRightKnight);
@@ -83,7 +83,7 @@ public class Board {
         Rook blackRightRook =  new Rook((ChessCell) this.chessCells.getItemByLocation(new Location(0,0,7)), ChessColor.BLACK,PieceId.BRR,this);
 
         for(int  i = 0 ; i < 8 ; i++){
-            Pawn blackPawn = new Pawn((ChessCell) this.chessCells.getItemByLocation(new Location(i,0,6)),ChessColor.BLACK,PieceId.BP,this);
+            Pawn blackPawn = new Pawn((ChessCell) this.chessCells.getItemByLocation(new Location(i,0,6)),ChessColor.BLACK,PieceId.get(i+10),this);
             this.blackPieces.add(blackPawn);
         }
         this.blackPieces.add(blackRightKnight);
