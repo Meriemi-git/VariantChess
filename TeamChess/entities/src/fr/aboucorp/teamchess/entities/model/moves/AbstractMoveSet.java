@@ -1,9 +1,9 @@
 package fr.aboucorp.teamchess.entities.model.moves;
 
 import fr.aboucorp.teamchess.entities.model.Board;
-import fr.aboucorp.teamchess.entities.model.Square;
 import fr.aboucorp.teamchess.entities.model.ChessColor;
 import fr.aboucorp.teamchess.entities.model.Piece;
+import fr.aboucorp.teamchess.entities.model.Square;
 import fr.aboucorp.teamchess.entities.model.Turn;
 import fr.aboucorp.teamchess.entities.model.enums.PieceEventType;
 import fr.aboucorp.teamchess.entities.model.enums.PieceId;
@@ -16,7 +16,7 @@ import fr.aboucorp.teamchess.entities.model.events.models.PieceEvent;
 import fr.aboucorp.teamchess.entities.model.events.models.TurnEvent;
 import fr.aboucorp.teamchess.entities.model.events.models.TurnStartEvent;
 import fr.aboucorp.teamchess.entities.model.pieces.King;
-import fr.aboucorp.teamchess.entities.model.utils.ChessCellList;
+import fr.aboucorp.teamchess.entities.model.utils.SquareList;
 
 public abstract class AbstractMoveSet implements GameEventSubscriber {
 
@@ -26,7 +26,7 @@ public abstract class AbstractMoveSet implements GameEventSubscriber {
     protected boolean isChecking;
     protected King kingInCheck;
     protected Piece checkingPiece;
-    protected ChessCellList nextMoves;
+    protected SquareList nextMoves;
     protected Turn actualTurn;
     protected Turn previousTurn;
 
@@ -57,7 +57,7 @@ public abstract class AbstractMoveSet implements GameEventSubscriber {
         }
     }
 
-    public ChessCellList calculateNextMoves(Board board, ChessColor turnColor){
+    public SquareList calculateNextMoves(Board board, ChessColor turnColor){
         if(isChecking){
            return this.calculateUncheckingMoves(board,turnColor);
         }else{
@@ -65,8 +65,8 @@ public abstract class AbstractMoveSet implements GameEventSubscriber {
         }
     }
 
-    private ChessCellList calculateUncheckingMoves(Board board, ChessColor turnColor){
-        ChessCellList uncheckingMoves = new ChessCellList();
+    private SquareList calculateUncheckingMoves(Board board, ChessColor turnColor){
+        SquareList uncheckingMoves = new SquareList();
         Square originalPosition = this.thisPiece.getActualSquare();
         ChessColor oppositeColor = turnColor == ChessColor.WHITE ? ChessColor.BLACK : ChessColor.WHITE;
         for (Square checkedMove : this.getPossibleMoves(this.thisPiece, this.board, turnColor)) {
@@ -101,11 +101,11 @@ public abstract class AbstractMoveSet implements GameEventSubscriber {
         return null;
     }
 
-    protected abstract ChessCellList getPossibleMoves(Piece piece, Board board, ChessColor turnColor);
+    protected abstract SquareList getPossibleMoves(Piece piece, Board board, ChessColor turnColor);
 
-    public abstract ChessCellList getThreats(Piece piece, Board board, ChessColor turnColor);
+    public abstract SquareList getThreats(Piece piece, Board board, ChessColor turnColor);
 
-    public ChessCellList getNextMoves() {
+    public SquareList getNextMoves() {
         return nextMoves;
     }
 }

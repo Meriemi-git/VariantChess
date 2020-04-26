@@ -4,7 +4,7 @@ import fr.aboucorp.teamchess.entities.model.Board;
 import fr.aboucorp.teamchess.entities.model.ChessColor;
 import fr.aboucorp.teamchess.entities.model.Piece;
 import fr.aboucorp.teamchess.entities.model.moves.AbstractMoveSet;
-import fr.aboucorp.teamchess.entities.model.utils.ChessCellList;
+import fr.aboucorp.teamchess.entities.model.utils.SquareList;
 
 public class QueenMoveSet extends AbstractMoveSet {
 
@@ -18,21 +18,21 @@ public class QueenMoveSet extends AbstractMoveSet {
     }
 
     @Override
-    protected ChessCellList getPossibleMoves(Piece piece, Board board, ChessColor turnColor) {
-        ChessCellList cells = new  ChessCellList();
-        ChessCellList rookMoves  = rookMoveSet.getPossibleMoves(piece,board,turnColor);
-        ChessCellList bishopMoves = bishopMoveSet.getPossibleMoves(piece, board,turnColor);
+    protected SquareList getPossibleMoves(Piece piece, Board board, ChessColor turnColor) {
+        SquareList squares = new SquareList();
+        SquareList rookMoves  = rookMoveSet.getPossibleMoves(piece,board,turnColor);
+        SquareList bishopMoves = bishopMoveSet.getPossibleMoves(piece, board,turnColor);
         if(rookMoves != null){
-            cells.addAll(rookMoves);
+            squares.addAll(rookMoves);
         }
         if(bishopMoves != null){
-            cells.addAll(bishopMoves);
+            squares.addAll(bishopMoves);
         }
-        return cells;
+        return squares;
     }
 
     @Override
-    public ChessCellList getThreats(Piece piece, Board board, ChessColor turnColor) {
+    public SquareList getThreats(Piece piece, Board board, ChessColor turnColor) {
         return getPossibleMoves(piece,board,turnColor);
     }
 }

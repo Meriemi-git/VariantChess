@@ -3,9 +3,8 @@ package fr.aboucorp.teamchess.entities.model;
 
 import fr.aboucorp.teamchess.entities.model.enums.PieceId;
 import fr.aboucorp.teamchess.entities.model.moves.AbstractMoveSet;
-import fr.aboucorp.teamchess.entities.model.moves.Movable;
 
-public abstract class Piece extends GameElement implements Movable {
+public abstract class Piece extends GameElement {
     protected AbstractMoveSet moveSet;
     private Square actualSquare;
     private PieceId pieceId;
@@ -18,7 +17,6 @@ public abstract class Piece extends GameElement implements Movable {
         square.setPiece(this);
     }
 
-    @Override
     public void move(Square square) {
         this.actualSquare.setPiece(null);
         this.actualSquare = square;
@@ -47,7 +45,7 @@ public abstract class Piece extends GameElement implements Movable {
 
     @Override
     public String toString() {
-        return this.pieceId.toString() + " [" + (this.actualSquare != null ? this.actualSquare.getCellLabel() : "EVEN") + "]";
+        return this.pieceId.toString() + " [" + (this.actualSquare != null ? this.actualSquare.getSquareLabel() : "EVEN") + "]";
     }
 
     public AbstractMoveSet getMoveSet() {

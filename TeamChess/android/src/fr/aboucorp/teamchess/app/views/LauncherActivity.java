@@ -1,4 +1,4 @@
-package fr.aboucorp.teamchess.app;
+package fr.aboucorp.teamchess.app.views;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -7,7 +7,6 @@ import android.view.View;
 import android.widget.Button;
 
 import fr.aboucorp.teamchess.R;
-import fr.aboucorp.teamchess.app.views.BoardActivity;
 
 public class LauncherActivity extends Activity {
 

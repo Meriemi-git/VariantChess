@@ -6,11 +6,11 @@ import com.badlogic.gdx.graphics.Camera;
 import java.util.ArrayList;
 
 import fr.aboucorp.teamchess.entities.model.Board;
-import fr.aboucorp.teamchess.entities.model.Square;
 import fr.aboucorp.teamchess.entities.model.ChessColor;
-import fr.aboucorp.teamchess.entities.model.Piece;
-import fr.aboucorp.teamchess.entities.model.Turn;
 import fr.aboucorp.teamchess.entities.model.Location;
+import fr.aboucorp.teamchess.entities.model.Piece;
+import fr.aboucorp.teamchess.entities.model.Square;
+import fr.aboucorp.teamchess.entities.model.Turn;
 import fr.aboucorp.teamchess.entities.model.enums.PieceEventType;
 import fr.aboucorp.teamchess.entities.model.enums.PieceId;
 import fr.aboucorp.teamchess.entities.model.events.GameEventManager;
@@ -24,8 +24,8 @@ import fr.aboucorp.teamchess.entities.model.events.models.PieceEvent;
 import fr.aboucorp.teamchess.entities.model.events.models.TurnEndEvent;
 import fr.aboucorp.teamchess.entities.model.events.models.TurnEvent;
 import fr.aboucorp.teamchess.entities.model.events.models.TurnStartEvent;
-import fr.aboucorp.teamchess.entities.model.utils.ChessCellList;
-import fr.aboucorp.teamchess.entities.model.utils.ChessPieceList;
+import fr.aboucorp.teamchess.entities.model.utils.PieceList;
+import fr.aboucorp.teamchess.entities.model.utils.SquareList;
 import fr.aboucorp.teamchess.libgdx.Board3dManager;
 import fr.aboucorp.teamchess.libgdx.models.ChessModel;
 
@@ -40,7 +40,7 @@ public class BoardManager implements GameEventSubscriber {
     private boolean waitingForBigCastle;
     private boolean waitingForLittleCastle;
     private boolean waitingForEnPassant;
-    private ChessCellList possiblesMoves;
+    private SquareList possiblesMoves;
 
     public BoardManager(Board3dManager board3dManager) {
         this.board = new Board();
@@ -76,7 +76,7 @@ public class BoardManager implements GameEventSubscriber {
                 Gdx.app.postRunnable(new Runnable() {
                     @Override
                     public void run() {
-                        BoardManager.this.board3dManager.createCells(BoardManager.this.board.getChessCells());
+                        BoardManager.this.board3dManager.createSquares(BoardManager.this.board.getSquares());
                         BoardManager.this.board3dManager.createPieces(BoardManager.this.board.getWhitePieces());
                         BoardManager.this.board3dManager.createPieces(BoardManager.this.board.getBlackPieces());
                     }
@@ -85,18 +85,18 @@ public class BoardManager implements GameEventSubscriber {
         }).start();
     }
 
-    public void moveSelectedPieceToCell(Square cell) {
+    public void moveSelectedPieceToSquare(Square square) {
         String eventMessage = String.format("Move %s from %s to %s",
                 selectedPiece.getPieceId().name(),
                 selectedPiece.getActualSquare(),
-                cell);
-        MoveEvent moveEvent = new MoveEvent(eventMessage, selectedPiece.getActualSquare(), cell, selectedPiece, cell.getPiece());
+                square);
+        MoveEvent moveEvent = new MoveEvent(eventMessage, selectedPiece.getActualSquare(), square, selectedPiece, square.getPiece());
         this.eventManager.sendMessage(moveEvent);
-        eat(cell);
-        this.selectedPiece.move(cell);
-        this.board3dManager.moveSelectedPieceIntoCell(cell);
+        eat(square);
+        this.selectedPiece.move(square);
+        this.board3dManager.moveSelectedPieceIntoSquare(square);
         if (this.waitingForBigCastle || this.waitingForLittleCastle) {
-            checkIfCastling(cell);
+            checkIfCastling(square);
         }
         resetHighlited();
         kingIsInCheck();
@@ -109,9 +109,9 @@ public class BoardManager implements GameEventSubscriber {
         }
     }
 
-    public void eat(Square cell) {
-        Piece toBeEaten = cell.getPiece();
-        if (isEnPassantMove(cell)) {
+    public void eat(Square square) {
+        Piece toBeEaten = square.getPiece();
+        if (isEnPassantMove(square)) {
             toBeEaten = this.previousTurn.played;
         }
         if (toBeEaten != null) {
@@ -134,35 +134,35 @@ public class BoardManager implements GameEventSubscriber {
     }
 
     private void resetHighlited() {
-        this.board3dManager.unHighlightCells(this.possiblesMoves);
+        this.board3dManager.unHighlightSquares(this.possiblesMoves);
         this.board3dManager.resetSelection();
         this.possiblesMoves = null;
     }
 
-    private void checkIfCastling(Square cell) {
+    private void checkIfCastling(Square square) {
         ChessColor turnColor = this.actualTurn.getTurnColor();
         Piece rookToMove = null;
         Square destination = null;
         if (this.waitingForBigCastle) {
-            if (turnColor == ChessColor.WHITE && cell.getCellLabel().equals("C1")) {
+            if (turnColor == ChessColor.WHITE && square.getSquareLabel().equals("C1")) {
                 rookToMove = this.board.getWhitePieces().getPieceById(PieceId.WLR);
-                destination = this.board.getChessCells().getChessCellByLabel("D1");
-            } else if (turnColor == ChessColor.BLACK && cell.getCellLabel().equals("C8")) {
+                destination = this.board.getSquares().getSquareByLabel("D1");
+            } else if (turnColor == ChessColor.BLACK && square.getSquareLabel().equals("C8")) {
                 this.board.getWhitePieces().getPieceById(PieceId.BLR).getLocation();
-                destination = this.board.getChessCells().getChessCellByLabel("D8");
+                destination = this.board.getSquares().getSquareByLabel("D8");
             }
         }
         if (this.waitingForLittleCastle) {
-            if (turnColor == ChessColor.WHITE && cell.getCellLabel().equals("G1")) {
+            if (turnColor == ChessColor.WHITE && square.getSquareLabel().equals("G1")) {
                 rookToMove = this.board.getWhitePieces().getPieceById(PieceId.WRR);
-                destination = this.board.getChessCells().getChessCellByLabel("F1");
-            } else if (turnColor == ChessColor.BLACK && cell.getCellLabel().equals("G8")) {
+                destination = this.board.getSquares().getSquareByLabel("F1");
+            } else if (turnColor == ChessColor.BLACK && square.getSquareLabel().equals("G8")) {
                 rookToMove = this.board.getWhitePieces().getPieceById(PieceId.BRR);
-                destination = this.board.getChessCells().getChessCellByLabel("F8");
+                destination = this.board.getSquares().getSquareByLabel("F8");
             }
         }
         if (rookToMove != null && destination != null) {
-            this.board3dManager.moveToCell(rookToMove, destination);
+            this.board3dManager.moveToSquare(rookToMove, destination);
             rookToMove.move(destination);
         }
     }
@@ -174,13 +174,13 @@ public class BoardManager implements GameEventSubscriber {
         this.hightLightPossibleMoves(this.possiblesMoves);
     }
 
-    private void hightLightPossibleMoves(ChessCellList possibleMoves) {
+    private void hightLightPossibleMoves(SquareList possibleMoves) {
         if (possibleMoves != null) {
-            for (Square cell : possibleMoves) {
-                if (cell.getPiece() == null) {
-                    this.board3dManager.highlightEmptyCellFromLocation(cell);
+            for (Square square : possibleMoves) {
+                if (square.getPiece() == null) {
+                    this.board3dManager.highlightEmptySquareFromLocation(square);
                 } else {
-                    this.board3dManager.highlightOccupiedCellFromLocation(cell);
+                    this.board3dManager.highlightOccupiedSquareFromLocation(square);
                 }
             }
         } else {
@@ -191,7 +191,7 @@ public class BoardManager implements GameEventSubscriber {
     public void unHighlight() {
         this.board3dManager.resetSelection();
         if (possiblesMoves != null) {
-            this.board3dManager.unHighlightCells(this.possiblesMoves);
+            this.board3dManager.unHighlightSquares(this.possiblesMoves);
         }
     }
 
@@ -211,8 +211,8 @@ public class BoardManager implements GameEventSubscriber {
         }
     }
 
-    public ArrayList<ChessModel> getPossibleCellModels() {
-        return this.board3dManager.getCellModelsFromPossibleMoves(this.possiblesMoves);
+    public ArrayList<ChessModel> getPossibleSquareModels() {
+        return this.board3dManager.getSquareModelsFromPossibleMoves(this.possiblesMoves);
     }
 
     public Piece getPieceFromLocation(Location location, ChessColor color) {
@@ -230,17 +230,17 @@ public class BoardManager implements GameEventSubscriber {
         return null;
     }
 
-    public Square getCellFromLocation(Location location) {
-        for (Square cell : this.board.getChessCells()) {
-            if (cell.getLocation().equals(location)) {
-                return cell;
+    public Square getSquareFromLocation(Location location) {
+        for (Square square : this.board.getSquares()) {
+            if (square.getLocation().equals(location)) {
+                return square;
             }
         }
         return null;
     }
 
-    public ArrayList<ChessModel> getChessCellModels() {
-        return this.board3dManager.getChessCellModels();
+    public ArrayList<ChessModel> getChessSquareModels() {
+        return this.board3dManager.getChessSquareModels();
     }
 
     public Camera getCamera() {
@@ -270,7 +270,7 @@ public class BoardManager implements GameEventSubscriber {
     }
 
     public ChessColor getWinner() {
-        ChessPieceList opposites;
+        PieceList opposites;
         ChessColor oppositeColor = actualTurn.getTurnColor() == ChessColor.WHITE ? ChessColor.BLACK : ChessColor.WHITE;
         if (actualTurn.getTurnColor() == ChessColor.WHITE) {
             opposites = this.board.getBlackPieces();

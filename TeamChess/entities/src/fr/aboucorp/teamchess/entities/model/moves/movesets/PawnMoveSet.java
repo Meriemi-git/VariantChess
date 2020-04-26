@@ -1,15 +1,15 @@
 package fr.aboucorp.teamchess.entities.model.moves.movesets;
 
 import fr.aboucorp.teamchess.entities.model.Board;
-import fr.aboucorp.teamchess.entities.model.Square;
 import fr.aboucorp.teamchess.entities.model.ChessColor;
-import fr.aboucorp.teamchess.entities.model.Piece;
 import fr.aboucorp.teamchess.entities.model.Location;
+import fr.aboucorp.teamchess.entities.model.Piece;
+import fr.aboucorp.teamchess.entities.model.Square;
 import fr.aboucorp.teamchess.entities.model.enums.PieceEventType;
 import fr.aboucorp.teamchess.entities.model.enums.PieceId;
 import fr.aboucorp.teamchess.entities.model.events.models.PieceEvent;
 import fr.aboucorp.teamchess.entities.model.moves.AbstractMoveSet;
-import fr.aboucorp.teamchess.entities.model.utils.ChessCellList;
+import fr.aboucorp.teamchess.entities.model.utils.SquareList;
 
 public class PawnMoveSet extends AbstractMoveSet {
 
@@ -18,24 +18,24 @@ public class PawnMoveSet extends AbstractMoveSet {
     }
 
     @Override
-    protected ChessCellList getPossibleMoves(Piece piece, Board board, ChessColor turnColor) {
-        ChessCellList validCells = getClassicMoves(piece, board, turnColor);
-        validCells.addAll(getEatingMoves(piece, board, turnColor, false));
-        return validCells;
+    protected SquareList getPossibleMoves(Piece piece, Board board, ChessColor turnColor) {
+        SquareList validSquares = getClassicMoves(piece, board, turnColor);
+        validSquares.addAll(getEatingMoves(piece, board, turnColor, false));
+        return validSquares;
     }
 
-    private ChessCellList getClassicMoves(Piece piece, Board board, ChessColor turnColor) {
-        ChessCellList classicMoves = new ChessCellList();
+    private SquareList getClassicMoves(Piece piece, Board board, ChessColor turnColor) {
+        SquareList classicMoves = new SquareList();
         Location start = piece.getLocation();
         Square simpleMove;
         int zpos = piece.getChessColor() == ChessColor.WHITE ? start.getZ() + 1 : start.getZ() - 1;
-        simpleMove = (Square) board.getChessCells().getItemByLocation(new Location(start.getX(), 0, zpos));
+        simpleMove = (Square) board.getSquares().getItemByLocation(new Location(start.getX(), 0, zpos));
         if (simpleMove != null && simpleMove.getPiece() == null) {
             classicMoves.add(simpleMove);
             Square doubleMove;
             if (piece.isFirstMove()) {
                 zpos = piece.getChessColor() == ChessColor.WHITE ? start.getZ() + 2 : start.getZ() - 2;
-                doubleMove = (Square) board.getChessCells().getItemByLocation(new Location(start.getX(), 0, zpos));
+                doubleMove = (Square) board.getSquares().getItemByLocation(new Location(start.getX(), 0, zpos));
                 if (doubleMove != null && doubleMove.getPiece() == null) {
                     classicMoves.add(doubleMove);
                 }
@@ -45,31 +45,31 @@ public class PawnMoveSet extends AbstractMoveSet {
     }
 
 
-    private ChessCellList getEatingMoves(Piece piece, Board board, ChessColor turnColor, boolean isThreat) {
+    private SquareList getEatingMoves(Piece piece, Board board, ChessColor turnColor, boolean isThreat) {
         Location start = piece.getLocation();
-        ChessCellList validCells = new ChessCellList();
+        SquareList validSquares = new SquareList();
         Square diagRight;
         Square diagLeft;
         int zpos = piece.getChessColor() == ChessColor.WHITE ? 1 : -1;
-        diagRight = (Square) board.getChessCells().getItemByLocation(new Location(start.getX() - 1, 0, start.getZ() + zpos));
-        diagLeft = (Square) board.getChessCells().getItemByLocation(new Location(start.getX() + 1, 0, start.getZ() + zpos));
+        diagRight = (Square) board.getSquares().getItemByLocation(new Location(start.getX() - 1, 0, start.getZ() + zpos));
+        diagLeft = (Square) board.getSquares().getItemByLocation(new Location(start.getX() + 1, 0, start.getZ() + zpos));
 
         if (diagRight != null
                 && (isThreat
                 || (diagRight.getPiece() != null && diagRight.getPiece().getChessColor() != turnColor))) {
-            validCells.add(diagRight);
+            validSquares.add(diagRight);
         } else if (diagRight != null && diagRight.getPiece() == null && enPassantRightIsPossible()){
-            validCells.add(diagRight);
+            validSquares.add(diagRight);
         }
 
         if (diagLeft != null
                 && (isThreat
                 || (diagLeft.getPiece() != null && diagLeft.getPiece().getChessColor() != turnColor))) {
-            validCells.add(diagLeft);
+            validSquares.add(diagLeft);
         }else if(diagLeft != null && diagLeft.getPiece() == null && enPassantLeftIsPossible()){
-            validCells.add(diagLeft);
+            validSquares.add(diagLeft);
         }
-        return validCells;
+        return validSquares;
     }
 
     private boolean enPassantRightIsPossible() {
@@ -96,7 +96,7 @@ public class PawnMoveSet extends AbstractMoveSet {
     }
 
     @Override
-    public ChessCellList getThreats(Piece piece, Board board, ChessColor turnColor) {
+    public SquareList getThreats(Piece piece, Board board, ChessColor turnColor) {
         return getEatingMoves(piece, board, turnColor, true);
     }
 

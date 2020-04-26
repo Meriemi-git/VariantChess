@@ -7,59 +7,59 @@ import fr.aboucorp.teamchess.entities.model.pieces.Knight;
 import fr.aboucorp.teamchess.entities.model.pieces.Pawn;
 import fr.aboucorp.teamchess.entities.model.pieces.Queen;
 import fr.aboucorp.teamchess.entities.model.pieces.Rook;
-import fr.aboucorp.teamchess.entities.model.utils.ChessCellList;
-import fr.aboucorp.teamchess.entities.model.utils.ChessPieceList;
+import fr.aboucorp.teamchess.entities.model.utils.PieceList;
+import fr.aboucorp.teamchess.entities.model.utils.SquareList;
 
 public class Board {
 
-    private ChessCellList chessCells;
-    private ChessPieceList blackPieces;
-    private ChessPieceList blackDeadPieces;
-    private ChessPieceList whitePieces;
-    private ChessPieceList whiteDeadPieces;
+    private SquareList chessSquares;
+    private PieceList blackPieces;
+    private PieceList blackDeadPieces;
+    private PieceList whitePieces;
+    private PieceList whiteDeadPieces;
 
     public Board(){
-        this.chessCells = new ChessCellList();
-        this.blackPieces = new ChessPieceList();
-        this.whitePieces = new ChessPieceList();
-        this.blackDeadPieces = new ChessPieceList();
-        this.whiteDeadPieces = new ChessPieceList();
+        this.chessSquares = new SquareList();
+        this.blackPieces = new PieceList();
+        this.whitePieces = new PieceList();
+        this.blackDeadPieces = new PieceList();
+        this.whiteDeadPieces = new PieceList();
     }
 
 
 
     public void initBoard(){
-        this.createCells();
+        this.createSquares();
         this.createWhitePieces();
         this.createBlackPieces();
     }
 
-    private void createCells(){
+    private void createSquares(){
         for (int x = 0; x < 8; x++) {
             for (int z = 0; z < 8; z++) {
-                Square cell = null;
+                Square square = null;
                 if(x % 2 == 0 && z % 2 != 0 || x % 2 != 0 && z % 2 == 0 ){
-                    cell = new Square(new Location(x, 0, z), ChessColor.BLACK);
+                    square = new Square(new Location(x, 0, z), ChessColor.BLACK);
                 }else{
-                    cell = new Square(new Location(x, 0, z), ChessColor.WHITE);
+                    square = new Square(new Location(x, 0, z), ChessColor.WHITE);
                 }
-                this.chessCells.add(cell);
+                this.chessSquares.add(square);
             }
         }
 
     }
 
     private void createWhitePieces(){
-        Knight whiteRightKnight = new Knight((Square) this.chessCells.getItemByLocation(new Location(6,0,0)), ChessColor.WHITE, PieceId.WRN,this);
-        Knight whiteLeftKnight =  new Knight((Square) this.chessCells.getItemByLocation(new Location(1,0,0)), ChessColor.WHITE, PieceId.WLN,this);
-        Bishop whiteRightBishop = new Bishop((Square) this.chessCells.getItemByLocation(new Location(5,0,0)), ChessColor.WHITE, PieceId.WRB,this);
-        Bishop whiteLeftBishop = new Bishop((Square) this.chessCells.getItemByLocation( new Location(2,0,0)), ChessColor.WHITE, PieceId.WLB,this);
-        Queen whiteQueen = new Queen((Square) this.chessCells.getItemByLocation(new Location(4,0,0)), ChessColor.WHITE,PieceId.WQ,this);
-        King whiteKing = new King((Square) this.chessCells.getItemByLocation(new Location(3,0,0)), ChessColor.WHITE,PieceId.WK,this);
-        Rook whiteLeftRook = new Rook((Square) this.chessCells.getItemByLocation(new Location(7,0,0)), ChessColor.WHITE,PieceId.WLR,this);
-        Rook whiteRightRook =  new Rook((Square) this.chessCells.getItemByLocation(new Location(0,0,0)), ChessColor.WHITE,PieceId.WRR,this);
+        Knight whiteRightKnight = new Knight((Square) this.chessSquares.getItemByLocation(new Location(6,0,0)), ChessColor.WHITE, PieceId.WRN,this);
+        Knight whiteLeftKnight =  new Knight((Square) this.chessSquares.getItemByLocation(new Location(1,0,0)), ChessColor.WHITE, PieceId.WLN,this);
+        Bishop whiteRightBishop = new Bishop((Square) this.chessSquares.getItemByLocation(new Location(5,0,0)), ChessColor.WHITE, PieceId.WRB,this);
+        Bishop whiteLeftBishop = new Bishop((Square) this.chessSquares.getItemByLocation( new Location(2,0,0)), ChessColor.WHITE, PieceId.WLB,this);
+        Queen whiteQueen = new Queen((Square) this.chessSquares.getItemByLocation(new Location(4,0,0)), ChessColor.WHITE,PieceId.WQ,this);
+        King whiteKing = new King((Square) this.chessSquares.getItemByLocation(new Location(3,0,0)), ChessColor.WHITE,PieceId.WK,this);
+        Rook whiteLeftRook = new Rook((Square) this.chessSquares.getItemByLocation(new Location(7,0,0)), ChessColor.WHITE,PieceId.WLR,this);
+        Rook whiteRightRook =  new Rook((Square) this.chessSquares.getItemByLocation(new Location(0,0,0)), ChessColor.WHITE,PieceId.WRR,this);
         for(int  i = 0 ; i < 8 ; i++){
-            Pawn whitePawn =  new Pawn((Square) this.chessCells.getItemByLocation(new Location(i,0,1)), ChessColor.WHITE,PieceId.get(i),this);
+            Pawn whitePawn =  new Pawn((Square) this.chessSquares.getItemByLocation(new Location(i,0,1)), ChessColor.WHITE,PieceId.get(i),this);
             this.whitePieces.add(whitePawn);
         }
         this.whitePieces.add(whiteRightKnight);
@@ -73,17 +73,17 @@ public class Board {
     }
 
     private void createBlackPieces(){
-        Knight blackRightKnight = new Knight((Square) this.chessCells.getItemByLocation(new Location(6,0,7)), ChessColor.BLACK,PieceId.BRN,this);
-        Knight blackLeftKnight = new Knight((Square) this.chessCells.getItemByLocation(new Location(1,0,7)), ChessColor.BLACK,PieceId.BLN,this);
-        Bishop blackLeftBishop = new Bishop((Square) this.chessCells.getItemByLocation(new Location(5,0,7)), ChessColor.BLACK,PieceId.BLB,this);
-        Bishop blackRightBishop =  new Bishop((Square) this.chessCells.getItemByLocation(new Location(2,0,7)), ChessColor.BLACK,PieceId.BRB,this);
-        Queen blackQueen = new Queen((Square) this.chessCells.getItemByLocation(new Location(4,0,7)), ChessColor.BLACK,PieceId.BQ,this);
-        King blackKing = new King((Square) this.chessCells.getItemByLocation(new Location(3,0,7)), ChessColor.BLACK,PieceId.BK,this);
-        Rook blackLeftRook =  new Rook((Square) this.chessCells.getItemByLocation(new Location(7,0,7)), ChessColor.BLACK,PieceId.BLR,this);
-        Rook blackRightRook =  new Rook((Square) this.chessCells.getItemByLocation(new Location(0,0,7)), ChessColor.BLACK,PieceId.BRR,this);
+        Knight blackRightKnight = new Knight((Square) this.chessSquares.getItemByLocation(new Location(6,0,7)), ChessColor.BLACK,PieceId.BRN,this);
+        Knight blackLeftKnight = new Knight((Square) this.chessSquares.getItemByLocation(new Location(1,0,7)), ChessColor.BLACK,PieceId.BLN,this);
+        Bishop blackLeftBishop = new Bishop((Square) this.chessSquares.getItemByLocation(new Location(5,0,7)), ChessColor.BLACK,PieceId.BLB,this);
+        Bishop blackRightBishop =  new Bishop((Square) this.chessSquares.getItemByLocation(new Location(2,0,7)), ChessColor.BLACK,PieceId.BRB,this);
+        Queen blackQueen = new Queen((Square) this.chessSquares.getItemByLocation(new Location(4,0,7)), ChessColor.BLACK,PieceId.BQ,this);
+        King blackKing = new King((Square) this.chessSquares.getItemByLocation(new Location(3,0,7)), ChessColor.BLACK,PieceId.BK,this);
+        Rook blackLeftRook =  new Rook((Square) this.chessSquares.getItemByLocation(new Location(7,0,7)), ChessColor.BLACK,PieceId.BLR,this);
+        Rook blackRightRook =  new Rook((Square) this.chessSquares.getItemByLocation(new Location(0,0,7)), ChessColor.BLACK,PieceId.BRR,this);
 
         for(int  i = 0 ; i < 8 ; i++){
-            Pawn blackPawn = new Pawn((Square) this.chessCells.getItemByLocation(new Location(i,0,6)),ChessColor.BLACK,PieceId.get(i+10),this);
+            Pawn blackPawn = new Pawn((Square) this.chessSquares.getItemByLocation(new Location(i,0,6)),ChessColor.BLACK,PieceId.get(i+10),this);
             this.blackPieces.add(blackPawn);
         }
         this.blackPieces.add(blackRightKnight);
@@ -96,37 +96,27 @@ public class Board {
         this.blackPieces.add(blackRightRook);
     }
 
-    public boolean isCellFree(Square cell){
-        Square boardCell = (Square) this.chessCells.getItemByLocation(cell.getLocation());
-        if(boardCell != null){
-            return boardCell.getPiece() == null;
+    public boolean isSquareFree(Square square){
+        Square boardSquare = (Square) this.chessSquares.getItemByLocation(square.getLocation());
+        if(boardSquare != null){
+            return boardSquare.getPiece() == null;
         }
         return false;
     }
 
-    public ChessCellList getChessCells() {
-        return chessCells;
+    public SquareList getSquares() {
+        return chessSquares;
     }
 
-    public ChessPieceList getBlackPieces() {
+    public PieceList getBlackPieces() {
         return blackPieces;
     }
 
-    public ChessPieceList getWhitePieces() {
+    public PieceList getWhitePieces() {
         return whitePieces;
     }
 
-    public ChessPieceList getPieceByColor(ChessColor color){
+    public PieceList getPieceByColor(ChessColor color){
         return color == ChessColor.WHITE ? getWhitePieces() : getBlackPieces();
     }
-    public ChessPieceList getBlackDeadPieces() {
-        return blackDeadPieces;
-    }
-
-    public ChessPieceList getWhiteDeadPieces() {
-        return whiteDeadPieces;
-    }
-
-
-
 }

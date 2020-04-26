@@ -4,10 +4,10 @@ import android.util.Log;
 
 import java.util.ArrayList;
 
-import fr.aboucorp.teamchess.entities.model.Square;
 import fr.aboucorp.teamchess.entities.model.ChessColor;
-import fr.aboucorp.teamchess.entities.model.Piece;
 import fr.aboucorp.teamchess.entities.model.Location;
+import fr.aboucorp.teamchess.entities.model.Piece;
+import fr.aboucorp.teamchess.entities.model.Square;
 import fr.aboucorp.teamchess.entities.model.enums.GameState;
 import fr.aboucorp.teamchess.entities.model.events.GameEventManager;
 import fr.aboucorp.teamchess.entities.model.events.GameEventSubscriber;
@@ -71,8 +71,8 @@ public class PartyManager implements GameEventSubscriber {
         }
     }
 
-    public void selectCell(Square square) {
-        this.boardManager.moveSelectedPieceToCell(square);
+    public void selectSquare(Square square) {
+        this.boardManager.moveSelectedPieceToSquare(square);
         this.turnManager.endTurn();
     }
 
@@ -89,8 +89,8 @@ public class PartyManager implements GameEventSubscriber {
         return this.boardManager.getPieceFromLocation(location,this.turnManager.getTurnColor());
     }
 
-    public Square getCellFromLocation(Location location) {
-       return boardManager.getCellFromLocation(location);
+    public Square getSquareFromLocation(Location location) {
+       return boardManager.getSquareFromLocation(location);
     }
 
     public GameState getGameState() {
@@ -101,8 +101,8 @@ public class PartyManager implements GameEventSubscriber {
         this.gameState = gameState;
     }
 
-    public ArrayList<ChessModel> getChessCellModels() {
-        return this.boardManager.getChessCellModels();
+    public ArrayList<ChessModel> getChessSquareModels() {
+        return this.boardManager.getChessSquareModels();
     }
 
     @Override
@@ -115,8 +115,8 @@ public class PartyManager implements GameEventSubscriber {
         return boardManager;
     }
 
-    public ArrayList<ChessModel> getPossibleCellModels() {
-        return this.boardManager.getPossibleCellModels();
+    public ArrayList<ChessModel> getPossibleSquareModels() {
+        return this.boardManager.getPossibleSquareModels();
     }
 
 }

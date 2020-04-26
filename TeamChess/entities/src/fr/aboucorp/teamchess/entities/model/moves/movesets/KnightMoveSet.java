@@ -1,12 +1,12 @@
 package fr.aboucorp.teamchess.entities.model.moves.movesets;
 
 import fr.aboucorp.teamchess.entities.model.Board;
-import fr.aboucorp.teamchess.entities.model.Square;
 import fr.aboucorp.teamchess.entities.model.ChessColor;
-import fr.aboucorp.teamchess.entities.model.Piece;
 import fr.aboucorp.teamchess.entities.model.Location;
+import fr.aboucorp.teamchess.entities.model.Piece;
+import fr.aboucorp.teamchess.entities.model.Square;
 import fr.aboucorp.teamchess.entities.model.moves.AbstractMoveSet;
-import fr.aboucorp.teamchess.entities.model.utils.ChessCellList;
+import fr.aboucorp.teamchess.entities.model.utils.SquareList;
 
 public class KnightMoveSet extends AbstractMoveSet {
 
@@ -15,46 +15,46 @@ public class KnightMoveSet extends AbstractMoveSet {
     }
 
     @Override
-    protected ChessCellList getPossibleMoves(Piece piece, Board board, ChessColor turnColor) {
-        ChessCellList validCells = new ChessCellList();
+    protected SquareList getPossibleMoves(Piece piece, Board board, ChessColor turnColor) {
+        SquareList validSquares = new SquareList();
         Location start = piece.getLocation();
 
-        for (Square cell : board.getChessCells()) {
-            Location end = cell.getLocation();
+        for (Square square : board.getSquares()) {
+            Location end = square.getLocation();
             if (end.getX() == start.getX() + 2
                     && (end.getZ() == start.getZ() + 1
                     || end.getZ() == start.getZ() - 1)) {
-                if(cell.getPiece() == null ||  cell.getPiece().getChessColor() != turnColor) {
-                    validCells.add(cell);
+                if(square.getPiece() == null ||  square.getPiece().getChessColor() != turnColor) {
+                    validSquares.add(square);
                 }
             }
             if (end.getX() == start.getX() - 2
                     && (end.getZ() == start.getZ() + 1
                     || end.getZ() == start.getZ() - 1)) {
-                if(cell.getPiece() == null || cell.getPiece().getChessColor() != turnColor) {
-                    validCells.add(cell);
+                if(square.getPiece() == null || square.getPiece().getChessColor() != turnColor) {
+                    validSquares.add(square);
                 }
             }
             if (end.getZ() == start.getZ() + 2
                     && (end.getX() == start.getX() + 1
                     || end.getX() == start.getX() - 1)) {
-                if(cell.getPiece() == null || cell.getPiece().getChessColor() != turnColor) {
-                    validCells.add(cell);
+                if(square.getPiece() == null || square.getPiece().getChessColor() != turnColor) {
+                    validSquares.add(square);
                 }
             }
             if (end.getZ() == start.getZ() - 2
                     && (end.getX() == start.getX() + 1
                     || end.getX() == start.getX() - 1)) {
-                if(cell.getPiece() == null || cell.getPiece().getChessColor() != turnColor) {
-                    validCells.add(cell);
+                if(square.getPiece() == null || square.getPiece().getChessColor() != turnColor) {
+                    validSquares.add(square);
                 }
             }
         }
-        return  validCells;
+        return  validSquares;
     }
 
     @Override
-    public ChessCellList getThreats(Piece piece, Board board, ChessColor turnColor) {
+    public SquareList getThreats(Piece piece, Board board, ChessColor turnColor) {
         return getPossibleMoves(piece,board,turnColor);
     }
 }

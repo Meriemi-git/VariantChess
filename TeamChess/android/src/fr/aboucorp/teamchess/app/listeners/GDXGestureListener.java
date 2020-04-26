@@ -4,8 +4,8 @@ import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
 
 import fr.aboucorp.teamchess.app.managers.PartyManager;
-import fr.aboucorp.teamchess.entities.model.Square;
 import fr.aboucorp.teamchess.entities.model.Piece;
+import fr.aboucorp.teamchess.entities.model.Square;
 import fr.aboucorp.teamchess.libgdx.models.ChessModel;
 
 
@@ -41,11 +41,11 @@ public class GDXGestureListener implements GestureDetector.GestureListener {
                         this.partyManager.selectPiece(otherTouchedPiece);
                     }
                 } else {
-                    ChessModel cellModel = touchedModelFinder.getTouchedModel(screenX, screenY, this.partyManager.getPossibleCellModels());
-                    if(cellModel != null) {
-                        Square square = this.partyManager.getCellFromLocation(cellModel.getLocation());
+                    ChessModel squareModel = touchedModelFinder.getTouchedModel(screenX, screenY, this.partyManager.getPossibleSquareModels());
+                    if(squareModel != null) {
+                        Square square = this.partyManager.getSquareFromLocation(squareModel.getLocation());
                         if (square != null) {
-                            this.partyManager.selectCell(square);
+                            this.partyManager.selectSquare(square);
                         }
                     }else {
                         this.partyManager.unHightlight();

@@ -6,7 +6,7 @@ import java.util.Iterator;
 import fr.aboucorp.teamchess.entities.model.GameElement;
 import fr.aboucorp.teamchess.entities.model.Location;
 
-public class ChessList<T extends GameElement> extends ArrayList<T> {
+public abstract class ChessList<T extends GameElement> extends ArrayList<T> {
 
     public GameElement getItemByLocation(Location location) {
       for(GameElement element : this){
