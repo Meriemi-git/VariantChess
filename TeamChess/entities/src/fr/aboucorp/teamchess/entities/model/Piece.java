@@ -5,25 +5,25 @@ import fr.aboucorp.teamchess.entities.model.enums.PieceId;
 import fr.aboucorp.teamchess.entities.model.moves.AbstractMoveSet;
 import fr.aboucorp.teamchess.entities.model.moves.Movable;
 
-public abstract class ChessPiece extends GameElement implements Movable {
+public abstract class Piece extends GameElement implements Movable {
     protected AbstractMoveSet moveSet;
-    private ChessCell actualCell;
+    private Square actualSquare;
     private PieceId pieceId;
     private boolean isFirstMove = true;
 
-    public ChessPiece(ChessCell cell, ChessColor chessColor,PieceId pieceId){
-        super(cell.getLocation(), chessColor);
-        this.actualCell = cell;
+    public Piece(Square square, ChessColor chessColor, PieceId pieceId){
+        super(square.getLocation(), chessColor);
+        this.actualSquare = square;
         this.pieceId = pieceId;
-        cell.setPiece(this);
+        square.setPiece(this);
     }
 
     @Override
-    public void move(ChessCell cell) {
-        this.actualCell.setPiece(null);
-        this.actualCell = cell;
-        cell.setPiece(this);
-        this.setLocation(cell.getLocation());
+    public void move(Square square) {
+        this.actualSquare.setPiece(null);
+        this.actualSquare = square;
+        square.setPiece(this);
+        this.setLocation(square.getLocation());
         this.isFirstMove = false;
     }
 
@@ -35,19 +35,19 @@ public abstract class ChessPiece extends GameElement implements Movable {
         return isFirstMove;
     }
 
-    public ChessCell getActualCell() {
-        return actualCell;
+    public Square getActualSquare() {
+        return actualSquare;
     }
 
     public void die(){
-        this.actualCell.setPiece(null);
-        this.actualCell = null;
+        this.actualSquare.setPiece(null);
+        this.actualSquare = null;
         this.setLocation(null);
     }
 
     @Override
     public String toString() {
-        return this.pieceId.toString() + " [" + (this.actualCell != null ? this.actualCell.getCellLabel() : "EVEN") + "]";
+        return this.pieceId.toString() + " [" + (this.actualSquare != null ? this.actualSquare.getCellLabel() : "EVEN") + "]";
     }
 
     public AbstractMoveSet getMoveSet() {

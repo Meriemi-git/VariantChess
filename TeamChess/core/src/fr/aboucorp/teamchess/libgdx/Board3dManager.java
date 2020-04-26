@@ -32,9 +32,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import fr.aboucorp.teamchess.entities.model.ChessCell;
+import fr.aboucorp.teamchess.entities.model.Square;
 import fr.aboucorp.teamchess.entities.model.ChessColor;
-import fr.aboucorp.teamchess.entities.model.ChessPiece;
+import fr.aboucorp.teamchess.entities.model.Piece;
 import fr.aboucorp.teamchess.entities.model.GameElement;
 import fr.aboucorp.teamchess.entities.model.Location;
 import fr.aboucorp.teamchess.entities.model.pieces.Bishop;
@@ -44,14 +44,14 @@ import fr.aboucorp.teamchess.entities.model.pieces.Pawn;
 import fr.aboucorp.teamchess.entities.model.pieces.Queen;
 import fr.aboucorp.teamchess.entities.model.pieces.Rook;
 import fr.aboucorp.teamchess.entities.model.utils.ChessCellList;
-import fr.aboucorp.teamchess.libgdx.models.ChessCellModel;
+import fr.aboucorp.teamchess.libgdx.models.ChessSquareM;
 import fr.aboucorp.teamchess.libgdx.models.ChessModel;
-import fr.aboucorp.teamchess.libgdx.models.pieces.BishopModel;
-import fr.aboucorp.teamchess.libgdx.models.pieces.KingModel;
-import fr.aboucorp.teamchess.libgdx.models.pieces.KnightModel;
-import fr.aboucorp.teamchess.libgdx.models.pieces.PawnModel;
-import fr.aboucorp.teamchess.libgdx.models.pieces.QueenModel;
-import fr.aboucorp.teamchess.libgdx.models.pieces.RookModel;
+import fr.aboucorp.teamchess.libgdx.models.pieces.BishopM;
+import fr.aboucorp.teamchess.libgdx.models.pieces.KingM;
+import fr.aboucorp.teamchess.libgdx.models.pieces.KnightM;
+import fr.aboucorp.teamchess.libgdx.models.pieces.PawnM;
+import fr.aboucorp.teamchess.libgdx.models.pieces.QueenM;
+import fr.aboucorp.teamchess.libgdx.models.pieces.RookM;
 import fr.aboucorp.teamchess.libgdx.utils.ChessModelList;
 
 public class Board3dManager extends ApplicationAdapter {
@@ -74,7 +74,7 @@ public class Board3dManager extends ApplicationAdapter {
     private final ChessModelList blackPieceModels;
     private final ChessModelList whiteDeadPieceModels;
     private final ChessModelList blackDeadPieceModels;
-    private final ArrayList<ChessPiece> loadingPieces;
+    private final ArrayList<Piece> loadingPieces;
 
 
     private final ArrayList<ModelInstance> devStuff;
@@ -99,7 +99,7 @@ public class Board3dManager extends ApplicationAdapter {
         this.blackPieceModels = new ChessModelList();
         this.blackDeadPieceModels = new ChessModelList();
         this.chessCellModels = new ChessModelList();
-        this.loadingPieces = new ArrayList<ChessPiece>();
+        this.loadingPieces = new ArrayList<Piece>();
 
     }
 
@@ -175,7 +175,7 @@ public class Board3dManager extends ApplicationAdapter {
                     .rotate(0, 1, 0, 180);
 
             spriteBatch.setProjectionMatrix(tmpMat4.set(camera.combined).mul(textTransform));
-            font.draw(spriteBatch, ((ChessCellModel)cellModel).getLabel(), 0, 0);
+            font.draw(spriteBatch, ((ChessSquareM)cellModel).getLabel(), 0, 0);
         }
         spriteBatch.end();
     }
@@ -197,7 +197,7 @@ public class Board3dManager extends ApplicationAdapter {
     }
 
 
-    public void createCells(List<ChessCell> cells) {
+    public void createCells(List<Square> cells) {
         this.modelBuilder = new ModelBuilder();
         Model compositeModel = createModelFromParts();
 
@@ -208,7 +208,7 @@ public class Board3dManager extends ApplicationAdapter {
             } else {
                 material = new Material(ColorAttribute.createDiffuse(Color.WHITE));
             }
-            ChessCellModel cellModel = new ChessCellModel(compositeModel, cell.getLocation(), material,((ChessCell)cell).getCellLabel());
+            ChessSquareM cellModel = new ChessSquareM(compositeModel, cell.getLocation(), material,((Square)cell).getCellLabel());
             this.chessCellModels.add(cellModel);
         }
 
@@ -229,7 +229,7 @@ public class Board3dManager extends ApplicationAdapter {
         return modelBuilder.end();
     }
 
-    public void createPieces(List<ChessPiece> pieces){
+    public void createPieces(List<Piece> pieces){
         this.loadingPieces.addAll(pieces);
     }
 
@@ -248,8 +248,8 @@ public class Board3dManager extends ApplicationAdapter {
         Model kingModel = this.assets.get("data/king.g3db", Model.class);
         Model rookModel = this.assets.get("data/rook.g3db", Model.class);
 
-        for (Iterator<ChessPiece> iter = this.loadingPieces.iterator(); iter.hasNext();) {
-            ChessPiece piece = iter.next();
+        for (Iterator<Piece> iter = this.loadingPieces.iterator(); iter.hasNext();) {
+            Piece piece = iter.next();
             Material material;
             if(piece.getChessColor() == ChessColor.WHITE){
                 material = new Material(ColorAttribute.createDiffuse(Color.WHITE));
@@ -258,27 +258,27 @@ public class Board3dManager extends ApplicationAdapter {
             }
             ChessModel model = null;
             if(piece instanceof Rook){
-                model = new RookModel(rookModel,piece.getLocation(), material);
+                model = new RookM(rookModel,piece.getLocation(), material);
             }else if(piece instanceof Pawn){
-                model = new PawnModel(pawnModel,piece.getLocation(), material);
+                model = new PawnM(pawnModel,piece.getLocation(), material);
             }else if(piece instanceof Knight){
-                model = new KnightModel(knightModel,piece.getLocation(), material);
+                model = new KnightM(knightModel,piece.getLocation(), material);
                 if(piece.getChessColor() == ChessColor.WHITE){
                     model.transform.rotate(Vector3.Y, -90);
                 }else{
                     model.transform.rotate(Vector3.Y, 90);
                 }
             }else if(piece instanceof Bishop){
-                model = new BishopModel(bishopModel,piece.getLocation(), material);
+                model = new BishopM(bishopModel,piece.getLocation(), material);
                 if(piece.getChessColor() == ChessColor.WHITE){
                     model.transform.rotate(Vector3.Y, -90);
                 }else{
                     model.transform.rotate(Vector3.Y, 90);
                 }
             }else if(piece instanceof King){
-                model = new KingModel(kingModel,piece.getLocation(), material);
+                model = new KingM(kingModel,piece.getLocation(), material);
             }else if(piece instanceof Queen){
-                model= new QueenModel(queenModel,piece.getLocation(), material);
+                model= new QueenM(queenModel,piece.getLocation(), material);
             }
             if(piece.getChessColor() == ChessColor.BLACK){
                 this.blackPieceModels.add(model);
@@ -305,7 +305,7 @@ public class Board3dManager extends ApplicationAdapter {
         this.devStuff.add(new ModelInstance(arrowZ));
     }
 
-    public void selectPiece(ChessPiece touched) {
+    public void selectPiece(Piece touched) {
         if(this.selectedModel != null){
             this.material3dManager.resetMaterial(this.selectedModel);
         }
@@ -378,15 +378,15 @@ public class Board3dManager extends ApplicationAdapter {
         this.androidListener = androidListener;
     }
 
-    public void moveSelectedPieceIntoCell(ChessCell cell) {
+    public void moveSelectedPieceIntoCell(Square cell) {
         this.selectedModel.move(cell.getLocation());
     }
 
-    public void highlightEmptyCellFromLocation(ChessCell cell) {
+    public void highlightEmptyCellFromLocation(Square cell) {
         this.material3dManager.setSelectedMaterial(this.chessCellModels.getByLocation(cell.getLocation()));
     }
 
-    public void highlightOccupiedCellFromLocation(ChessCell cell) {
+    public void highlightOccupiedCellFromLocation(Square cell) {
         this.material3dManager.setOccupiedMaterial(this.chessCellModels.getByLocation(cell.getLocation()));
         if(cell.getPiece().getChessColor() == ChessColor.WHITE){
             this.material3dManager.setOccupiedMaterial(this.getWhitePieceModels().getByLocation(cell.getPiece().getLocation()));
@@ -395,7 +395,7 @@ public class Board3dManager extends ApplicationAdapter {
         }
     }
 
-    public void moveToCell(ChessPiece piece, ChessCell cell) {
+    public void moveToCell(Piece piece, Square cell) {
         if(piece.getChessColor() == ChessColor.WHITE){
             this.getWhitePieceModels().getByLocation(piece.getLocation()).move(cell.getLocation());
         }else{
@@ -407,7 +407,7 @@ public class Board3dManager extends ApplicationAdapter {
         ArrayList<ChessModel> possibleCells = new ArrayList<>();
         if(possiblesMoves  != null) {
             for (ChessModel cellModel : getChessCellModels()) {
-                for (ChessCell cell : possiblesMoves) {
+                for (Square cell : possiblesMoves) {
                     if (cellModel.getLocation().equals(cell.getLocation())) {
                         possibleCells.add(cellModel);
                     }
@@ -418,7 +418,7 @@ public class Board3dManager extends ApplicationAdapter {
     }
 
     public void unHighlightCells(ChessCellList possiblesMoves) {
-        for (ChessCell cell: possiblesMoves) {
+        for (Square cell: possiblesMoves) {
             this.material3dManager.resetMaterial(getChessCellModels().getByLocation(cell.getLocation()));
             if(cell.getPiece() !=null){
                 if(cell.getPiece().getChessColor() == ChessColor.WHITE){
@@ -430,7 +430,7 @@ public class Board3dManager extends ApplicationAdapter {
         }
     }
 
-    public void moveToEven(ChessPiece piece) {
+    public void moveToEven(Piece piece) {
         ChessModel eatenPiece;
         if(piece.getChessColor() == ChessColor.WHITE){
             eatenPiece = getWhitePieceModels().removeByLocation(piece.getLocation());

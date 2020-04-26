@@ -4,8 +4,8 @@ import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
 
 import fr.aboucorp.teamchess.app.managers.PartyManager;
-import fr.aboucorp.teamchess.entities.model.ChessCell;
-import fr.aboucorp.teamchess.entities.model.ChessPiece;
+import fr.aboucorp.teamchess.entities.model.Square;
+import fr.aboucorp.teamchess.entities.model.Piece;
 import fr.aboucorp.teamchess.libgdx.models.ChessModel;
 
 
@@ -24,7 +24,7 @@ public class GDXGestureListener implements GestureDetector.GestureListener {
             case SelectPiece:
                 ChessModel touchedModel = touchedModelFinder.getTouchedModel(screenX, screenY, this.partyManager.getPiecesModelsFromActualTurn());
                 if (touchedModel != null) {
-                    ChessPiece touchedPiece = this.partyManager.getPieceFromLocation(touchedModel.getLocation());
+                    Piece touchedPiece = this.partyManager.getPieceFromLocation(touchedModel.getLocation());
                     if (touchedPiece != null) {
                         this.partyManager.selectPiece(touchedPiece);
                     } else {
@@ -35,7 +35,7 @@ public class GDXGestureListener implements GestureDetector.GestureListener {
             case SelectCase:
                 ChessModel otherModel = touchedModelFinder.getTouchedModel(screenX, screenY, this.partyManager.getPiecesModelsFromActualTurn());
                 if (otherModel != null) {
-                    ChessPiece otherTouchedPiece = this.partyManager.getPieceFromLocation(otherModel.getLocation());
+                    Piece otherTouchedPiece = this.partyManager.getPieceFromLocation(otherModel.getLocation());
                     if (otherTouchedPiece != null) {
                         this.partyManager.unHightlight();
                         this.partyManager.selectPiece(otherTouchedPiece);
@@ -43,9 +43,9 @@ public class GDXGestureListener implements GestureDetector.GestureListener {
                 } else {
                     ChessModel cellModel = touchedModelFinder.getTouchedModel(screenX, screenY, this.partyManager.getPossibleCellModels());
                     if(cellModel != null) {
-                        ChessCell chessCell = this.partyManager.getCellFromLocation(cellModel.getLocation());
-                        if (chessCell != null) {
-                            this.partyManager.selectCell(chessCell);
+                        Square square = this.partyManager.getCellFromLocation(cellModel.getLocation());
+                        if (square != null) {
+                            this.partyManager.selectCell(square);
                         }
                     }else {
                         this.partyManager.unHightlight();

@@ -1,13 +1,13 @@
 package fr.aboucorp.teamchess.entities.model;
 
 
-public class ChessCell extends GameElement {
+public class Square extends GameElement {
 
     private String cellLabel;
 
-    private ChessPiece piece;
+    private Piece piece;
 
-    public ChessCell(Location location, ChessColor chessColor) {
+    public Square(Location location, ChessColor chessColor) {
         super(location, chessColor);
         this.cellLabel = Character.toString( (char)( 65 + (7 - this.getLocation().getX())) )+ (this.getLocation().getZ()+1);
     }
@@ -17,11 +17,11 @@ public class ChessCell extends GameElement {
         return '[' + this.cellLabel + ']';
     }
 
-    public ChessPiece getPiece() {
+    public Piece getPiece() {
         return piece;
     }
 
-    public void setPiece(ChessPiece piece) {
+    public void setPiece(Piece piece) {
         this.piece = piece;
     }
 
@@ -31,6 +31,6 @@ public class ChessCell extends GameElement {
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof ChessCell && ((ChessCell) obj).getLocation().equals(getLocation());
+        return obj instanceof Square && ((Square) obj).getLocation().equals(getLocation());
     }
 }

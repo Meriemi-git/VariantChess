@@ -6,10 +6,10 @@ import com.badlogic.gdx.graphics.Camera;
 import java.util.ArrayList;
 
 import fr.aboucorp.teamchess.entities.model.Board;
-import fr.aboucorp.teamchess.entities.model.ChessCell;
+import fr.aboucorp.teamchess.entities.model.Square;
 import fr.aboucorp.teamchess.entities.model.ChessColor;
-import fr.aboucorp.teamchess.entities.model.ChessPiece;
-import fr.aboucorp.teamchess.entities.model.ChessTurn;
+import fr.aboucorp.teamchess.entities.model.Piece;
+import fr.aboucorp.teamchess.entities.model.Turn;
 import fr.aboucorp.teamchess.entities.model.Location;
 import fr.aboucorp.teamchess.entities.model.enums.PieceEventType;
 import fr.aboucorp.teamchess.entities.model.enums.PieceId;
@@ -33,10 +33,10 @@ public class BoardManager implements GameEventSubscriber {
 
     private final Board board;
     private final Board3dManager board3dManager;
-    private ChessPiece selectedPiece;
+    private Piece selectedPiece;
     private GameEventManager eventManager;
-    private ChessTurn previousTurn;
-    private ChessTurn actualTurn;
+    private Turn previousTurn;
+    private Turn actualTurn;
     private boolean waitingForBigCastle;
     private boolean waitingForLittleCastle;
     private boolean waitingForEnPassant;
@@ -85,12 +85,12 @@ public class BoardManager implements GameEventSubscriber {
         }).start();
     }
 
-    public void moveSelectedPieceToCell(ChessCell cell) {
+    public void moveSelectedPieceToCell(Square cell) {
         String eventMessage = String.format("Move %s from %s to %s",
                 selectedPiece.getPieceId().name(),
-                selectedPiece.getActualCell(),
+                selectedPiece.getActualSquare(),
                 cell);
-        MoveEvent moveEvent = new MoveEvent(eventMessage, selectedPiece.getActualCell(), cell, selectedPiece, cell.getPiece());
+        MoveEvent moveEvent = new MoveEvent(eventMessage, selectedPiece.getActualSquare(), cell, selectedPiece, cell.getPiece());
         this.eventManager.sendMessage(moveEvent);
         eat(cell);
         this.selectedPiece.move(cell);
@@ -103,14 +103,14 @@ public class BoardManager implements GameEventSubscriber {
     }
 
     private void kingIsInCheck() {
-        ChessPiece kingInCheck = this.selectedPiece.getMoveSet().pieceMoveCauseCheck(this.selectedPiece, board, actualTurn.getTurnColor());
+        Piece kingInCheck = this.selectedPiece.getMoveSet().pieceMoveCauseCheck(this.selectedPiece, board, actualTurn.getTurnColor());
         if (kingInCheck != null) {
             this.eventManager.sendMessage(new CheckEvent("King is in check", PieceEventType.CHECK, kingInCheck, this.selectedPiece));
         }
     }
 
-    public void eat(ChessCell cell) {
-        ChessPiece toBeEaten = cell.getPiece();
+    public void eat(Square cell) {
+        Piece toBeEaten = cell.getPiece();
         if (isEnPassantMove(cell)) {
             toBeEaten = this.previousTurn.played;
         }
@@ -127,7 +127,7 @@ public class BoardManager implements GameEventSubscriber {
         }
     }
 
-    private boolean isEnPassantMove(ChessCell destination) {
+    private boolean isEnPassantMove(Square destination) {
         return this.waitingForEnPassant
                 && destination.getPiece() == null
                 && this.selectedPiece.getLocation().getX() != destination.getLocation().getX();
@@ -139,10 +139,10 @@ public class BoardManager implements GameEventSubscriber {
         this.possiblesMoves = null;
     }
 
-    private void checkIfCastling(ChessCell cell) {
+    private void checkIfCastling(Square cell) {
         ChessColor turnColor = this.actualTurn.getTurnColor();
-        ChessPiece rookToMove = null;
-        ChessCell destination = null;
+        Piece rookToMove = null;
+        Square destination = null;
         if (this.waitingForBigCastle) {
             if (turnColor == ChessColor.WHITE && cell.getCellLabel().equals("C1")) {
                 rookToMove = this.board.getWhitePieces().getPieceById(PieceId.WLR);
@@ -167,7 +167,7 @@ public class BoardManager implements GameEventSubscriber {
         }
     }
 
-    public void selectPiece(ChessPiece touched) {
+    public void selectPiece(Piece touched) {
         this.selectedPiece = touched;
         this.board3dManager.selectPiece(touched);
         this.possiblesMoves = touched.getMoveSet().getNextMoves();
@@ -176,7 +176,7 @@ public class BoardManager implements GameEventSubscriber {
 
     private void hightLightPossibleMoves(ChessCellList possibleMoves) {
         if (possibleMoves != null) {
-            for (ChessCell cell : possibleMoves) {
+            for (Square cell : possibleMoves) {
                 if (cell.getPiece() == null) {
                     this.board3dManager.highlightEmptyCellFromLocation(cell);
                 } else {
@@ -215,14 +215,14 @@ public class BoardManager implements GameEventSubscriber {
         return this.board3dManager.getCellModelsFromPossibleMoves(this.possiblesMoves);
     }
 
-    public ChessPiece getPieceFromLocation(Location location, ChessColor color) {
-        ArrayList<ChessPiece> arrayList = null;
+    public Piece getPieceFromLocation(Location location, ChessColor color) {
+        ArrayList<Piece> arrayList = null;
         if (color == ChessColor.WHITE) {
             arrayList = this.board.getWhitePieces();
         } else {
             arrayList = this.board.getBlackPieces();
         }
-        for (ChessPiece piece : arrayList) {
+        for (Piece piece : arrayList) {
             if (piece.getLocation().equals(location)) {
                 return piece;
             }
@@ -230,8 +230,8 @@ public class BoardManager implements GameEventSubscriber {
         return null;
     }
 
-    public ChessCell getCellFromLocation(Location location) {
-        for (ChessCell cell : this.board.getChessCells()) {
+    public Square getCellFromLocation(Location location) {
+        for (Square cell : this.board.getChessCells()) {
             if (cell.getLocation().equals(location)) {
                 return cell;
             }
@@ -255,13 +255,13 @@ public class BoardManager implements GameEventSubscriber {
         return this.board3dManager.getWhitePieceModels();
     }
 
-    public ChessPiece getSelectedPiece() {
+    public Piece getSelectedPiece() {
         return selectedPiece;
     }
 
     public boolean isGameFinished() {
         boolean cantMove = true;
-        for (ChessPiece piece : board.getPieceByColor(this.actualTurn.getTurnColor())) {
+        for (Piece piece : board.getPieceByColor(this.actualTurn.getTurnColor())) {
             if (piece.getMoveSet().getNextMoves().size() > 0) {
                 cantMove = false;
             }
@@ -278,7 +278,7 @@ public class BoardManager implements GameEventSubscriber {
             opposites = this.board.getWhitePieces();
         }
         boolean canMove = false;
-        for (ChessPiece piece : opposites) {
+        for (Piece piece : opposites) {
             piece.getMoveSet().calculateNextMoves(this.board, oppositeColor);
             if (piece.getMoveSet().getNextMoves().size() > 0) {
                 canMove = true;

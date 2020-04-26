@@ -1,9 +1,9 @@
 package fr.aboucorp.teamchess.entities.model.moves.movesets;
 
 import fr.aboucorp.teamchess.entities.model.Board;
-import fr.aboucorp.teamchess.entities.model.ChessCell;
+import fr.aboucorp.teamchess.entities.model.Square;
 import fr.aboucorp.teamchess.entities.model.ChessColor;
-import fr.aboucorp.teamchess.entities.model.ChessPiece;
+import fr.aboucorp.teamchess.entities.model.Piece;
 import fr.aboucorp.teamchess.entities.model.Location;
 import fr.aboucorp.teamchess.entities.model.enums.PieceEventType;
 import fr.aboucorp.teamchess.entities.model.enums.PieceId;
@@ -13,29 +13,29 @@ import fr.aboucorp.teamchess.entities.model.utils.ChessCellList;
 
 public class PawnMoveSet extends AbstractMoveSet {
 
-    public PawnMoveSet(ChessPiece thisPiece, Board board) {
+    public PawnMoveSet(Piece thisPiece, Board board) {
         super(thisPiece, board);
     }
 
     @Override
-    protected ChessCellList getPossibleMoves(ChessPiece piece, Board board, ChessColor turnColor) {
+    protected ChessCellList getPossibleMoves(Piece piece, Board board, ChessColor turnColor) {
         ChessCellList validCells = getClassicMoves(piece, board, turnColor);
         validCells.addAll(getEatingMoves(piece, board, turnColor, false));
         return validCells;
     }
 
-    private ChessCellList getClassicMoves(ChessPiece piece, Board board, ChessColor turnColor) {
+    private ChessCellList getClassicMoves(Piece piece, Board board, ChessColor turnColor) {
         ChessCellList classicMoves = new ChessCellList();
         Location start = piece.getLocation();
-        ChessCell simpleMove;
+        Square simpleMove;
         int zpos = piece.getChessColor() == ChessColor.WHITE ? start.getZ() + 1 : start.getZ() - 1;
-        simpleMove = (ChessCell) board.getChessCells().getItemByLocation(new Location(start.getX(), 0, zpos));
+        simpleMove = (Square) board.getChessCells().getItemByLocation(new Location(start.getX(), 0, zpos));
         if (simpleMove != null && simpleMove.getPiece() == null) {
             classicMoves.add(simpleMove);
-            ChessCell doubleMove;
+            Square doubleMove;
             if (piece.isFirstMove()) {
                 zpos = piece.getChessColor() == ChessColor.WHITE ? start.getZ() + 2 : start.getZ() - 2;
-                doubleMove = (ChessCell) board.getChessCells().getItemByLocation(new Location(start.getX(), 0, zpos));
+                doubleMove = (Square) board.getChessCells().getItemByLocation(new Location(start.getX(), 0, zpos));
                 if (doubleMove != null && doubleMove.getPiece() == null) {
                     classicMoves.add(doubleMove);
                 }
@@ -45,14 +45,14 @@ public class PawnMoveSet extends AbstractMoveSet {
     }
 
 
-    private ChessCellList getEatingMoves(ChessPiece piece, Board board, ChessColor turnColor, boolean isThreat) {
+    private ChessCellList getEatingMoves(Piece piece, Board board, ChessColor turnColor, boolean isThreat) {
         Location start = piece.getLocation();
         ChessCellList validCells = new ChessCellList();
-        ChessCell diagRight;
-        ChessCell diagLeft;
+        Square diagRight;
+        Square diagLeft;
         int zpos = piece.getChessColor() == ChessColor.WHITE ? 1 : -1;
-        diagRight = (ChessCell) board.getChessCells().getItemByLocation(new Location(start.getX() - 1, 0, start.getZ() + zpos));
-        diagLeft = (ChessCell) board.getChessCells().getItemByLocation(new Location(start.getX() + 1, 0, start.getZ() + zpos));
+        diagRight = (Square) board.getChessCells().getItemByLocation(new Location(start.getX() - 1, 0, start.getZ() + zpos));
+        diagLeft = (Square) board.getChessCells().getItemByLocation(new Location(start.getX() + 1, 0, start.getZ() + zpos));
 
         if (diagRight != null
                 && (isThreat
@@ -96,7 +96,7 @@ public class PawnMoveSet extends AbstractMoveSet {
     }
 
     @Override
-    public ChessCellList getThreats(ChessPiece piece, Board board, ChessColor turnColor) {
+    public ChessCellList getThreats(Piece piece, Board board, ChessColor turnColor) {
         return getEatingMoves(piece, board, turnColor, true);
     }
 

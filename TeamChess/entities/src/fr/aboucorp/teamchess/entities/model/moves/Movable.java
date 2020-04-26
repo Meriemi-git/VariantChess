@@ -1,9 +1,9 @@
 package fr.aboucorp.teamchess.entities.model.moves;
 
-import fr.aboucorp.teamchess.entities.model.ChessCell;
+import fr.aboucorp.teamchess.entities.model.Square;
 
 
 public interface Movable {
 
-    void move(ChessCell cell);
+    void move(Square cell);
 }

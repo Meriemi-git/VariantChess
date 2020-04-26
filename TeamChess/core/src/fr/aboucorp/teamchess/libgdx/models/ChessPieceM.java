@@ -5,9 +5,9 @@ import com.badlogic.gdx.graphics.g3d.Model;
 
 import fr.aboucorp.teamchess.entities.model.Location;
 
-public class ChessPieceModel extends ChessModel {
+public class ChessPieceM extends ChessModel {
 
-    public ChessPieceModel(Model model, Location location, Material originalMaterial) {
+    public ChessPieceM(Model model, Location location, Material originalMaterial) {
         super(model, location, originalMaterial);
     }
 }

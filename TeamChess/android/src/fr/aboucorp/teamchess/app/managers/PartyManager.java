@@ -4,9 +4,9 @@ import android.util.Log;
 
 import java.util.ArrayList;
 
-import fr.aboucorp.teamchess.entities.model.ChessCell;
+import fr.aboucorp.teamchess.entities.model.Square;
 import fr.aboucorp.teamchess.entities.model.ChessColor;
-import fr.aboucorp.teamchess.entities.model.ChessPiece;
+import fr.aboucorp.teamchess.entities.model.Piece;
 import fr.aboucorp.teamchess.entities.model.Location;
 import fr.aboucorp.teamchess.entities.model.enums.GameState;
 import fr.aboucorp.teamchess.entities.model.events.GameEventManager;
@@ -53,7 +53,7 @@ public class PartyManager implements GameEventSubscriber {
         return this.turnManager.getTurnColor().name();
     }
 
-    public void selectPiece(ChessPiece touched) {
+    public void selectPiece(Piece touched) {
         this.gameState = GameState.SelectCase;
         this.boardManager.selectPiece(touched);
     }
@@ -71,8 +71,8 @@ public class PartyManager implements GameEventSubscriber {
         }
     }
 
-    public void selectCell(ChessCell chessCell) {
-        this.boardManager.moveSelectedPieceToCell(chessCell);
+    public void selectCell(Square square) {
+        this.boardManager.moveSelectedPieceToCell(square);
         this.turnManager.endTurn();
     }
 
@@ -85,11 +85,11 @@ public class PartyManager implements GameEventSubscriber {
         return  this.boardManager.getWhitePieceModels();
     }
 
-    public ChessPiece getPieceFromLocation(Location location) {
+    public Piece getPieceFromLocation(Location location) {
         return this.boardManager.getPieceFromLocation(location,this.turnManager.getTurnColor());
     }
 
-    public ChessCell getCellFromLocation(Location location) {
+    public Square getCellFromLocation(Location location) {
        return boardManager.getCellFromLocation(location);
     }
 

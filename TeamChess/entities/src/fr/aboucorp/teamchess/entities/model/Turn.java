@@ -2,17 +2,17 @@ package fr.aboucorp.teamchess.entities.model;
 
 import java.time.Duration;
 
-public class ChessTurn {
+public class Turn {
 
     public final int turnNumber;
     public Duration duration;
-    public ChessCell from;
-    public ChessCell to;
-    public ChessPiece played;
-    public ChessPiece DeadPiece;
+    public Square from;
+    public Square to;
+    public Piece played;
+    public Piece DeadPiece;
     public final Team team;
 
-    public ChessTurn(int turnNumber, Team team) {
+    public Turn(int turnNumber, Team team) {
         this.turnNumber = turnNumber;
         this.team = team;
     }
@@ -21,35 +21,35 @@ public class ChessTurn {
         return this.team.getChessColor();
     }
 
-    public ChessPiece getDeadPiece() {
+    public Piece getDeadPiece() {
         return DeadPiece;
     }
 
-    public void setDeadPiece(ChessPiece deadPiece) {
+    public void setDeadPiece(Piece deadPiece) {
         DeadPiece = deadPiece;
     }
 
-    public ChessCell getFrom() {
+    public Square getFrom() {
         return from;
     }
 
-    public void setFrom(ChessCell from) {
+    public void setFrom(Square from) {
         this.from = from;
     }
 
-    public ChessCell getTo() {
+    public Square getTo() {
         return to;
     }
 
-    public void setTo(ChessCell to) {
+    public void setTo(Square to) {
         this.to = to;
     }
 
-    public ChessPiece getPlayed() {
+    public Piece getPlayed() {
         return played;
     }
 
-    public void setPlayed(ChessPiece played) {
+    public void setPlayed(Piece played) {
         this.played = played;
     }
 

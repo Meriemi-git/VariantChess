@@ -1,13 +1,14 @@
 package fr.aboucorp.teamchess.libgdx.models.pieces;
 
+
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
 
 import fr.aboucorp.teamchess.entities.model.Location;
-import fr.aboucorp.teamchess.libgdx.models.ChessPieceModel;
+import fr.aboucorp.teamchess.libgdx.models.ChessPieceM;
 
-public class BishopModel extends ChessPieceModel {
-    public BishopModel(Model model, Location location, Material originalMaterial) {
+public class PawnM extends ChessPieceM {
+    public PawnM(Model model, Location location, Material originalMaterial) {
         super(model, location, originalMaterial);
     }
 }

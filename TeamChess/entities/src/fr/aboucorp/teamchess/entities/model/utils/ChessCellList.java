@@ -1,10 +1,10 @@
 package fr.aboucorp.teamchess.entities.model.utils;
 
-import fr.aboucorp.teamchess.entities.model.ChessCell;
+import fr.aboucorp.teamchess.entities.model.Square;
 
-public class ChessCellList extends ChessList<ChessCell> {
-    public ChessCell getChessCellByLabel(String label){
-        for(ChessCell cell : this){
+public class ChessCellList extends ChessList<Square> {
+    public Square getChessCellByLabel(String label){
+        for(Square cell : this){
             if(cell.getCellLabel().toLowerCase().equals(label.toLowerCase())){
                 return cell;
             }
