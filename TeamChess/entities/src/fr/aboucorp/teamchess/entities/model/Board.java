@@ -39,9 +39,9 @@ public class Board {
             for (int z = 0; z < 8; z++) {
                 Square square = null;
                 if(x % 2 == 0 && z % 2 != 0 || x % 2 != 0 && z % 2 == 0 ){
-                    square = new Square(new Location(x, 0, z), ChessColor.BLACK);
-                }else{
                     square = new Square(new Location(x, 0, z), ChessColor.WHITE);
+                }else{
+                square = new Square(new Location(x, 0, z), ChessColor.BLACK);
                 }
                 this.chessSquares.add(square);
             }
@@ -116,7 +116,7 @@ public class Board {
         return whitePieces;
     }
 
-    public PieceList getPieceByColor(ChessColor color){
+    public PieceList getPiecesByColor(ChessColor color){
         return color == ChessColor.WHITE ? getWhitePieces() : getBlackPieces();
     }
 }

@@ -1,17 +1,20 @@
 package fr.aboucorp.teamchess.entities.model.moves;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import fr.aboucorp.teamchess.entities.model.Board;
 import fr.aboucorp.teamchess.entities.model.ChessColor;
 import fr.aboucorp.teamchess.entities.model.Piece;
 import fr.aboucorp.teamchess.entities.model.Square;
 import fr.aboucorp.teamchess.entities.model.Turn;
-import fr.aboucorp.teamchess.entities.model.enums.PieceEventType;
+import fr.aboucorp.teamchess.entities.model.enums.BoardEventType;
 import fr.aboucorp.teamchess.entities.model.enums.PieceId;
 import fr.aboucorp.teamchess.entities.model.events.GameEventManager;
 import fr.aboucorp.teamchess.entities.model.events.GameEventSubscriber;
-import fr.aboucorp.teamchess.entities.model.events.models.CheckEvent;
+import fr.aboucorp.teamchess.entities.model.events.models.CheckInEvent;
 import fr.aboucorp.teamchess.entities.model.events.models.GameEvent;
-import fr.aboucorp.teamchess.entities.model.events.models.LogEvent;
 import fr.aboucorp.teamchess.entities.model.events.models.PieceEvent;
 import fr.aboucorp.teamchess.entities.model.events.models.TurnEvent;
 import fr.aboucorp.teamchess.entities.model.events.models.TurnStartEvent;
@@ -21,89 +24,119 @@ import fr.aboucorp.teamchess.entities.model.utils.SquareList;
 public abstract class AbstractMoveSet implements GameEventSubscriber {
 
     protected GameEventManager eventManager;
-    protected final Piece thisPiece;
+    protected final Piece piece;
     protected final Board board;
     protected boolean isChecking;
     protected King kingInCheck;
-    protected Piece checkingPiece;
+    protected List<Piece> checkingPieces;
     protected SquareList nextMoves;
     protected Turn actualTurn;
     protected Turn previousTurn;
 
-    public AbstractMoveSet(Piece thisPiece, Board board){
-        this.thisPiece = thisPiece;
+    public AbstractMoveSet(Piece piece, Board board) {
+        this.piece = piece;
         this.board = board;
         this.eventManager = GameEventManager.getINSTANCE();
-        this.eventManager.subscribe(PieceEvent.class,this);
-        this.eventManager.subscribe(TurnEvent.class,this);
+        this.eventManager.subscribe(PieceEvent.class, this, 1);
+        this.eventManager.subscribe(TurnEvent.class, this, 1);
     }
 
     @Override
     public void receiveGameEvent(GameEvent event) {
-        if(event instanceof PieceEvent ){
-            if(event instanceof CheckEvent && ((CheckEvent) event).piece.getChessColor() == this.thisPiece.getChessColor()) {
+        if (event instanceof PieceEvent) {
+            if (event instanceof CheckInEvent && ((CheckInEvent) event).piece.getChessColor() == this.piece.getChessColor()) {
                 this.isChecking = true;
-                this.kingInCheck = (King) ((CheckEvent) event).piece;
-                this.checkingPiece = ((CheckEvent) event).checkingPiece;
-            }else if(((PieceEvent) event).type == PieceEventType.DEATH && ((PieceEvent) event).piece.getPieceId() == this.thisPiece.getPieceId()){
-                this.eventManager.unSubscribe(GameEvent.class,this);
+                this.kingInCheck = (King) ((CheckInEvent) event).piece;
+                this.checkingPieces = ((CheckInEvent) event).checkingPieces;
+            } else if (((PieceEvent) event).type == BoardEventType.DEATH && ((PieceEvent) event).piece.getPieceId() == this.piece.getPieceId()) {
+                this.eventManager.unSubscribe(GameEvent.class, this);
             }
-        }else if(event instanceof TurnStartEvent){
+        } else if (event instanceof TurnStartEvent) {
             this.previousTurn = this.actualTurn;
             this.actualTurn = ((TurnStartEvent) event).turn;
-            if(((TurnStartEvent) event).turn.getTurnColor() == this.thisPiece.getChessColor()){
-                this.nextMoves = calculateNextMoves(this.board,((TurnStartEvent) event).turn.getTurnColor());
+            if (((TurnStartEvent) event).turn.getTurnColor() == this.piece.getChessColor()) {
+                this.nextMoves = calculateNextMoves(((TurnStartEvent) event).turn.getTurnColor());
             }
         }
     }
 
-    public SquareList calculateNextMoves(Board board, ChessColor turnColor){
-        if(isChecking){
-           return this.calculateUncheckingMoves(board,turnColor);
-        }else{
-           return this.getPossibleMoves(this.thisPiece,this.board,turnColor);
+    public SquareList calculateNextMoves(ChessColor turnColor) {
+        if (isChecking) {
+            return this.calculateUncheckingMoves(turnColor);
+        } else {
+            return this.getPossibleMoves(this.piece, turnColor);
         }
     }
 
-    private SquareList calculateUncheckingMoves(Board board, ChessColor turnColor){
+    private SquareList calculateUncheckingMoves(ChessColor turnColor) {
         SquareList uncheckingMoves = new SquareList();
-        Square originalPosition = this.thisPiece.getActualSquare();
+        Square originalPosition = this.piece.getActualSquare();
         ChessColor oppositeColor = turnColor == ChessColor.WHITE ? ChessColor.BLACK : ChessColor.WHITE;
-        for (Square checkedMove : this.getPossibleMoves(this.thisPiece, this.board, turnColor)) {
+        for (Square checkedMove : this.getPossibleMoves(this.piece, turnColor)) {
             Piece originalPiece = checkedMove.getPiece();
-            if(checkedMove.equals(this.checkingPiece.getActualSquare())){
+            if (this.checkingPieces.size() == 1 && checkedMove.equals(this.checkingPieces.get(0).getActualSquare())) {
                 uncheckingMoves.add(checkedMove);
-            }else{
-                checkedMove.setPiece(this.thisPiece);
-                this.thisPiece.move(checkedMove);
-                if(this.kingInCheck.getMoveSet().pieceMoveCauseCheck(this.checkingPiece,board,oppositeColor) == null){
+            } else {
+                checkedMove.setPiece(this.piece);
+                this.piece.move(checkedMove);
+                boolean isUnchecking = true;
+                for (Piece ckecking : this.checkingPieces) {
+                    if (this.kingInCheck.getMoveSet().moveCausingSingleCheck(ckecking, oppositeColor) != null) {
+                        isUnchecking = false;
+                    }
+                }
+                if (isUnchecking) {
                     uncheckingMoves.add(checkedMove);
                 }
-                this.thisPiece.move(originalPosition);
+                this.piece.move(originalPosition);
                 checkedMove.setPiece(originalPiece);
             }
         }
-        String logMessage = String.format("%s: ischecking : %s; turncolor : %s; moves : %s",this.thisPiece.getPieceId(),isChecking,turnColor.name(),uncheckingMoves.size());
-        this.eventManager.sendMessage(new LogEvent(logMessage));
         return uncheckingMoves;
     }
 
-    public Piece pieceMoveCauseCheck(Piece piece, Board board, ChessColor turnColor){
-        for (Square possibleMove : piece.getMoveSet().getPossibleMoves(piece,board,turnColor)) {
-            if(possibleMove.getPiece() != null){
-                if(turnColor == ChessColor.WHITE && possibleMove.getPiece().getPieceId() == PieceId.BK){
-                    return possibleMove.getPiece();
-                }else if(turnColor == ChessColor.BLACK && possibleMove.getPiece().getPieceId() == PieceId.WK){
-                    return possibleMove.getPiece();
+
+    public List<Piece> moveCauseCheck(ChessColor color) {
+        List<Piece> causingChecks = new ArrayList<>();
+        for (Piece piece : board.getPiecesByColor(color)) {
+             Piece causingCheck = moveCausingSingleCheck(piece, color);
+             if(causingCheck != null) {
+                 causingChecks.add(causingCheck);
+             }
+        }
+        return causingChecks;
+    }
+
+    private Piece moveCausingSingleCheck(Piece piece, ChessColor color) {
+        for (Square possibleMove : piece.getMoveSet().getPossibleMoves(piece, color)) {
+            if (possibleMove.getPiece() != null) {
+                if ((color == ChessColor.WHITE && possibleMove.getPiece().getPieceId() == PieceId.BK)
+                        || (color == ChessColor.BLACK && possibleMove.getPiece().getPieceId() == PieceId.WK)) {
+                    return piece;
                 }
             }
         }
         return null;
     }
 
-    protected abstract SquareList getPossibleMoves(Piece piece, Board board, ChessColor turnColor);
+    private List<Piece> indirectChecks(Piece piece, ChessColor turnColor) {
 
-    public abstract SquareList getThreats(Piece piece, Board board, ChessColor turnColor);
+        return board.getPiecesByColor(turnColor)
+                .stream()
+                .filter(p ->
+                        p.getMoveSet().getNextMoves().contains(piece.getActualSquare())
+                                && pieceCauseCheck(p, turnColor))
+                .collect(Collectors.toList());
+    }
+
+    private boolean pieceCauseCheck(Piece piece, ChessColor turnColor) {
+        return false;
+    }
+
+
+    protected abstract SquareList getPossibleMoves(Piece piece, ChessColor turnColor);
+
+    public abstract SquareList getThreats(Piece piece, ChessColor turnColor);
 
     public SquareList getNextMoves() {
         return nextMoves;

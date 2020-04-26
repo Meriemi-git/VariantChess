@@ -15,7 +15,7 @@ public class RookMoveSet extends AbstractMoveSet {
     }
 
     @Override
-    protected SquareList getPossibleMoves(Piece piece, Board board, ChessColor turnColor) {
+    protected SquareList getPossibleMoves(Piece piece,ChessColor turnColor) {
         SquareList validSquares = new SquareList();
         Location start = piece.getLocation();
         for(int x = start.getX()+1; x < 8 ; x++){
@@ -69,7 +69,7 @@ public class RookMoveSet extends AbstractMoveSet {
     }
 
     @Override
-    public SquareList getThreats(Piece piece, Board board, ChessColor turnColor) {
-        return getPossibleMoves(piece,board,turnColor);
+    public SquareList getThreats(Piece piece,ChessColor turnColor) {
+        return getPossibleMoves(piece,turnColor);
     }
 }

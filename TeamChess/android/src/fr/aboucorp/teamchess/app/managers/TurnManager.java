@@ -3,8 +3,8 @@ package fr.aboucorp.teamchess.app.managers;
 import java.util.LinkedList;
 
 import fr.aboucorp.teamchess.entities.model.ChessColor;
-import fr.aboucorp.teamchess.entities.model.Turn;
 import fr.aboucorp.teamchess.entities.model.Team;
+import fr.aboucorp.teamchess.entities.model.Turn;
 import fr.aboucorp.teamchess.entities.model.events.GameEventManager;
 import fr.aboucorp.teamchess.entities.model.events.GameEventSubscriber;
 import fr.aboucorp.teamchess.entities.model.events.models.GameEvent;
@@ -23,7 +23,7 @@ public class TurnManager implements GameEventSubscriber {
     private TurnManager() {
         this.turns = new LinkedList<Turn>();
         this.eventManager = GameEventManager.getINSTANCE();
-        this.eventManager.subscribe(MoveEvent.class,this);
+        this.eventManager.subscribe(MoveEvent.class,this,1);
         this.white = new Team("white",ChessColor.WHITE);
         this.black = new Team("white",ChessColor.BLACK);
     }

@@ -1,65 +1,61 @@
 package fr.aboucorp.teamchess.entities.model.events;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 
 import fr.aboucorp.teamchess.entities.model.events.models.GameEvent;
 
 public class GameEventManager {
     private static GameEventManager INSTANCE;
-    private static Hashtable<Class, List<GameEventSubscriber>> SUBSCRIBERS;
+    private static Hashtable<Class, List<Subscription>> SUBSCRIPTIONS;
     private GameEventManager(){
     }
 
     public static GameEventManager getINSTANCE() {
         if(INSTANCE == null){
             INSTANCE = new GameEventManager();
-            SUBSCRIBERS = new Hashtable();
+            SUBSCRIPTIONS = new Hashtable();
         }
         return INSTANCE;
     }
 
-    public void subscribe(Class gameEventType, GameEventSubscriber subscriber){
-        List<GameEventSubscriber> subsribers = SUBSCRIBERS.get(gameEventType);
+    public void subscribe(Class gameEventType, GameEventSubscriber subscriber,int priority){
+        List<Subscription> subsribers = SUBSCRIPTIONS.get(gameEventType);
         if(subsribers == null){
             subsribers = new ArrayList<>();
         }
-        subsribers.add(subscriber);
-        SUBSCRIBERS.put(gameEventType,subsribers);
+        subsribers.add(new Subscription(subscriber,priority));
+        SUBSCRIPTIONS.put(gameEventType,subsribers);
     }
 
     public void unSubscribe(Class gameEventType, GameEventSubscriber subscriber){
-        for (Class aClass: SUBSCRIBERS.keySet()) {
-            if(gameEventType.isAssignableFrom(aClass)){
-                List<GameEventSubscriber> subsribers = SUBSCRIBERS.get(aClass);
-                for(Iterator<GameEventSubscriber> iter = subsribers.iterator();iter.hasNext();){
-                    GameEventSubscriber sub = iter.next();
-                    if(sub == subscriber){
-                        iter.remove();
-                    }
-                }
-            }
-        }
+        SUBSCRIPTIONS
+                .keySet()
+                .stream()
+                .filter(aClass -> gameEventType.isAssignableFrom(aClass))
+                .map(aClass -> SUBSCRIPTIONS.get(aClass))
+                .forEach(subs -> subs.removeIf(sub -> sub.subscriber == subscriber));
     }
 
     public void sendMessage(GameEvent event){
-        List<GameEventSubscriber> subscribers = new ArrayList();
-        getSubscribersRec(event.getClass(),subscribers);
-        for (GameEventSubscriber subscriber : subscribers) {
-            subscriber.receiveGameEvent(event);
-        }
+        List<Subscription> subscriptions = new ArrayList();
+        getSubscriptionsRec(event.getClass(),subscriptions);
+        subscriptions
+                .stream()
+                .sorted(Comparator.naturalOrder())
+                .forEachOrdered( sub -> sub.subscriber.receiveGameEvent(event));
     }
 
-    public  List<GameEventSubscriber> getSubscribersRec(Class eventClass,List<GameEventSubscriber> subscribers) {
-        List<GameEventSubscriber> subs = SUBSCRIBERS.get(eventClass);
+    public  List<Subscription> getSubscriptionsRec(Class eventClass, List<Subscription> subscription) {
+        List<Subscription> subs = SUBSCRIPTIONS.get(eventClass);
         if(subs != null){
-            subscribers.addAll(subs);
+            subscription.addAll(subs);
         }
         if(!eventClass.getSuperclass().equals(Object.class)){
-            getSubscribersRec(eventClass.getSuperclass(),subscribers);
+            getSubscriptionsRec(eventClass.getSuperclass(),subscription);
         }
-        return subscribers;
+        return subscription;
     }
 }

@@ -19,21 +19,23 @@ import fr.aboucorp.teamchess.app.managers.PartyManager;
 import fr.aboucorp.teamchess.entities.model.events.GameEventManager;
 import fr.aboucorp.teamchess.entities.model.events.GameEventSubscriber;
 import fr.aboucorp.teamchess.entities.model.events.models.GameEvent;
-import fr.aboucorp.teamchess.entities.model.events.models.LogEvent;
+import fr.aboucorp.teamchess.entities.model.events.models.MoveEvent;
+import fr.aboucorp.teamchess.entities.model.events.models.TurnEvent;
 import fr.aboucorp.teamchess.libgdx.Board3dManager;
 
 public class BoardActivity extends AndroidApplication implements GameEventSubscriber {
 
     public FrameLayout board_panel;
     public Button btn_end_turn;
+    public Button btn_test;
     public GameEventManager eventManager;
-    private PartyManager party_manager;
+    private PartyManager partyManager;
     private TextView lbl_turn;
     private TextView party_logs;
 
     public BoardActivity(){
         this.eventManager = GameEventManager.getINSTANCE();
-        this.eventManager.subscribe(GameEvent.class,this);
+        this.eventManager.subscribe(GameEvent.class,this,1);
     }
 
     @Override
@@ -48,16 +50,16 @@ public class BoardActivity extends AndroidApplication implements GameEventSubscr
     private void initializeBoard(){
         Board3dManager board3dManager = new Board3dManager();
         BoardManager boardManager = new BoardManager(board3dManager);
-        this.party_manager = new PartyManager(boardManager);
+        this.partyManager = new PartyManager(boardManager);
         InputAdapter inputAdapter = new GDXInputAdapter();
         board3dManager.setAndroidInputAdapter(inputAdapter);
-        GDXGestureListener gestureListener = new GDXGestureListener(this.party_manager);
+        GDXGestureListener gestureListener = new GDXGestureListener(this.partyManager);
         board3dManager.setAndroidListener(gestureListener);
         this.bindViews();
         AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
         board_panel.addView(initializeForView(board3dManager, config));
-        this.party_manager.startGame();
-        this.lbl_turn.setText("Turn of " + BoardActivity.this.party_manager.getPartyInfos());
+        this.partyManager.startGame();
+        this.lbl_turn.setText("Turn of " + BoardActivity.this.partyManager.getPartyInfos());
     }
 
     public void bindViews() {
@@ -65,13 +67,19 @@ public class BoardActivity extends AndroidApplication implements GameEventSubscr
         this.btn_end_turn = findViewById(R.id.btn_end_turn);
         this.lbl_turn = findViewById(R.id.lbl_turn);
         this.party_logs = findViewById(R.id.party_logs);
+        this.btn_test = findViewById(R.id.btn_test);
     }
 
     public void bindListeners() {
         btn_end_turn.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
-               BoardActivity.this.party_manager.endTurn();
-               BoardActivity.this.lbl_turn.setText("Turn of " + BoardActivity.this.party_manager.getPartyInfos());
+               BoardActivity.this.partyManager.endTurn();
+               BoardActivity.this.lbl_turn.setText("Turn of " + BoardActivity.this.partyManager.getPartyInfos());
+            }
+        });
+        btn_test.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v){
+                BoardActivity.this.eventManager.unSubscribe(GameEvent.class, BoardActivity.this);
             }
         });
     }
@@ -80,13 +88,11 @@ public class BoardActivity extends AndroidApplication implements GameEventSubscr
     public void receiveGameEvent(final GameEvent event) {
         this.runOnUiThread(new Runnable() {
             public void run() {
-                if(event instanceof LogEvent){
-                    BoardActivity.this.party_logs.setText( BoardActivity.this.party_logs.getText() + "\nLOG :" + event.eventMessage);
-                }else{
-                    BoardActivity.this.party_logs.setText( BoardActivity.this.party_logs.getText() + "\n" + event.eventMessage);
+                if(event instanceof MoveEvent || event instanceof TurnEvent){
+                    BoardActivity.this.party_logs.setText( BoardActivity.this.party_logs.getText() + "\nLOG :" + event.message);
                 }
-                BoardActivity.this.lbl_turn.setText("Turn of " + BoardActivity.this.party_manager.getPartyInfos());
-                Log.i("fr.aboucorp.teamchess",event.eventMessage);
+                BoardActivity.this.lbl_turn.setText("Turn of " + BoardActivity.this.partyManager.getPartyInfos());
+                Log.i("fr.aboucorp.teamchess",event.message);
             }
         });
     }

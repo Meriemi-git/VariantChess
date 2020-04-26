@@ -193,7 +193,6 @@ public class Board3dManager extends ApplicationAdapter {
         modelsPath.put(Pawn.class,"data/pawn.g3db");
         modelsPath.put(Rook.class,"data/rook.g3db");
         modelsPath.put(Bishop.class,"data/bishop.g3db");
-
     }
 
 

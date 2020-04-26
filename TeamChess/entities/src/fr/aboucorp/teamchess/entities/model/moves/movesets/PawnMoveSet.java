@@ -5,7 +5,7 @@ import fr.aboucorp.teamchess.entities.model.ChessColor;
 import fr.aboucorp.teamchess.entities.model.Location;
 import fr.aboucorp.teamchess.entities.model.Piece;
 import fr.aboucorp.teamchess.entities.model.Square;
-import fr.aboucorp.teamchess.entities.model.enums.PieceEventType;
+import fr.aboucorp.teamchess.entities.model.enums.BoardEventType;
 import fr.aboucorp.teamchess.entities.model.enums.PieceId;
 import fr.aboucorp.teamchess.entities.model.events.models.PieceEvent;
 import fr.aboucorp.teamchess.entities.model.moves.AbstractMoveSet;
@@ -18,13 +18,13 @@ public class PawnMoveSet extends AbstractMoveSet {
     }
 
     @Override
-    protected SquareList getPossibleMoves(Piece piece, Board board, ChessColor turnColor) {
-        SquareList validSquares = getClassicMoves(piece, board, turnColor);
-        validSquares.addAll(getEatingMoves(piece, board, turnColor, false));
+    protected SquareList getPossibleMoves(Piece piece, ChessColor turnColor) {
+        SquareList validSquares = getClassicMoves(piece, turnColor);
+        validSquares.addAll(getEatingMoves(piece,  turnColor, false));
         return validSquares;
     }
 
-    private SquareList getClassicMoves(Piece piece, Board board, ChessColor turnColor) {
+    private SquareList getClassicMoves(Piece piece, ChessColor turnColor) {
         SquareList classicMoves = new SquareList();
         Location start = piece.getLocation();
         Square simpleMove;
@@ -45,7 +45,7 @@ public class PawnMoveSet extends AbstractMoveSet {
     }
 
 
-    private SquareList getEatingMoves(Piece piece, Board board, ChessColor turnColor, boolean isThreat) {
+    private SquareList getEatingMoves(Piece piece, ChessColor turnColor, boolean isThreat) {
         Location start = piece.getLocation();
         SquareList validSquares = new SquareList();
         Square diagRight;
@@ -73,31 +73,31 @@ public class PawnMoveSet extends AbstractMoveSet {
     }
 
     private boolean enPassantRightIsPossible() {
-        if (enPassantIsPossible() && this.thisPiece.getLocation().getZ() == this.previousTurn.to.getLocation().getZ()) {
-            this.eventManager.sendMessage(new PieceEvent("En passant", PieceEventType.EN_PASSANT, this.thisPiece));
+        if (enPassantIsPossible() && this.piece.getLocation().getZ() == this.previousTurn.to.getLocation().getZ()) {
+            this.eventManager.sendMessage(new PieceEvent("En passant", BoardEventType.EN_PASSANT, this.piece));
             return true;
         }
         return false;
     }
 
     private boolean enPassantLeftIsPossible() {
-        if (enPassantIsPossible() && this.thisPiece.getLocation().getZ() == this.previousTurn.to.getLocation().getZ()) {
-            this.eventManager.sendMessage(new PieceEvent("En passant", PieceEventType.EN_PASSANT, this.thisPiece));
+        if (enPassantIsPossible() && this.piece.getLocation().getZ() == this.previousTurn.to.getLocation().getZ()) {
+            this.eventManager.sendMessage(new PieceEvent("En passant", BoardEventType.EN_PASSANT, this.piece));
             return true;
         }
         return false;
     }
 
     private boolean enPassantIsPossible() {
-        return ((this.thisPiece.getChessColor() == ChessColor.WHITE && this.thisPiece.getLocation().getZ() == 4)
-                || (this.thisPiece.getChessColor() == ChessColor.BLACK && this.thisPiece.getLocation().getZ() == 3))
+        return ((this.piece.getChessColor() == ChessColor.WHITE && this.piece.getLocation().getZ() == 4)
+                || (this.piece.getChessColor() == ChessColor.BLACK && this.piece.getLocation().getZ() == 3))
                 && PieceId.isPawn(this.previousTurn.played.getPieceId())
                 && Math.abs(this.previousTurn.to.getLocation().getZ() - this.previousTurn.from.getLocation().getZ()) == 2;
     }
 
     @Override
-    public SquareList getThreats(Piece piece, Board board, ChessColor turnColor) {
-        return getEatingMoves(piece, board, turnColor, true);
+    public SquareList getThreats(Piece piece, ChessColor turnColor) {
+        return getEatingMoves(piece, turnColor, true);
     }
 
 }

@@ -8,11 +8,13 @@ import fr.aboucorp.teamchess.entities.model.ChessColor;
 import fr.aboucorp.teamchess.entities.model.Location;
 import fr.aboucorp.teamchess.entities.model.Piece;
 import fr.aboucorp.teamchess.entities.model.Square;
+import fr.aboucorp.teamchess.entities.model.enums.BoardEventType;
 import fr.aboucorp.teamchess.entities.model.enums.GameState;
 import fr.aboucorp.teamchess.entities.model.events.GameEventManager;
 import fr.aboucorp.teamchess.entities.model.events.GameEventSubscriber;
 import fr.aboucorp.teamchess.entities.model.events.models.GameEvent;
 import fr.aboucorp.teamchess.entities.model.events.models.PartyEvent;
+import fr.aboucorp.teamchess.entities.model.events.models.PieceEvent;
 import fr.aboucorp.teamchess.libgdx.models.ChessModel;
 
 
@@ -30,7 +32,7 @@ public class PartyManager implements GameEventSubscriber {
         this.gameState = GameState.SelectPiece;
         this.turnManager = TurnManager.getINSTANCE();
         this.eventManager = GameEventManager.getINSTANCE();
-        this.eventManager.subscribe(PartyEvent.class,this);
+        this.eventManager.subscribe(PartyEvent.class,this,1);
     }
 
     public void startGame(){
@@ -41,10 +43,6 @@ public class PartyManager implements GameEventSubscriber {
     public void endTurn() {
         this.turnManager.endTurn();
         this.turnManager.startTurn();
-        if(this.boardManager.isGameFinished()){
-            ChessColor winner = boardManager.getWinner();
-            this.eventManager.sendMessage(new PartyEvent(String.format("Game finished ! Winner : %s",winner != null ? winner.name() : "EQUALITY")));
-        }
     }
 
 
@@ -72,7 +70,7 @@ public class PartyManager implements GameEventSubscriber {
     }
 
     public void selectSquare(Square square) {
-        this.boardManager.moveSelectedPieceToSquare(square);
+        this.boardManager.moveToSquare(square);
         this.turnManager.endTurn();
     }
 
@@ -97,18 +95,16 @@ public class PartyManager implements GameEventSubscriber {
         return gameState;
     }
 
-    public void setGameState(GameState gameState) {
-        this.gameState = gameState;
-    }
-
-    public ArrayList<ChessModel> getChessSquareModels() {
-        return this.boardManager.getChessSquareModels();
-    }
 
     @Override
     public void receiveGameEvent(GameEvent event) {
-        // TODO react to game event
-        Log.i("fr.aboucorp.teamchess","GameManager receive PartyEvent");
+        if(event instanceof PartyEvent){
+            // TODO display draw claim option
+            Log.i("fr.aboucorp.teamchess",event.message);
+        }else if(event instanceof PieceEvent && ((PieceEvent) event).type == BoardEventType.CHECKMATE){
+            ChessColor winner = boardManager.getWinner();
+            this.eventManager.sendMessage(new PartyEvent(String.format("Game finished ! Winner : %s",winner != null ? winner.name() : "EQUALITY")));
+        }
     }
 
     public BoardManager getBoardManager() {

@@ -1,14 +1,12 @@
 package fr.aboucorp.teamchess.entities.model.events.models;
 
 import fr.aboucorp.teamchess.entities.model.Piece;
-import fr.aboucorp.teamchess.entities.model.enums.PieceEventType;
+import fr.aboucorp.teamchess.entities.model.enums.BoardEventType;
 
 public class PieceEvent extends BoardEvent {
     public Piece piece;
-    public PieceEventType type;
-    public PieceEvent(String eventMessage, PieceEventType type, Piece piece) {
-        super(eventMessage);
-        this.type = type;
+    public PieceEvent(String eventMessage, BoardEventType type, Piece piece) {
+        super(eventMessage, type);
         this.piece = piece;
     }
 }

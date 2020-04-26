@@ -15,7 +15,7 @@ public class BishopMoveSet extends AbstractMoveSet {
     }
 
     @Override
-    protected SquareList getPossibleMoves(Piece piece, Board board, ChessColor turnColor) {
+    protected SquareList getPossibleMoves(Piece piece, ChessColor turnColor) {
         SquareList allSquares = board.getSquares();
         SquareList validSquares = new SquareList();
         Location start = piece.getLocation();
@@ -71,7 +71,7 @@ public class BishopMoveSet extends AbstractMoveSet {
     }
 
     @Override
-    public SquareList getThreats(Piece piece, Board board, ChessColor turnColor) {
-        return getPossibleMoves(piece, board, turnColor);
+    public SquareList getThreats(Piece piece, ChessColor turnColor) {
+        return getPossibleMoves(piece, turnColor);
     }
 }
