@@ -4,12 +4,13 @@ package fr.aboucorp.teamchess.entities.model;
 public class Square extends GameElement {
 
     private String squareLabel;
-
+    private char columnLetter;
     private Piece piece;
 
     public Square(Location location, ChessColor chessColor) {
         super(location, chessColor);
-        this.squareLabel = Character.toString( (char)( 65 + (7 - this.getLocation().getX())) )+ (this.getLocation().getZ()+1);
+        this.columnLetter =  (char)( 65 + (7 - this.getLocation().getX()));
+        this.squareLabel =  columnLetter + "" + (this.getLocation().getZ()+1);
     }
 
     @Override
@@ -27,6 +28,10 @@ public class Square extends GameElement {
 
     public String getSquareLabel() {
         return squareLabel;
+    }
+
+    public char getColumnLetter(){
+        return columnLetter;
     }
 
     @Override

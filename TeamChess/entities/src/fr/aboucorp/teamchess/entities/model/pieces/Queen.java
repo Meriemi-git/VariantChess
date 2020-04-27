@@ -14,4 +14,8 @@ public class Queen extends Piece {
         this.moveSet = new QueenMoveSet(this,board);
     }
 
+    @Override
+    public char fen() {
+        return this.getChessColor() == ChessColor.WHITE ? 'Q' : 'q';
+    }
 }

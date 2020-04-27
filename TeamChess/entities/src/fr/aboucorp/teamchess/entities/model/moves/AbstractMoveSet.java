@@ -14,6 +14,7 @@ import fr.aboucorp.teamchess.entities.model.enums.PieceId;
 import fr.aboucorp.teamchess.entities.model.events.GameEventManager;
 import fr.aboucorp.teamchess.entities.model.events.GameEventSubscriber;
 import fr.aboucorp.teamchess.entities.model.events.models.CheckInEvent;
+import fr.aboucorp.teamchess.entities.model.events.models.CheckOutEvent;
 import fr.aboucorp.teamchess.entities.model.events.models.GameEvent;
 import fr.aboucorp.teamchess.entities.model.events.models.PieceEvent;
 import fr.aboucorp.teamchess.entities.model.events.models.TurnEvent;
@@ -48,6 +49,10 @@ public abstract class AbstractMoveSet implements GameEventSubscriber {
                 this.isChecking = true;
                 this.kingInCheck = (King) ((CheckInEvent) event).piece;
                 this.checkingPieces = ((CheckInEvent) event).checkingPieces;
+            } else if(event instanceof CheckOutEvent && ((CheckInEvent) event).piece.getChessColor() == this.piece.getChessColor()){
+                this.isChecking = false;
+                this.kingInCheck = null;
+                this.checkingPieces = null;
             } else if (((PieceEvent) event).type == BoardEventType.DEATH && ((PieceEvent) event).piece.getPieceId() == this.piece.getPieceId()) {
                 this.eventManager.unSubscribe(GameEvent.class, this);
             }

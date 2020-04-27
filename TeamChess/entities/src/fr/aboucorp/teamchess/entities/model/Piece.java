@@ -51,4 +51,6 @@ public abstract class Piece extends GameElement {
     public AbstractMoveSet getMoveSet() {
         return moveSet;
     }
+
+    public abstract char fen();
 }

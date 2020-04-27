@@ -12,4 +12,9 @@ public class Rook extends Piece {
         super(square, chessColor,pieceId);
         this.moveSet = new RookMoveSet(this,board);
     }
+
+    @Override
+    public char fen() {
+        return this.getChessColor() == ChessColor.WHITE ? 'R' : 'r';
+    }
 }

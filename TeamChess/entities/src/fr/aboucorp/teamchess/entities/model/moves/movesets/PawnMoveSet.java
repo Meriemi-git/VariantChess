@@ -7,7 +7,7 @@ import fr.aboucorp.teamchess.entities.model.Piece;
 import fr.aboucorp.teamchess.entities.model.Square;
 import fr.aboucorp.teamchess.entities.model.enums.BoardEventType;
 import fr.aboucorp.teamchess.entities.model.enums.PieceId;
-import fr.aboucorp.teamchess.entities.model.events.models.PieceEvent;
+import fr.aboucorp.teamchess.entities.model.events.models.EnPassantEvent;
 import fr.aboucorp.teamchess.entities.model.moves.AbstractMoveSet;
 import fr.aboucorp.teamchess.entities.model.utils.SquareList;
 
@@ -58,7 +58,7 @@ public class PawnMoveSet extends AbstractMoveSet {
                 && (isThreat
                 || (diagRight.getPiece() != null && diagRight.getPiece().getChessColor() != turnColor))) {
             validSquares.add(diagRight);
-        } else if (diagRight != null && diagRight.getPiece() == null && enPassantRightIsPossible()){
+        } else if (diagRight != null && diagRight.getPiece() == null && enPassantRightIsPossible(diagRight)){
             validSquares.add(diagRight);
         }
 
@@ -66,23 +66,23 @@ public class PawnMoveSet extends AbstractMoveSet {
                 && (isThreat
                 || (diagLeft.getPiece() != null && diagLeft.getPiece().getChessColor() != turnColor))) {
             validSquares.add(diagLeft);
-        }else if(diagLeft != null && diagLeft.getPiece() == null && enPassantLeftIsPossible()){
+        }else if(diagLeft != null && diagLeft.getPiece() == null && enPassantLeftIsPossible(diagLeft)){
             validSquares.add(diagLeft);
         }
         return validSquares;
     }
 
-    private boolean enPassantRightIsPossible() {
-        if (enPassantIsPossible() && this.piece.getLocation().getZ() == this.previousTurn.to.getLocation().getZ()) {
-            this.eventManager.sendMessage(new PieceEvent("En passant", BoardEventType.EN_PASSANT, this.piece));
+    private boolean enPassantRightIsPossible(Square diagRight) {
+        if (enPassantIsPossible() && diagRight.getLocation().getX() == this.previousTurn.to.getLocation().getX() ) {
+            this.eventManager.sendMessage(new EnPassantEvent("En passant", BoardEventType.EN_PASSANT,diagRight));
             return true;
         }
         return false;
     }
 
-    private boolean enPassantLeftIsPossible() {
-        if (enPassantIsPossible() && this.piece.getLocation().getZ() == this.previousTurn.to.getLocation().getZ()) {
-            this.eventManager.sendMessage(new PieceEvent("En passant", BoardEventType.EN_PASSANT, this.piece));
+    private boolean enPassantLeftIsPossible(Square diagLeft) {
+        if (enPassantIsPossible() && diagLeft.getLocation().getX() == this.previousTurn.to.getLocation().getX()) {
+            this.eventManager.sendMessage(new EnPassantEvent("En passant", BoardEventType.EN_PASSANT, diagLeft));
             return true;
         }
         return false;
@@ -92,7 +92,8 @@ public class PawnMoveSet extends AbstractMoveSet {
         return ((this.piece.getChessColor() == ChessColor.WHITE && this.piece.getLocation().getZ() == 4)
                 || (this.piece.getChessColor() == ChessColor.BLACK && this.piece.getLocation().getZ() == 3))
                 && PieceId.isPawn(this.previousTurn.played.getPieceId())
-                && Math.abs(this.previousTurn.to.getLocation().getZ() - this.previousTurn.from.getLocation().getZ()) == 2;
+                && Math.abs(this.previousTurn.to.getLocation().getZ() - this.previousTurn.from.getLocation().getZ()) == 2
+                && Math.abs(this.previousTurn.to.getLocation().getX() - this.previousTurn.from.getLocation().getX()) == 1;
     }
 
     @Override

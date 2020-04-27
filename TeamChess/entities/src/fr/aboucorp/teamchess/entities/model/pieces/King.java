@@ -14,4 +14,9 @@ public class King extends Piece {
         super(square, chessColor,pieceId);
         this.moveSet = new KingMoveSet(this, board);
     }
+
+    @Override
+    public char fen() {
+        return this.getChessColor() == ChessColor.WHITE ? 'K' : 'k';
+    }
 }

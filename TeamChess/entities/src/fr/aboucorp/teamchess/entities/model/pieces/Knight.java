@@ -14,4 +14,9 @@ public class Knight extends Piece {
         super(square, chessColor,id);
         this.moveSet = new KnightMoveSet(this,board);
     }
+
+    @Override
+    public char fen() {
+        return this.getChessColor() == ChessColor.WHITE ? 'N' : 'n';
+    }
 }

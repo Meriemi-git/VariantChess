@@ -26,7 +26,8 @@ public class Pawn extends Piece {
         return isFirstMove;
     }
 
-    public void setFirstMove(boolean firstMove) {
-        isFirstMove = firstMove;
+    @Override
+    public char fen() {
+        return this.getChessColor() == ChessColor.WHITE ? 'P' : 'p';
     }
 }
