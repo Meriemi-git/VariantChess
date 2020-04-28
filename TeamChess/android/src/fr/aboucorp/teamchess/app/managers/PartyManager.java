@@ -13,6 +13,7 @@ import fr.aboucorp.teamchess.entities.model.enums.GameState;
 import fr.aboucorp.teamchess.entities.model.events.GameEventManager;
 import fr.aboucorp.teamchess.entities.model.events.GameEventSubscriber;
 import fr.aboucorp.teamchess.entities.model.events.models.GameEvent;
+import fr.aboucorp.teamchess.entities.model.events.models.LogEvent;
 import fr.aboucorp.teamchess.entities.model.events.models.PartyEvent;
 import fr.aboucorp.teamchess.entities.model.events.models.PieceEvent;
 import fr.aboucorp.teamchess.libgdx.models.ChessModel;
@@ -37,8 +38,20 @@ public class PartyManager implements GameEventSubscriber {
 
     public void startGame(){
         this.boardManager.createBoard();
-        this.turnManager.startTurn();
+        this.turnManager.newParty(ChessColor.WHITE);
     }
+
+    public void loadBoard(String fenString){
+        try {
+
+            ChessColor color = this.boardManager.loadBoard(fenString);
+            this.turnManager.newParty(color);
+        } catch (Exception e) {
+            e.printStackTrace();
+            this.eventManager.sendMessage(new LogEvent(String.format("Error during parsing fen string. Message : %s",e.getMessage())));
+        }
+    }
+
 
     public void endTurn() {
         this.turnManager.endTurn();

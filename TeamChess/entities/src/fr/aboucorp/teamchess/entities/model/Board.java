@@ -1,6 +1,7 @@
 package fr.aboucorp.teamchess.entities.model;
 
 import fr.aboucorp.teamchess.entities.model.enums.PieceId;
+import fr.aboucorp.teamchess.entities.model.exceptions.FenStringBadFormatException;
 import fr.aboucorp.teamchess.entities.model.pieces.Bishop;
 import fr.aboucorp.teamchess.entities.model.pieces.King;
 import fr.aboucorp.teamchess.entities.model.pieces.Knight;
@@ -17,6 +18,7 @@ public class Board {
     private PieceList blackDeadPieces;
     private PieceList whitePieces;
     private PieceList whiteDeadPieces;
+    private Object locker;
 
     public Board(){
         this.chessSquares = new SquareList();
@@ -25,8 +27,6 @@ public class Board {
         this.blackDeadPieces = new PieceList();
         this.whiteDeadPieces = new PieceList();
     }
-
-
 
     public void initBoard(){
         this.createSquares();
@@ -50,58 +50,130 @@ public class Board {
     }
 
     private void createWhitePieces(){
-        Knight whiteRightKnight = new Knight((Square) this.chessSquares.getItemByLocation(new Location(6,0,0)), ChessColor.WHITE, PieceId.WRN,this);
-        Knight whiteLeftKnight =  new Knight((Square) this.chessSquares.getItemByLocation(new Location(1,0,0)), ChessColor.WHITE, PieceId.WLN,this);
-        Bishop whiteRightBishop = new Bishop((Square) this.chessSquares.getItemByLocation(new Location(5,0,0)), ChessColor.WHITE, PieceId.WRB,this);
-        Bishop whiteLeftBishop = new Bishop((Square) this.chessSquares.getItemByLocation( new Location(2,0,0)), ChessColor.WHITE, PieceId.WLB,this);
-        Queen whiteQueen = new Queen((Square) this.chessSquares.getItemByLocation(new Location(4,0,0)), ChessColor.WHITE,PieceId.WQ,this);
-        King whiteKing = new King((Square) this.chessSquares.getItemByLocation(new Location(3,0,0)), ChessColor.WHITE,PieceId.WK,this);
-        Rook whiteLeftRook = new Rook((Square) this.chessSquares.getItemByLocation(new Location(7,0,0)), ChessColor.WHITE,PieceId.WLR,this);
-        Rook whiteRightRook =  new Rook((Square) this.chessSquares.getItemByLocation(new Location(0,0,0)), ChessColor.WHITE,PieceId.WRR,this);
         for(int  i = 0 ; i < 8 ; i++){
-            Pawn whitePawn =  new Pawn((Square) this.chessSquares.getItemByLocation(new Location(i,0,1)), ChessColor.WHITE,PieceId.get(i),this);
-            this.whitePieces.add(whitePawn);
+            this.whitePieces.add(createPawn(new Location(i,0,1), ChessColor.WHITE,PieceId.get(i)));
         }
-        this.whitePieces.add(whiteRightKnight);
-        this.whitePieces.add(whiteLeftKnight);
-        this.whitePieces.add(whiteRightBishop);
-        this.whitePieces.add(whiteLeftBishop);
-        this.whitePieces.add(whiteQueen);
-        this.whitePieces.add(whiteKing);
-        this.whitePieces.add(whiteLeftRook);
-        this.whitePieces.add(whiteRightRook);
+        this.whitePieces.add(createKnight(new Location(6,0,0), ChessColor.WHITE, PieceId.WRN));
+        this.whitePieces.add(createKnight(new Location(1,0,0), ChessColor.WHITE, PieceId.WLN));
+        this.whitePieces.add(createBishop(new Location(5,0,0), ChessColor.WHITE, PieceId.WRB));
+        this.whitePieces.add(createBishop(new Location(2,0,0), ChessColor.WHITE, PieceId.WLB));
+        this.whitePieces.add(createQueen(new Location(4,0,0), ChessColor.WHITE,PieceId.WQ));
+        this.whitePieces.add(createKing(new Location(3,0,0), ChessColor.WHITE,PieceId.WK));
+        this.whitePieces.add(createRook(new Location(7,0,0), ChessColor.WHITE,PieceId.WLR));
+        this.whitePieces.add(createRook(new Location(0,0,0), ChessColor.WHITE,PieceId.WRR));
     }
 
     private void createBlackPieces(){
-        Knight blackRightKnight = new Knight((Square) this.chessSquares.getItemByLocation(new Location(6,0,7)), ChessColor.BLACK,PieceId.BRN,this);
-        Knight blackLeftKnight = new Knight((Square) this.chessSquares.getItemByLocation(new Location(1,0,7)), ChessColor.BLACK,PieceId.BLN,this);
-        Bishop blackLeftBishop = new Bishop((Square) this.chessSquares.getItemByLocation(new Location(5,0,7)), ChessColor.BLACK,PieceId.BLB,this);
-        Bishop blackRightBishop =  new Bishop((Square) this.chessSquares.getItemByLocation(new Location(2,0,7)), ChessColor.BLACK,PieceId.BRB,this);
-        Queen blackQueen = new Queen((Square) this.chessSquares.getItemByLocation(new Location(4,0,7)), ChessColor.BLACK,PieceId.BQ,this);
-        King blackKing = new King((Square) this.chessSquares.getItemByLocation(new Location(3,0,7)), ChessColor.BLACK,PieceId.BK,this);
-        Rook blackLeftRook =  new Rook((Square) this.chessSquares.getItemByLocation(new Location(7,0,7)), ChessColor.BLACK,PieceId.BLR,this);
-        Rook blackRightRook =  new Rook((Square) this.chessSquares.getItemByLocation(new Location(0,0,7)), ChessColor.BLACK,PieceId.BRR,this);
-
         for(int  i = 0 ; i < 8 ; i++){
-            Pawn blackPawn = new Pawn((Square) this.chessSquares.getItemByLocation(new Location(i,0,6)),ChessColor.BLACK,PieceId.get(i+10),this);
-            this.blackPieces.add(blackPawn);
+            this.blackPieces.add(createPawn(new Location(i,0,6),ChessColor.BLACK,PieceId.get(i+10)));
         }
-        this.blackPieces.add(blackRightKnight);
-        this.blackPieces.add(blackLeftKnight);
-        this.blackPieces.add(blackLeftBishop);
-        this.blackPieces.add(blackRightBishop);
-        this.blackPieces.add(blackQueen);
-        this.blackPieces.add(blackKing);
-        this.blackPieces.add(blackLeftRook);
-        this.blackPieces.add(blackRightRook);
+        this.blackPieces.add(createKnight(new Location(6,0,7), ChessColor.BLACK,PieceId.BRN));
+        this.blackPieces.add(createKnight(new Location(1,0,7), ChessColor.BLACK,PieceId.BLN));
+        this.blackPieces.add(createBishop(new Location(5,0,7), ChessColor.BLACK,PieceId.BLB));
+        this.blackPieces.add(createBishop(new Location(2,0,7), ChessColor.BLACK,PieceId.BRB));
+        this.blackPieces.add(createQueen(new Location(4,0,7), ChessColor.BLACK,PieceId.BQ));
+        this.blackPieces.add(createKing(new Location(3,0,7), ChessColor.BLACK,PieceId.BK));
+        this.blackPieces.add(createRook(new Location(7,0,7), ChessColor.BLACK,PieceId.BLR));
+        this.blackPieces.add(createRook(new Location(0,0,7), ChessColor.BLACK,PieceId.BRR));
     }
 
-    public boolean isSquareFree(Square square){
-        Square boardSquare = (Square) this.chessSquares.getItemByLocation(square.getLocation());
-        if(boardSquare != null){
-            return boardSquare.getPiece() == null;
+    private Knight createKnight(Location location, ChessColor color,PieceId pieceID){
+        return new Knight((Square) this.chessSquares.getItemByLocation(location), color,pieceID,this);
+    }
+
+    private Bishop createBishop(Location location, ChessColor color,PieceId pieceID){
+        return new Bishop((Square) this.chessSquares.getItemByLocation(location), color,pieceID,this);
+    }
+
+    private Rook createRook(Location location, ChessColor color, PieceId pieceID){
+        return new Rook((Square) this.chessSquares.getItemByLocation(location), color,pieceID,this);
+    }
+
+    private Queen createQueen(Location location, ChessColor color, PieceId pieceID){
+        return new Queen((Square) this.chessSquares.getItemByLocation(location), color,pieceID,this);
+    }
+
+    private King createKing(Location location, ChessColor color, PieceId pieceID){
+        return new King((Square) this.chessSquares.getItemByLocation(location), color,pieceID,this);
+    }
+
+    private Pawn createPawn(Location location, ChessColor color, PieceId pieceID){
+        return new Pawn((Square) this.chessSquares.getItemByLocation(location), color,pieceID,this);
+    }
+
+    public void loadBoard(String fenString) throws FenStringBadFormatException {
+        String[] lines = fenString.split("/");
+        if(lines.length != 8){
+            throw new FenStringBadFormatException("Cannot load game from fen string, fen string doesn't contains enought lines");
         }
-        return false;
+        createPiecesFromFen(lines);
+    }
+
+    private void createPiecesFromFen(String[] lines) throws FenStringBadFormatException {
+        boolean firstWN = true, firstBN = true, firstWB = true, firstBB = true,firstWR = true,firstBR = true;
+        for(int i = 0 ; i < lines.length;i++){
+            int caseIndex = 0;
+            for(int j = 0 ;  j < lines[i].length() ; j++){
+                int xPos = 7-caseIndex;
+                int zPos = 7-i;
+                switch(lines[i].charAt(j)){
+                    case 'p':
+                        this.blackPieces.add(createPawn(new Location(xPos,0,zPos),ChessColor.BLACK,PieceId.get(xPos)));
+                        break;
+                    case 'P':
+                        this.whitePieces.add(createPawn(new Location(xPos,0,zPos),ChessColor.WHITE,PieceId.get(xPos+10)));
+                        break;
+                    case 'r':
+                        this.blackPieces.add(createRook(new Location(xPos,0,zPos),ChessColor.BLACK,firstBR ? PieceId.BLR:PieceId.BRR));
+                        firstBR = false;
+                        break;
+                    case 'R':
+                        this.whitePieces.add(createRook(new Location(xPos,0,zPos),ChessColor.WHITE,firstWR ? PieceId.WLR:PieceId.WRR));
+                        firstWR = false;
+                        break;
+                    case 'b':
+                        this.blackPieces.add(createBishop(new Location(xPos,0,zPos),ChessColor.BLACK,firstBB ? PieceId.BLB:PieceId.BRB));
+                        firstBB = false;
+                        break;
+                    case 'B':
+                        this.whitePieces.add(createBishop(new Location(xPos,0,zPos),ChessColor.WHITE,firstWB ? PieceId.WLB:PieceId.WRB));
+                        firstWB = false;
+                        break;
+                    case 'n':
+                        this.blackPieces.add(createKnight(new Location(xPos,0,zPos),ChessColor.BLACK,firstBN ? PieceId.BLN:PieceId.BRN));
+                        firstBN = false;
+                        break;
+                    case 'N':
+                        this.whitePieces.add(createKnight(new Location(xPos,0,zPos),ChessColor.WHITE,firstWN ? PieceId.WLN:PieceId.WRN));
+                        firstWN = false;
+                        break;
+                    case 'k':
+                        this.blackPieces.add(createKing(new Location(xPos,0,zPos),ChessColor.BLACK,PieceId.BK));
+                        break;
+                    case 'K':
+                        this.whitePieces.add(createKing(new Location(xPos,0,zPos),ChessColor.WHITE,PieceId.WK));
+                        break;
+                    case 'q':
+                        this.blackPieces.add(createQueen(new Location(xPos,0,zPos),ChessColor.BLACK,PieceId.BQ));
+                        break;
+                    case 'Q':
+                        this.whitePieces.add(createQueen(new Location(xPos,0,zPos),ChessColor.WHITE,PieceId.WQ));
+                        break;
+                    default:
+                        try {
+                            int emptyCells = Integer.parseInt(lines[i].charAt(j) + "");
+                            if(emptyCells < 1 || emptyCells > 8){
+                                throw new FenStringBadFormatException("Incorrect Number of empty cells");
+                            }
+                            caseIndex = caseIndex + emptyCells-1;
+                        }catch (Exception ex){
+                            throw new FenStringBadFormatException("Incorrect Number of empty cells");
+                        }
+                        break;
+                }
+                caseIndex++;
+            }
+        }
     }
 
     public SquareList getSquares() {
@@ -118,5 +190,12 @@ public class Board {
 
     public PieceList getPiecesByColor(ChessColor color){
         return color == ChessColor.WHITE ? getWhitePieces() : getBlackPieces();
+    }
+
+    public void clearBoard() {
+        this.whitePieces.clear();
+        this.blackPieces.clear();
+        this.blackDeadPieces.clear();
+        this.whiteDeadPieces.clear();
     }
 }

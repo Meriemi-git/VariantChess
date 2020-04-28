@@ -61,7 +61,6 @@ public class PawnMoveSet extends AbstractMoveSet {
         } else if (diagRight != null && diagRight.getPiece() == null && enPassantRightIsPossible(diagRight)){
             validSquares.add(diagRight);
         }
-
         if (diagLeft != null
                 && (isThreat
                 || (diagLeft.getPiece() != null && diagLeft.getPiece().getChessColor() != turnColor))) {
@@ -93,7 +92,7 @@ public class PawnMoveSet extends AbstractMoveSet {
                 || (this.piece.getChessColor() == ChessColor.BLACK && this.piece.getLocation().getZ() == 3))
                 && PieceId.isPawn(this.previousTurn.played.getPieceId())
                 && Math.abs(this.previousTurn.to.getLocation().getZ() - this.previousTurn.from.getLocation().getZ()) == 2
-                && Math.abs(this.previousTurn.to.getLocation().getX() - this.previousTurn.from.getLocation().getX()) == 1;
+                && Math.abs(this.previousTurn.to.getLocation().getX() - this.piece.getLocation().getX()) == 1;
     }
 
     @Override

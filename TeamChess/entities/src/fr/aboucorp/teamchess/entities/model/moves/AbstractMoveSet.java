@@ -49,7 +49,7 @@ public abstract class AbstractMoveSet implements GameEventSubscriber {
                 this.isChecking = true;
                 this.kingInCheck = (King) ((CheckInEvent) event).piece;
                 this.checkingPieces = ((CheckInEvent) event).checkingPieces;
-            } else if(event instanceof CheckOutEvent && ((CheckInEvent) event).piece.getChessColor() == this.piece.getChessColor()){
+            } else if(event instanceof CheckOutEvent && ((CheckInEvent) event).piece.getChessColor() == this.piece.getChessColor()) {
                 this.isChecking = false;
                 this.kingInCheck = null;
                 this.checkingPieces = null;

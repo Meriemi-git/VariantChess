@@ -230,6 +230,7 @@ public class Board3dManager extends ApplicationAdapter {
 
     public void createPieces(List<Piece> pieces){
         this.loadingPieces.addAll(pieces);
+        this.boardIsLoading = true;
     }
 
     private void loadModels(){
@@ -446,5 +447,12 @@ public class Board3dManager extends ApplicationAdapter {
         }
         this.material3dManager.resetMaterial(eatenPiece);
         eatenPiece.transform.rotate(Vector3.Y, 180);
+    }
+
+    public void clearBoard() {
+        this.blackPieceModels.clear();
+        this.whitePieceModels.clear();
+        this.whiteDeadPieceModels.clear();
+        this.blackDeadPieceModels.clear();
     }
 }

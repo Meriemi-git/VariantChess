@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
@@ -32,6 +33,7 @@ public class BoardActivity extends AndroidApplication implements GameEventSubscr
     private PartyManager partyManager;
     private TextView lbl_turn;
     private TextView party_logs;
+    private EditText fen_txt;
 
     public BoardActivity(){
         this.eventManager = GameEventManager.getINSTANCE();
@@ -68,6 +70,7 @@ public class BoardActivity extends AndroidApplication implements GameEventSubscr
         this.lbl_turn = findViewById(R.id.lbl_turn);
         this.party_logs = findViewById(R.id.party_logs);
         this.btn_test = findViewById(R.id.btn_test);
+        this.fen_txt = findViewById(R.id.fen_txt);
     }
 
     public void bindListeners() {
@@ -79,7 +82,7 @@ public class BoardActivity extends AndroidApplication implements GameEventSubscr
         });
         btn_test.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
-                BoardActivity.this.eventManager.unSubscribe(GameEvent.class, BoardActivity.this);
+                BoardActivity.this.partyManager.loadBoard(fen_txt.getText().toString().trim());
             }
         });
     }

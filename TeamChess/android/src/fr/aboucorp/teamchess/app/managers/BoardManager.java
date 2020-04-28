@@ -27,6 +27,7 @@ import fr.aboucorp.teamchess.entities.model.events.models.PartyEvent;
 import fr.aboucorp.teamchess.entities.model.events.models.PieceEvent;
 import fr.aboucorp.teamchess.entities.model.events.models.TurnEndEvent;
 import fr.aboucorp.teamchess.entities.model.events.models.TurnStartEvent;
+import fr.aboucorp.teamchess.entities.model.exceptions.FenStringBadFormatException;
 import fr.aboucorp.teamchess.entities.model.utils.PieceList;
 import fr.aboucorp.teamchess.entities.model.utils.SquareList;
 import fr.aboucorp.teamchess.libgdx.Board3dManager;
@@ -50,6 +51,8 @@ public class BoardManager implements GameEventSubscriber {
     private boolean kingIsInCheck;
     private Square enPassant;
     private int moveNumber = 0;
+    private final Object lock1 = new Object();
+    private final Object lock2 = new Object();
 
     public BoardManager(Board3dManager board3dManager) {
         this.board = new Board();
@@ -59,6 +62,7 @@ public class BoardManager implements GameEventSubscriber {
         this.eventManager.subscribe(TurnStartEvent.class, this, 2);
         this.eventManager.subscribe(TurnEndEvent.class, this, 1);
         this.eventManager.subscribe(PieceEvent.class, this, 1);
+        this.eventManager.subscribe(EnPassantEvent.class, this, 1);
     }
 
     @Override
@@ -90,6 +94,79 @@ public class BoardManager implements GameEventSubscriber {
             }
         }).start();
     }
+
+    public ChessColor loadBoard(String fenString) throws FenStringBadFormatException,NumberFormatException {
+
+        String[] parts = fenString.trim().split(" ");
+        if(parts.length < 5 || parts.length > 6){
+            throw new FenStringBadFormatException("Cannot load game from fen string, fen string doesn't contains enought parts");
+        }
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Gdx.app.postRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        clearBoard();
+                        try {
+                            board.loadBoard(parts[0]);
+                            BoardManager.this.board3dManager.createPieces(BoardManager.this.board.getWhitePieces());
+                            BoardManager.this.board3dManager.createPieces(BoardManager.this.board.getBlackPieces());
+                        } catch (FenStringBadFormatException e) {
+                            e.printStackTrace();
+                        }finally {
+                            synchronized (lock2) {
+                                lock2.notify();
+                            }
+                        }
+                    }
+                });
+                synchronized (lock2) {
+                    try {
+                        lock2.wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                synchronized (lock1) {
+                    lock1.notify();
+                }
+            }
+        }).start();
+        synchronized (lock1) {
+            try {
+                lock1.wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        this.whiteCanCastleKing = parts[2].contains("K");
+        this.whiteCanCastleQueen = parts[2].contains("Q");
+        this.blackCanCastleKing = parts[2].contains("k");
+        this.blackCanCastleQueen = parts[2].contains("q");
+        if(!parts[3].equals("-")) {
+            this.enPassant = this.board.getSquares().getSquareByLabel(parts[3]);
+        }
+        this.moveNumber = Integer.parseInt(parts[4]);
+        this.fiftyMoveCounter = Integer.parseInt(parts[5]);
+        if(parts[1] == "w"){
+            return ChessColor.WHITE;
+        }else{
+            return ChessColor.BLACK;
+        }
+    }
+
+    private void clearBoard() {
+        this.selectedPiece = null;
+        this.previousTurn = null;
+        this.actualTurn = null;
+        this.possiblesMoves = null;
+        this.kingIsInCheck = false;
+        this.board.clearBoard();
+        this.board3dManager.clearBoard();
+    }
+
 
     public void moveToSquare(Square square) {
         String eventMessage = String.format("Move %s from %s to %s",
@@ -245,13 +322,16 @@ public class BoardManager implements GameEventSubscriber {
     private void manageTurnStart(TurnStartEvent event) {
         this.previousTurn = actualTurn;
         this.actualTurn = event.turn;
-        canClaimADraw();
-        canCastle();
-        isGameFinished();
+        if(previousTurn != null) {
+            canClaimADraw();
+            canCastle();
+            isGameFinished();
+            this.eventManager.sendMessage(new LogEvent(this.getFenFromBoard()));
+        }
         if (event.turn.getTurnColor() == ChessColor.WHITE) {
             this.moveNumber++;
         }
-        this.eventManager.sendMessage(new LogEvent(this.getFenFromBoard()));
+
     }
 
     private void manageTurnEnd() {
@@ -315,6 +395,7 @@ public class BoardManager implements GameEventSubscriber {
                 && this.board.getSquares().getSquareByLabel("C1").getPiece() == null
                 && this.board.getSquares().getSquareByLabel("CB1").getPiece() == null;
     }
+
     private boolean whiteCanCastleQueen() {
         return this.board.getWhitePieces().getPieceById(PieceId.WK).isFirstMove()
                 && this.board.getWhitePieces().getPieceById(PieceId.WLR).isFirstMove() ;
@@ -325,6 +406,7 @@ public class BoardManager implements GameEventSubscriber {
                 && this.board.getSquares().getSquareByLabel("G1").getPiece() == null
                 && this.board.getSquares().getSquareByLabel("F1").getPiece() == null;
     }
+
     private boolean whiteCanCastleKing() {
         return this.board.getWhitePieces().getPieceById(PieceId.WK).isFirstMove()
                 && this.board.getWhitePieces().getPieceById(PieceId.WRR).isFirstMove();
@@ -388,18 +470,8 @@ public class BoardManager implements GameEventSubscriber {
         }
         fenString.append(' ');
         if (enPassant != null) {
-            if (this.actualTurn.getTurnColor() == ChessColor.WHITE) {
-                fenString.append(enPassant.getSquareLabel());
-                fenString.append(' ');
-                fenString.append('-');
-            } else {
-                fenString.append('-');
-                fenString.append(' ');
-                fenString.append(enPassant.getSquareLabel());
-            }
+            fenString.append(enPassant.getSquareLabel());
         } else {
-            fenString.append('-');
-            fenString.append(' ');
             fenString.append('-');
         }
         fenString.append(' ');

@@ -28,17 +28,20 @@ public class TurnManager implements GameEventSubscriber {
         this.black = new Team("white",ChessColor.BLACK);
     }
 
+    public void newParty(ChessColor color) {
+        Team team = (color == ChessColor.WHITE ? white : black);
+        Turn firsTurn = new Turn(1,team);
+        this.turns.add(firsTurn);
+        String eventMessage = String.format("Next turn, color : %s",firsTurn.getTurnColor());
+        this.eventManager.sendMessage(new TurnStartEvent(eventMessage,firsTurn));
+    }
 
     public void startTurn(){
         Turn nextTurn;
-        if(this.turns.isEmpty()){
-            nextTurn = new Turn(1,white);
+        if (this.turns.getLast().getTurnColor() == ChessColor.WHITE) {
+            nextTurn = new Turn(this.turns.size()+1,black);
         }else{
-            if (this.turns.getLast().getTurnColor() == ChessColor.WHITE) {
-                nextTurn = new Turn(this.turns.size()+1,black);
-            }else{
-                nextTurn = new Turn(this.turns.size()+1,white);
-            }
+            nextTurn = new Turn(this.turns.size()+1,white);
         }
         this.turns.add(nextTurn);
         String eventMessage = String.format("Next turn, color : %s",nextTurn.getTurnColor());
@@ -79,4 +82,6 @@ public class TurnManager implements GameEventSubscriber {
             this.turns.getLast().setDeadPiece(((MoveEvent) event).deadPiece);
         }
     }
+
+
 }
