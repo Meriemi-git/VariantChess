@@ -21,7 +21,6 @@ public class Material3dManager {
         this.occupiedMaterial = new Material();
         this.occupiedMaterial.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, 0.8f));
         this.occupiedMaterial.set(ColorAttribute.createDiffuse(Color.RED));
-
     }
 
     public void resetMaterial(ChessModel piece) {
@@ -49,5 +48,9 @@ public class Material3dManager {
 
     public void setOccupiedMaterial(ChessModel model) {
         setMaterial(model,this.occupiedMaterial);
+    }
+
+    public void setPieceMaterialToCell(ChessModel piece, ChessModel square) {
+        // TODO apply texture on square depeding on piece
     }
 }

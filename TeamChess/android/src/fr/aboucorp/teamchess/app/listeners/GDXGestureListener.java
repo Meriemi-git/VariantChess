@@ -3,7 +3,7 @@ package fr.aboucorp.teamchess.app.listeners;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
 
-import fr.aboucorp.teamchess.app.managers.PartyManager;
+import fr.aboucorp.teamchess.app.managers.boards.BoardManager;
 import fr.aboucorp.teamchess.entities.model.Piece;
 import fr.aboucorp.teamchess.entities.model.Square;
 import fr.aboucorp.teamchess.libgdx.models.ChessModel;
@@ -11,44 +11,44 @@ import fr.aboucorp.teamchess.libgdx.models.ChessModel;
 
 public class GDXGestureListener implements GestureDetector.GestureListener {
 
-    private PartyManager partyManager;
+    private BoardManager boardManager;
     private TouchedModelFinder touchedModelFinder;
-    public GDXGestureListener(PartyManager partyManager) {
-        this.partyManager = partyManager;
-        this.touchedModelFinder = new TouchedModelFinder(partyManager);
+    public GDXGestureListener(BoardManager boardManager) {
+        this.boardManager = boardManager;
+        this.touchedModelFinder = new TouchedModelFinder(boardManager);
     }
 
     @Override
     public boolean touchDown(float screenX, float screenY, int pointer, int button) {
-        switch (partyManager.getGameState()) {
+        switch (boardManager.getGameState()) {
             case SelectPiece:
-                ChessModel touchedModel = touchedModelFinder.getTouchedModel(screenX, screenY, this.partyManager.getPiecesModelsFromActualTurn());
+                ChessModel touchedModel = touchedModelFinder.getTouchedModel(screenX, screenY, this.boardManager.getPiecesModelsFromActualTurn());
                 if (touchedModel != null) {
-                    Piece touchedPiece = this.partyManager.getPieceFromLocation(touchedModel.getLocation());
+                    Piece touchedPiece = this.boardManager.getPieceFromLocation(touchedModel.getLocation());
                     if (touchedPiece != null) {
-                        this.partyManager.selectPiece(touchedPiece);
+                        this.boardManager.selectPiece(touchedPiece);
                     } else {
-                        this.partyManager.unHightlight();
+                        this.boardManager.unHighlight();
                     }
                 }
                 break;
             case SelectCase:
-                ChessModel otherModel = touchedModelFinder.getTouchedModel(screenX, screenY, this.partyManager.getPiecesModelsFromActualTurn());
+                ChessModel otherModel = touchedModelFinder.getTouchedModel(screenX, screenY, this.boardManager.getPiecesModelsFromActualTurn());
                 if (otherModel != null) {
-                    Piece otherTouchedPiece = this.partyManager.getPieceFromLocation(otherModel.getLocation());
+                    Piece otherTouchedPiece = this.boardManager.getPieceFromLocation(otherModel.getLocation());
                     if (otherTouchedPiece != null) {
-                        this.partyManager.unHightlight();
-                        this.partyManager.selectPiece(otherTouchedPiece);
+                        this.boardManager.unHighlight();
+                        this.boardManager.selectPiece(otherTouchedPiece);
                     }
                 } else {
-                    ChessModel squareModel = touchedModelFinder.getTouchedModel(screenX, screenY, this.partyManager.getPossibleSquareModels());
+                    ChessModel squareModel = touchedModelFinder.getTouchedModel(screenX, screenY, this.boardManager.getPossibleSquareModels());
                     if(squareModel != null) {
-                        Square square = this.partyManager.getSquareFromLocation(squareModel.getLocation());
+                        Square square = this.boardManager.getSquareFromLocation(squareModel.getLocation());
                         if (square != null) {
-                            this.partyManager.selectSquare(square);
+                            this.boardManager.selectSquare(square);
                         }
                     }else {
-                        this.partyManager.unHightlight();
+                        this.boardManager.unHighlight();
                     }
                 }
                 break;

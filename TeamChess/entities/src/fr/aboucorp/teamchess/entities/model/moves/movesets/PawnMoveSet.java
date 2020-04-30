@@ -19,12 +19,12 @@ public class PawnMoveSet extends AbstractMoveSet {
 
     @Override
     protected SquareList getPossibleMoves(Piece piece, ChessColor turnColor) {
-        SquareList validSquares = getClassicMoves(piece, turnColor);
+        SquareList validSquares = getClassicMoves(piece);
         validSquares.addAll(getEatingMoves(piece,  turnColor, false));
         return validSquares;
     }
 
-    private SquareList getClassicMoves(Piece piece, ChessColor turnColor) {
+    private SquareList getClassicMoves(Piece piece) {
         SquareList classicMoves = new SquareList();
         Location start = piece.getLocation();
         Square simpleMove;

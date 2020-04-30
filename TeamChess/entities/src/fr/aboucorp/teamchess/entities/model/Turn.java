@@ -2,12 +2,12 @@ package fr.aboucorp.teamchess.entities.model;
 
 import java.time.Duration;
 
-public class Turn {
+public class Turn implements Comparable<Turn>{
 
     public final int turnNumber;
     public Duration duration;
-    public Square from;
     public Square to;
+    public Square from;
     public Piece played;
     public Piece DeadPiece;
     public final Team team;
@@ -29,14 +29,6 @@ public class Turn {
         DeadPiece = deadPiece;
     }
 
-    public Square getFrom() {
-        return from;
-    }
-
-    public void setFrom(Square from) {
-        this.from = from;
-    }
-
     public Square getTo() {
         return to;
     }
@@ -53,7 +45,6 @@ public class Turn {
         this.played = played;
     }
 
-
     public Duration getDuration() {
         return duration;
     }
@@ -62,7 +53,16 @@ public class Turn {
         this.duration = duration;
     }
 
+    public Square getFrom() {
+        return from;
+    }
 
+    public void setFrom(Square from) {
+        this.from = from;
+    }
 
-
+    @Override
+    public int compareTo(Turn turn) {
+        return Integer.compare(this.turnNumber,turn.turnNumber);
+    }
 }

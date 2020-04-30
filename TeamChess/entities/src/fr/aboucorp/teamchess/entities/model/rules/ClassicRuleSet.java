@@ -6,7 +6,7 @@ import fr.aboucorp.teamchess.entities.model.ChessColor;
 import fr.aboucorp.teamchess.entities.model.Piece;
 import fr.aboucorp.teamchess.entities.model.Square;
 import fr.aboucorp.teamchess.entities.model.Turn;
-import fr.aboucorp.teamchess.entities.model.boards.ClassicBoard;
+import fr.aboucorp.teamchess.entities.model.boards.Board;
 import fr.aboucorp.teamchess.entities.model.enums.BoardEventType;
 import fr.aboucorp.teamchess.entities.model.enums.PieceId;
 import fr.aboucorp.teamchess.entities.model.events.GameEventManager;
@@ -26,7 +26,7 @@ import fr.aboucorp.teamchess.entities.model.utils.PieceList;
 
 public class ClassicRuleSet extends AbstracRuleSet implements GameEventSubscriber {
 
-    private final ClassicBoard classicBoard;
+    private final Board board;
     public static int FIFTY_MOVE_RULE_NUMBER = 75;
     public int fiftyMoveCounter = 0;
     public boolean whiteCanCastleKing;
@@ -40,8 +40,8 @@ public class ClassicRuleSet extends AbstracRuleSet implements GameEventSubscribe
 
     private GameEventManager eventManager;
 
-    public ClassicRuleSet(ClassicBoard classicBoard) {
-        this.classicBoard = classicBoard;
+    public ClassicRuleSet(Board board) {
+        this.board = board;
         this.eventManager = GameEventManager.getINSTANCE();
         this.eventManager.subscribe(TurnEvent.class,this,1);
     }
@@ -55,8 +55,8 @@ public class ClassicRuleSet extends AbstracRuleSet implements GameEventSubscribe
         if (causingCheck.size() > 0) {
             this.kingIsInCheck = true;
             Piece kingInCheck = this.previousTurn.getTurnColor() == ChessColor.WHITE
-                    ? this.classicBoard.getWhitePieces().getPieceById(PieceId.WK)
-                    : this.classicBoard.getBlackPieces().getPieceById(PieceId.BK);
+                    ? this.board.getWhitePieces().getPieceById(PieceId.WK)
+                    : this.board.getBlackPieces().getPieceById(PieceId.BK);
             this.eventManager.sendMessage(new CheckInEvent("King is in check", BoardEventType.CHECK_IN, kingInCheck, causingCheck));
         }
     }
@@ -73,23 +73,23 @@ public class ClassicRuleSet extends AbstracRuleSet implements GameEventSubscribe
         Square destination = null;
         BoardEventType castlingType = null;
         if (this.whiteCanCastleQueen && turnColor == ChessColor.WHITE && square.getSquareLabel().equals("C1")) {
-            rookToMove = this.classicBoard.getWhitePieces().getPieceById(PieceId.WLR);
-            destination = this.classicBoard.getSquares().getSquareByLabel("D1");
+            rookToMove = this.board.getWhitePieces().getPieceById(PieceId.WLR);
+            destination = this.board.getSquares().getSquareByLabel("D1");
             castlingType = BoardEventType.CASTLE_QUEEN;
         }
         if (this.blackCanCastleQueen && turnColor == ChessColor.BLACK && square.getSquareLabel().equals("C8")) {
-            rookToMove = this.classicBoard.getBlackPieces().getPieceById(PieceId.BLR);
-            destination = this.classicBoard.getSquares().getSquareByLabel("D8");
+            rookToMove = this.board.getBlackPieces().getPieceById(PieceId.BLR);
+            destination = this.board.getSquares().getSquareByLabel("D8");
             castlingType = BoardEventType.CASTLE_QUEEN;
         }
         if (this.whiteCanCastleKing && turnColor == ChessColor.WHITE && square.getSquareLabel().equals("G1")) {
-            rookToMove = this.classicBoard.getWhitePieces().getPieceById(PieceId.WRR);
-            destination = this.classicBoard.getSquares().getSquareByLabel("F1");
+            rookToMove = this.board.getWhitePieces().getPieceById(PieceId.WRR);
+            destination = this.board.getSquares().getSquareByLabel("F1");
             castlingType = BoardEventType.CASTLE_KING;
         }
         if (this.blackCanCastleKing && turnColor == ChessColor.BLACK && square.getSquareLabel().equals("G8")) {
-            rookToMove = this.classicBoard.getBlackPieces().getPieceById(PieceId.BRR);
-            destination = this.classicBoard.getSquares().getSquareByLabel("F8");
+            rookToMove = this.board.getBlackPieces().getPieceById(PieceId.BRR);
+            destination = this.board.getSquares().getSquareByLabel("F8");
             castlingType = BoardEventType.CASTLE_KING;
         }
         if (rookToMove != null && destination != null) {
@@ -100,25 +100,25 @@ public class ClassicRuleSet extends AbstracRuleSet implements GameEventSubscribe
     public void canCastle() {
         if (whiteCanCastleKingNow()) {
             this.whiteCanCastleKing = true;
-            this.eventManager.sendMessage(new PieceEvent("White can castle on king side", BoardEventType.CASTLE_KING, this.classicBoard.getWhitePieces().getPieceById(PieceId.WK)));
+            this.eventManager.sendMessage(new PieceEvent("White can castle on king side", BoardEventType.CASTLE_KING, this.board.getWhitePieces().getPieceById(PieceId.WK)));
         } else {
             this.whiteCanCastleKing = false;
         }
         if (whiteCanCastleQueenNow()) {
             this.whiteCanCastleQueen = true;
-            this.eventManager.sendMessage(new PieceEvent("White can castle on queen side", BoardEventType.CASTLE_QUEEN, this.classicBoard.getWhitePieces().getPieceById(PieceId.WK)));
+            this.eventManager.sendMessage(new PieceEvent("White can castle on queen side", BoardEventType.CASTLE_QUEEN, this.board.getWhitePieces().getPieceById(PieceId.WK)));
         } else {
             this.whiteCanCastleQueen = false;
         }
         if (blackCanCastleKingNow()) {
             this.blackCanCastleKing = true;
-            this.eventManager.sendMessage(new PieceEvent("Black can castle on king side", BoardEventType.CASTLE_KING, this.classicBoard.getBlackPieces().getPieceById(PieceId.BK)));
+            this.eventManager.sendMessage(new PieceEvent("Black can castle on king side", BoardEventType.CASTLE_KING, this.board.getBlackPieces().getPieceById(PieceId.BK)));
         } else {
             this.blackCanCastleKing = false;
         }
         if (blackCanCastleQueenNow()) {
             this.blackCanCastleQueen = true;
-            this.eventManager.sendMessage(new PieceEvent("Black can castle on queen side", BoardEventType.CASTLE_QUEEN, this.classicBoard.getBlackPieces().getPieceById(PieceId.BK)));
+            this.eventManager.sendMessage(new PieceEvent("Black can castle on queen side", BoardEventType.CASTLE_QUEEN, this.board.getBlackPieces().getPieceById(PieceId.BK)));
         } else {
             this.blackCanCastleQueen = false;
         }
@@ -126,47 +126,47 @@ public class ClassicRuleSet extends AbstracRuleSet implements GameEventSubscribe
 
     private boolean blackCanCastleQueenNow() {
         return this.blackCanCastleQueen()
-                && this.classicBoard.getSquares().getSquareByLabel("D8").getPiece() == null
-                && this.classicBoard.getSquares().getSquareByLabel("C8").getPiece() == null;
+                && this.board.getSquares().getSquareByLabel("D8").getPiece() == null
+                && this.board.getSquares().getSquareByLabel("C8").getPiece() == null;
     }
 
     public boolean blackCanCastleQueen() {
-        return this.classicBoard.getBlackPieces().getPieceById(PieceId.BK).isFirstMove()
-                && this.classicBoard.getBlackPieces().getPieceById(PieceId.BLR).isFirstMove();
+        return this.board.getBlackPieces().getPieceById(PieceId.BK).isFirstMove()
+                && this.board.getBlackPieces().getPieceById(PieceId.BLR).isFirstMove();
     }
 
     private boolean blackCanCastleKingNow() {
         return this.blackCanCastleKing()
-                && this.classicBoard.getSquares().getSquareByLabel("F8").getPiece() == null
-                && this.classicBoard.getSquares().getSquareByLabel("G8").getPiece() == null;
+                && this.board.getSquares().getSquareByLabel("F8").getPiece() == null
+                && this.board.getSquares().getSquareByLabel("G8").getPiece() == null;
     }
 
     public boolean blackCanCastleKing() {
-        return this.classicBoard.getBlackPieces().getPieceById(PieceId.BK).isFirstMove()
-                && this.classicBoard.getBlackPieces().getPieceById(PieceId.BLR).isFirstMove();
+        return this.board.getBlackPieces().getPieceById(PieceId.BK).isFirstMove()
+                && this.board.getBlackPieces().getPieceById(PieceId.BLR).isFirstMove();
     }
 
     private boolean whiteCanCastleQueenNow() {
         return whiteCanCastleQueen()
-                && this.classicBoard.getSquares().getSquareByLabel("D1").getPiece() == null
-                && this.classicBoard.getSquares().getSquareByLabel("C1").getPiece() == null
-                && this.classicBoard.getSquares().getSquareByLabel("CB1").getPiece() == null;
+                && this.board.getSquares().getSquareByLabel("D1").getPiece() == null
+                && this.board.getSquares().getSquareByLabel("C1").getPiece() == null
+                && this.board.getSquares().getSquareByLabel("CB1").getPiece() == null;
     }
 
     public boolean whiteCanCastleQueen() {
-        return this.classicBoard.getWhitePieces().getPieceById(PieceId.WK).isFirstMove()
-                && this.classicBoard.getWhitePieces().getPieceById(PieceId.WLR).isFirstMove() ;
+        return this.board.getWhitePieces().getPieceById(PieceId.WK).isFirstMove()
+                && this.board.getWhitePieces().getPieceById(PieceId.WLR).isFirstMove() ;
     }
 
     private boolean whiteCanCastleKingNow() {
         return whiteCanCastleKing()
-                && this.classicBoard.getSquares().getSquareByLabel("G1").getPiece() == null
-                && this.classicBoard.getSquares().getSquareByLabel("F1").getPiece() == null;
+                && this.board.getSquares().getSquareByLabel("G1").getPiece() == null
+                && this.board.getSquares().getSquareByLabel("F1").getPiece() == null;
     }
 
     public boolean whiteCanCastleKing() {
-        return this.classicBoard.getWhitePieces().getPieceById(PieceId.WK).isFirstMove()
-                && this.classicBoard.getWhitePieces().getPieceById(PieceId.WRR).isFirstMove();
+        return this.board.getWhitePieces().getPieceById(PieceId.WK).isFirstMove()
+                && this.board.getWhitePieces().getPieceById(PieceId.WRR).isFirstMove();
 
     }
 
@@ -190,7 +190,7 @@ public class ClassicRuleSet extends AbstracRuleSet implements GameEventSubscribe
     public void isGameFinished() {
         if (previousTurn != null) {
             boolean cantMove = true;
-            for (Piece piece : classicBoard.getPiecesByColor(this.actualTurn.getTurnColor())) {
+            for (Piece piece : board.getPiecesByColor(this.actualTurn.getTurnColor())) {
                 if (piece.getMoveSet().getNextMoves().size() > 0) {
                     cantMove = false;
                 }
@@ -209,9 +209,9 @@ public class ClassicRuleSet extends AbstracRuleSet implements GameEventSubscribe
         PieceList opposites;
         ChessColor oppositeColor = actualTurn.getTurnColor() == ChessColor.WHITE ? ChessColor.BLACK : ChessColor.WHITE;
         if (actualTurn.getTurnColor() == ChessColor.WHITE) {
-            opposites = this.classicBoard.getBlackPieces();
+            opposites = this.board.getBlackPieces();
         } else {
-            opposites = this.classicBoard.getWhitePieces();
+            opposites = this.board.getWhitePieces();
         }
         boolean canMove = false;
         for (Piece piece : opposites) {

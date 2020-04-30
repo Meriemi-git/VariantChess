@@ -1,6 +1,6 @@
 package fr.aboucorp.teamchess.entities.model;
 
-public class Location {
+public class Location implements Cloneable {
 
     private final int x;
     private final int y;
@@ -28,6 +28,11 @@ public class Location {
 
     public int getZ() {
         return z;
+    }
+
+    @Override
+    protected Location clone()  {
+        return new Location(this.x,this.y,this.z);
     }
 
     @Override

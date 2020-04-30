@@ -1,7 +1,6 @@
 package fr.aboucorp.teamchess.app.managers.boards;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Camera;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +10,7 @@ import fr.aboucorp.teamchess.entities.model.ChessColor;
 import fr.aboucorp.teamchess.entities.model.Location;
 import fr.aboucorp.teamchess.entities.model.Piece;
 import fr.aboucorp.teamchess.entities.model.Square;
-import fr.aboucorp.teamchess.entities.model.boards.ClassicBoard;
+import fr.aboucorp.teamchess.entities.model.boards.Board;
 import fr.aboucorp.teamchess.entities.model.enums.BoardEventType;
 import fr.aboucorp.teamchess.entities.model.events.GameEventManager;
 import fr.aboucorp.teamchess.entities.model.events.GameEventSubscriber;
@@ -19,7 +18,6 @@ import fr.aboucorp.teamchess.entities.model.events.models.CastlingEvent;
 import fr.aboucorp.teamchess.entities.model.events.models.EnPassantEvent;
 import fr.aboucorp.teamchess.entities.model.events.models.GameEvent;
 import fr.aboucorp.teamchess.entities.model.events.models.LogEvent;
-import fr.aboucorp.teamchess.entities.model.events.models.MoveEvent;
 import fr.aboucorp.teamchess.entities.model.events.models.PartyEvent;
 import fr.aboucorp.teamchess.entities.model.events.models.PieceEvent;
 import fr.aboucorp.teamchess.entities.model.events.models.TurnEndEvent;
@@ -31,11 +29,11 @@ import fr.aboucorp.teamchess.entities.model.utils.SquareList;
 import fr.aboucorp.teamchess.libgdx.Board3dManager;
 import fr.aboucorp.teamchess.libgdx.models.ChessModel;
 
-public class ClassicBoardManager extends AbstractBoardManager implements GameEventSubscriber {
+public class ClassicBoardManager extends BoardManager implements GameEventSubscriber {
 
 
-    public ClassicBoardManager(Board3dManager board3dManager, ClassicBoard classicBoard, ClassicRuleSet ruleSet) {
-        super(classicBoard,board3dManager,ruleSet);
+    public ClassicBoardManager(Board3dManager board3dManager, Board board, ClassicRuleSet ruleSet) {
+        super(board,board3dManager,ruleSet);
         this.eventManager = GameEventManager.getINSTANCE();
         this.eventManager.subscribe(PartyEvent.class, this, 1);
 /*        this.eventManager.subscribe(TurnStartEvent.class, this, 2);
@@ -56,7 +54,7 @@ public class ClassicBoardManager extends AbstractBoardManager implements GameEve
             this.board3dManager.moveToSquare(((CastlingEvent) event).piece,((CastlingEvent) event).detination);
         }
     }
-
+    @Override
     public void createBoard() {
         this.board.initBoard();
         new Thread(() -> Gdx.app.postRunnable(() -> {
@@ -66,6 +64,7 @@ public class ClassicBoardManager extends AbstractBoardManager implements GameEve
         })).start();
     }
 
+    @Override
     public ChessColor loadBoard(String fenString) throws FenStringBadFormatException,NumberFormatException {
 
         String[] parts = fenString.trim().split(" ");
@@ -105,30 +104,66 @@ public class ClassicBoardManager extends AbstractBoardManager implements GameEve
         }
     }
 
-    private void clearBoard() {
-        this.selectedPiece = null;
-        this.previousTurn = null;
-        this.actualTurn = null;
-        this.board.clearBoard();
-        this.board3dManager.clearBoard();
-    }
-
-    public void moveToSquare(Square square) {
-        String eventMessage = String.format("Move %s from %s to %s",
-                selectedPiece.getPieceId().name(),
-                selectedPiece.getActualSquare(),
-                square);
-        MoveEvent moveEvent = new MoveEvent(eventMessage, selectedPiece.getActualSquare(), square, selectedPiece, square.getPiece());
-        this.eventManager.sendMessage(moveEvent);
-        eat(square);
+    @Override
+    public Piece moveToSquare(Square square) {
+        Piece eated = eat(square);
         this.selectedPiece.move(square);
         this.board3dManager.moveSelectedPieceIntoSquare(square);
         ((ClassicRuleSet)this.ruleSet).isKingInCheck(this.selectedPiece);
         ((ClassicRuleSet)this.ruleSet).checkIfCastling(square);
         resetHighlited();
+        return eated;
     }
 
-    private void eat(Square square) {
+
+    private void resetHighlited() {
+        this.board3dManager.unHighlightSquares(this.possiblesMoves);
+        this.board3dManager.resetSelection();
+        this.possiblesMoves = null;
+    }
+
+    @Override
+    public void selectPiece(Piece touched) {
+        super.selectPiece(touched);
+        this.selectedPiece = touched;
+        this.board3dManager.selectPiece(touched);
+        this.possiblesMoves = touched.getMoveSet().getNextMoves();
+        this.hightLightPossibleMoves(this.possiblesMoves);
+    }
+
+    @Override
+    public void unHighlight() {
+        super.unHighlight();
+        this.board3dManager.resetSelection();
+        if (possiblesMoves != null) {
+            this.board3dManager.unHighlightSquares(this.possiblesMoves);
+        }
+    }
+
+    private void hightLightPossibleMoves(SquareList possibleMoves) {
+        if (possibleMoves != null) {
+            for (Square square : possibleMoves) {
+                if (square.getPiece() == null) {
+                    this.board3dManager.highlightEmptySquareFromLocation(square);
+                } else {
+                    this.board3dManager.highlightOccupiedSquareFromLocation(square);
+                }
+            }
+        }
+    }
+
+    private void manageTurnStart(TurnStartEvent event) {
+        this.previousTurn = actualTurn;
+        this.actualTurn = event.turn;
+        this.eventManager.sendMessage(new LogEvent(this.getFenFromBoard()));
+    }
+
+    private void manageTurnEnd() {
+        this.selectedPiece = null;
+        this.possiblesMoves = null;
+    }
+
+    private Piece eat(Square square) {
         Piece toBeEaten = square.getPiece();
         if (((ClassicRuleSet)this.ruleSet).isEnPassantMove(this.selectedPiece, square)) {
             toBeEaten = this.previousTurn.played;
@@ -144,49 +179,7 @@ public class ClassicBoardManager extends AbstractBoardManager implements GameEve
             this.eventManager.sendMessage(new PieceEvent(eventMessage, BoardEventType.DEATH, toBeEaten));
             toBeEaten.die();
         }
-    }
-
-    private void resetHighlited() {
-        this.board3dManager.unHighlightSquares(this.possiblesMoves);
-        this.board3dManager.resetSelection();
-        this.possiblesMoves = null;
-    }
-
-    public void selectPiece(Piece touched) {
-        this.selectedPiece = touched;
-        this.board3dManager.selectPiece(touched);
-        this.possiblesMoves = touched.getMoveSet().getNextMoves();
-        this.hightLightPossibleMoves(this.possiblesMoves);
-    }
-
-    private void hightLightPossibleMoves(SquareList possibleMoves) {
-        if (possibleMoves != null) {
-            for (Square square : possibleMoves) {
-                if (square.getPiece() == null) {
-                    this.board3dManager.highlightEmptySquareFromLocation(square);
-                } else {
-                    this.board3dManager.highlightOccupiedSquareFromLocation(square);
-                }
-            }
-        }
-    }
-
-    public void unHighlight() {
-        this.board3dManager.resetSelection();
-        if (possiblesMoves != null) {
-            this.board3dManager.unHighlightSquares(this.possiblesMoves);
-        }
-    }
-
-    private void manageTurnStart(TurnStartEvent event) {
-        this.previousTurn = actualTurn;
-        this.actualTurn = event.turn;
-        this.eventManager.sendMessage(new LogEvent(this.getFenFromBoard()));
-    }
-
-    private void manageTurnEnd() {
-        this.selectedPiece = null;
-        this.possiblesMoves = null;
+        return toBeEaten;
     }
 
     private String getFenFromBoard() {
@@ -244,21 +237,6 @@ public class ClassicBoardManager extends AbstractBoardManager implements GameEve
         return this.board3dManager.getSquareModelsFromPossibleMoves(this.possiblesMoves);
     }
 
-    public Piece getPieceFromLocation(Location location, ChessColor color) {
-        ArrayList<Piece> arrayList;
-        if (color == ChessColor.WHITE) {
-            arrayList = this.board.getWhitePieces();
-        } else {
-            arrayList = this.board.getBlackPieces();
-        }
-        for (Piece piece : arrayList) {
-            if (piece.getLocation().equals(location)) {
-                return piece;
-            }
-        }
-        return null;
-    }
-
     public Square getSquareFromLocation(Location location) {
         for (Square square : this.board.getSquares()) {
             if (square.getLocation().equals(location)) {
@@ -266,10 +244,6 @@ public class ClassicBoardManager extends AbstractBoardManager implements GameEve
             }
         }
         return null;
-    }
-
-    public Camera getCamera() {
-        return this.board3dManager.getCamera();
     }
 
     public ArrayList<ChessModel> getBlackPieceModels() {

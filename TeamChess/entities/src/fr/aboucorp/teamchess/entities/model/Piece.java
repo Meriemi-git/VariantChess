@@ -33,7 +33,7 @@ public abstract class Piece extends GameElement {
         return isFirstMove;
     }
 
-    public Square getActualSquare() {
+    public Square getSquare() {
         return actualSquare;
     }
 

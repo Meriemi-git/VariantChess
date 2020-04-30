@@ -69,17 +69,16 @@ public class Board3dManager extends ApplicationAdapter {
     /** Ecouteur d'évènement au clic sur la fenêtre */
     private InputAdapter androidInputAdapter;
     private GestureDetector.GestureListener androidListener;
+
+    private boolean tacticalViewEnabled;
+
     private final ChessModelList chessSquareModels;
     private final ChessModelList whitePieceModels;
     private final ChessModelList blackPieceModels;
     private final ChessModelList whiteDeadPieceModels;
     private final ChessModelList blackDeadPieceModels;
     private final ArrayList<Piece> loadingPieces;
-
-
     private final ArrayList<ModelInstance> devStuff;
-
-
     public static Map<Class,String> modelsPath =  new HashMap<>();
 
     private ModelBuilder modelBuilder;
@@ -87,8 +86,6 @@ public class Board3dManager extends ApplicationAdapter {
     private boolean boardIsLoading;
     private ChessModel selectedModel;
     private Material3dManager material3dManager;
-
-
 
     public Board3dManager() {
         this.devStuff = new ArrayList<ModelInstance>();
@@ -145,12 +142,12 @@ public class Board3dManager extends ApplicationAdapter {
             }
         }
         for (ChessModel piece : this.blackPieceModels) {
-            if(piece.isVisible(this.camera)){
+            if(piece.isVisible(this.camera) && !tacticalViewEnabled){
             modelBatch.render(piece, this.environment);
             }
         }
         for (ChessModel deadPiece : this.blackDeadPieceModels) {
-            if(deadPiece.isVisible(this.camera)) {
+            if(deadPiece.isVisible(this.camera) && !tacticalViewEnabled) {
                 modelBatch.render(deadPiece, this.environment);
             }
         }
@@ -362,7 +359,6 @@ public class Board3dManager extends ApplicationAdapter {
         this.camera.far = 300f;
         this.camera.update();
         this.camController = new CameraInputController(camera);
-        Vector3 right = new Vector3(3.5f,0f,3.5f).set(camera.direction).crs(camera.up).nor();
     }
 
     public PerspectiveCamera getCamera() {
@@ -395,10 +391,16 @@ public class Board3dManager extends ApplicationAdapter {
     }
 
     public void moveToSquare(Piece piece, Square square) {
+        ChessModel squareModel = this.getChessSquareModels().getByLocation(square.getLocation());
+        ChessModel pieceModel;
         if(piece.getChessColor() == ChessColor.WHITE){
-            this.getWhitePieceModels().getByLocation(piece.getLocation()).move(square.getLocation());
+            pieceModel = this.getWhitePieceModels().getByLocation(piece.getLocation());
         }else{
-            this.getBlackPieceModels().getByLocation(piece.getLocation()).move(square.getLocation());
+            pieceModel = this.getBlackPieceModels().getByLocation(piece.getLocation());
+        }
+        pieceModel.move(square.getLocation());
+        if(tacticalViewEnabled){
+            this.material3dManager.setPieceMaterialToCell(pieceModel,squareModel);
         }
     }
 
@@ -453,6 +455,22 @@ public class Board3dManager extends ApplicationAdapter {
         this.whitePieceModels.clear();
         this.whiteDeadPieceModels.clear();
         this.blackDeadPieceModels.clear();
+    }
+
+    public void toogleTacticalView() {
+        if(tacticalViewEnabled){
+            disableTacticalView();
+        }else{
+            enableTacticalView();
+        }
+        this.tacticalViewEnabled = !this.tacticalViewEnabled;
+    }
+
+    private void disableTacticalView() {
+    }
+
+    private void enableTacticalView() {
+
     }
 
 }

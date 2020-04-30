@@ -1,13 +1,16 @@
 package fr.aboucorp.teamchess.entities.model;
 
 public abstract class GameElement {
+    private final Location initial;
     private Location location;
     private ChessColor chessColor;
 
     public GameElement(Location location, ChessColor chessColor) {
         this.location = location;
+        initial = location.clone();
         this.chessColor = chessColor;
     }
+
     public Location getLocation() {
         return location;
     }

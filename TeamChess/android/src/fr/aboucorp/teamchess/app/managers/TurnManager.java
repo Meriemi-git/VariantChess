@@ -77,11 +77,9 @@ public class TurnManager implements GameEventSubscriber {
     public void receiveGameEvent(GameEvent event) {
         if(event instanceof MoveEvent){
             this.turns.getLast().setPlayed(((MoveEvent) event).played);
-            this.turns.getLast().setFrom(((MoveEvent) event).from);
             this.turns.getLast().setTo(((MoveEvent) event).to);
+            this.turns.getLast().setFrom(((MoveEvent) event).from);
             this.turns.getLast().setDeadPiece(((MoveEvent) event).deadPiece);
         }
     }
-
-
 }

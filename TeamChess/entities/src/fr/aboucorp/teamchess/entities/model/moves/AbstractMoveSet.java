@@ -74,11 +74,11 @@ public abstract class AbstractMoveSet implements GameEventSubscriber {
 
     private SquareList calculateUncheckingMoves(ChessColor turnColor) {
         SquareList uncheckingMoves = new SquareList();
-        Square originalPosition = this.piece.getActualSquare();
+        Square originalPosition = this.piece.getSquare();
         ChessColor oppositeColor = turnColor == ChessColor.WHITE ? ChessColor.BLACK : ChessColor.WHITE;
         for (Square checkedMove : this.getPossibleMoves(this.piece, turnColor)) {
             Piece originalPiece = checkedMove.getPiece();
-            if (this.checkingPieces.size() == 1 && checkedMove.equals(this.checkingPieces.get(0).getActualSquare())) {
+            if (this.checkingPieces.size() == 1 && checkedMove.equals(this.checkingPieces.get(0).getSquare())) {
                 uncheckingMoves.add(checkedMove);
             } else {
                 checkedMove.setPiece(this.piece);

@@ -15,12 +15,14 @@ import fr.aboucorp.teamchess.R;
 import fr.aboucorp.teamchess.app.listeners.GDXGestureListener;
 import fr.aboucorp.teamchess.app.listeners.GDXInputAdapter;
 import fr.aboucorp.teamchess.app.managers.PartyManager;
+import fr.aboucorp.teamchess.app.managers.boards.BoardManager;
 import fr.aboucorp.teamchess.app.managers.boards.ClassicBoardManager;
+import fr.aboucorp.teamchess.entities.model.boards.Board;
 import fr.aboucorp.teamchess.entities.model.boards.ClassicBoard;
 import fr.aboucorp.teamchess.entities.model.events.GameEventManager;
 import fr.aboucorp.teamchess.entities.model.events.GameEventSubscriber;
+import fr.aboucorp.teamchess.entities.model.events.models.BoardEvent;
 import fr.aboucorp.teamchess.entities.model.events.models.GameEvent;
-import fr.aboucorp.teamchess.entities.model.events.models.MoveEvent;
 import fr.aboucorp.teamchess.entities.model.events.models.TurnEvent;
 import fr.aboucorp.teamchess.entities.model.rules.ClassicRuleSet;
 import fr.aboucorp.teamchess.libgdx.Board3dManager;
@@ -30,8 +32,10 @@ public class BoardActivity extends AndroidApplication implements GameEventSubscr
     public FrameLayout board_panel;
     public Button btn_end_turn;
     public Button btn_test;
+    public Button btn_tactical;
     public GameEventManager eventManager;
     private PartyManager partyManager;
+    private BoardManager boardManager;
     private TextView lbl_turn;
     private TextView party_logs;
     private EditText fen_txt;
@@ -52,13 +56,13 @@ public class BoardActivity extends AndroidApplication implements GameEventSubscr
 
     private void initializeBoard(){
         Board3dManager board3dManager = new Board3dManager();
-        ClassicBoard classicBoard = new ClassicBoard();
+        Board classicBoard = new ClassicBoard();
         ClassicRuleSet classicRules = new ClassicRuleSet(classicBoard);
-        ClassicBoardManager classicBoardManager = new ClassicBoardManager(board3dManager, classicBoard,classicRules);
-        this.partyManager = new PartyManager(classicBoardManager);
+        boardManager = new ClassicBoardManager(board3dManager, classicBoard,classicRules);
+        this.partyManager = new PartyManager(boardManager);
         InputAdapter inputAdapter = new GDXInputAdapter(board3dManager);
         board3dManager.setAndroidInputAdapter(inputAdapter);
-        GDXGestureListener gestureListener = new GDXGestureListener(this.partyManager);
+        GDXGestureListener gestureListener = new GDXGestureListener(boardManager);
         board3dManager.setAndroidListener(gestureListener);
         this.bindViews();
         AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
@@ -74,6 +78,7 @@ public class BoardActivity extends AndroidApplication implements GameEventSubscr
         this.party_logs = findViewById(R.id.party_logs);
         this.btn_test = findViewById(R.id.btn_test);
         this.fen_txt = findViewById(R.id.fen_txt);
+        this.btn_tactical = findViewById(R.id.btn_tactical);
     }
 
     public void bindListeners() {
@@ -82,12 +87,14 @@ public class BoardActivity extends AndroidApplication implements GameEventSubscr
            BoardActivity.this.lbl_turn.setText("Turn of " + BoardActivity.this.partyManager.getPartyInfos());
         });
         btn_test.setOnClickListener(v -> BoardActivity.this.partyManager.loadBoard(fen_txt.getText().toString().trim()));
+
+        btn_tactical.setOnClickListener(v -> BoardActivity.this.boardManager.toogleTacticalView());
     }
 
     @Override
     public void receiveGameEvent(final GameEvent event) {
         this.runOnUiThread(() -> {
-            if(event instanceof MoveEvent || event instanceof TurnEvent){
+            if(event instanceof BoardEvent || event instanceof TurnEvent){
                 BoardActivity.this.party_logs.setText( BoardActivity.this.party_logs.getText() + "\nLOG :" + event.message);
             }
             BoardActivity.this.lbl_turn.setText("Turn of " + BoardActivity.this.partyManager.getPartyInfos());
