@@ -18,7 +18,6 @@ public class Board {
     private PieceList blackDeadPieces;
     private PieceList whitePieces;
     private PieceList whiteDeadPieces;
-    private Object locker;
 
     public Board(){
         this.chessSquares = new SquareList();

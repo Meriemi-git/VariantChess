@@ -2,13 +2,11 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#773636"
     android:visibility="visible">
 
     <ScrollView
         android:layout_width="300dp"
-        android:layout_height="match_parent"
-        android:background="#00424242">
+        android:layout_height="match_parent">
 
         <TextView
             android:id="@+id/party_logs"

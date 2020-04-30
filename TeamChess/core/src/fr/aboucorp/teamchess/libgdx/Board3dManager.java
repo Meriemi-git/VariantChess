@@ -100,7 +100,6 @@ public class Board3dManager extends ApplicationAdapter {
         this.blackDeadPieceModels = new ChessModelList();
         this.chessSquareModels = new ChessModelList();
         this.loadingPieces = new ArrayList<Piece>();
-
     }
 
     @Override
@@ -126,7 +125,7 @@ public class Board3dManager extends ApplicationAdapter {
             this.doneLoading();
         }
         this.camController.update();
-        Gdx.gl.glClearColor(135 / 255f, 206 / 255f, 235 / 255f, 1);
+        Gdx.gl.glClearColor(98 / 255f, 98 / 255f, 98 / 255f, 1);
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         this.modelBatch.begin(camera);
@@ -363,12 +362,12 @@ public class Board3dManager extends ApplicationAdapter {
         this.camera.far = 300f;
         this.camera.update();
         this.camController = new CameraInputController(camera);
+        Vector3 right = new Vector3(3.5f,0f,3.5f).set(camera.direction).crs(camera.up).nor();
     }
 
     public PerspectiveCamera getCamera() {
         return camera;
     }
-
 
     public void setAndroidInputAdapter(InputAdapter androidInputAdapter) {
         this.androidInputAdapter = androidInputAdapter;
@@ -455,4 +454,5 @@ public class Board3dManager extends ApplicationAdapter {
         this.whiteDeadPieceModels.clear();
         this.blackDeadPieceModels.clear();
     }
+
 }

@@ -28,7 +28,6 @@ public class TouchedModelFinder {
         Ray ray = this.partyManager.getBoardManager().getCamera().getPickRay(screenX, screenY);
         double distance = -1;
         int result = -1;
-
         for (int i = 0; i < models.size(); i++) {
             Vector3 position = new Vector3();
             final ChessModel piece = models.get(i);

@@ -53,7 +53,7 @@ public class BoardActivity extends AndroidApplication implements GameEventSubscr
         Board3dManager board3dManager = new Board3dManager();
         BoardManager boardManager = new BoardManager(board3dManager);
         this.partyManager = new PartyManager(boardManager);
-        InputAdapter inputAdapter = new GDXInputAdapter();
+        InputAdapter inputAdapter = new GDXInputAdapter(board3dManager);
         board3dManager.setAndroidInputAdapter(inputAdapter);
         GDXGestureListener gestureListener = new GDXGestureListener(this.partyManager);
         board3dManager.setAndroidListener(gestureListener);

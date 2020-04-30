@@ -2,14 +2,18 @@ package fr.aboucorp.teamchess.app.listeners;
 
 import com.badlogic.gdx.InputAdapter;
 
+import fr.aboucorp.teamchess.libgdx.Board3dManager;
+
 /**
  * Cette classe couplé au GDXGestureListener se charge de recevoir les évènements de clic
  * Created by Meriemi on 10/04/2020.
  */
 public class GDXInputAdapter extends InputAdapter {
 
+    private Board3dManager board3dManager;
 
-    public GDXInputAdapter(){
+    public GDXInputAdapter(Board3dManager board3dManager){
+        this.board3dManager = board3dManager;
     }
 
     @Override
