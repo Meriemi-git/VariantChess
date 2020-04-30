@@ -4,6 +4,7 @@ import android.util.Log;
 
 import java.util.ArrayList;
 
+import fr.aboucorp.teamchess.app.managers.boards.ClassicBoardManager;
 import fr.aboucorp.teamchess.entities.model.ChessColor;
 import fr.aboucorp.teamchess.entities.model.Location;
 import fr.aboucorp.teamchess.entities.model.Piece;
@@ -20,16 +21,16 @@ import fr.aboucorp.teamchess.libgdx.models.ChessModel;
 
 
 public class PartyManager implements GameEventSubscriber {
-    private final BoardManager boardManager;
+    private final ClassicBoardManager classicBoardManager;
     private GameState gameState;
     private final TurnManager turnManager;
     private GameEventManager eventManager;
 
 
 
-    public PartyManager(BoardManager boardManager) {
+    public PartyManager(ClassicBoardManager classicBoardManager) {
 
-        this.boardManager = boardManager;
+        this.classicBoardManager = classicBoardManager;
         this.gameState = GameState.SelectPiece;
         this.turnManager = TurnManager.getINSTANCE();
         this.eventManager = GameEventManager.getINSTANCE();
@@ -37,14 +38,14 @@ public class PartyManager implements GameEventSubscriber {
     }
 
     public void startGame(){
-        this.boardManager.createBoard();
+        this.classicBoardManager.createBoard();
         this.turnManager.newParty(ChessColor.WHITE);
     }
 
     public void loadBoard(String fenString){
         try {
 
-            ChessColor color = this.boardManager.loadBoard(fenString);
+            ChessColor color = this.classicBoardManager.loadBoard(fenString);
             this.turnManager.newParty(color);
         } catch (Exception e) {
             e.printStackTrace();
@@ -66,12 +67,12 @@ public class PartyManager implements GameEventSubscriber {
 
     public void selectPiece(Piece touched) {
         this.gameState = GameState.SelectCase;
-        this.boardManager.selectPiece(touched);
+        this.classicBoardManager.selectPiece(touched);
     }
 
     public void unHightlight() {
         this.gameState = GameState.SelectPiece;
-        this.boardManager.unHighlight();
+        this.classicBoardManager.unHighlight();
     }
 
     public ArrayList<ChessModel> getPiecesModelsFromActualTurn(){
@@ -83,25 +84,25 @@ public class PartyManager implements GameEventSubscriber {
     }
 
     public void selectSquare(Square square) {
-        this.boardManager.moveToSquare(square);
+        this.classicBoardManager.moveToSquare(square);
         this.turnManager.endTurn();
     }
 
 
     public ArrayList<ChessModel> getBlackPieceModels() {
-        return this.boardManager.getBlackPieceModels();
+        return this.classicBoardManager.getBlackPieceModels();
     }
 
     public ArrayList<ChessModel> getWhitePieceModels() {
-        return  this.boardManager.getWhitePieceModels();
+        return  this.classicBoardManager.getWhitePieceModels();
     }
 
     public Piece getPieceFromLocation(Location location) {
-        return this.boardManager.getPieceFromLocation(location,this.turnManager.getTurnColor());
+        return this.classicBoardManager.getPieceFromLocation(location,this.turnManager.getTurnColor());
     }
 
     public Square getSquareFromLocation(Location location) {
-       return boardManager.getSquareFromLocation(location);
+       return classicBoardManager.getSquareFromLocation(location);
     }
 
     public GameState getGameState() {
@@ -115,17 +116,17 @@ public class PartyManager implements GameEventSubscriber {
             // TODO display draw claim option
             Log.i("fr.aboucorp.teamchess",event.message);
         }else if(event instanceof PieceEvent && ((PieceEvent) event).type == BoardEventType.CHECKMATE){
-            ChessColor winner = boardManager.getWinner();
+            ChessColor winner = classicBoardManager.getWinner();
             this.eventManager.sendMessage(new PartyEvent(String.format("Game finished ! Winner : %s",winner != null ? winner.name() : "EQUALITY")));
         }
     }
 
-    public BoardManager getBoardManager() {
-        return boardManager;
+    public ClassicBoardManager getClassicBoardManager() {
+        return classicBoardManager;
     }
 
     public ArrayList<ChessModel> getPossibleSquareModels() {
-        return this.boardManager.getPossibleSquareModels();
+        return this.classicBoardManager.getPossibleSquareModels();
     }
 
 }

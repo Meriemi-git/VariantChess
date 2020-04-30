@@ -1,10 +1,10 @@
 package fr.aboucorp.teamchess.entities.model.moves.movesets;
 
-import fr.aboucorp.teamchess.entities.model.Board;
 import fr.aboucorp.teamchess.entities.model.ChessColor;
 import fr.aboucorp.teamchess.entities.model.Location;
 import fr.aboucorp.teamchess.entities.model.Piece;
 import fr.aboucorp.teamchess.entities.model.Square;
+import fr.aboucorp.teamchess.entities.model.boards.ClassicBoard;
 import fr.aboucorp.teamchess.entities.model.enums.BoardEventType;
 import fr.aboucorp.teamchess.entities.model.enums.PieceId;
 import fr.aboucorp.teamchess.entities.model.events.models.EnPassantEvent;
@@ -13,8 +13,8 @@ import fr.aboucorp.teamchess.entities.model.utils.SquareList;
 
 public class PawnMoveSet extends AbstractMoveSet {
 
-    public PawnMoveSet(Piece thisPiece, Board board) {
-        super(thisPiece, board);
+    public PawnMoveSet(Piece thisPiece, ClassicBoard classicBoard) {
+        super(thisPiece, classicBoard);
     }
 
     @Override
@@ -29,13 +29,13 @@ public class PawnMoveSet extends AbstractMoveSet {
         Location start = piece.getLocation();
         Square simpleMove;
         int zpos = piece.getChessColor() == ChessColor.WHITE ? start.getZ() + 1 : start.getZ() - 1;
-        simpleMove = (Square) board.getSquares().getItemByLocation(new Location(start.getX(), 0, zpos));
+        simpleMove = (Square) classicBoard.getSquares().getItemByLocation(new Location(start.getX(), 0, zpos));
         if (simpleMove != null && simpleMove.getPiece() == null) {
             classicMoves.add(simpleMove);
             Square doubleMove;
             if (piece.isFirstMove()) {
                 zpos = piece.getChessColor() == ChessColor.WHITE ? start.getZ() + 2 : start.getZ() - 2;
-                doubleMove = (Square) board.getSquares().getItemByLocation(new Location(start.getX(), 0, zpos));
+                doubleMove = (Square) classicBoard.getSquares().getItemByLocation(new Location(start.getX(), 0, zpos));
                 if (doubleMove != null && doubleMove.getPiece() == null) {
                     classicMoves.add(doubleMove);
                 }
@@ -51,8 +51,8 @@ public class PawnMoveSet extends AbstractMoveSet {
         Square diagRight;
         Square diagLeft;
         int zpos = piece.getChessColor() == ChessColor.WHITE ? 1 : -1;
-        diagRight = (Square) board.getSquares().getItemByLocation(new Location(start.getX() - 1, 0, start.getZ() + zpos));
-        diagLeft = (Square) board.getSquares().getItemByLocation(new Location(start.getX() + 1, 0, start.getZ() + zpos));
+        diagRight = (Square) classicBoard.getSquares().getItemByLocation(new Location(start.getX() - 1, 0, start.getZ() + zpos));
+        diagLeft = (Square) classicBoard.getSquares().getItemByLocation(new Location(start.getX() + 1, 0, start.getZ() + zpos));
 
         if (diagRight != null
                 && (isThreat

@@ -1,10 +1,10 @@
 package fr.aboucorp.teamchess.entities.model.moves.movesets;
 
-import fr.aboucorp.teamchess.entities.model.Board;
 import fr.aboucorp.teamchess.entities.model.ChessColor;
 import fr.aboucorp.teamchess.entities.model.Location;
 import fr.aboucorp.teamchess.entities.model.Piece;
 import fr.aboucorp.teamchess.entities.model.Square;
+import fr.aboucorp.teamchess.entities.model.boards.ClassicBoard;
 import fr.aboucorp.teamchess.entities.model.enums.BoardEventType;
 import fr.aboucorp.teamchess.entities.model.events.GameEventManager;
 import fr.aboucorp.teamchess.entities.model.events.GameEventSubscriber;
@@ -22,8 +22,8 @@ public class KingMoveSet extends AbstractMoveSet implements GameEventSubscriber 
     private boolean canCastleKingSide;
     private boolean canCastleQueenSide;
 
-    public KingMoveSet(Piece thisPiece, Board board) {
-        super(thisPiece, board);
+    public KingMoveSet(Piece thisPiece, ClassicBoard classicBoard) {
+        super(thisPiece, classicBoard);
         this.eventManager = GameEventManager.getINSTANCE();
     }
 
@@ -32,8 +32,8 @@ public class KingMoveSet extends AbstractMoveSet implements GameEventSubscriber 
         SquareList validSquares = getClassicMoves(piece,turnColor);
         if(piece.getChessColor() == turnColor) {
             if (turnColor == ChessColor.WHITE) {
-                Square c1 = board.getSquares().getSquareByLabel("C1");
-                Square g1 = board.getSquares().getSquareByLabel("G1");
+                Square c1 = classicBoard.getSquares().getSquareByLabel("C1");
+                Square g1 = classicBoard.getSquares().getSquareByLabel("G1");
                 this.eventManager.sendMessage(new LogEvent(String.format("GetPossibleMoves %s => canCastleQueenSide : %s ; canCastleKingSide : %s",this.actualTurn.getTurnColor(),canCastleQueenSide,canCastleKingSide)));
                 if (canCastleQueenSide && !this.isChecking && this.isLocationSafe(c1,turnColor)) {
                     validSquares.add(c1);
@@ -42,8 +42,8 @@ public class KingMoveSet extends AbstractMoveSet implements GameEventSubscriber 
                     validSquares.add(g1);
                 }
             } else {
-                Square c8 = board.getSquares().getSquareByLabel("C8");
-                Square g8 = board.getSquares().getSquareByLabel("G8");
+                Square c8 = classicBoard.getSquares().getSquareByLabel("C8");
+                Square g8 = classicBoard.getSquares().getSquareByLabel("G8");
                 if (canCastleQueenSide && isLocationSafe(c8,turnColor)) {
                     validSquares.add(c8);
                 }
@@ -76,9 +76,9 @@ public class KingMoveSet extends AbstractMoveSet implements GameEventSubscriber 
     private boolean isLocationSafe(Square square, ChessColor turnColor) {
         ChessList<Piece> pieces;
         if(turnColor == ChessColor.BLACK) {
-            pieces = board.getWhitePieces();
+            pieces = classicBoard.getWhitePieces();
         }else {
-            pieces = board.getBlackPieces();
+            pieces = classicBoard.getBlackPieces();
         }
         for (Piece piece: pieces) {
             ChessList<Square> squares = piece.getMoveSet().getThreats(piece,turnColor);
@@ -90,7 +90,7 @@ public class KingMoveSet extends AbstractMoveSet implements GameEventSubscriber 
     }
 
     public SquareList getClassicMoves(Piece piece, ChessColor turnColor){
-        SquareList allSquares = board.getSquares();
+        SquareList allSquares = classicBoard.getSquares();
         SquareList validSquares = new SquareList();
         Location start = piece.getLocation();
         Square up = (Square) allSquares.getItemByLocation(new Location(start.getX()+1,0,start.getZ()));

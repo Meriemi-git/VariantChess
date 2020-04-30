@@ -1,17 +1,17 @@
 package fr.aboucorp.teamchess.entities.model.moves.movesets;
 
-import fr.aboucorp.teamchess.entities.model.Board;
 import fr.aboucorp.teamchess.entities.model.ChessColor;
 import fr.aboucorp.teamchess.entities.model.Location;
 import fr.aboucorp.teamchess.entities.model.Piece;
 import fr.aboucorp.teamchess.entities.model.Square;
+import fr.aboucorp.teamchess.entities.model.boards.ClassicBoard;
 import fr.aboucorp.teamchess.entities.model.moves.AbstractMoveSet;
 import fr.aboucorp.teamchess.entities.model.utils.SquareList;
 
 public class KnightMoveSet extends AbstractMoveSet {
 
-    public KnightMoveSet(Piece thisPiece, Board board) {
-        super(thisPiece, board);
+    public KnightMoveSet(Piece thisPiece, ClassicBoard classicBoard) {
+        super(thisPiece, classicBoard);
     }
 
     @Override
@@ -19,7 +19,7 @@ public class KnightMoveSet extends AbstractMoveSet {
         SquareList validSquares = new SquareList();
         Location start = piece.getLocation();
 
-        for (Square square : board.getSquares()) {
+        for (Square square : classicBoard.getSquares()) {
             Location end = square.getLocation();
             if (end.getX() == start.getX() + 2
                     && (end.getZ() == start.getZ() + 1

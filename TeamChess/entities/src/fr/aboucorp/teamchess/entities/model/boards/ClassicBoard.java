@@ -1,5 +1,8 @@
-package fr.aboucorp.teamchess.entities.model;
+package fr.aboucorp.teamchess.entities.model.boards;
 
+import fr.aboucorp.teamchess.entities.model.ChessColor;
+import fr.aboucorp.teamchess.entities.model.Location;
+import fr.aboucorp.teamchess.entities.model.Square;
 import fr.aboucorp.teamchess.entities.model.enums.PieceId;
 import fr.aboucorp.teamchess.entities.model.exceptions.FenStringBadFormatException;
 import fr.aboucorp.teamchess.entities.model.pieces.Bishop;
@@ -11,7 +14,7 @@ import fr.aboucorp.teamchess.entities.model.pieces.Rook;
 import fr.aboucorp.teamchess.entities.model.utils.PieceList;
 import fr.aboucorp.teamchess.entities.model.utils.SquareList;
 
-public class Board {
+public class ClassicBoard extends Board{
 
     private SquareList chessSquares;
     private PieceList blackPieces;
@@ -19,7 +22,7 @@ public class Board {
     private PieceList whitePieces;
     private PieceList whiteDeadPieces;
 
-    public Board(){
+    public ClassicBoard(){
         this.chessSquares = new SquareList();
         this.blackPieces = new PieceList();
         this.whitePieces = new PieceList();
@@ -27,6 +30,7 @@ public class Board {
         this.whiteDeadPieces = new PieceList();
     }
 
+    @Override
     public void initBoard(){
         this.createSquares();
         this.createWhitePieces();
@@ -100,6 +104,7 @@ public class Board {
         return new Pawn((Square) this.chessSquares.getItemByLocation(location), color,pieceID,this);
     }
 
+    @Override
     public void loadBoard(String fenString) throws FenStringBadFormatException {
         String[] lines = fenString.split("/");
         if(lines.length != 8){
@@ -175,22 +180,27 @@ public class Board {
         }
     }
 
+    @Override
     public SquareList getSquares() {
         return chessSquares;
     }
 
+    @Override
     public PieceList getBlackPieces() {
         return blackPieces;
     }
 
+    @Override
     public PieceList getWhitePieces() {
         return whitePieces;
     }
 
+    @Override
     public PieceList getPiecesByColor(ChessColor color){
         return color == ChessColor.WHITE ? getWhitePieces() : getBlackPieces();
     }
 
+    @Override
     public void clearBoard() {
         this.whitePieces.clear();
         this.blackPieces.clear();

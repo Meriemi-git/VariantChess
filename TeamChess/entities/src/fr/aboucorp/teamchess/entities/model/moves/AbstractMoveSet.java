@@ -2,13 +2,12 @@ package fr.aboucorp.teamchess.entities.model.moves;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import fr.aboucorp.teamchess.entities.model.Board;
 import fr.aboucorp.teamchess.entities.model.ChessColor;
 import fr.aboucorp.teamchess.entities.model.Piece;
 import fr.aboucorp.teamchess.entities.model.Square;
 import fr.aboucorp.teamchess.entities.model.Turn;
+import fr.aboucorp.teamchess.entities.model.boards.ClassicBoard;
 import fr.aboucorp.teamchess.entities.model.enums.BoardEventType;
 import fr.aboucorp.teamchess.entities.model.enums.PieceId;
 import fr.aboucorp.teamchess.entities.model.events.GameEventManager;
@@ -26,7 +25,7 @@ public abstract class AbstractMoveSet implements GameEventSubscriber {
 
     protected GameEventManager eventManager;
     protected final Piece piece;
-    protected final Board board;
+    protected final ClassicBoard classicBoard;
     protected boolean isChecking;
     protected King kingInCheck;
     protected List<Piece> checkingPieces;
@@ -34,9 +33,9 @@ public abstract class AbstractMoveSet implements GameEventSubscriber {
     protected Turn actualTurn;
     protected Turn previousTurn;
 
-    public AbstractMoveSet(Piece piece, Board board) {
+    public AbstractMoveSet(Piece piece, ClassicBoard classicBoard) {
         this.piece = piece;
-        this.board = board;
+        this.classicBoard = classicBoard;
         this.eventManager = GameEventManager.getINSTANCE();
         this.eventManager.subscribe(PieceEvent.class, this, 1);
         this.eventManager.subscribe(TurnEvent.class, this, 1);
@@ -49,7 +48,7 @@ public abstract class AbstractMoveSet implements GameEventSubscriber {
                 this.isChecking = true;
                 this.kingInCheck = (King) ((CheckInEvent) event).piece;
                 this.checkingPieces = ((CheckInEvent) event).checkingPieces;
-            } else if(event instanceof CheckOutEvent && ((CheckInEvent) event).piece.getChessColor() == this.piece.getChessColor()) {
+            } else if(event instanceof CheckOutEvent && ((CheckOutEvent) event).piece.getChessColor() == this.piece.getChessColor()) {
                 this.isChecking = false;
                 this.kingInCheck = null;
                 this.checkingPieces = null;
@@ -100,10 +99,9 @@ public abstract class AbstractMoveSet implements GameEventSubscriber {
         return uncheckingMoves;
     }
 
-
     public List<Piece> moveCauseCheck(ChessColor color) {
         List<Piece> causingChecks = new ArrayList<>();
-        for (Piece piece : board.getPiecesByColor(color)) {
+        for (Piece piece : classicBoard.getPiecesByColor(color)) {
              Piece causingCheck = moveCausingSingleCheck(piece, color);
              if(causingCheck != null) {
                  causingChecks.add(causingCheck);
@@ -123,21 +121,6 @@ public abstract class AbstractMoveSet implements GameEventSubscriber {
         }
         return null;
     }
-
-    private List<Piece> indirectChecks(Piece piece, ChessColor turnColor) {
-
-        return board.getPiecesByColor(turnColor)
-                .stream()
-                .filter(p ->
-                        p.getMoveSet().getNextMoves().contains(piece.getActualSquare())
-                                && pieceCauseCheck(p, turnColor))
-                .collect(Collectors.toList());
-    }
-
-    private boolean pieceCauseCheck(Piece piece, ChessColor turnColor) {
-        return false;
-    }
-
 
     protected abstract SquareList getPossibleMoves(Piece piece, ChessColor turnColor);
 

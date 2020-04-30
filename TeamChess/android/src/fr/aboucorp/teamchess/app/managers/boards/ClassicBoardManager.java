@@ -1,4 +1,4 @@
-package fr.aboucorp.teamchess.app.managers;
+package fr.aboucorp.teamchess.app.managers.boards;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
@@ -7,13 +7,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.aboucorp.teamchess.app.utils.GdxPostRunner;
-import fr.aboucorp.teamchess.entities.model.Board;
 import fr.aboucorp.teamchess.entities.model.ChessColor;
 import fr.aboucorp.teamchess.entities.model.Location;
 import fr.aboucorp.teamchess.entities.model.Piece;
-import fr.aboucorp.teamchess.entities.model.RuleSet;
 import fr.aboucorp.teamchess.entities.model.Square;
-import fr.aboucorp.teamchess.entities.model.Turn;
+import fr.aboucorp.teamchess.entities.model.boards.ClassicBoard;
 import fr.aboucorp.teamchess.entities.model.enums.BoardEventType;
 import fr.aboucorp.teamchess.entities.model.events.GameEventManager;
 import fr.aboucorp.teamchess.entities.model.events.GameEventSubscriber;
@@ -25,34 +23,26 @@ import fr.aboucorp.teamchess.entities.model.events.models.MoveEvent;
 import fr.aboucorp.teamchess.entities.model.events.models.PartyEvent;
 import fr.aboucorp.teamchess.entities.model.events.models.PieceEvent;
 import fr.aboucorp.teamchess.entities.model.events.models.TurnEndEvent;
+import fr.aboucorp.teamchess.entities.model.events.models.TurnEvent;
 import fr.aboucorp.teamchess.entities.model.events.models.TurnStartEvent;
 import fr.aboucorp.teamchess.entities.model.exceptions.FenStringBadFormatException;
+import fr.aboucorp.teamchess.entities.model.rules.ClassicRuleSet;
 import fr.aboucorp.teamchess.entities.model.utils.SquareList;
 import fr.aboucorp.teamchess.libgdx.Board3dManager;
 import fr.aboucorp.teamchess.libgdx.models.ChessModel;
 
-public class BoardManager implements GameEventSubscriber {
+public class ClassicBoardManager extends AbstractBoardManager implements GameEventSubscriber {
 
 
-    private final Board board;
-    private final Board3dManager board3dManager;
-    private Piece selectedPiece;
-    private GameEventManager eventManager;
-    private Turn previousTurn;
-    private Turn actualTurn;
-    private final RuleSet ruleSet;
-    private SquareList possiblesMoves;
-
-    public BoardManager(Board3dManager board3dManager) {
-        this.board = new Board();
-        this.board3dManager = board3dManager;
+    public ClassicBoardManager(Board3dManager board3dManager, ClassicBoard classicBoard, ClassicRuleSet ruleSet) {
+        super(classicBoard,board3dManager,ruleSet);
         this.eventManager = GameEventManager.getINSTANCE();
         this.eventManager.subscribe(PartyEvent.class, this, 1);
-        this.eventManager.subscribe(TurnStartEvent.class, this, 2);
-        this.eventManager.subscribe(TurnEndEvent.class, this, 1);
+/*        this.eventManager.subscribe(TurnStartEvent.class, this, 2);
+        this.eventManager.subscribe(TurnEndEvent.class, this, 1);*/
+        this.eventManager.subscribe(TurnEvent.class, this, 1);
         this.eventManager.subscribe(PieceEvent.class, this, 1);
         this.eventManager.subscribe(EnPassantEvent.class, this, 1);
-        this.ruleSet = new RuleSet(board);
     }
 
     @Override
@@ -67,16 +57,16 @@ public class BoardManager implements GameEventSubscriber {
         }
     }
 
-    void createBoard() {
+    public void createBoard() {
         this.board.initBoard();
         new Thread(() -> Gdx.app.postRunnable(() -> {
-            BoardManager.this.board3dManager.createSquares(BoardManager.this.board.getSquares());
-            BoardManager.this.board3dManager.createPieces(BoardManager.this.board.getWhitePieces());
-            BoardManager.this.board3dManager.createPieces(BoardManager.this.board.getBlackPieces());
+            ClassicBoardManager.this.board3dManager.createSquares(ClassicBoardManager.this.board.getSquares());
+            ClassicBoardManager.this.board3dManager.createPieces(ClassicBoardManager.this.board.getWhitePieces());
+            ClassicBoardManager.this.board3dManager.createPieces(ClassicBoardManager.this.board.getBlackPieces());
         })).start();
     }
 
-    ChessColor loadBoard(String fenString) throws FenStringBadFormatException,NumberFormatException {
+    public ChessColor loadBoard(String fenString) throws FenStringBadFormatException,NumberFormatException {
 
         String[] parts = fenString.trim().split(" ");
         if(parts.length < 5 || parts.length > 6){
@@ -89,8 +79,8 @@ public class BoardManager implements GameEventSubscriber {
                 try {
                     clearBoard();
                     board.loadBoard(parts[0]);
-                    BoardManager.this.board3dManager.createPieces(BoardManager.this.board.getWhitePieces());
-                    BoardManager.this.board3dManager.createPieces(BoardManager.this.board.getBlackPieces());
+                    ClassicBoardManager.this.board3dManager.createPieces(ClassicBoardManager.this.board.getWhitePieces());
+                    ClassicBoardManager.this.board3dManager.createPieces(ClassicBoardManager.this.board.getBlackPieces());
                 } catch (FenStringBadFormatException e) {
                     e.printStackTrace();
                 }
@@ -99,15 +89,15 @@ public class BoardManager implements GameEventSubscriber {
         };
         runner.start();
 
-        this.ruleSet.whiteCanCastleKing = parts[2].contains("K");
-        this.ruleSet.whiteCanCastleQueen = parts[2].contains("Q");
-        this.ruleSet.blackCanCastleKing = parts[2].contains("k");
-        this.ruleSet.blackCanCastleQueen = parts[2].contains("q");
+        ((ClassicRuleSet)this.ruleSet).whiteCanCastleKing = parts[2].contains("K");
+        ((ClassicRuleSet)this.ruleSet).whiteCanCastleQueen = parts[2].contains("Q");
+        ((ClassicRuleSet)this.ruleSet).blackCanCastleKing = parts[2].contains("k");
+        ((ClassicRuleSet)this.ruleSet).blackCanCastleQueen = parts[2].contains("q");
         if(!parts[3].equals("-")) {
-            this.ruleSet.enPassant = this.board.getSquares().getSquareByLabel(parts[3]);
+            ((ClassicRuleSet)this.ruleSet).enPassant = this.board.getSquares().getSquareByLabel(parts[3]);
         }
         this.ruleSet.moveNumber = Integer.parseInt(parts[4]);
-        this.ruleSet.fiftyMoveCounter = Integer.parseInt(parts[5]);
+        ((ClassicRuleSet)this.ruleSet).fiftyMoveCounter = Integer.parseInt(parts[5]);
         if(parts[1].equals("w")){
             return ChessColor.WHITE;
         }else{
@@ -123,8 +113,7 @@ public class BoardManager implements GameEventSubscriber {
         this.board3dManager.clearBoard();
     }
 
-
-    void moveToSquare(Square square) {
+    public void moveToSquare(Square square) {
         String eventMessage = String.format("Move %s from %s to %s",
                 selectedPiece.getPieceId().name(),
                 selectedPiece.getActualSquare(),
@@ -134,16 +123,14 @@ public class BoardManager implements GameEventSubscriber {
         eat(square);
         this.selectedPiece.move(square);
         this.board3dManager.moveSelectedPieceIntoSquare(square);
-        this.ruleSet.isKingInCheck(this.selectedPiece);
-        this.ruleSet.checkIfCastling(square);
+        ((ClassicRuleSet)this.ruleSet).isKingInCheck(this.selectedPiece);
+        ((ClassicRuleSet)this.ruleSet).checkIfCastling(square);
         resetHighlited();
     }
 
-
-
     private void eat(Square square) {
         Piece toBeEaten = square.getPiece();
-        if (ruleSet.isEnPassantMove(this.selectedPiece, square)) {
+        if (((ClassicRuleSet)this.ruleSet).isEnPassantMove(this.selectedPiece, square)) {
             toBeEaten = this.previousTurn.played;
         }
         if (toBeEaten != null) {
@@ -165,8 +152,7 @@ public class BoardManager implements GameEventSubscriber {
         this.possiblesMoves = null;
     }
 
-
-    void selectPiece(Piece touched) {
+    public void selectPiece(Piece touched) {
         this.selectedPiece = touched;
         this.board3dManager.selectPiece(touched);
         this.possiblesMoves = touched.getMoveSet().getNextMoves();
@@ -185,13 +171,12 @@ public class BoardManager implements GameEventSubscriber {
         }
     }
 
-    void unHighlight() {
+    public void unHighlight() {
         this.board3dManager.resetSelection();
         if (possiblesMoves != null) {
             this.board3dManager.unHighlightSquares(this.possiblesMoves);
         }
     }
-
 
     private void manageTurnStart(TurnStartEvent event) {
         this.previousTurn = actualTurn;
@@ -203,7 +188,6 @@ public class BoardManager implements GameEventSubscriber {
         this.selectedPiece = null;
         this.possiblesMoves = null;
     }
-
 
     private String getFenFromBoard() {
         StringBuilder fenString = new StringBuilder();
@@ -231,36 +215,36 @@ public class BoardManager implements GameEventSubscriber {
         fenString.append(' ');
         fenString.append(this.actualTurn.getTurnColor() == ChessColor.WHITE ? 'w' : 'b');
         fenString.append(' ');
-        if (this.ruleSet.whiteCanCastleKing()) {
+        if (((ClassicRuleSet)this.ruleSet).whiteCanCastleKing()) {
             fenString.append('K');
         }
-        if (this.ruleSet.whiteCanCastleQueen()) {
+        if (((ClassicRuleSet)this.ruleSet).whiteCanCastleQueen()) {
             fenString.append('Q');
         }
-        if (this.ruleSet.blackCanCastleKing()) {
+        if (((ClassicRuleSet)this.ruleSet).blackCanCastleKing()) {
             fenString.append('k');
         }
-        if (this.ruleSet.blackCanCastleQueen()) {
+        if (((ClassicRuleSet)this.ruleSet).blackCanCastleQueen()) {
             fenString.append('q');
         }
         fenString.append(' ');
-        if (this.ruleSet.enPassant != null) {
-            fenString.append(this.ruleSet.enPassant.getSquareLabel());
+        if (((ClassicRuleSet)this.ruleSet).enPassant != null) {
+            fenString.append(((ClassicRuleSet)this.ruleSet).enPassant.getSquareLabel());
         } else {
             fenString.append('-');
         }
         fenString.append(' ');
-        fenString.append(this.ruleSet.fiftyMoveCounter);
+        fenString.append(((ClassicRuleSet)this.ruleSet).fiftyMoveCounter);
         fenString.append(' ');
         fenString.append(this.ruleSet.moveNumber);
         return fenString.toString();
     }
 
-    ArrayList<ChessModel> getPossibleSquareModels() {
+    public ArrayList<ChessModel> getPossibleSquareModels() {
         return this.board3dManager.getSquareModelsFromPossibleMoves(this.possiblesMoves);
     }
 
-    Piece getPieceFromLocation(Location location, ChessColor color) {
+    public Piece getPieceFromLocation(Location location, ChessColor color) {
         ArrayList<Piece> arrayList;
         if (color == ChessColor.WHITE) {
             arrayList = this.board.getWhitePieces();
@@ -275,7 +259,7 @@ public class BoardManager implements GameEventSubscriber {
         return null;
     }
 
-    Square getSquareFromLocation(Location location) {
+    public Square getSquareFromLocation(Location location) {
         for (Square square : this.board.getSquares()) {
             if (square.getLocation().equals(location)) {
                 return square;
@@ -288,15 +272,15 @@ public class BoardManager implements GameEventSubscriber {
         return this.board3dManager.getCamera();
     }
 
-    ArrayList<ChessModel> getBlackPieceModels() {
+    public ArrayList<ChessModel> getBlackPieceModels() {
         return this.board3dManager.getBlackPieceModels();
     }
 
-    ArrayList<ChessModel> getWhitePieceModels() {
+    public ArrayList<ChessModel> getWhitePieceModels() {
         return this.board3dManager.getWhitePieceModels();
     }
 
     public ChessColor getWinner() {
-        return this.ruleSet.getWinner();
+        return ((ClassicRuleSet)this.ruleSet).getWinner();
     }
 }
