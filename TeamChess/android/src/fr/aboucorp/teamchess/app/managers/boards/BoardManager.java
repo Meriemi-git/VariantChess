@@ -3,7 +3,6 @@ package fr.aboucorp.teamchess.app.managers.boards;
 import com.badlogic.gdx.graphics.Camera;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import fr.aboucorp.teamchess.entities.model.ChessColor;
 import fr.aboucorp.teamchess.entities.model.Location;
@@ -13,14 +12,21 @@ import fr.aboucorp.teamchess.entities.model.Turn;
 import fr.aboucorp.teamchess.entities.model.boards.Board;
 import fr.aboucorp.teamchess.entities.model.enums.GameState;
 import fr.aboucorp.teamchess.entities.model.events.GameEventManager;
+import fr.aboucorp.teamchess.entities.model.events.GameEventSubscriber;
+import fr.aboucorp.teamchess.entities.model.events.models.GameEvent;
 import fr.aboucorp.teamchess.entities.model.events.models.MoveEvent;
+import fr.aboucorp.teamchess.entities.model.events.models.PartyEvent;
+import fr.aboucorp.teamchess.entities.model.events.models.PieceEvent;
+import fr.aboucorp.teamchess.entities.model.events.models.TurnEndEvent;
+import fr.aboucorp.teamchess.entities.model.events.models.TurnEvent;
+import fr.aboucorp.teamchess.entities.model.events.models.TurnStartEvent;
 import fr.aboucorp.teamchess.entities.model.exceptions.FenStringBadFormatException;
 import fr.aboucorp.teamchess.entities.model.rules.AbstracRuleSet;
 import fr.aboucorp.teamchess.entities.model.utils.SquareList;
 import fr.aboucorp.teamchess.libgdx.Board3dManager;
 import fr.aboucorp.teamchess.libgdx.models.ChessModel;
 
-public abstract class BoardManager {
+public abstract class BoardManager implements GameEventSubscriber {
     protected final Board board;
     protected final Board3dManager board3dManager;
     protected Piece selectedPiece;
@@ -37,7 +43,25 @@ public abstract class BoardManager {
         this.board3dManager = board3dManager;
         this.ruleSet = ruleSet;
         this.gameState = GameState.SelectPiece;
+        this.eventManager = GameEventManager.getINSTANCE();
+        this.eventManager.subscribe(PartyEvent.class, this, 1);
+        this.eventManager.subscribe(TurnEvent.class, this, 1);
+        this.eventManager.subscribe(PieceEvent.class, this, 1);
     }
+
+
+    @Override
+    public void receiveGameEvent(GameEvent event) {
+        if (event instanceof TurnStartEvent) {
+            manageTurnStart((TurnStartEvent) event);
+        } else if (event instanceof TurnEndEvent) {
+            manageTurnEnd();
+        }
+    }
+
+    protected abstract void manageTurnStart(TurnStartEvent event);
+
+    protected abstract void manageTurnEnd();
 
     void clearBoard() {
         this.selectedPiece = null;
@@ -106,9 +130,10 @@ public abstract class BoardManager {
     }
 
     public void toogleTacticalView(){
-        List<Piece> pieces = new ArrayList();
-        pieces.addAll(board.getWhitePieces());
-        pieces.addAll(board.getBlackPieces());
-        this.board3dManager.toogleTacticalView(pieces);
+        this.board3dManager.toogleTacticalView(this.actualTurn.getTurnColor());
+    }
+
+    public boolean IsTacticalViewOn(){
+        return this.board3dManager.tacticalViewEnabled;
     }
 }

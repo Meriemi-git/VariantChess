@@ -12,16 +12,13 @@ import fr.aboucorp.teamchess.entities.model.Piece;
 import fr.aboucorp.teamchess.entities.model.Square;
 import fr.aboucorp.teamchess.entities.model.boards.Board;
 import fr.aboucorp.teamchess.entities.model.enums.BoardEventType;
-import fr.aboucorp.teamchess.entities.model.events.GameEventManager;
 import fr.aboucorp.teamchess.entities.model.events.GameEventSubscriber;
 import fr.aboucorp.teamchess.entities.model.events.models.CastlingEvent;
 import fr.aboucorp.teamchess.entities.model.events.models.EnPassantEvent;
 import fr.aboucorp.teamchess.entities.model.events.models.GameEvent;
 import fr.aboucorp.teamchess.entities.model.events.models.LogEvent;
-import fr.aboucorp.teamchess.entities.model.events.models.PartyEvent;
 import fr.aboucorp.teamchess.entities.model.events.models.PieceEvent;
 import fr.aboucorp.teamchess.entities.model.events.models.TurnEndEvent;
-import fr.aboucorp.teamchess.entities.model.events.models.TurnEvent;
 import fr.aboucorp.teamchess.entities.model.events.models.TurnStartEvent;
 import fr.aboucorp.teamchess.entities.model.exceptions.FenStringBadFormatException;
 import fr.aboucorp.teamchess.entities.model.rules.ClassicRuleSet;
@@ -34,12 +31,6 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
 
     public ClassicBoardManager(Board3dManager board3dManager, Board board, ClassicRuleSet ruleSet) {
         super(board,board3dManager,ruleSet);
-        this.eventManager = GameEventManager.getINSTANCE();
-        this.eventManager.subscribe(PartyEvent.class, this, 1);
-/*        this.eventManager.subscribe(TurnStartEvent.class, this, 2);
-        this.eventManager.subscribe(TurnEndEvent.class, this, 1);*/
-        this.eventManager.subscribe(TurnEvent.class, this, 1);
-        this.eventManager.subscribe(PieceEvent.class, this, 1);
         this.eventManager.subscribe(EnPassantEvent.class, this, 1);
     }
 
@@ -115,7 +106,6 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
         return eated;
     }
 
-
     private void resetHighlited() {
         this.board3dManager.unHighlightSquares(this.possiblesMoves);
         this.board3dManager.resetSelection();
@@ -152,13 +142,22 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
         }
     }
 
-    private void manageTurnStart(TurnStartEvent event) {
+    @Override
+    protected void manageTurnStart(TurnStartEvent event) {
         this.previousTurn = actualTurn;
         this.actualTurn = event.turn;
         this.eventManager.sendMessage(new LogEvent(this.getFenFromBoard()));
+        GdxPostRunner runner = new GdxPostRunner() {
+            @Override
+            public void execute() {
+                ClassicBoardManager.this.board3dManager.moveCameraOnNewTurn(ClassicBoardManager.this.actualTurn.getTurnColor());
+            }
+        };
+        runner.startAsync();
     }
 
-    private void manageTurnEnd() {
+    @Override
+    protected void manageTurnEnd() {
         this.selectedPiece = null;
         this.possiblesMoves = null;
     }

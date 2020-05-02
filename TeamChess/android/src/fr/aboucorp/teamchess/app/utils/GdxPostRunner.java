@@ -9,33 +9,27 @@ public abstract class GdxPostRunner {
     private final Object lock2 = new Object();
 
     public void start() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Gdx.app.postRunnable(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            execute();
-                        } catch (Exception ex) {
-                            Log.e("fr.Aboucorp.teamchess",ex.getMessage());
-                        } finally {
-                            synchronized (lock2) {
-                                lock2.notify();
-                            }
-                        }
-                    }
-                });
-                synchronized (lock2) {
-                    try {
-                        lock2.wait();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+        new Thread(() -> {
+            Gdx.app.postRunnable(() -> {
+                try {
+                    execute();
+                } catch (Exception ex) {
+                    Log.e("fr.aboucorp.teamchess",ex.getMessage());
+                } finally {
+                    synchronized (lock2) {
+                        lock2.notify();
                     }
                 }
-                synchronized (lock1) {
-                    lock1.notify();
+            });
+            synchronized (lock2) {
+                try {
+                    lock2.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
+            }
+            synchronized (lock1) {
+                lock1.notify();
             }
         }).start();
         synchronized (lock1) {
@@ -45,6 +39,16 @@ public abstract class GdxPostRunner {
                 e.printStackTrace();
             }
         }
+    }
+
+    public void startAsync(){
+        new Thread(() -> Gdx.app.postRunnable(() -> {
+            try {
+                execute();
+            } catch (Exception ex) {
+                Log.e("fr.aboucorp.teamchess",ex.getMessage());
+            }
+        })).start();
     }
 
     public abstract void execute();

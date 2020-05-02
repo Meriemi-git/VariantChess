@@ -55,7 +55,7 @@ public class GDXGestureListener implements GestureDetector.GestureListener {
                 default:
                     break;
         }
-        return false;
+        return this.boardManager.IsTacticalViewOn();
     }
 
     @Override

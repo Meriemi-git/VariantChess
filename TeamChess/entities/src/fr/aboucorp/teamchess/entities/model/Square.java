@@ -9,8 +9,8 @@ public class Square extends GameElement {
 
     public Square(Location location, ChessColor chessColor) {
         super(location, chessColor);
-        this.columnLetter =  (char)( 65 + (7 - this.getLocation().getX()));
-        this.squareLabel =  columnLetter + "" + (this.getLocation().getZ()+1);
+        this.columnLetter =  (char)( 65 + (7 - (int)this.getLocation().getX()));
+        this.squareLabel =  columnLetter + "" + (int)(this.getLocation().getZ()+1);
     }
 
     @Override

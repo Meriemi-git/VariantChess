@@ -5,6 +5,7 @@ import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.badlogic.gdx.InputAdapter;
@@ -32,7 +33,7 @@ public class BoardActivity extends AndroidApplication implements GameEventSubscr
     public FrameLayout board_panel;
     public Button btn_end_turn;
     public Button btn_test;
-    public Button btn_tactical;
+    public Switch switch_tactical;
     public GameEventManager eventManager;
     private PartyManager partyManager;
     private BoardManager boardManager;
@@ -78,7 +79,7 @@ public class BoardActivity extends AndroidApplication implements GameEventSubscr
         this.party_logs = findViewById(R.id.party_logs);
         this.btn_test = findViewById(R.id.btn_test);
         this.fen_txt = findViewById(R.id.fen_txt);
-        this.btn_tactical = findViewById(R.id.btn_tactical);
+        this.switch_tactical = findViewById(R.id.switch_tactical);
     }
 
     public void bindListeners() {
@@ -88,7 +89,7 @@ public class BoardActivity extends AndroidApplication implements GameEventSubscr
         });
         btn_test.setOnClickListener(v -> BoardActivity.this.partyManager.loadBoard(fen_txt.getText().toString().trim()));
 
-        btn_tactical.setOnClickListener(v -> BoardActivity.this.boardManager.toogleTacticalView());
+        switch_tactical.setOnClickListener(v -> BoardActivity.this.boardManager.toogleTacticalView());
     }
 
     @Override

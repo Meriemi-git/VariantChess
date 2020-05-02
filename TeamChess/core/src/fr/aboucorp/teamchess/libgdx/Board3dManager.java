@@ -75,7 +75,7 @@ public class Board3dManager extends ApplicationAdapter {
     private InputAdapter androidInputAdapter;
     private GestureDetector.GestureListener androidListener;
 
-    private boolean tacticalViewEnabled;
+    public boolean tacticalViewEnabled;
 
     private final ChessModelList chessSquareModels;
     private final ChessModelList whitePieceModels;
@@ -276,7 +276,6 @@ public class Board3dManager extends ApplicationAdapter {
         assetPaths.put(Piece.class,"data/pictures/pieces.atlas");
     }
 
-
     public void createSquares(List<Square> squares) {
         this.modelBuilder = new ModelBuilder();
         Model compositeModel = createModelFromParts();
@@ -444,25 +443,13 @@ public class Board3dManager extends ApplicationAdapter {
      */
     private void initCamera(){
         this.camera = new PerspectiveCamera(30, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        this.camera.position.set(3.5f, 16f,-10f);
-        this.camera.lookAt(3.5f,0,3.5f);
+        this.camera.position.set(3.5f, 15f,-5f);
+        this.camera.lookAt(3.475f,0,3.475f);
         this.camera.near = 1f;
         this.camera.far = 300f;
         this.camera.update();
         this.camController = new CameraInputController(camera);
         this.camController.target.set(new Vector3(3.5f,0,3.5f));
-    }
-
-    public PerspectiveCamera getCamera() {
-        return camera;
-    }
-
-    public void setAndroidInputAdapter(InputAdapter androidInputAdapter) {
-        this.androidInputAdapter = androidInputAdapter;
-    }
-
-    public void setAndroidListener(GestureDetector.GestureListener androidListener) {
-        this.androidListener = androidListener;
     }
 
     public void moveSelectedPieceIntoSquare(Square square) {
@@ -546,14 +533,47 @@ public class Board3dManager extends ApplicationAdapter {
         this.blackDeadPieceModels.clear();
     }
 
-    public void toogleTacticalView(List<Piece> pieces) {
+    public void toogleTacticalView(ChessColor turnColor) {
+        camera.direction.set(0, 0, 0);
+        this.camera.lookAt(3.5f,0,3.5f);
+        camera.up.set(0, 1, 0);
         if(tacticalViewEnabled){
-
+            this.camera.position.set(3.5f, 15f,-8f);
+            this.camera.lookAt(3.5f,0,3.5f);
         }else{
-
+            this.camera.position.set(new Vector3(3.475f,20,3.475f));
+            this.camera.lookAt(3.5f,0,3.5f);
+            this.camera.rotate(Vector3.Y, -45);
+            if(turnColor == ChessColor.BLACK){
+                this.camera.rotate(Vector3.Y, -180);
+            }
         }
+        this.camera.update();
         this.tacticalViewEnabled = !this.tacticalViewEnabled;
+    }
 
+    public void moveCameraOnNewTurn(ChessColor color){
+        this.camera.direction.set(0, 0, 0);
+        this.camera.up.set(0, 1, 0);
+        if(color == ChessColor.WHITE){
+            this.camera.position.set(3.5f, 15f,-5f);
+        }else{
+            this.camera.position.set(3.5f, 15f,13f);
+        }
+        this.camera.lookAt(3.5f,0,3.5f);
+        this.camera.update();
+    }
+
+    public PerspectiveCamera getCamera() {
+        return camera;
+    }
+
+    public void setAndroidInputAdapter(InputAdapter androidInputAdapter) {
+        this.androidInputAdapter = androidInputAdapter;
+    }
+
+    public void setAndroidListener(GestureDetector.GestureListener androidListener) {
+        this.androidListener = androidListener;
     }
 
 

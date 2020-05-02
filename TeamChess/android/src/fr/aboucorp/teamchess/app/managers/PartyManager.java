@@ -10,6 +10,7 @@ import fr.aboucorp.teamchess.entities.model.events.GameEventSubscriber;
 import fr.aboucorp.teamchess.entities.model.events.models.BoardEvent;
 import fr.aboucorp.teamchess.entities.model.events.models.GameEvent;
 import fr.aboucorp.teamchess.entities.model.events.models.LogEvent;
+import fr.aboucorp.teamchess.entities.model.events.models.MoveEvent;
 import fr.aboucorp.teamchess.entities.model.events.models.PartyEvent;
 
 public class PartyManager implements GameEventSubscriber {
@@ -43,7 +44,6 @@ public class PartyManager implements GameEventSubscriber {
 
     public void endTurn() {
         this.turnManager.endTurn();
-        this.turnManager.startTurn();
     }
 
     public String getPartyInfos(){
@@ -57,6 +57,8 @@ public class PartyManager implements GameEventSubscriber {
         }else if(event instanceof BoardEvent && ((BoardEvent) event).type == BoardEventType.CHECKMATE){
             ChessColor winner = boardManager.getWinner();
             this.eventManager.sendMessage(new PartyEvent(String.format("Game finished ! Winner : %s",winner != null ? winner.name() : "EQUALITY")));
+        }else if(event instanceof MoveEvent && ((BoardEvent) event).type == BoardEventType.MOVE){
+            endTurn();
         }
     }
 }
