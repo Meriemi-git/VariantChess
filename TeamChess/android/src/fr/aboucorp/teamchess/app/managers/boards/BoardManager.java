@@ -3,6 +3,7 @@ package fr.aboucorp.teamchess.app.managers.boards;
 import com.badlogic.gdx.graphics.Camera;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import fr.aboucorp.teamchess.entities.model.ChessColor;
 import fr.aboucorp.teamchess.entities.model.Location;
@@ -105,6 +106,9 @@ public abstract class BoardManager {
     }
 
     public void toogleTacticalView(){
-        this.board3dManager.toogleTacticalView();
+        List<Piece> pieces = new ArrayList();
+        pieces.addAll(board.getWhitePieces());
+        pieces.addAll(board.getBlackPieces());
+        this.board3dManager.toogleTacticalView(pieces);
     }
 }

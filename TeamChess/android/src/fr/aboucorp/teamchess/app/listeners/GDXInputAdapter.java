@@ -12,7 +12,7 @@ public class GDXInputAdapter extends InputAdapter {
 
     private Board3dManager board3dManager;
 
-    public GDXInputAdapter(Board3dManager board3dManager){
+    public GDXInputAdapter(Board3dManager board3dManager) {
         this.board3dManager = board3dManager;
     }
 
@@ -55,5 +55,6 @@ public class GDXInputAdapter extends InputAdapter {
     public boolean scrolled(int amount) {
         return super.scrolled(amount);
     }
-
 }
+
+

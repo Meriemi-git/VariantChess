@@ -38,8 +38,8 @@ public class ClassicBoard extends Board{
     }
 
     private void createSquares(){
-        for (int x = 0; x < 8; x++) {
-            for (int z = 0; z < 8; z++) {
+        for (float x = 0f; x < 8; x++) {
+            for (float z = 0f; z < 8f; z++) {
                 Square square = null;
                 if(x % 2 == 0 && z % 2 != 0 || x % 2 != 0 && z % 2 == 0 ){
                     square = new Square(new Location(x, 0, z), ChessColor.WHITE);

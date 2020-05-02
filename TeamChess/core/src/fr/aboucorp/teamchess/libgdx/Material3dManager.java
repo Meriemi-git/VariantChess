@@ -12,6 +12,8 @@ public class Material3dManager {
     private static Material3dManager INSTANCE;
     private Material selectedPieceMaterial;
     private Material occupiedMaterial;
+    public boolean picturesLoading;
+
 
     private Material3dManager() {
         this.selectedPieceMaterial = new Material();
@@ -22,6 +24,7 @@ public class Material3dManager {
         this.occupiedMaterial.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, 0.8f));
         this.occupiedMaterial.set(ColorAttribute.createDiffuse(Color.RED));
     }
+
 
     public void resetMaterial(ChessModel piece) {
         Material oldMat = piece.materials.get(0);
@@ -50,7 +53,4 @@ public class Material3dManager {
         setMaterial(model,this.occupiedMaterial);
     }
 
-    public void setPieceMaterialToCell(ChessModel piece, ChessModel square) {
-        // TODO apply texture on square depeding on piece
-    }
 }

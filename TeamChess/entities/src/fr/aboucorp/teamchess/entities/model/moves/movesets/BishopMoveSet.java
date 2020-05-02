@@ -20,7 +20,7 @@ public class BishopMoveSet extends AbstractMoveSet {
         SquareList validSquares = new SquareList();
         Location start = piece.getLocation();
         // top left direction
-        for(int x = start.getX()+1, z = start.getZ()+1 ; x < 8 && z < 8; x++,z++ ){
+        for(float x = start.getX()+1, z = start.getZ()+1 ; x < 8 && z < 8; x++,z++ ){
             Square validSquare = (Square) allSquares.getItemByLocation(new Location(x,0,z));
             if(validSquare != null && validSquare.getPiece() == null){
                 validSquares.add(validSquare);
@@ -32,7 +32,7 @@ public class BishopMoveSet extends AbstractMoveSet {
             }
         }
         // Top Right direction
-        for(int x = start.getX()-1, z = start.getZ()+1 ; x >= 0 && z < 8; x--,z++ ){
+        for(float x = start.getX()-1, z = start.getZ()+1 ; x >= 0 && z < 8; x--,z++ ){
             Square validSquare = (Square) allSquares.getItemByLocation(new Location(x,0,z));
             if(validSquare != null && validSquare.getPiece() == null){
                 validSquares.add(validSquare);
@@ -44,7 +44,7 @@ public class BishopMoveSet extends AbstractMoveSet {
             }
         }
         // Down Left direction
-        for(int x = start.getX()-1, z = start.getZ()-1 ; x >= 0 && z >= 0; x--,z-- ){
+        for(float x = start.getX()-1, z = start.getZ()-1 ; x >= 0 && z >= 0; x--,z-- ){
             Square validSquare = (Square) allSquares.getItemByLocation(new Location(x,0,z));
             if(validSquare != null && validSquare.getPiece() == null){
                 validSquares.add(validSquare);
@@ -56,7 +56,7 @@ public class BishopMoveSet extends AbstractMoveSet {
             }
         }
         // Down Right direction
-        for(int x = start.getX()+1, z = start.getZ()-1 ; x < 8 && z >= 0; x++,z-- ){
+        for(float x = start.getX()+1, z = start.getZ()-1 ; x < 8 && z >= 0; x++,z-- ){
             Square validSquare = (Square) allSquares.getItemByLocation(new Location(x,0,z));
             if(validSquare != null && validSquare.getPiece() == null){
                 validSquares.add(validSquare);

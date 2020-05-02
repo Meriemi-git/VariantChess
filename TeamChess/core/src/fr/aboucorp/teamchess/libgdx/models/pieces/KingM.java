@@ -4,10 +4,11 @@ import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
 
 import fr.aboucorp.teamchess.entities.model.Location;
+import fr.aboucorp.teamchess.entities.model.enums.PieceId;
 import fr.aboucorp.teamchess.libgdx.models.ChessPieceM;
 
 public class KingM extends ChessPieceM {
-    public KingM(Model model, Location location, Material originalMaterial) {
-        super(model, location, originalMaterial);
+    public KingM(Model model, Location location, Material originalMaterial, PieceId id) {
+        super(model, location, originalMaterial, id);
     }
 }

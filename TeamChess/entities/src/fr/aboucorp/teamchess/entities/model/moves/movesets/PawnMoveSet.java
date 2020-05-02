@@ -28,7 +28,7 @@ public class PawnMoveSet extends AbstractMoveSet {
         SquareList classicMoves = new SquareList();
         Location start = piece.getLocation();
         Square simpleMove;
-        int zpos = piece.getChessColor() == ChessColor.WHITE ? start.getZ() + 1 : start.getZ() - 1;
+        float zpos = piece.getChessColor() == ChessColor.WHITE ? start.getZ() + 1 : start.getZ() - 1;
         simpleMove = (Square) classicBoard.getSquares().getItemByLocation(new Location(start.getX(), 0, zpos));
         if (simpleMove != null && simpleMove.getPiece() == null) {
             classicMoves.add(simpleMove);

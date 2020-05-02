@@ -2,11 +2,11 @@ package fr.aboucorp.teamchess.entities.model;
 
 public class Location implements Cloneable {
 
-    private final int x;
-    private final int y;
-    private final int z;
+    private final float x;
+    private final float y;
+    private final float z;
 
-    public Location(int x, int y, int z) {
+    public Location(float x, float y, float z) {
         this.x = x;
         this.y = y;
         this.z = z;
@@ -17,16 +17,16 @@ public class Location implements Cloneable {
         return obj instanceof Location && ((Location) obj).getX() == x && ((Location) obj).getY() == y && ((Location) obj).getZ() == z;
     }
 
-    public int getX() {
+    public float getX() {
         return x;
     }
 
-    public int getY() {
+    public float getY() {
         return y;
     }
 
 
-    public int getZ() {
+    public float getZ() {
         return z;
     }
 

@@ -20,7 +20,6 @@ public abstract class ChessModel extends ModelInstance {
     public ChessModel(Model model, Location location, Material originalMaterial) {
         super(model,location.getX(),location.getY(),location.getZ());
         this.originalMaterial = originalMaterial;
-        this.materials.get(0).set(originalMaterial);
         this.location = location;
         calculateBoundingBox(boundingBox);
         this.boundingBox.getCenter(center);
