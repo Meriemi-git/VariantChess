@@ -150,7 +150,7 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
         GdxPostRunner runner = new GdxPostRunner() {
             @Override
             public void execute() {
-                ClassicBoardManager.this.board3dManager.moveCameraOnNewTurn(ClassicBoardManager.this.actualTurn.getTurnColor());
+                //ClassicBoardManager.this.board3dManager.moveCameraOnNewTurn(ClassicBoardManager.this.actualTurn.getTurnColor());
             }
         };
         runner.startAsync();

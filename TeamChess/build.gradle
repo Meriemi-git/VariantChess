@@ -68,7 +68,4 @@ project(":core") {
 
 project(":entities") {
     apply plugin: "java-library"
-    dependencies {
-
-    }
 }

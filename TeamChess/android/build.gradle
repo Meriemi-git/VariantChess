@@ -93,9 +93,8 @@ task run(type: Exec) {
     commandLine "$adb", 'shell', 'am', 'start', '-n', 'fr.aboucorp.teamchess/fr.aboucorp.teamchess.app.views.LauncherActivity'
 }
 
-dependencies {
 
+dependencies {
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
 }
-
 eclipse.project.name = appName + "-android"

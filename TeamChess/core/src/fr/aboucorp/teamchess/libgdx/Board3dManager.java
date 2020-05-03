@@ -555,10 +555,20 @@ public class Board3dManager extends ApplicationAdapter {
     public void moveCameraOnNewTurn(ChessColor color){
         this.camera.direction.set(0, 0, 0);
         this.camera.up.set(0, 1, 0);
-        if(color == ChessColor.WHITE){
-            this.camera.position.set(3.5f, 15f,-5f);
-        }else{
-            this.camera.position.set(3.5f, 15f,13f);
+        if(tacticalViewEnabled){
+
+            this.camera.position.set(3.5f, 20f,3.5f);
+            this.camera.lookAt(new Vector3(3.5f,0,3.5f));
+            if(color == ChessColor.WHITE){
+                camera.update();
+                this.camera.rotate(Vector3.Y,180);
+            }
+        }else {
+            if (color == ChessColor.WHITE) {
+                this.camera.position.set(3.5f, 15f, -5f);
+            } else {
+                this.camera.position.set(3.5f, 15f, 13f);
+            }
         }
         this.camera.lookAt(3.5f,0,3.5f);
         this.camera.update();
