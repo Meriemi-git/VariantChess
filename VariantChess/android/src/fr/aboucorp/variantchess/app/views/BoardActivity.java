@@ -12,7 +12,7 @@ import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 
-import fr.aboucorp.teamchess.R;
+import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.listeners.GDXGestureListener;
 import fr.aboucorp.variantchess.app.listeners.GDXInputAdapter;
 import fr.aboucorp.variantchess.app.managers.PartyManager;
@@ -23,10 +23,10 @@ import fr.aboucorp.variantchess.entities.boards.ClassicBoard;
 import fr.aboucorp.variantchess.entities.events.GameEventManager;
 import fr.aboucorp.variantchess.entities.events.GameEventSubscriber;
 import fr.aboucorp.variantchess.entities.events.models.BoardEvent;
-import fr.aboucorp.variantchess.libgdx.Board3dManager;
 import fr.aboucorp.variantchess.entities.events.models.GameEvent;
 import fr.aboucorp.variantchess.entities.events.models.TurnEvent;
 import fr.aboucorp.variantchess.entities.rules.ClassicRuleSet;
+import fr.aboucorp.variantchess.libgdx.Board3dManager;
 
 public class BoardActivity extends AndroidApplication implements GameEventSubscriber {
 
@@ -99,7 +99,7 @@ public class BoardActivity extends AndroidApplication implements GameEventSubscr
                 BoardActivity.this.party_logs.setText( BoardActivity.this.party_logs.getText() + "\nLOG :" + event.message);
             }
             BoardActivity.this.lbl_turn.setText("Turn of " + BoardActivity.this.partyManager.getPartyInfos());
-            Log.i("fr.aboucorp.teamchess",event.message);
+            Log.i("fr.aboucorp.variantchess",event.message);
         });
     }
 }

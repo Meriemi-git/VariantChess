@@ -61,13 +61,13 @@ public class NakamaSessionManager {
 
     public void testUser() throws ExecutionException, InterruptedException {
         User user = this.client.getAccount(this.session).get().getUser();
-        Log.i("fr.aboucorp.teamchess","DisplayName :" +user.getDisplayName());
+        Log.i("fr.aboucorp.variantchess","DisplayName :" +user.getDisplayName());
         String displayName = "Doremus";
         String avatarUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Tux_Enhanced.svg/878px-Tux_Enhanced.svg.png";
         String location = "Toulouse";
         client.updateAccount(session, null, displayName, avatarUrl, null, location);
         user = this.client.getAccount(this.session).get().getUser();
-        Log.i("fr.aboucorp.teamchess","DisplayName :" +user.getDisplayName());
+        Log.i("fr.aboucorp.variantchess","DisplayName :" +user.getDisplayName());
     }
 
     public SocketClient getSocket() throws ExecutionException, InterruptedException {
@@ -79,24 +79,24 @@ public class NakamaSessionManager {
             @Override
             public void onError(Error error) {
                 super.onError(error);
-                Log.i("fr.aboucorp.teamchess","Error: " + error.getMessage());
+                Log.i("fr.aboucorp.variantchess","Error: " + error.getMessage());
             }
 
             @Override
             public void onMatchData(MatchData matchData) {
                 super.onMatchData(matchData);
-                Log.i("fr.aboucorp.teamchess","Match data :" + matchData.getMatchId());
+                Log.i("fr.aboucorp.variantchess","Match data :" + matchData.getMatchId());
             }
 
             @Override
             public void onDisconnect(final Throwable t) {
-                Log.i("fr.aboucorp.teamchess", "Socket disconnected");
+                Log.i("fr.aboucorp.variantchess", "Socket disconnected");
             }
 
             @Override
             public void onMatchmakerMatched(final MatchmakerMatched matched) {
-                Log.i("fr.aboucorp.teamchess",String.format("Received MatchmakerMatched message: %s", matched.toString()));
-                Log.i("fr.aboucorp.teamchess",String.format("Matched opponents: %s", matched.getUsers().toString()));
+                Log.i("fr.aboucorp.variantchess",String.format("Received MatchmakerMatched message: %s", matched.toString()));
+                Log.i("fr.aboucorp.variantchess",String.format("Matched opponents: %s", matched.getUsers().toString()));
             }
         };
 
@@ -110,11 +110,11 @@ public class NakamaSessionManager {
         StorageObjectId objectId = new StorageObjectId("saves");
         objectId.setUserId(session.getUserId());
         StorageObjects objects = client.readStorageObjects(session, objectId).get();
-        Log.i("fr.aboucorp.teamchess", String.format("Read objects %s", objects.getObjectsList().toString()));
+        Log.i("fr.aboucorp.variantchess", String.format("Read objects %s", objects.getObjectsList().toString()));
 
 
         StorageObjectList objectList = client.listUsersStorageObjects(session, "saves", session.getUserId()).get();
-        Log.i("fr.aboucorp.teamchess", String.format("List objects %s", objectList));
+        Log.i("fr.aboucorp.variantchess", String.format("List objects %s", objectList));
     }
 
     public void testMachmaking() throws ExecutionException, InterruptedException {
@@ -123,12 +123,12 @@ public class NakamaSessionManager {
         if(ticket != null){
             try {
                 socket.removeMatchmaker(ticket).get();
-                Log.i("fr.aboucorp.teamchess", "Removed form matcmaking");
+                Log.i("fr.aboucorp.variantchess", "Removed form matcmaking");
             }catch(Exception e){
-                Log.i("fr.aboucorp.teamchess", "Cannot remove matchmaking");
+                Log.i("fr.aboucorp.variantchess", "Cannot remove matchmaking");
             }
         }
-        Log.i("fr.aboucorp.teamchess","machmaking creation");
+        Log.i("fr.aboucorp.variantchess","machmaking creation");
         int minCount = 2;
         int maxCount = 2;
         String query = "+properties.region:europe +properties.rank:>=5 +properties.rank:<=10";
@@ -140,7 +140,7 @@ public class NakamaSessionManager {
         }};
 
         MatchmakerTicket tiket = socket.addMatchmaker(minCount,maxCount,query,stringProperties,numericProperties).get();
-        Log.i("fr.aboucorp.teamchess",String.format("Matchmaking tiket : %s",tiket.getTicket()));
+        Log.i("fr.aboucorp.variantchess",String.format("Matchmaking tiket : %s",tiket.getTicket()));
         putInSharedPreference("matchmaking",tiket.getTicket());
     }
 
@@ -168,6 +168,6 @@ public class NakamaSessionManager {
         String payload = "{\"id\": \"11111111-1111-1111-1111-111111111111\"}";
         String rpcid = "get_user_by_id";
         Rpc getUSerById = client.rpc(session, rpcid, payload).get();
-        Log.i("fr.aboucorp.teamchess",String.format("Retrieved user: %s", getUSerById.getPayload()));
+        Log.i("fr.aboucorp.variantchess",String.format("Retrieved user: %s", getUSerById.getPayload()));
     }
 }

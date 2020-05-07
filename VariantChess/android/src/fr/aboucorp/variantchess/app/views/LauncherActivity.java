@@ -2,10 +2,9 @@ package fr.aboucorp.variantchess.app.views;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 
-import fr.aboucorp.teamchess.R;
+import fr.aboucorp.variantchess.R;
 
 public class LauncherActivity extends AbstractActivity {
 
@@ -26,17 +25,13 @@ public class LauncherActivity extends AbstractActivity {
     }
     @Override
     public void bindListeners() {
-        this.btn_create.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Intent intent = new Intent(LauncherActivity.this, BoardActivity.class);
-                startActivity(intent);
-            }
+        this.btn_create.setOnClickListener(v -> {
+            Intent intent = new Intent(LauncherActivity.this, ConnexionActivity.class);
+            startActivity(intent);
         });
-        this.btn_connect.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Intent intent = new Intent(LauncherActivity.this, BoardActivity.class);
-                startActivity(intent);
-            }
+        this.btn_connect.setOnClickListener(v -> {
+            Intent intent = new Intent(LauncherActivity.this, ConnexionActivity.class);
+            startActivity(intent);
         });
     }
 }

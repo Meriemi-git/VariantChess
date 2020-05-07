@@ -4,14 +4,14 @@ import android.util.Log;
 
 import fr.aboucorp.variantchess.app.managers.boards.BoardManager;
 import fr.aboucorp.variantchess.entities.ChessColor;
+import fr.aboucorp.variantchess.entities.enums.BoardEventType;
 import fr.aboucorp.variantchess.entities.events.GameEventManager;
 import fr.aboucorp.variantchess.entities.events.GameEventSubscriber;
 import fr.aboucorp.variantchess.entities.events.models.BoardEvent;
-import fr.aboucorp.variantchess.entities.events.models.PartyEvent;
-import fr.aboucorp.variantchess.entities.enums.BoardEventType;
 import fr.aboucorp.variantchess.entities.events.models.GameEvent;
 import fr.aboucorp.variantchess.entities.events.models.LogEvent;
 import fr.aboucorp.variantchess.entities.events.models.MoveEvent;
+import fr.aboucorp.variantchess.entities.events.models.PartyEvent;
 
 public class PartyManager implements GameEventSubscriber {
     private final BoardManager boardManager;
@@ -53,7 +53,7 @@ public class PartyManager implements GameEventSubscriber {
     @Override
     public void receiveGameEvent(GameEvent event) {
         if(event instanceof PartyEvent){
-            Log.i("fr.aboucorp.teamchess",event.message);
+            Log.i("fr.aboucorp.variantchess",event.message);
         }else if(event instanceof BoardEvent && ((BoardEvent) event).type == fr.aboucorp.variantchess.entities.enums.BoardEventType.CHECKMATE){
             ChessColor winner = boardManager.getWinner();
             this.eventManager.sendMessage(new PartyEvent(String.format("Game finished ! Winner : %s",winner != null ? winner.name() : "EQUALITY")));

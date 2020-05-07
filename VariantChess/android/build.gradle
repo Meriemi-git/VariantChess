@@ -31,7 +31,7 @@ android {
         exclude 'META-INF/robovm/ios/robovm.xml'
     }
     defaultConfig {
-        applicationId "fr.aboucorp.teamchess"
+        applicationId "fr.aboucorp.variantchess"
         minSdkVersion 24
         targetSdkVersion 29
         versionCode 1
@@ -108,7 +108,7 @@ task run(type: Exec) {
     }
 
     def adb = path + "/platform-tools/adb"
-    commandLine "$adb", 'shell', 'am', 'start', '-n', 'fr.aboucorp.teamchess/fr.aboucorp.teamchess.app.views.LauncherActivity'
+    commandLine "$adb", 'shell', 'am', 'start', '-n', 'fr.aboucorp.variantchess/fr.aboucorp.variantchess.app.views.LauncherActivity'
 }
 
 repositories {

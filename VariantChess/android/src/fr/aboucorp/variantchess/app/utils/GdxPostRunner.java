@@ -14,7 +14,7 @@ public abstract class GdxPostRunner {
                 try {
                     execute();
                 } catch (Exception ex) {
-                    Log.e("fr.aboucorp.teamchess",ex.getMessage());
+                    Log.e("fr.aboucorp.variantchess",ex.getMessage());
                 } finally {
                     synchronized (lock2) {
                         lock2.notify();
@@ -46,7 +46,7 @@ public abstract class GdxPostRunner {
             try {
                 execute();
             } catch (Exception ex) {
-                Log.e("fr.aboucorp.teamchess",ex.getMessage());
+                Log.e("fr.aboucorp.variantchess",ex.getMessage());
             }
         })).start();
     }
