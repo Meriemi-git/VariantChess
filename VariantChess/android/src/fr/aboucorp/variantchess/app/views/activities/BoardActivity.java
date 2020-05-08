@@ -1,4 +1,4 @@
-package fr.aboucorp.variantchess.app.views;
+package fr.aboucorp.variantchess.app.views.activities;
 
 import android.os.Bundle;
 import android.util.Log;

@@ -3,11 +3,20 @@
     <string name="app_name">VariantChess</string>
     <string name="btn_launch_game">Démarrer</string>
     <string name="btn_end_turn">Fin du tour</string>
-    <string name="lbl_connect">Connection</string>
+    <string name="lbl_connect">Connexion</string>
     <string name="lbl_create_account">Créer un compte</string>
     <string name="lbl_btn_facebook">Facebook</string>
     <string name="lbl_btn_google">Google</string>
     <string name="lbl_hint_email">Votre mail</string>
     <string name="lbl_hint_password">Votre mot de passe</string>
     <string name="app_id">737891246568</string>
+    <string name="lbl_mail_connect">Connectez-vous avec votre adresse email</string>
+    <string name="lbl_google_connect">Ou avec Google</string>
+    <string name="lbl_confirm">Connexion</string>
+    <string name="menu_icon">Menu icon</string>
+    <string name="lbl_online_game">Partie en ligne</string>
+    <string name="lbl_local_game">Partie locale</string>
+    <string name="menu_action_profil">Profil</string>
+    <string name="menu_action_settings">Paramètres</string>
+    <string name="menu_action_disconnect">Déconexion</string>
 </resources>

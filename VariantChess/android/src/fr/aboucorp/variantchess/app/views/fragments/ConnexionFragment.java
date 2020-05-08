@@ -1,73 +1,70 @@
-package fr.aboucorp.variantchess.app.views;
+package fr.aboucorp.variantchess.app.views.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-
-import androidx.annotation.Nullable;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 
 import fr.aboucorp.variantchess.R;
-import fr.aboucorp.variantchess.app.multiplayer.NakamaSessionManager;
 
-public class ConnexionActivity extends AbstractActivity {
-    private NakamaSessionManager manager;
+public class ConnexionFragment extends VariantChessFragment {
     public EditText txt_mail;
     public EditText txt_pwd;
     public SignInButton btn_connexion_google;
-    public Button btn_connexion_facebook;
+    public Button btn_mail_connect;
     private GoogleSignInClient clientsignin;
 
+    public ConnexionFragment(GoogleSignInClient clientsignin) {
+        this.clientsignin = clientsignin;
+    }
+
+
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.connexion);
-        this.manager = new NakamaSessionManager(this);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.connexion_f, container, false);
+        return view;
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         bindViews();
         bindListeners();
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .requestProfile()
-                .build();
-        clientsignin = GoogleSignIn.getClient(this, gso);
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
-        if(account != null){
-            Log.i("fr.aboucorp.variantchess",account.getDisplayName());
-        }
-
-    }
 
     @Override
     protected void bindViews() {
-        this.txt_mail = findViewById(R.id.txt_mail);
-        this.txt_pwd = findViewById(R.id.txt_pwd);
-        this.btn_connexion_facebook = findViewById(R.id.btn_connexion_facebook);
-        this.btn_connexion_google = findViewById(R.id.btn_connexion_google);
+        this.txt_mail = getView().findViewById(R.id.txt_mail);
+        this.txt_pwd = getView().findViewById(R.id.txt_pwd);
+        this.btn_mail_connect = getView().findViewById(R.id.btn_mail_connect);
+        this.btn_connexion_google = getView().findViewById(R.id.btn_connexion_google);
     }
 
     @Override
     protected void bindListeners() {
-        this.btn_connexion_google.setOnClickListener(v -> signIn());
+        this.btn_connexion_google.setOnClickListener(v -> signInWithGoogle());
+        this.btn_mail_connect.setOnClickListener(v -> signInWithMail());
     }
 
-    private void signIn() {
+    private void signInWithMail() {
+
+    }
+
+    private void signInWithGoogle() {
         Intent signInIntent = clientsignin.getSignInIntent();
         startActivityForResult(signInIntent, 200);
-
     }
 
     @Override
@@ -95,16 +92,5 @@ public class ConnexionActivity extends AbstractActivity {
             Log.w("fr.aboucorp.variantchess", "signInResult:failed code=" + e.getStatusCode());
         }
 
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        try {
-            manager.stopClient();
-            Log.i("fr.aboucorp.variantchess", "Stoping Client");
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 }

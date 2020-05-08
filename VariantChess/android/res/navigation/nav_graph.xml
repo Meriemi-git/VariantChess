@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" android:id="@+id/nav_graph"
+    app:startDestination="@id/launcherActivity">
+
+    <activity
+        android:id="@+id/launcherActivity"
+        android:name="fr.aboucorp.variantchess.app.views.activities.MainActivity"
+        android:label="LauncherActivity" />
+    <activity
+        android:id="@+id/connexionActivity"
+        android:name="fr.aboucorp.variantchess.app.views.fragments.ConnexionFragment"
+        android:label="ConnexionActivity" />
+    <activity
+        android:id="@+id/homeActivity"
+        android:name="fr.aboucorp.variantchess.app.views.fragments.HomeFragment"
+        android:label="HomeActivity" />
+</navigation>
