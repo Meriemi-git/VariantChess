@@ -18,15 +18,15 @@ import com.google.android.gms.tasks.Task;
 
 import fr.aboucorp.variantchess.R;
 
-public class ConnexionFragment extends VariantChessFragment {
+public class ConnectFragment extends VariantChessFragment {
     public EditText txt_mail;
     public EditText txt_pwd;
     public SignInButton btn_connexion_google;
     public Button btn_mail_connect;
     private GoogleSignInClient clientsignin;
+    OnConnectListener callback;
 
-    public ConnexionFragment(GoogleSignInClient clientsignin) {
-        this.clientsignin = clientsignin;
+    public ConnectFragment() {
     }
 
 
@@ -83,14 +83,25 @@ public class ConnexionFragment extends VariantChessFragment {
     private void handleSignInResult(Task<GoogleSignInAccount> task) {
         try {
             GoogleSignInAccount account = task.getResult(ApiException.class);
-
             // Signed in successfully, show authenticated UI.
             Log.i("fr.aboucorp.variantchess","Successfully signed");
+            this.callback.OnConnect();
         } catch (ApiException e) {
             // The ApiException status code indicates the detailed failure reason.
             // Please refer to the GoogleSignInStatusCodes class reference for more information.
             Log.w("fr.aboucorp.variantchess", "signInResult:failed code=" + e.getStatusCode());
         }
+    }
 
+    public void setCallback(OnConnectListener callback) {
+        this.callback = callback;
+    }
+
+    public interface OnConnectListener{
+        void OnConnect();
+    }
+
+    public void setClientsignin(GoogleSignInClient clientsignin) {
+        this.clientsignin = clientsignin;
     }
 }

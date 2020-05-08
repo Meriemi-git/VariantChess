@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import fr.aboucorp.variantchess.R;
+import fr.aboucorp.variantchess.app.views.activities.MainActivity;
 
 public class AccountFragment extends VariantChessFragment {
 
@@ -27,6 +28,7 @@ public class AccountFragment extends VariantChessFragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         bindViews();
+        bindListeners();
 
     }
     @Override
@@ -37,6 +39,6 @@ public class AccountFragment extends VariantChessFragment {
 
     @Override
     protected void bindListeners() {
-
+        this.btn_connect.setOnClickListener(v -> ((MainActivity)getActivity()).setFragment(new ConnectFragment()));
     }
 }
