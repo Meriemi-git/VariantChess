@@ -49,7 +49,7 @@ public class BoardActivity extends AndroidApplication implements GameEventSubscr
     @Override
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.board);
+        setContentView(R.layout.board_layout);
         bindViews();
         bindListeners();
         this.initializeBoard();

@@ -23,6 +23,12 @@
             android:layout_height="wrap_content"
             android:text="@string/lbl_local_game"
             android:textSize="18sp" />
+
+        <Button
+            android:id="@+id/btn_user_list"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="User List" />
     </LinearLayout>
 
 </LinearLayout>

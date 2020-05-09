@@ -12,7 +12,7 @@
     <string name="lbl_hint_password">Your password</string>
     <string name="app_id">737891246568</string>
     <string name="lbl_mail_connect">Connect with your mail</string>
-    <string name="lbl_google_connect">Or with Google</string>
+    <string name="lbl_google_connect">Or with your Google account</string>
     <string name="lbl_confirm">Connect</string>
     <string name="menu_icon">Menu icon</string>
     <string name="lbl_online_game">Online game</string>
@@ -21,5 +21,14 @@
     <string name="menu_action_settings">Settings</string>
     <string name="menu_action_disconnect">Disconnect</string>
     <string name="disconnect_message">Disconnected</string>
+    <string name="lbl_err_email">Mail invalid</string>
+    <string name="success_login">Login successfull</string>
+    <string name="failed_login">Login failed</string>
+    <string name="server_client_id" translatable="false">737891246568-lrqnd68abhib2c1lo8egqa2ofvp1lk0u.apps.googleusercontent.com</string>
+    <string name="user_info_dialog_title">User infos</string>
+    <string name="close">Close</string>
+    <string name="register_lbl_account_creation">Create your account with your email</string>
+    <string name="register_hint_username">Username</string>
+    <string name="error_duplicate_displayname">Username already taken</string>
 
 </resources>

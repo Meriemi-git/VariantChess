@@ -29,20 +29,52 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 public class NakamaSessionManager {
+    private static NakamaSessionManager INSTANCE;
     private final Context context;
     public final Client client = new DefaultClient("defaultkey","192.168.1.37", 7349, false);
     public Session session;
 
-    public NakamaSessionManager(Context context) {
+    private NakamaSessionManager(Context context) {
         this.context = context;
     }
 
 
     public void start() throws ExecutionException, InterruptedException {
-        // TODO implement other id mecanism
         String android_id = Settings.Secure.getString(context.getContentResolver(),
                 Settings.Secure.ANDROID_ID);
         SharedPreferences pref = context.getSharedPreferences("nakama",Context.MODE_PRIVATE);
+        if(!restorSessionIfPossible(pref)) {
+            this.session = client.authenticateCustom(android_id).get();
+            pref = context.getSharedPreferences("nakama", Context.MODE_PRIVATE);
+            pref.edit().putString("nk.session", session.getAuthToken()).apply();
+        }
+    }
+
+
+    public User authentWithEmail(String mail, String password) throws ExecutionException, InterruptedException {
+        SharedPreferences pref = context.getSharedPreferences("nakama",Context.MODE_PRIVATE);
+        if(!restorSessionIfPossible(pref)){
+            this.session = client.authenticateEmail(mail,password).get();
+            pref = context.getSharedPreferences("nakama",Context.MODE_PRIVATE);
+            pref.edit().putString("nk.session", session.getAuthToken()).apply();
+        }
+        return this.client.getAccount(this.session).get().getUser();
+    }
+
+    public User authentWithGoogle(String idToken, String mail) throws ExecutionException, InterruptedException {
+        SharedPreferences pref = context.getSharedPreferences("nakama",Context.MODE_PRIVATE);
+        if(!restorSessionIfPossible(pref)){
+            Map<String, String> mailInfo = new HashMap<>();
+            mailInfo.put("mail",mail);
+            this.session = client.authenticateGoogle(idToken,mailInfo).get();
+            pref = context.getSharedPreferences("nakama",Context.MODE_PRIVATE);
+            pref.edit().putString("nk.session", session.getAuthToken()).apply();
+        }
+        return this.client.getAccount(this.session).get().getUser();
+    }
+
+    public boolean restorSessionIfPossible(SharedPreferences pref){
+
         // Lets check if we can restore a cached session.
         String sessionString = pref.getString("nk.session", null);
         if (sessionString != null && !sessionString.isEmpty()) {
@@ -50,13 +82,10 @@ public class NakamaSessionManager {
             if (!restoredSession.isExpired(new Date())) {
                 // Session was valid and is restored now.
                 this.session = restoredSession;
-                return;
+                return true;
             }
         }
-
-            this.session = client.authenticateCustom(android_id).get();
-            pref = context.getSharedPreferences("nakama",Context.MODE_PRIVATE);
-            pref.edit().putString("nk.session", session.getAuthToken()).apply();
+        return false;
     }
 
     public void testUser() throws ExecutionException, InterruptedException {
@@ -72,7 +101,7 @@ public class NakamaSessionManager {
 
     public SocketClient getSocket() throws ExecutionException, InterruptedException {
         String host = "localhost";
-        int port = 7350; // different port to the main API port
+        int port = 7350; // different port to the main_layout API port
         boolean ssl = false;
         SocketClient socket = client.createSocket();
         SocketListener listener = new AbstractSocketListener() {
@@ -169,5 +198,12 @@ public class NakamaSessionManager {
         String rpcid = "get_user_by_id";
         Rpc getUSerById = client.rpc(session, rpcid, payload).get();
         Log.i("fr.aboucorp.variantchess",String.format("Retrieved user: %s", getUSerById.getPayload()));
+    }
+
+    public static NakamaSessionManager getInstance(Context context){
+        if(INSTANCE == null){
+            INSTANCE = new NakamaSessionManager(context);
+        }
+        return INSTANCE;
     }
 }

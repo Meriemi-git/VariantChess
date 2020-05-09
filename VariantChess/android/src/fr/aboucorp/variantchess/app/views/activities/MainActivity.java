@@ -1,42 +1,40 @@
 package fr.aboucorp.variantchess.app.views.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.tasks.Task;
 
 import fr.aboucorp.variantchess.R;
+import fr.aboucorp.variantchess.app.db.user.User;
+import fr.aboucorp.variantchess.app.managers.AccountManager;
+import fr.aboucorp.variantchess.app.viewmodel.UserViewModel;
 import fr.aboucorp.variantchess.app.views.fragments.AccountFragment;
 import fr.aboucorp.variantchess.app.views.fragments.ConnectFragment;
 import fr.aboucorp.variantchess.app.views.fragments.HomeFragment;
+import fr.aboucorp.variantchess.app.views.fragments.RegisterFragment;
 
-public class MainActivity extends VariantChessActivity implements ConnectFragment.OnConnectListener{
-
-
-    private GoogleSignInClient googleSignInClient;
+public class MainActivity extends VariantChessActivity {
+    private UserViewModel userViewModel;
+    private AccountManager accountManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+        setContentView(R.layout.main_layout);
         setToolbar();
-        this.bindViews();
-        this.bindListeners();
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .requestProfile()
-                .build();
-        this.googleSignInClient = GoogleSignIn.getClient(this, gso);
+        this.accountManager = new AccountManager(this);
+        userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
     }
 
     private void setToolbar() {
@@ -47,28 +45,28 @@ public class MainActivity extends VariantChessActivity implements ConnectFragmen
     @Override
     protected void onStart() {
         super.onStart();
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
-        Fragment fragment  = null;
-        if(account != null){
-            Log.i("fr.aboucorp.variantchess",account.getDisplayName());
+        manageAuthentification();
+    }
+
+    private void manageAuthentification() {
+        User connected = userViewModel.getConnectedUser();
+        if(connected != null){
+            if(TextUtils.isEmpty(connected.password)){
+
+            }
             setFragment(new HomeFragment());
         }else{
             setFragment(new AccountFragment());
         }
-
     }
 
+    @Override
     public void setFragment(Fragment fragment){
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.fragment_container, fragment);
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }
-
-    @Override
-    public void bindViews() { }
-    @Override
-    public void bindListeners() { }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -85,7 +83,7 @@ public class MainActivity extends VariantChessActivity implements ConnectFragmen
                 return true;
 
             case R.id.menu_action_disconnect:
-               disconnectUser();
+               this.accountManager.disconnectUser();
                 return true;
             case R.id.menu_action_settings:
                 // User chose the "Favorite" action, mark the current item
@@ -99,23 +97,35 @@ public class MainActivity extends VariantChessActivity implements ConnectFragmen
         }
     }
 
-    private void disconnectUser() {
-        this.googleSignInClient.signOut()
-                .addOnCompleteListener(this, task -> Toast.makeText(MainActivity.this,R.string.disconnect_message,Toast.LENGTH_LONG).show());
-        this.setFragment(new AccountFragment());
-    }
-
     @Override
     public void onAttachFragment(Fragment fragment) {
         if (fragment instanceof ConnectFragment) {
             ConnectFragment connectionfragment = (ConnectFragment) fragment;
-            connectionfragment.setClientsignin(this.googleSignInClient);
-            connectionfragment.setCallback(this);
+            connectionfragment.setAccountManager(this.accountManager);
+        }else if (fragment instanceof RegisterFragment) {
+            RegisterFragment connectionfragment = (RegisterFragment) fragment;
+            connectionfragment.setAccountManager(this.accountManager);
         }
     }
 
     @Override
-    public void OnConnect() {
-        this.setFragment(new HomeFragment());
+    protected void bindViews() {}
+
+    @Override
+    protected void bindListeners() {}
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 200) {
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            this.accountManager.handleAuthentWithGoogleResult(task);
+            this.setFragment(new HomeFragment());
+        }
+    }
+
+    public void userIsConnected(User user) {
+        setFragment(new HomeFragment());
+        this.userViewModel.setConnected(user);
     }
 }

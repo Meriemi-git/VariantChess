@@ -14,13 +14,10 @@ public class AccountFragment extends VariantChessFragment {
     public Button btn_create;
     public Button btn_connect;
 
-    public AccountFragment() {
-        super();
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.account_f, container, false);
+        View view = inflater.inflate(R.layout.account_layout, container, false);
         return view;
     }
 
@@ -40,5 +37,6 @@ public class AccountFragment extends VariantChessFragment {
     @Override
     protected void bindListeners() {
         this.btn_connect.setOnClickListener(v -> ((MainActivity)getActivity()).setFragment(new ConnectFragment()));
+        this.btn_create.setOnClickListener(v -> ((MainActivity)getActivity()).setFragment(new RegisterFragment()));
     }
 }
