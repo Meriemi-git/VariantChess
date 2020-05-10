@@ -42,6 +42,6 @@ public class HomeFragment extends VariantChessFragment {
 
     @Override
     protected void bindListeners() {
-        this.btn_user_list.setOnClickListener(v -> ((MainActivity)getActivity()).setFragment(new UserListFragment()));
+        this.btn_user_list.setOnClickListener(v -> ((MainActivity)getActivity()).setFragment(UserListFragment.class,"userList",this.getArguments()));
     }
 }

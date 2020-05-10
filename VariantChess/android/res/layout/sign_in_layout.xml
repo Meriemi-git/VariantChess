@@ -9,7 +9,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingBottom="20dp"
-        android:text="@string/register_lbl_account_creation"
+        android:text="@string/sign_in_lbl_account_creation"
         android:textSize="24sp" />
 
     <EditText
@@ -20,7 +20,7 @@
         android:gravity="center"
         android:inputType="textPersonName"
         android:layout_marginBottom="40dp"
-        android:text="@string/register_hint_username" />
+        android:text="@string/sign_in_hint_username" />
     <EditText
         android:id="@+id/register_mail"
         android:layout_width="wrap_content"

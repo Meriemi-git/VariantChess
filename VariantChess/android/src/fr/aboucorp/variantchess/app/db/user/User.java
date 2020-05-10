@@ -5,6 +5,8 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import fr.aboucorp.variantchess.app.utils.AuthType;
+
 @Entity(tableName = "user")
 public class User {
     @PrimaryKey(autoGenerate = true)
@@ -31,6 +33,10 @@ public class User {
     @ColumnInfo(name = "is_connected")
     @NonNull
     public boolean isConnected;
+
+    @ColumnInfo(name = "auth_type")
+    @NonNull
+    public AuthType authType;
 
     public User() {
     }

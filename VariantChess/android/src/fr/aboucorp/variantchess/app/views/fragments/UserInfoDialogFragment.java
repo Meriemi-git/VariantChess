@@ -44,7 +44,7 @@ public class UserInfoDialogFragment extends DialogFragment {
         }
         alertDialogBuilder.setView(view)
                 .setTitle(getString(R.string.user_info_dialog_title))
-                .setPositiveButton(R.string.close, (dialog, which) -> dialog.cancel());
+                .setPositiveButton(R.string.general_close, (dialog, which) -> dialog.cancel());
         return alertDialogBuilder.create();
     }
 

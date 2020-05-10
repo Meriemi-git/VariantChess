@@ -36,10 +36,14 @@ public interface UserDao {
     void deleteAll();
 
     @Query("SELECT * FROM user WHERE is_connected = 1 LIMIT 1")
-    LiveData<User> getConnectedUser();
+    User getConnectedUser();
 
     @Query("SELECT * FROM user WHERE user_id = :userId LIMIT 1")
     User findByUserId(String userId);
 
+    @Query("SELECT * FROM user WHERE mail = :mail LIMIT 1")
+    User findUserByMail(String mail);
 
+    @Query("UPDATE user SET is_connected = 0 WHERE id = :id")
+    void disconnectUser(int id);
 }

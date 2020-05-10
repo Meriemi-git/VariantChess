@@ -8,12 +8,16 @@ import androidx.annotation.NonNull;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
+import androidx.room.TypeConverters;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import fr.aboucorp.variantchess.app.db.user.User;
 import fr.aboucorp.variantchess.app.db.user.UserDao;
+import fr.aboucorp.variantchess.app.utils.AuthType;
+import fr.aboucorp.variantchess.app.utils.AuthTypeConverter;
 
 @Database(entities = {User.class}, version = 1)
+@TypeConverters({AuthTypeConverter.class})
 public abstract class VariantChessDatabase extends RoomDatabase {
     private static final String DB_NAME = "variantchess.db";
     private static VariantChessDatabase INSTANCE;
@@ -25,13 +29,13 @@ public abstract class VariantChessDatabase extends RoomDatabase {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
                             VariantChessDatabase.class, DB_NAME)
-                            // TODO Remove it before production release
                             .fallbackToDestructiveMigration()
+                            // TODO Remove it before production release
                             .addCallback(new RoomDatabase.Callback() {
                                 @Override
                                 public void onCreate(@NonNull SupportSQLiteDatabase db) {
                                     super.onCreate(db);
-                                    Log.d("VariantChessDatabase", "populating with data...");
+                                    Log.d("fr.aboucorp.variantchess", "populating with data...");
                                     new PopulateDbAsync(INSTANCE).execute();
                                 }
                             })
@@ -39,7 +43,6 @@ public abstract class VariantChessDatabase extends RoomDatabase {
                 }
             }
         }
-
         return INSTANCE;
     }
 
@@ -49,10 +52,18 @@ public abstract class VariantChessDatabase extends RoomDatabase {
 
         public PopulateDbAsync(VariantChessDatabase instance) {
             userDao = instance.userDao();
+
         }
 
         @Override
         protected Void doInBackground(Void... voids) {
+            User test = new User();
+            test.username="test";
+            test.userId="11111111-1111-1111-1111-111111111111";
+            test.username = "test_user";
+            test.mail = "test@test.com";
+            test.authType = AuthType.MAIL;
+            userDao.insertAll(test);
             return null;
         }
     }

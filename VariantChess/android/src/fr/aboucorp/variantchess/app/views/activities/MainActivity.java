@@ -2,7 +2,6 @@ package fr.aboucorp.variantchess.app.views.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -20,13 +19,15 @@ import fr.aboucorp.variantchess.app.db.user.User;
 import fr.aboucorp.variantchess.app.managers.AccountManager;
 import fr.aboucorp.variantchess.app.viewmodel.UserViewModel;
 import fr.aboucorp.variantchess.app.views.fragments.AccountFragment;
-import fr.aboucorp.variantchess.app.views.fragments.ConnectFragment;
 import fr.aboucorp.variantchess.app.views.fragments.HomeFragment;
-import fr.aboucorp.variantchess.app.views.fragments.RegisterFragment;
+import fr.aboucorp.variantchess.app.views.fragments.SignInFragment;
+import fr.aboucorp.variantchess.app.views.fragments.SignUpFragment;
 
 public class MainActivity extends VariantChessActivity {
     private UserViewModel userViewModel;
     private AccountManager accountManager;
+    private Toolbar toolbar;
+    private boolean menuIsReady = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,35 +36,31 @@ public class MainActivity extends VariantChessActivity {
         setToolbar();
         this.accountManager = new AccountManager(this);
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
+        userViewModel.getConnected().observe(this, user -> MainActivity.this.updateConnectionUI(user));
+        this.accountManager.cheskConnectedUser();
     }
 
-    private void setToolbar() {
-        Toolbar myToolbar = findViewById(R.id.my_toolbar);
-        setSupportActionBar(myToolbar);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        manageAuthentification();
-    }
-
-    private void manageAuthentification() {
-        User connected = userViewModel.getConnectedUser();
-        if(connected != null){
-            if(TextUtils.isEmpty(connected.password)){
-
-            }
-            setFragment(new HomeFragment());
-        }else{
-            setFragment(new AccountFragment());
+    private void updateConnectionUI(User user){
+        if(menuIsReady) {
+            MenuItem disconnect = this.toolbar.getMenu().findItem(R.id.menu_action_disconnect);
+            MenuItem profile = this.toolbar.getMenu().findItem(R.id.menu_action_profil);
+            disconnect.setVisible(user != null);
+            profile.setVisible(user != null);
+        }
+        if(user != null){
+            setFragment(HomeFragment.class,"home",this.getIntent().getExtras());
         }
     }
 
+    private void setToolbar() {
+        toolbar = findViewById(R.id.main_toolbar);
+        setSupportActionBar(toolbar);
+    }
+
     @Override
-    public void setFragment(Fragment fragment){
+    public void setFragment(Class fragmentClass,String tag, Bundle args){
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.fragment_container, fragment);
+        fragmentTransaction.replace(R.id.fragment_container, fragmentClass,args,tag);
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }
@@ -72,6 +69,7 @@ public class MainActivity extends VariantChessActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main_menu, menu);
+        this.menuIsReady = true;
         return true;
     }
 
@@ -83,8 +81,10 @@ public class MainActivity extends VariantChessActivity {
                 return true;
 
             case R.id.menu_action_disconnect:
-               this.accountManager.disconnectUser();
-                return true;
+               this.accountManager.disconnectUser(userViewModel.getConnected().getValue());
+               this.userViewModel.setConnected(null);
+               this.setFragment(AccountFragment.class,"account",this.getIntent().getExtras());
+               return true;
             case R.id.menu_action_settings:
                 // User chose the "Favorite" action, mark the current item
                 // as a favorite...
@@ -93,17 +93,16 @@ public class MainActivity extends VariantChessActivity {
                 // If we got here, the user's action was not recognized.
                 // Invoke the superclass to handle it.
                 return super.onOptionsItemSelected(item);
-
         }
     }
 
     @Override
     public void onAttachFragment(Fragment fragment) {
-        if (fragment instanceof ConnectFragment) {
-            ConnectFragment connectionfragment = (ConnectFragment) fragment;
+        if (fragment instanceof SignUpFragment) {
+            SignUpFragment connectionfragment = (SignUpFragment) fragment;
             connectionfragment.setAccountManager(this.accountManager);
-        }else if (fragment instanceof RegisterFragment) {
-            RegisterFragment connectionfragment = (RegisterFragment) fragment;
+        }else if (fragment instanceof SignInFragment) {
+            SignInFragment connectionfragment = (SignInFragment) fragment;
             connectionfragment.setAccountManager(this.accountManager);
         }
     }
@@ -120,12 +119,16 @@ public class MainActivity extends VariantChessActivity {
         if (requestCode == 200) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             this.accountManager.handleAuthentWithGoogleResult(task);
-            this.setFragment(new HomeFragment());
+            this.setFragment(HomeFragment.class,"home",this.getIntent().getExtras());
         }
     }
 
-    public void userIsConnected(User user) {
-        setFragment(new HomeFragment());
-        this.userViewModel.setConnected(user);
+    public void userIsConnected(User connected) {
+        if(connected != null){
+            this.userViewModel.setConnected(connected);
+            setFragment(HomeFragment.class,"home",getIntent().getExtras());
+        }else{
+            setFragment(AccountFragment.class,"account",getIntent().getExtras());
+        }
     }
 }

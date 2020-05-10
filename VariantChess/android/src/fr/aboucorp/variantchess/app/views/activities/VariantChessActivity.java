@@ -1,10 +1,11 @@
 package fr.aboucorp.variantchess.app.views.activities;
 
+import android.os.Bundle;
+
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 
 public abstract class VariantChessActivity extends AppCompatActivity {
-    public abstract void setFragment(Fragment fragment);
+    public abstract void setFragment(Class fragmentClass, String tag, Bundle args);
 
     protected abstract void bindViews();
     protected abstract void bindListeners();

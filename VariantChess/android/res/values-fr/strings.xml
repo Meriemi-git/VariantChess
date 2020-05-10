@@ -24,8 +24,10 @@
     <string name="success_login">Connexion réussie</string>
     <string name="failed_login">Echec de la connexion</string>
     <string name="user_info_dialog_title">Informations utilisateur</string>
-    <string name="close">Fermer</string>
-    <string name="register_lbl_account_creation">Créez votre compte avec votre mail</string>
-    <string name="register_hint_username">Nom d\'utilisateur</string>
-    <string name="error_duplicate_displayname">Ce nom d\'utilisateur est déjà pris</string>
+    <string name="general_close">Fermer</string>
+    <string name="sign_in_lbl_account_creation">Créez votre compte avec votre mail</string>
+    <string name="sign_in_hint_username">Nom d\'utilisateur</string>
+    <string name="sign_in_error_duplicate_displayname">Ce nom d\'utilisateur est déjà pris</string>
+    <string name="sign_in_error_duplicate_mail">Cette adresse mail est déjà prise</string>
+    <string name="general_unconnected">Déconnecté</string>
 </resources>

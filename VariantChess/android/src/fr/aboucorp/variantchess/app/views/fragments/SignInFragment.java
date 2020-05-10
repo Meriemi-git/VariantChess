@@ -1,5 +1,6 @@
 package fr.aboucorp.variantchess.app.views.fragments;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,6 +9,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.android.gms.common.SignInButton;
 import com.mobsandgeeks.saripaar.QuickRule;
 import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
@@ -23,10 +25,10 @@ import fr.aboucorp.variantchess.app.db.VariantChessDatabase;
 import fr.aboucorp.variantchess.app.managers.AccountManager;
 import fr.aboucorp.variantchess.app.multiplayer.NakamaSessionManager;
 
-public class RegisterFragment extends VariantChessFragment  implements Validator.ValidationListener {
+public class SignInFragment extends VariantChessFragment  implements Validator.ValidationListener {
 
     public Button btn_register;
-    public Button btn_signin_google;
+    public SignInButton btn_signin_google;
     @NotEmpty
     public EditText txt_username;
     @Email
@@ -41,14 +43,14 @@ public class RegisterFragment extends VariantChessFragment  implements Validator
 
 
     private Validator validator;
-    private QuickRule<EditText> uniqueUsernameRule;
+    private QuickRule<EditText> uniqueMailRule;
     private VariantChessDatabase db;
     private NakamaSessionManager sessionManager;
     private AccountManager accountManager;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.register_layout, container, false);
+        View view = inflater.inflate(R.layout.sign_in_layout, container, false);
         return view;
     }
 
@@ -61,19 +63,19 @@ public class RegisterFragment extends VariantChessFragment  implements Validator
         validator.setValidationListener(this);
         db = VariantChessDatabase.getDatabase(getActivity());
         sessionManager = NakamaSessionManager.getInstance(getActivity());
-      /*  this.uniqueUsernameRule = new QuickRule<EditText>() {
+        this.uniqueMailRule = new QuickRule<EditText>() {
 
             @Override
             public boolean isValid(EditText editText) {
-                return db.userDao().findByDisplayName(editText.getText().toString()) == null;
+                return db.userDao().findUserByMail(editText.getText().toString()) == null;
             }
 
             @Override
             public String getMessage(Context context) {
-                return context.getString(R.string.error_duplicate_displayname);
+                return context.getString(R.string.sign_in_error_duplicate_mail);
             }
         };
-        validator.put(this.txt_username,uniqueUsernameRule);*/
+        validator.put(this.txt_username,uniqueMailRule);
     }
 
     @Override

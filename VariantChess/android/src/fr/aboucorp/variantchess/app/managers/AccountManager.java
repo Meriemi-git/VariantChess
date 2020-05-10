@@ -1,6 +1,8 @@
 package fr.aboucorp.variantchess.app.managers;
 
 import android.content.Intent;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -18,9 +20,9 @@ import fr.aboucorp.variantchess.app.db.VariantChessDatabase;
 import fr.aboucorp.variantchess.app.db.user.User;
 import fr.aboucorp.variantchess.app.exception.HashException;
 import fr.aboucorp.variantchess.app.multiplayer.NakamaSessionManager;
+import fr.aboucorp.variantchess.app.utils.AuthType;
 import fr.aboucorp.variantchess.app.utils.Encryptor;
 import fr.aboucorp.variantchess.app.views.activities.MainActivity;
-import fr.aboucorp.variantchess.app.views.fragments.AccountFragment;
 
 public class AccountManager {
     private GoogleSignInClient googleSignInClient;
@@ -40,6 +42,7 @@ public class AccountManager {
         googleSignInClient = GoogleSignIn.getClient(mainActivity, gso);
         nakamaSessionManager = NakamaSessionManager.getInstance(mainActivity);
         this.database = VariantChessDatabase.getDatabase(mainActivity);
+
     }
 
     public void authentWithGoogle() {
@@ -58,6 +61,7 @@ public class AccountManager {
             variantChessUser.password = null;
             variantChessUser.userId = nakamaUser.getId();
             variantChessUser.username = nakamaUser.getUsername();
+            variantChessUser.authType = AuthType.MIXED;
             setUserConnected(variantChessUser);
         } catch (ApiException e) {
             Log.e("fr.aboucorp.variantchess", "signInResult:failed code=" + e.getMessage());
@@ -68,9 +72,11 @@ public class AccountManager {
         }
     }
 
-    public void disconnectUser() {
+    public void disconnectUser(User connected) {
         this.googleSignInClient.signOut().addOnCompleteListener(this.mainActivity, task -> Toast.makeText(this.mainActivity,R.string.disconnect_message,Toast.LENGTH_LONG).show());
-        this.mainActivity.setFragment(new AccountFragment());
+        new Thread(() -> {
+            this.database.userDao().disconnectUser(connected.id);
+        }).start();
     }
 
     public User authentWithEmail(String mail, String password,String displayName) throws ExecutionException, InterruptedException {
@@ -81,6 +87,7 @@ public class AccountManager {
         variantChessUser.password = password;
         variantChessUser.userId = nakamaUser.getId();
         variantChessUser.username = nakamaUser.getUsername();
+        variantChessUser.authType = AuthType.MAIL;
         return variantChessUser;
     }
 
@@ -126,11 +133,25 @@ public class AccountManager {
             if(existing != null){
                 existing.isConnected = true;
                 this.database.userDao().update(variantChessUser);
+                Log.i("fr.aboucorp.variantchess","Update user to 'connected'");
             }else{
                 variantChessUser.isConnected = true;
                 this.database.userDao().insertAll(variantChessUser);
+                Log.i("fr.aboucorp.variantchess","Insert new User");
             }
         }).start();
         mainActivity.userIsConnected(variantChessUser);
+    }
+
+    public void cheskConnectedUser() {
+        new Thread(() -> {
+            User connected = this.database.userDao().getConnectedUser();
+            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                @Override
+                public void run() {
+                    AccountManager.this.mainActivity.userIsConnected(connected);
+                }
+            });
+        }).start();
     }
 }

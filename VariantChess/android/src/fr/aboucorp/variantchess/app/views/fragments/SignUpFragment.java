@@ -21,7 +21,7 @@ import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.managers.AccountManager;
 
 
-public class ConnectFragment extends VariantChessFragment implements Validator.ValidationListener {
+public class SignUpFragment extends VariantChessFragment implements Validator.ValidationListener {
     @NotEmpty
     @Email
     public EditText txt_mail;
@@ -38,11 +38,11 @@ public class ConnectFragment extends VariantChessFragment implements Validator.V
 
     private AccountManager accountManager;
 
-    public ConnectFragment() {}
+    public SignUpFragment() {}
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.connexion_layout, container, false);
+        View view = inflater.inflate(R.layout.sign_up_layout, container, false);
         return view;
     }
 

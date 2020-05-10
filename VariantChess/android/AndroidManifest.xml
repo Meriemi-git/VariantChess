@@ -20,7 +20,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="fr.aboucorp.variantchess.app.views.fragments.ConnectFragment"/>
+        <activity android:name="fr.aboucorp.variantchess.app.views.fragments.SignUpFragment"/>
         <activity android:name="fr.aboucorp.variantchess.app.views.activities.BoardActivity"/>
         <uses-library android:name="androidx.test.base" android:required="false" />
         <uses-library android:name="androidx.test.mock" android:required="false" />
