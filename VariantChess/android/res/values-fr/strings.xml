@@ -35,4 +35,8 @@
     <string name="general_lbl_error_connexion">Impossible de se connecter avec ces informations</string>
     <string name="general_lbl_dismiss">Sortir</string>
     <string name="general_error_title">Erreur</string>
+    <string name="general_info_title">Information</string>
+    <string name="link_dialog_message">Nous avons trouvé un compte enregistré pour cette adress mail. Vous pouvez vous connecter avec votre mot de passe pour lier ce compte à votre compte gmail.</string>
+    <string name="general_lbl_cancel">Annuler</string>
+    <string name="general_lbl_confirm">Confimer</string>
 </resources>

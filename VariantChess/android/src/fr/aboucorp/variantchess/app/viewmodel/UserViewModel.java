@@ -11,10 +11,7 @@ import com.heroiclabs.nakama.api.User;
 
 import java.util.List;
 
-import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
-
 public class UserViewModel extends AndroidViewModel {
-    private SessionManager sessionManager;
     private MutableLiveData<User> connected = new MutableLiveData<>();
     public UserViewModel(@NonNull Application application) {
         super(application);

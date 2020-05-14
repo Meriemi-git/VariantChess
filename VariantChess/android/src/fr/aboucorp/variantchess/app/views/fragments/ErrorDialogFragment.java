@@ -31,6 +31,4 @@ public class ErrorDialogFragment extends DialogFragment {
         return builder.create();
     }
 
-
-
 }

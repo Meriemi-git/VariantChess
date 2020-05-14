@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Metadata {
-    Map<String,String> values = new HashMap();
+    public Map<String,String> values = new HashMap();
 
     public Metadata() {}
 
@@ -26,7 +26,7 @@ public class Metadata {
     public static String getJsonFromMetadata(Metadata metadata){
         Gson gson = new Gson();
         Type datasetListType = new TypeToken<Map<String,String>>() {}.getType();
-        String json = gson.toJson(gson.toJson(metadata), datasetListType);
+        String json = gson.toJson(metadata.values, datasetListType);
         return json;
     }
 }

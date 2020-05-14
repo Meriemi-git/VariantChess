@@ -37,5 +37,9 @@
     <string name="general_error_title">Error</string>
     <string name="general_lbl_error_connexion">Cannot connect with there credentials</string>
     <string name="general_lbl_dismiss">Dismiss</string>
+    <string name="general_info_title">Information</string>
+    <string name="link_dialog_message">We found an account for the following mail. You can loggin with your password to link this account to your google account.</string>
+    <string name="general_lbl_cancel">Cancel</string>
+    <string name="general_lbl_confirm">Confirm</string>
 
 </resources>

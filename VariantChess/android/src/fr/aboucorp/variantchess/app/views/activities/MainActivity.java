@@ -11,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -25,6 +26,7 @@ import fr.aboucorp.variantchess.app.utils.SignType;
 import fr.aboucorp.variantchess.app.viewmodel.UserViewModel;
 import fr.aboucorp.variantchess.app.views.fragments.AccountFragment;
 import fr.aboucorp.variantchess.app.views.fragments.HomeFragment;
+import fr.aboucorp.variantchess.app.views.fragments.LinkDialogFragment;
 
 import static fr.aboucorp.variantchess.app.multiplayer.SessionManager.SHARED_PREFERENCE_NAME;
 
@@ -88,7 +90,6 @@ public class MainActivity extends VariantChessActivity {
         return true;
     }
 
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -115,11 +116,15 @@ public class MainActivity extends VariantChessActivity {
     }
 
     @Override
-    protected void bindViews() {
+    public void requestForMailLink(String mail) {
+        DialogFragment linkDialog = new LinkDialogFragment(mail,null);
+        linkDialog.show(getSupportFragmentManager(),"link");
     }
 
     @Override
-    protected void bindListeners() {
+    public void requestForGoogleLink(String googleToken) {
+        DialogFragment linkDialog = new LinkDialogFragment(null,googleToken);
+        linkDialog.show(getSupportFragmentManager(),"link");
     }
 
     @Override
@@ -144,5 +149,15 @@ public class MainActivity extends VariantChessActivity {
         } else {
             setFragment(AccountFragment.class, "account", getIntent().getExtras());
         }
+    }
+
+    @Override
+    public void confirmLinkMailAccount(String mail, String password) {
+        this.sessionManager.confirmLinkMailAccount(mail, password);
+    }
+
+    @Override
+    public void confirmLinkGoogleAccount(String googleToken) {
+        this.sessionManager.confirmLinkGoogleAccount(googleToken);
     }
 }

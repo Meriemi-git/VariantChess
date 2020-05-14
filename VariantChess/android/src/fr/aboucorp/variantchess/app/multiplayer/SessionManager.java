@@ -19,6 +19,7 @@ import com.heroiclabs.nakama.PermissionRead;
 import com.heroiclabs.nakama.PermissionWrite;
 import com.heroiclabs.nakama.Session;
 import com.heroiclabs.nakama.StorageObjectWrite;
+import com.heroiclabs.nakama.api.Rpc;
 import com.heroiclabs.nakama.api.StorageObjectAcks;
 import com.heroiclabs.nakama.api.User;
 
@@ -28,14 +29,14 @@ import java.util.concurrent.ExecutionException;
 import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.utils.SignType;
 import fr.aboucorp.variantchess.app.views.activities.MainActivity;
-import io.grpc.Status;
+import fr.aboucorp.variantchess.app.views.activities.VariantChessActivity;
 import io.grpc.StatusRuntimeException;
 
 public class SessionManager {
     public static final String SHARED_PREFERENCE_NAME = "nakama";
     private static SessionManager INSTANCE;
     private GoogleSignInClient googleSignInClient;
-    private final MainActivity activity;
+    private final VariantChessActivity activity;
     public final Client client = new DefaultClient("defaultkey", "192.168.1.37", 7349, false);
     public Session session;
 
@@ -134,9 +135,13 @@ public class SessionManager {
         GoogleSignInAccount account = null;
         try {
             account = task.getResult(ApiException.class);
-
             com.heroiclabs.nakama.api.User nakamaUser = authentWithGoogle(account.getIdToken(), account.getEmail(), SignType.SIGNIN);
-            activity.userIsConnected(nakamaUser);
+            if(userExist(account.getEmail(),false)){
+                activity.requestForMailLink(account.getEmail());
+                Toast.makeText(activity, "Can link account", Toast.LENGTH_LONG).show();
+            }else{
+                activity.userIsConnected(nakamaUser);
+            }
         } catch (ApiException e) {
             Log.e("fr.aboucorp.variantchess", "Exception message=" + e.getMessage());
             Toast.makeText(activity, R.string.failed_login, Toast.LENGTH_LONG).show();
@@ -146,24 +151,38 @@ public class SessionManager {
         } catch (ExecutionException e) {
             Log.e("fr.aboucorp.variantchess", "Exception message=" + e.getMessage());
             if (e.getCause() instanceof StatusRuntimeException) {
-                Status.Code code = ((StatusRuntimeException) e.getCause()).getStatus().getCode();
-                if (code == Status.Code.UNAUTHENTICATED) {
-                    Toast.makeText(activity, "Can link account", Toast.LENGTH_LONG).show();
-
-                } else if (code == Status.Code.ALREADY_EXISTS) {
-                    Toast.makeText(activity, "Google account already exists", Toast.LENGTH_LONG).show();
-                }else{
-                    Toast.makeText(activity, R.string.failed_login, Toast.LENGTH_LONG).show();
-                }
+                Toast.makeText(activity, R.string.failed_login, Toast.LENGTH_LONG).show();
             }
         }
+    }
+
+    private boolean userExist(String email, boolean searchGoogleAccount) {
+        Metadata metadata = new Metadata();
+        metadata.values.put("email",email);
+        metadata.values.put("searchGoogleAccount",Boolean.toString(searchGoogleAccount));
+        String rpcid = "user_exists";
+        Rpc userExistsRpc = null;
+        try {
+            userExistsRpc = client.rpc(session, rpcid, Metadata.getJsonFromMetadata(metadata)).get();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        Log.i("fr.aboucorp.variantchess",String.format("UserExists return: %s", userExistsRpc.getPayload()));
+        return Boolean.parseBoolean(userExistsRpc.getPayload());
     }
 
     public void signInWithEmail(String mail, String password, String username) throws ExecutionException, InterruptedException {
         authentWithEmail(mail, password, SignType.SIGNIN);
         client.updateAccount(this.session, username);
         User connected = this.client.getAccount(this.session).get().getUser();
-        activity.userIsConnected(connected);
+        if(userExist(mail,false)){
+            activity.requestForGoogleLink(mail);
+            Toast.makeText(activity, "Can link account", Toast.LENGTH_LONG).show();
+        }else{
+            activity.userIsConnected(connected);
+        }
     }
 
     public void signUpWithGoogle() {
@@ -195,9 +214,34 @@ public class SessionManager {
     }
 
     public void destroySession() {
+
     }
 
     public User makeJobOnSession() throws ExecutionException, InterruptedException {
         return this.client.getAccount(session).get().getUser();
+    }
+
+    public void confirmLinkMailAccount(String mail,String password) {
+        try {
+            this.client.linkEmail(session,mail,password).get();
+        } catch (ExecutionException e) {
+            Log.e("fr.aboucorp.variantchess",e.getMessage());
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            Log.e("fr.aboucorp.variantchess",e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    public void confirmLinkGoogleAccount(String googleToken) {
+        try {
+            this.client.linkGoogle(session,googleToken).get();
+        } catch (ExecutionException e) {
+            Log.e("fr.aboucorp.variantchess",e.getMessage());
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            Log.e("fr.aboucorp.variantchess",e.getMessage());
+            e.printStackTrace();
+        }
     }
 }
