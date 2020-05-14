@@ -20,8 +20,12 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.tasks.Task;
 import com.heroiclabs.nakama.api.User;
 
+import java.util.concurrent.ExecutionException;
+
 import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
+import fr.aboucorp.variantchess.app.utils.CauseCodeExtractor;
+import fr.aboucorp.variantchess.app.utils.ExceptionCauseCode;
 import fr.aboucorp.variantchess.app.utils.SignType;
 import fr.aboucorp.variantchess.app.viewmodel.UserViewModel;
 import fr.aboucorp.variantchess.app.views.fragments.AccountFragment;
@@ -116,8 +120,8 @@ public class MainActivity extends VariantChessActivity {
     }
 
     @Override
-    public void requestForMailLink(String mail) {
-        DialogFragment linkDialog = new LinkDialogFragment(mail,null);
+    public void requestForMailLink(String mail,String googleToken) {
+        DialogFragment linkDialog = new LinkDialogFragment(mail,googleToken);
         linkDialog.show(getSupportFragmentManager(),"link");
     }
 
@@ -157,7 +161,16 @@ public class MainActivity extends VariantChessActivity {
     }
 
     @Override
-    public void confirmLinkGoogleAccount(String googleToken) {
-        this.sessionManager.confirmLinkGoogleAccount(googleToken);
+    public void confirmLinkGoogleAccount(String mail,String password,String googleToken) {
+        try {
+            this.sessionManager.confirmLinkGoogleAccount(mail, password,googleToken);
+        } catch (ExecutionException e) {
+            if(CauseCodeExtractor.getCodeValueFromCause(e.getCause()) == ExceptionCauseCode.UNAUTHENTICATED){
+                // TODO display error message
+            }
+            Log.e("fr.aboucorp.variantchess",e.getMessage());
+        } catch (InterruptedException e) {
+            Log.e("fr.aboucorp.variantchess",e.getMessage());
+        }
     }
 }

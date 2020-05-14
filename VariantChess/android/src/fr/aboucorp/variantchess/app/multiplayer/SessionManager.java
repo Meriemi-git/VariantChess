@@ -135,11 +135,11 @@ public class SessionManager {
         GoogleSignInAccount account = null;
         try {
             account = task.getResult(ApiException.class);
-            com.heroiclabs.nakama.api.User nakamaUser = authentWithGoogle(account.getIdToken(), account.getEmail(), SignType.SIGNIN);
             if(userExist(account.getEmail(),false)){
-                activity.requestForMailLink(account.getEmail());
+                activity.requestForMailLink(account.getEmail(),account.getIdToken());
                 Toast.makeText(activity, "Can link account", Toast.LENGTH_LONG).show();
             }else{
+                com.heroiclabs.nakama.api.User nakamaUser = authentWithGoogle(account.getIdToken(), account.getEmail(), SignType.SIGNIN);
                 activity.userIsConnected(nakamaUser);
             }
         } catch (ApiException e) {
@@ -233,15 +233,8 @@ public class SessionManager {
         }
     }
 
-    public void confirmLinkGoogleAccount(String googleToken) {
-        try {
-            this.client.linkGoogle(session,googleToken).get();
-        } catch (ExecutionException e) {
-            Log.e("fr.aboucorp.variantchess",e.getMessage());
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            Log.e("fr.aboucorp.variantchess",e.getMessage());
-            e.printStackTrace();
-        }
+    public void confirmLinkGoogleAccount(String mail,String password,String googleToken) throws ExecutionException, InterruptedException {
+        Session session = this.client.authenticateEmail(mail, password).get();
+        this.client.linkGoogle(session,googleToken).get();
     }
 }

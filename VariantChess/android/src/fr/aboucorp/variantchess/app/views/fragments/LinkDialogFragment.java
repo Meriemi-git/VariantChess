@@ -44,17 +44,14 @@ public class LinkDialogFragment extends DialogFragment implements Validator.Vali
         mail.setText(this.mail);
         final AppCompatButton confirm = view.findViewById(R.id.link_dialog_btn_confirm);
 
-        if(googleToken == null) {
+        if(googleToken != null) {
             link_dialog_txt_pwd = view.findViewById(R.id.link_dialog_txt_pwd);
             validator = new Validator(this);
             validator.setValidationListener(this);
             confirm.setOnClickListener(v -> this.validator.validate());
         }else{
-            confirm.setOnClickListener(v ->  ((VariantChessActivity) getActivity()).confirmLinkGoogleAccount(googleToken));
+
         }
-
-
-
 
         final AppCompatButton cancel = view.findViewById(R.id.link_dialog_btn_cancel);
         cancel.setOnClickListener(v -> dismiss() );
@@ -65,7 +62,7 @@ public class LinkDialogFragment extends DialogFragment implements Validator.Vali
 
     @Override
     public void onValidationSucceeded() {
-        ((VariantChessActivity) getActivity()).confirmLinkMailAccount(mail, link_dialog_txt_pwd.getText().toString());
+        ((VariantChessActivity) getActivity()).confirmLinkGoogleAccount(mail, link_dialog_txt_pwd.getText().toString(),this.googleToken);
     }
 
     @Override
