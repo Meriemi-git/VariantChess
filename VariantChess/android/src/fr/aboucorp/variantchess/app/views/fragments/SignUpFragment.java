@@ -18,7 +18,8 @@ import com.mobsandgeeks.saripaar.annotation.Password;
 import java.util.List;
 
 import fr.aboucorp.variantchess.R;
-import fr.aboucorp.variantchess.app.managers.AccountManager;
+import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
+import fr.aboucorp.variantchess.app.views.activities.MainActivity;
 
 
 public class SignUpFragment extends VariantChessFragment implements Validator.ValidationListener {
@@ -36,9 +37,10 @@ public class SignUpFragment extends VariantChessFragment implements Validator.Va
     private Validator validator;
 
 
-    private AccountManager accountManager;
+    private SessionManager sessionManager;
 
-    public SignUpFragment() {}
+    public SignUpFragment() {
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -49,10 +51,12 @@ public class SignUpFragment extends VariantChessFragment implements Validator.Va
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        sessionManager = SessionManager.getInstance((MainActivity) getActivity());
         bindViews();
         bindListeners();
         validator = new Validator(this);
         validator.setValidationListener(this);
+
     }
 
     @Override
@@ -65,14 +69,13 @@ public class SignUpFragment extends VariantChessFragment implements Validator.Va
 
     @Override
     protected void bindListeners() {
-        this.btn_connexion_google.setOnClickListener(v -> accountManager.signUpWithGoogle());
+        this.btn_connexion_google.setOnClickListener(v -> sessionManager.signUpWithGoogle());
         this.btn_mail_connect.setOnClickListener(v -> validator.validate());
     }
 
     @Override
     public void onValidationSucceeded() {
-            this.accountManager.signUpWithEmail(this.txt_mail.getText().toString(),this.txt_pwd.getText().toString());
-            Toast.makeText(getActivity(), R.string.success_login, Toast.LENGTH_SHORT).show();
+        this.sessionManager.signUpWithEmail(this.txt_mail.getText().toString(), this.txt_pwd.getText().toString());
     }
 
     @Override
@@ -89,10 +92,4 @@ public class SignUpFragment extends VariantChessFragment implements Validator.Va
             }
         }
     }
-
-    public void setAccountManager(AccountManager accountManager) {
-        this.accountManager = accountManager;
-    }
-
-
 }

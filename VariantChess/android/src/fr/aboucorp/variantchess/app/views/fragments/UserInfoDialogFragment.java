@@ -10,8 +10,9 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.fragment.app.DialogFragment;
 
+import com.heroiclabs.nakama.api.User;
+
 import fr.aboucorp.variantchess.R;
-import fr.aboucorp.variantchess.app.db.user.User;
 
 public class UserInfoDialogFragment extends DialogFragment {
     private User user;
@@ -38,9 +39,9 @@ public class UserInfoDialogFragment extends DialogFragment {
         final AppCompatTextView lastname = view.findViewById(R.id.txt_lastname);
         final AppCompatTextView mail = view.findViewById(R.id.txt_mail);
         if (user != null) {
-            firstname.setText(user.displayName);
-            lastname.setText(user.username);
-            mail.setText(user.mail);
+            firstname.setText(user.getDisplayName());
+            lastname.setText(user.getUsername());
+            mail.setText(user.getMetadata());
         }
         alertDialogBuilder.setView(view)
                 .setTitle(getString(R.string.user_info_dialog_title))

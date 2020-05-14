@@ -30,4 +30,9 @@
     <string name="sign_in_error_duplicate_displayname">Username already taken</string>
     <string name="sign_in_error_duplicate_mail">This email is already taken</string>
     <string name="general_unconnected">Disconnected</string>
+    <string name="error_during_signin">Error during signin operation</string>
+    <string name="connected">Connected !</string>
+    <string name="general_error_title">Error</string>
+    <string name="general_lbl_error_connexion">Cannot connect with there credentials</string>
+    <string name="general_lbl_dismiss">Dismiss</string>
 </resources>

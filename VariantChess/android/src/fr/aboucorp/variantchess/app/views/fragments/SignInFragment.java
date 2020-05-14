@@ -1,7 +1,7 @@
 package fr.aboucorp.variantchess.app.views.fragments;
 
-import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,7 +10,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.common.SignInButton;
-import com.mobsandgeeks.saripaar.QuickRule;
 import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.ConfirmPassword;
@@ -19,11 +18,11 @@ import com.mobsandgeeks.saripaar.annotation.NotEmpty;
 import com.mobsandgeeks.saripaar.annotation.Password;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import fr.aboucorp.variantchess.R;
-import fr.aboucorp.variantchess.app.db.VariantChessDatabase;
-import fr.aboucorp.variantchess.app.managers.AccountManager;
-import fr.aboucorp.variantchess.app.multiplayer.NakamaSessionManager;
+import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
+import fr.aboucorp.variantchess.app.views.activities.MainActivity;
 
 public class SignInFragment extends VariantChessFragment  implements Validator.ValidationListener {
 
@@ -41,12 +40,8 @@ public class SignInFragment extends VariantChessFragment  implements Validator.V
     @ConfirmPassword
     public EditText txt_condifm_pwd;
 
-
     private Validator validator;
-    private QuickRule<EditText> uniqueMailRule;
-    private VariantChessDatabase db;
-    private NakamaSessionManager sessionManager;
-    private AccountManager accountManager;
+    private SessionManager sessionManager;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -61,21 +56,7 @@ public class SignInFragment extends VariantChessFragment  implements Validator.V
         bindListeners();
         validator = new Validator(this);
         validator.setValidationListener(this);
-        db = VariantChessDatabase.getDatabase(getActivity());
-        sessionManager = NakamaSessionManager.getInstance(getActivity());
-        this.uniqueMailRule = new QuickRule<EditText>() {
-
-            @Override
-            public boolean isValid(EditText editText) {
-                return db.userDao().findUserByMail(editText.getText().toString()) == null;
-            }
-
-            @Override
-            public String getMessage(Context context) {
-                return context.getString(R.string.sign_in_error_duplicate_mail);
-            }
-        };
-        validator.put(this.txt_username,uniqueMailRule);
+        sessionManager = SessionManager.getInstance((MainActivity) getActivity());
     }
 
     @Override
@@ -90,22 +71,23 @@ public class SignInFragment extends VariantChessFragment  implements Validator.V
 
     @Override
     protected void bindListeners() {
-        this.btn_register.setOnClickListener(v -> this.authentWithMail());
-        this.btn_signin_google.setOnClickListener(v -> this.authentWithGoogle());
-    }
-
-    private void authentWithGoogle(){
-        accountManager.authentWithGoogle();
-        accountManager.signInWithGoogle();
-    }
-
-    private void authentWithMail(){
-        validator.validate(true);
+        this.btn_register.setOnClickListener(v -> validator.validate());
+        this.btn_signin_google.setOnClickListener(v -> sessionManager.signInWithGoogle());
     }
 
     @Override
     public void onValidationSucceeded() {
-        this.accountManager.signInWithEmail(txt_mail.getText().toString(),txt_pwd.getText().toString(),txt_username.getText().toString());
+        try {
+            this.sessionManager.signInWithEmail(txt_mail.getText().toString(),txt_pwd.getText().toString(),txt_username.getText().toString());
+        } catch (ExecutionException e) {
+            Log.i("fr.aboucorp.variantchess","ExecutionException during mail signin message : " + e.getMessage());
+            Toast.makeText(getActivity(), R.string.error_during_signin, Toast.LENGTH_LONG).show();
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            Log.i("fr.aboucorp.variantchess","InterruptedException during mail signin message : " + e.getMessage());
+            Toast.makeText(getActivity(), R.string.error_during_signin, Toast.LENGTH_LONG).show();
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -119,9 +101,5 @@ public class SignInFragment extends VariantChessFragment  implements Validator.V
                 Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
             }
         }
-    }
-
-    public void setAccountManager(AccountManager accountManager) {
-        this.accountManager = accountManager;
     }
 }

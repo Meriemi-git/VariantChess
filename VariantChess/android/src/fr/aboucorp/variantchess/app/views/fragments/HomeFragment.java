@@ -5,17 +5,24 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.heroiclabs.nakama.api.User;
+
+import java.util.concurrent.ExecutionException;
+
 import fr.aboucorp.variantchess.R;
+import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
 import fr.aboucorp.variantchess.app.views.activities.MainActivity;
 
 public class HomeFragment extends VariantChessFragment {
     public Button btn_online_game;
     public Button btn_local_game;
     public Button btn_user_list;
+    private SessionManager sessionManager;
 
     public HomeFragment() {
     }
@@ -25,6 +32,7 @@ public class HomeFragment extends VariantChessFragment {
         super.onViewCreated(view, savedInstanceState);
         this.bindViews();
         this.bindListeners();
+        this.sessionManager = SessionManager.getInstance((MainActivity) getActivity());
     }
 
     @Override
@@ -42,6 +50,16 @@ public class HomeFragment extends VariantChessFragment {
 
     @Override
     protected void bindListeners() {
-        this.btn_user_list.setOnClickListener(v -> ((MainActivity)getActivity()).setFragment(UserListFragment.class,"userList",this.getArguments()));
+        //this.btn_user_list.setOnClickListener(v -> ((MainActivity)getActivity()).setFragment(UserListFragment.class,"userList",this.getArguments()));
+        this.btn_user_list.setOnClickListener(v -> {
+            try {
+                User user = sessionManager.makeJobOnSession();
+                Toast.makeText(getActivity(),user.getUsername(), Toast.LENGTH_LONG).show();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
     }
 }

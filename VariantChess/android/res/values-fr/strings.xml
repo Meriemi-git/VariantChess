@@ -30,4 +30,9 @@
     <string name="sign_in_error_duplicate_displayname">Ce nom d\'utilisateur est déjà pris</string>
     <string name="sign_in_error_duplicate_mail">Cette adresse mail est déjà prise</string>
     <string name="general_unconnected">Déconnecté</string>
+    <string name="error_during_signin">Erreur lors de la création du compte</string>
+    <string name="connected">Connecté !</string>
+    <string name="general_lbl_error_connexion">Impossible de se connecter avec ces informations</string>
+    <string name="general_lbl_dismiss">Sortir</string>
+    <string name="general_error_title">Erreur</string>
 </resources>

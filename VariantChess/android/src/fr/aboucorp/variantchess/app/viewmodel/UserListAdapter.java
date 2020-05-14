@@ -11,10 +11,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.heroiclabs.nakama.api.User;
+
 import java.util.List;
 
 import fr.aboucorp.variantchess.R;
-import fr.aboucorp.variantchess.app.db.user.User;
 import fr.aboucorp.variantchess.app.views.fragments.UserInfoDialogFragment;
 
 public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserViewHolder> {
@@ -47,7 +48,7 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
 
         final User user = userList.get(position);
         if (user != null) {
-            holder.userText.setText(user.displayName + " " + user.username);
+            holder.userText.setText(user.getDisplayName() + " " + user.getUsername());
             holder.itemView.setOnClickListener(v -> {
                 DialogFragment dialogFragment = UserInfoDialogFragment.newInstance(user);
                 dialogFragment.show(((AppCompatActivity) context).getSupportFragmentManager(), "yolo");
@@ -66,7 +67,6 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserVi
 
     static class UserViewHolder extends RecyclerView.ViewHolder {
         private TextView userText;
-
         public UserViewHolder(View itemView) {
             super(itemView);
             userText = itemView.findViewById(R.id.tvuser);

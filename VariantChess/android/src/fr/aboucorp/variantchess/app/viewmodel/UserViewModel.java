@@ -7,22 +7,21 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.heroiclabs.nakama.api.User;
+
 import java.util.List;
 
-import fr.aboucorp.variantchess.app.db.VariantChessDatabase;
-import fr.aboucorp.variantchess.app.db.user.User;
-import fr.aboucorp.variantchess.app.db.user.UserDao;
+import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
 
 public class UserViewModel extends AndroidViewModel {
-    private UserDao userDao;
+    private SessionManager sessionManager;
     private MutableLiveData<User> connected = new MutableLiveData<>();
     public UserViewModel(@NonNull Application application) {
         super(application);
-        this.userDao = VariantChessDatabase.getDatabase(application).userDao();
     }
 
     public LiveData<List<User>> getUsers(){
-        return this.userDao.getAll();
+        return null;
     }
 
     public LiveData<User> getConnected() {
