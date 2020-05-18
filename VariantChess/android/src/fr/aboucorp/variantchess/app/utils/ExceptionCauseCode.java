@@ -1,5 +1,7 @@
 package fr.aboucorp.variantchess.app.utils;
 
+import io.grpc.StatusRuntimeException;
+
 public final class ExceptionCauseCode {
     public static final int OK = 0;
     public static final int CANCELLED = 1;
@@ -18,4 +20,12 @@ public final class ExceptionCauseCode {
     public static final int UNAVAILABLE   = 14;
     public static final int DATA_LOSS   = 15;
     public static final int UNAUTHENTICATED   = 16;
+
+
+    public static int getCodeValueFromCause(Throwable t){
+        if(t instanceof StatusRuntimeException){
+            return ((StatusRuntimeException) t).getStatus().getCode().value();
+        }
+        return -1;
+    }
 }

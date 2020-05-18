@@ -35,9 +35,9 @@ public class UserInfoDialogFragment extends DialogFragment {
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
         View view = getActivity().getLayoutInflater().inflate(R.layout.user_info_dialog_layout, null);
-        final AppCompatTextView firstname = view.findViewById(R.id.txt_firstname);
-        final AppCompatTextView lastname = view.findViewById(R.id.txt_lastname);
-        final AppCompatTextView mail = view.findViewById(R.id.txt_mail);
+        final AppCompatTextView firstname = view.findViewById(R.id.user_dialog_txt_firstname);
+        final AppCompatTextView lastname = view.findViewById(R.id.user_dialog_txt_lastname);
+        final AppCompatTextView mail = view.findViewById(R.id.user_dialog_txt_mail);
         if (user != null) {
             firstname.setText(user.getDisplayName());
             lastname.setText(user.getUsername());

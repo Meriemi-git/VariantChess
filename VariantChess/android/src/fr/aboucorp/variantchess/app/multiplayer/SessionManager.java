@@ -27,7 +27,7 @@ import java.util.Date;
 import java.util.concurrent.ExecutionException;
 
 import fr.aboucorp.variantchess.R;
-import fr.aboucorp.variantchess.app.utils.SignType;
+import fr.aboucorp.variantchess.app.utils.ResultType;
 import fr.aboucorp.variantchess.app.views.activities.MainActivity;
 import fr.aboucorp.variantchess.app.views.activities.VariantChessActivity;
 import io.grpc.StatusRuntimeException;
@@ -55,7 +55,7 @@ public class SessionManager {
         Metadata metadata = new Metadata();
         User connected;
         SharedPreferences pref = activity.getSharedPreferences(SHARED_PREFERENCE_NAME, Context.MODE_PRIVATE);
-        if (signType == SignType.SIGNUP) {
+        if (signType == ResultType.SIGNUP) {
             metadata.values.put("signType", "SIGNIN");
             connected = restoreSessionIfPossible(pref);
             if (connected == null) {
@@ -75,13 +75,13 @@ public class SessionManager {
     public User authentWithGoogle(String idToken, String mail, int signType) throws ExecutionException, InterruptedException {
         Metadata metadata = new Metadata();
         metadata.values.put("mail", mail);
-        User connected;
+        User connected = null;
         SharedPreferences pref = activity.getSharedPreferences(SHARED_PREFERENCE_NAME, Context.MODE_PRIVATE);
-        if (signType == SignType.SIGNUP) {
+        if (signType == ResultType.SIGNUP) {
             metadata.values.put("signType", "SIGNUP");
-            connected = restoreSessionIfPossible(pref);
+            //connected = restoreSessionIfPossible(pref);
             if (connected == null) {
-                this.session = client.authenticateGoogle(idToken, false, "", metadata.values).get();
+                this.session = client.authenticateGoogle(idToken, false).get();
                 connected = this.client.getAccount(session).get().getUser();
             }
         } else {
@@ -128,18 +128,19 @@ public class SessionManager {
 
     public void signInWithGoogle() {
         Intent signInIntent = googleSignInClient.getSignInIntent();
-        activity.startActivityForResult(signInIntent, SignType.SIGNIN);
+        activity.startActivityForResult(signInIntent, ResultType.SIGNIN);
     }
 
     public void handleSignInWithGoogleResult(Task<GoogleSignInAccount> task) {
         GoogleSignInAccount account = null;
         try {
             account = task.getResult(ApiException.class);
+            authentWithGoogle(account.getIdToken(),account.getEmail(),ResultType.SIGNUP);
             if(userExist(account.getEmail(),false)){
-                activity.requestForMailLink(account.getEmail(),account.getIdToken());
+                activity.requestForLink(account.getEmail(),account.getIdToken());
                 Toast.makeText(activity, "Can link account", Toast.LENGTH_LONG).show();
             }else{
-                com.heroiclabs.nakama.api.User nakamaUser = authentWithGoogle(account.getIdToken(), account.getEmail(), SignType.SIGNIN);
+                com.heroiclabs.nakama.api.User nakamaUser = authentWithGoogle(account.getIdToken(), account.getEmail(), ResultType.SIGNIN);
                 activity.userIsConnected(nakamaUser);
             }
         } catch (ApiException e) {
@@ -174,11 +175,11 @@ public class SessionManager {
     }
 
     public void signInWithEmail(String mail, String password, String username) throws ExecutionException, InterruptedException {
-        authentWithEmail(mail, password, SignType.SIGNIN);
+        authentWithEmail(mail, password, ResultType.SIGNIN);
         client.updateAccount(this.session, username);
         User connected = this.client.getAccount(this.session).get().getUser();
         if(userExist(mail,false)){
-            activity.requestForGoogleLink(mail);
+            activity.requestForLink(mail,null);
             Toast.makeText(activity, "Can link account", Toast.LENGTH_LONG).show();
         }else{
             activity.userIsConnected(connected);
@@ -187,13 +188,13 @@ public class SessionManager {
 
     public void signUpWithGoogle() {
         Intent signInIntent = googleSignInClient.getSignInIntent();
-        activity.startActivityForResult(signInIntent, SignType.SIGNUP);
+        activity.startActivityForResult(signInIntent, ResultType.SIGNUP);
     }
 
     public void handleSignUpWithGoogleResult(Task<GoogleSignInAccount> task) {
         try {
             GoogleSignInAccount account = task.getResult(ApiException.class);
-            com.heroiclabs.nakama.api.User nakamaUser = authentWithGoogle(account.getIdToken(), account.getEmail(), SignType.SIGNUP);
+            com.heroiclabs.nakama.api.User nakamaUser = authentWithGoogle(account.getIdToken(), account.getEmail(), ResultType.SIGNUP);
             activity.userIsConnected(nakamaUser);
         } catch (Exception e) {
             Toast.makeText(activity, R.string.failed_login, Toast.LENGTH_LONG).show();
@@ -204,7 +205,7 @@ public class SessionManager {
     public void signUpWithEmail(String mail, String password) {
         User user = null;
         try {
-            user = authentWithEmail(mail, password, SignType.SIGNUP);
+            user = authentWithEmail(mail, password, ResultType.SIGNUP);
             activity.userIsConnected(user);
         } catch (Exception e) {
             Toast.makeText(activity, R.string.failed_login, Toast.LENGTH_LONG).show();

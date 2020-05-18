@@ -61,10 +61,10 @@ public class SignUpFragment extends VariantChessFragment implements Validator.Va
 
     @Override
     protected void bindViews() {
-        this.txt_mail = getView().findViewById(R.id.txt_mail);
-        this.txt_pwd = getView().findViewById(R.id.txt_pwd);
-        this.btn_mail_connect = getView().findViewById(R.id.btn_mail_connect);
-        this.btn_connexion_google = getView().findViewById(R.id.btn_signup_google);
+        this.txt_mail = getView().findViewById(R.id.signup_txt_mail);
+        this.txt_pwd = getView().findViewById(R.id.signup_txt_pwd);
+        this.btn_mail_connect = getView().findViewById(R.id.signup_btn_mail_connect);
+        this.btn_connexion_google = getView().findViewById(R.id.signup_btn_signup_google);
     }
 
     @Override

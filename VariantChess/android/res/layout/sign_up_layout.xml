@@ -6,7 +6,6 @@
     android:orientation="vertical">
 
     <TextView
-        android:id="@+id/register_username"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingBottom="20dp"
@@ -14,7 +13,7 @@
         android:textSize="24sp" />
 
     <EditText
-        android:id="@+id/txt_mail"
+        android:id="@+id/signup_txt_mail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:autofillHints=""
@@ -24,7 +23,7 @@
         android:inputType="textEmailAddress" />
 
     <EditText
-        android:id="@+id/txt_pwd"
+        android:id="@+id/signup_txt_pwd"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:autofillHints=""
@@ -34,7 +33,7 @@
         android:inputType="textPassword" />
 
     <Button
-        android:id="@+id/btn_mail_connect"
+        android:id="@+id/signup_btn_mail_connect"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/lbl_connect"
@@ -48,7 +47,6 @@
         android:paddingTop="40dp">
 
         <TextView
-            android:id="@+id/textView3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingBottom="20dp"
@@ -56,7 +54,7 @@
             android:textSize="24sp" />
 
         <com.google.android.gms.common.SignInButton
-            android:id="@+id/btn_signup_google"
+            android:id="@+id/signup_btn_signup_google"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 

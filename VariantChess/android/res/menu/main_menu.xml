@@ -10,7 +10,7 @@
         android:title="@string/menu_action_settings"
         app:showAsAction="never"/>
     <item android:id="@+id/menu_action_disconnect"
-        android:title="@string/menu_action_disconnect"
+        android:title="@string/general_disconnect"
         app:showAsAction="never"/>
 
 </menu>

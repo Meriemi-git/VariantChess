@@ -5,17 +5,17 @@
     android:orientation="vertical">
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/txt_firstname"
+        android:id="@+id/user_dialog_txt_firstname"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/txt_lastname"
+        android:id="@+id/user_dialog_txt_lastname"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:id="@+id/txt_mail"
+        android:id="@+id/user_dialog_txt_mail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 </LinearLayout>

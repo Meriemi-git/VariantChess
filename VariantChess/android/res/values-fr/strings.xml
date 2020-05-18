@@ -18,7 +18,7 @@
     <string name="lbl_local_game">Partie locale</string>
     <string name="menu_action_profil">Profil</string>
     <string name="menu_action_settings">Paramètres</string>
-    <string name="menu_action_disconnect">Déconexion</string>
+    <string name="general_disconnect">Déconexion</string>
     <string name="disconnect_message">Déconnecté</string>
     <string name="lbl_err_email">Adresse mail invalid</string>
     <string name="success_login">Connexion réussie</string>
@@ -36,7 +36,9 @@
     <string name="general_lbl_dismiss">Sortir</string>
     <string name="general_error_title">Erreur</string>
     <string name="general_info_title">Information</string>
-    <string name="link_dialog_message">Nous avons trouvé un compte enregistré pour cette adress mail. Vous pouvez vous connecter avec votre mot de passe pour lier ce compte à votre compte gmail.</string>
+    <string name="link_mail_message">Nous avons trouvé un compte pour @. Saisissez votre mot de passe pour vous connecter avec Google la prochaine fois.</string>
     <string name="general_lbl_cancel">Annuler</string>
     <string name="general_lbl_confirm">Confimer</string>
+    <string name="error_wrong_password">Mot de passe incorrect</string>
+    <string name="general_password">Mot de passe</string>
 </resources>

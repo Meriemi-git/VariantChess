@@ -3,15 +3,17 @@ package fr.aboucorp.variantchess.app.views.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
-import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -24,13 +26,12 @@ import java.util.concurrent.ExecutionException;
 
 import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
-import fr.aboucorp.variantchess.app.utils.CauseCodeExtractor;
 import fr.aboucorp.variantchess.app.utils.ExceptionCauseCode;
-import fr.aboucorp.variantchess.app.utils.SignType;
+import fr.aboucorp.variantchess.app.utils.ResultType;
 import fr.aboucorp.variantchess.app.viewmodel.UserViewModel;
 import fr.aboucorp.variantchess.app.views.fragments.AccountFragment;
 import fr.aboucorp.variantchess.app.views.fragments.HomeFragment;
-import fr.aboucorp.variantchess.app.views.fragments.LinkDialogFragment;
+import fr.aboucorp.variantchess.app.views.fragments.LinkFragment;
 
 import static fr.aboucorp.variantchess.app.multiplayer.SessionManager.SHARED_PREFERENCE_NAME;
 
@@ -120,24 +121,21 @@ public class MainActivity extends VariantChessActivity {
     }
 
     @Override
-    public void requestForMailLink(String mail,String googleToken) {
-        DialogFragment linkDialog = new LinkDialogFragment(mail,googleToken);
-        linkDialog.show(getSupportFragmentManager(),"link");
+    public void requestForLink(String mail, String googleToken) {
+        Bundle args = new Bundle();
+        args.putString("mail",mail);
+        args.putString("googleToken",googleToken);
+        setFragment(LinkFragment.class,"link",args);
     }
 
-    @Override
-    public void requestForGoogleLink(String googleToken) {
-        DialogFragment linkDialog = new LinkDialogFragment(null,googleToken);
-        linkDialog.show(getSupportFragmentManager(),"link");
-    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == SignType.SIGNIN) {
+        if (requestCode == ResultType.SIGNIN) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             this.sessionManager.handleSignInWithGoogleResult(task);
-        } else if (requestCode == SignType.SIGNUP) {
+        } else if (requestCode == ResultType.SIGNUP) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             this.sessionManager.handleSignUpWithGoogleResult(task);
         }
@@ -156,19 +154,22 @@ public class MainActivity extends VariantChessActivity {
     }
 
     @Override
-    public void confirmLinkMailAccount(String mail, String password) {
-        this.sessionManager.confirmLinkMailAccount(mail, password);
-    }
-
-    @Override
-    public void confirmLinkGoogleAccount(String mail,String password,String googleToken) {
+    public void confirmLinkAccount(String mail, String password, String googleToken) {
         try {
-            this.sessionManager.confirmLinkGoogleAccount(mail, password,googleToken);
-        } catch (ExecutionException e) {
-            if(CauseCodeExtractor.getCodeValueFromCause(e.getCause()) == ExceptionCauseCode.UNAUTHENTICATED){
-                // TODO display error message
+            if(googleToken != null) {
+                this.sessionManager.confirmLinkGoogleAccount(mail, password, googleToken);
+            }else{
+                this.sessionManager.confirmLinkMailAccount(mail, password);
             }
-            Log.e("fr.aboucorp.variantchess",e.getMessage());
+        } catch (ExecutionException e) {
+            if(ExceptionCauseCode.getCodeValueFromCause(e.getCause()) == ExceptionCauseCode.UNAUTHENTICATED){
+                Toast toast = Toast.makeText(this, R.string.error_wrong_password, Toast.LENGTH_LONG);
+                View toastView = toast.getView();
+                toastView.getBackground().setColorFilter(Color.argb(0.5f,233f,89f,28f), PorterDuff.Mode.SRC_IN);
+                TextView text = toastView.findViewById(android.R.id.message);
+                text.setTextColor(Color.WHITE);
+                toast.show();
+            }
         } catch (InterruptedException e) {
             Log.e("fr.aboucorp.variantchess",e.getMessage());
         }
