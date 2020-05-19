@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">VariantChess</string>
+    <string name="btn_launch_game">Launch</string>
+    <string name="btn_end_turn">End turn</string>
+    <string name="lbl_connect">Connection</string>
+    <string name="lbl_create_account">Create account</string>
+    <string name="lbl_btn_facebook">Facebook</string>
+    <string name="lbl_btn_google">Google</string>
+    <string name="lbl_hint_email">example@test.com</string>
+    <string name="lbl_hint_password">8 character with numbers</string>
+    <string name="app_id">737891246568</string>
+    <string name="lbl_mail_connect">Connect with your mail</string>
+    <string name="lbl_google_connect">Or with your Google account</string>
+    <string name="lbl_confirm">Connect</string>
+    <string name="menu_icon">Menu icon</string>
+    <string name="lbl_online_game">Online game</string>
+    <string name="lbl_local_game">Local game</string>
+    <string name="menu_action_profil">Profile</string>
+    <string name="menu_action_settings">Settings</string>
+    <string name="general_disconnect">Disconnect</string>
+    <string name="disconnect_message">Disconnected</string>
+    <string name="lbl_err_email">Mail invalid</string>
+    <string name="success_login">Login successfull</string>
+    <string name="failed_login">Login failed</string>
+    <string name="server_client_id" translatable="false">737891246568-lrqnd68abhib2c1lo8egqa2ofvp1lk0u.apps.googleusercontent.com</string>
+    <string name="user_info_dialog_title">User infos</string>
+    <string name="general_close">Close</string>
+    <string name="sign_in_lbl_account_creation">Create your account with your email</string>
+    <string name="username_hint_username">Username</string>
+    <string name="sign_in_error_duplicate_displayname">Username already taken</string>
+    <string name="sign_in_error_duplicate_mail">This email is already taken</string>
+    <string name="general_unconnected">Disconnected</string>
+    <string name="error_during_signin">Error during signin operation</string>
+    <string name="connected">Connected !</string>
+    <string name="general_error_title">Error</string>
+    <string name="general_lbl_error_connexion">Cannot connect with there credentials</string>
+    <string name="general_lbl_dismiss">Dismiss</string>
+    <string name="general_info_title">Information</string>
+    <string name="link_mail_message">We found an account for @. Enter your password to logon with your google account next time.</string>
+    <string name="general_lbl_cancel">Cancel</string>
+    <string name="general_lbl_confirm">Confirm</string>
+    <string name="error_wrong_password">Wrong password</string>
+    <string name="general_password">Password</string>
+    <string name="lbl_link_title">Link your account</string>
+    <string name="link_google_message">We found a google account for @. Login with it to link your account an signup autmatically with yo</string>
+    <string name="username_already_exists">This username is already taken</string>
+    <string name="username_lbl_choose_username">Choose your username</string>
+    <string name="signin_lbl_mail">Enter your mail</string>
+    <string name="signin_lbl_password">Enter your password</string>
+    <string name="signin_lbl_confirm_password">Confirm your password</string>
+    <string name="online_lbl_gamemode">Select a game mode</string>
+    <string name="home_lbl_new_game">New game</string>
+    <string name="new_game_lbl_launch">Launch</string>
+    <string name="new_game_online">Online</string>
+    <string name="new_game_offline">Offline</string>
+    <string name="matchmaking_failed">Matchmaking error, please relaunch it.</string>
+    <string name="matchmaking_success">Match found</string>
+
+</resources>
