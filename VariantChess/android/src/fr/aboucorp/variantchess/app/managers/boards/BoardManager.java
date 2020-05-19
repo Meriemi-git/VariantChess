@@ -8,23 +8,23 @@ import fr.aboucorp.variantchess.entities.ChessColor;
 import fr.aboucorp.variantchess.entities.Location;
 import fr.aboucorp.variantchess.entities.Piece;
 import fr.aboucorp.variantchess.entities.Square;
+import fr.aboucorp.variantchess.entities.Turn;
+import fr.aboucorp.variantchess.entities.boards.Board;
 import fr.aboucorp.variantchess.entities.enums.GameState;
 import fr.aboucorp.variantchess.entities.events.GameEventManager;
 import fr.aboucorp.variantchess.entities.events.GameEventSubscriber;
-import fr.aboucorp.variantchess.entities.events.models.TurnEndEvent;
-import fr.aboucorp.variantchess.entities.exceptions.FenStringBadFormatException;
-import fr.aboucorp.variantchess.libgdx.Board3dManager;
-import fr.aboucorp.variantchess.libgdx.models.ChessModel;
-import fr.aboucorp.variantchess.entities.Turn;
-import fr.aboucorp.variantchess.entities.boards.Board;
 import fr.aboucorp.variantchess.entities.events.models.GameEvent;
 import fr.aboucorp.variantchess.entities.events.models.MoveEvent;
 import fr.aboucorp.variantchess.entities.events.models.PartyEvent;
 import fr.aboucorp.variantchess.entities.events.models.PieceEvent;
+import fr.aboucorp.variantchess.entities.events.models.TurnEndEvent;
 import fr.aboucorp.variantchess.entities.events.models.TurnEvent;
 import fr.aboucorp.variantchess.entities.events.models.TurnStartEvent;
-import fr.aboucorp.variantchess.entities.rules.AbstracRuleSet;
+import fr.aboucorp.variantchess.entities.exceptions.FenStringBadFormatException;
+import fr.aboucorp.variantchess.entities.rules.AbstractRuleSet;
 import fr.aboucorp.variantchess.entities.utils.SquareList;
+import fr.aboucorp.variantchess.libgdx.Board3dManager;
+import fr.aboucorp.variantchess.libgdx.models.ChessModel;
 
 public abstract class BoardManager implements GameEventSubscriber {
     protected final fr.aboucorp.variantchess.entities.boards.Board board;
@@ -33,12 +33,12 @@ public abstract class BoardManager implements GameEventSubscriber {
     protected GameEventManager eventManager;
     protected fr.aboucorp.variantchess.entities.Turn previousTurn;
     protected Turn actualTurn;
-    protected final fr.aboucorp.variantchess.entities.rules.AbstracRuleSet ruleSet;
+    protected final AbstractRuleSet ruleSet;
     protected SquareList possiblesMoves;
     private GameState gameState;
 
 
-    public BoardManager(Board board, Board3dManager board3dManager, AbstracRuleSet ruleSet) {
+    public BoardManager(Board board, Board3dManager board3dManager, AbstractRuleSet ruleSet) {
         this.board = board;
         this.board3dManager = board3dManager;
         this.ruleSet = ruleSet;

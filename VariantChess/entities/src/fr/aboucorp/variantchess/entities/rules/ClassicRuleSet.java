@@ -2,29 +2,29 @@ package fr.aboucorp.variantchess.entities.rules;
 
 import java.util.List;
 
-import fr.aboucorp.variantchess.entities.enums.BoardEventType;
-import fr.aboucorp.variantchess.entities.events.GameEventManager;
-import fr.aboucorp.variantchess.entities.events.GameEventSubscriber;
-import fr.aboucorp.variantchess.entities.events.models.BoardEvent;
-import fr.aboucorp.variantchess.entities.events.models.CheckOutEvent;
-import fr.aboucorp.variantchess.entities.events.models.TurnEndEvent;
 import fr.aboucorp.variantchess.entities.ChessColor;
 import fr.aboucorp.variantchess.entities.Piece;
 import fr.aboucorp.variantchess.entities.Square;
+import fr.aboucorp.variantchess.entities.Turn;
 import fr.aboucorp.variantchess.entities.boards.Board;
+import fr.aboucorp.variantchess.entities.enums.BoardEventType;
 import fr.aboucorp.variantchess.entities.enums.PieceId;
+import fr.aboucorp.variantchess.entities.events.GameEventManager;
+import fr.aboucorp.variantchess.entities.events.GameEventSubscriber;
+import fr.aboucorp.variantchess.entities.events.models.BoardEvent;
 import fr.aboucorp.variantchess.entities.events.models.CastlingEvent;
 import fr.aboucorp.variantchess.entities.events.models.CheckInEvent;
+import fr.aboucorp.variantchess.entities.events.models.CheckOutEvent;
 import fr.aboucorp.variantchess.entities.events.models.EnPassantEvent;
+import fr.aboucorp.variantchess.entities.events.models.GameEvent;
 import fr.aboucorp.variantchess.entities.events.models.PartyEvent;
+import fr.aboucorp.variantchess.entities.events.models.PieceEvent;
+import fr.aboucorp.variantchess.entities.events.models.TurnEndEvent;
+import fr.aboucorp.variantchess.entities.events.models.TurnEvent;
 import fr.aboucorp.variantchess.entities.events.models.TurnStartEvent;
 import fr.aboucorp.variantchess.entities.utils.PieceList;
-import fr.aboucorp.variantchess.entities.Turn;
-import fr.aboucorp.variantchess.entities.events.models.GameEvent;
-import fr.aboucorp.variantchess.entities.events.models.PieceEvent;
-import fr.aboucorp.variantchess.entities.events.models.TurnEvent;
 
-public class ClassicRuleSet extends AbstracRuleSet implements GameEventSubscriber {
+public class ClassicRuleSet extends AbstractRuleSet implements GameEventSubscriber {
 
     private final Board board;
     public static int FIFTY_MOVE_RULE_NUMBER = 75;

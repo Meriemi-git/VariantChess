@@ -11,16 +11,17 @@ public class MetadataTest {
     public void getMetadataFromString() {
         String okString = "{\"email\":\"test@test.com\",\"searchGoogleAccount\":\"true\"}";
         Metadata metadata = new Metadata();
-        metadata.values.put("email","test@test.com");
-        metadata.values.put("searchGoogleAccount",Boolean.toString(true));
-        Assert.assertEquals(Metadata.getJsonFromMetadata(metadata),okString);
+        metadata.put("email","test@test.com");
+        metadata.put("searchGoogleAccount",Boolean.toString(true));
+        Assert.assertEquals(metadata.getJsonFromMetadata(),okString);
     }
 
     @Test
     public void getJsonFromMetadata() {
         String okString = "{\"email\":\"test@test.com\",\"searchGoogleAccount\":\"true\"}";
-        Metadata metadata = Metadata.getMetadataFromString(okString);
-        Assert.assertEquals(metadata.values.get("email"),"test@test.com");
-        Assert.assertEquals(metadata.values.get("searchGoogleAccount"),"true");
+        Metadata metadata = new Metadata();
+        metadata.setMetadataFromString(okString);
+        Assert.assertEquals(metadata.get("email"),"test@test.com");
+        Assert.assertEquals(metadata.get("searchGoogleAccount"),"true");
     }
 }

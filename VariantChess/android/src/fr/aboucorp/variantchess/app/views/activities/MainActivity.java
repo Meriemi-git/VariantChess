@@ -1,15 +1,12 @@
 package fr.aboucorp.variantchess.app.views.activities;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -17,21 +14,14 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.tasks.Task;
 import com.heroiclabs.nakama.api.User;
-
-import java.util.concurrent.ExecutionException;
 
 import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
-import fr.aboucorp.variantchess.app.utils.ExceptionCauseCode;
-import fr.aboucorp.variantchess.app.utils.ResultType;
 import fr.aboucorp.variantchess.app.viewmodel.UserViewModel;
 import fr.aboucorp.variantchess.app.views.fragments.AccountFragment;
 import fr.aboucorp.variantchess.app.views.fragments.HomeFragment;
-import fr.aboucorp.variantchess.app.views.fragments.LinkFragment;
+import fr.aboucorp.variantchess.app.views.fragments.UsernameFragment;
 
 import static fr.aboucorp.variantchess.app.multiplayer.SessionManager.SHARED_PREFERENCE_NAME;
 
@@ -53,11 +43,6 @@ public class MainActivity extends VariantChessActivity {
         try {
             user = this.sessionManager.restoreSessionIfPossible(pref);
             userIsConnected(user);
-            if (user != null) {
-                setFragment(HomeFragment.class, "home", savedInstanceState);
-            } else {
-                setFragment(AccountFragment.class, "account", savedInstanceState);
-            }
         } catch (Exception e) {
             Log.e("fr.aboucorp.variantchess", e.getMessage());
             e.printStackTrace();
@@ -120,58 +105,19 @@ public class MainActivity extends VariantChessActivity {
         }
     }
 
-    @Override
-    public void requestForLink(String mail, String googleToken) {
-        Bundle args = new Bundle();
-        args.putString("mail",mail);
-        args.putString("googleToken",googleToken);
-        setFragment(LinkFragment.class,"link",args);
-    }
-
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == ResultType.SIGNIN) {
-            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            this.sessionManager.handleSignInWithGoogleResult(task);
-        } else if (requestCode == ResultType.SIGNUP) {
-            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            this.sessionManager.handleSignUpWithGoogleResult(task);
-        }
-    }
-
     public void userIsConnected(User connected) {
         TextView userText = toolbar.findViewById(R.id.lbl_display_name);
         this.userViewModel.setConnected(connected);
         if (connected != null) {
-            userText.setText(connected.getDisplayName());
-            setFragment(HomeFragment.class, "home", getIntent().getExtras());
-            Toast.makeText(this, R.string.connected, Toast.LENGTH_LONG).show();
+            if(TextUtils.isEmpty(connected.getDisplayName())){
+                setFragment(UsernameFragment.class, "username", getIntent().getExtras());
+            }else{
+                userText.setText(connected.getDisplayName());
+                setFragment(HomeFragment.class, "home", getIntent().getExtras());
+                Toast.makeText(this, R.string.connected, Toast.LENGTH_LONG).show();
+            }
         } else {
             setFragment(AccountFragment.class, "account", getIntent().getExtras());
-        }
-    }
-
-    @Override
-    public void confirmLinkAccount(String mail, String password, String googleToken) {
-        try {
-            if(googleToken != null) {
-                this.sessionManager.confirmLinkGoogleAccount(mail, password, googleToken);
-            }else{
-                this.sessionManager.confirmLinkMailAccount(mail, password);
-            }
-        } catch (ExecutionException e) {
-            if(ExceptionCauseCode.getCodeValueFromCause(e.getCause()) == ExceptionCauseCode.UNAUTHENTICATED){
-                Toast toast = Toast.makeText(this, R.string.error_wrong_password, Toast.LENGTH_LONG);
-                View toastView = toast.getView();
-                toastView.getBackground().setColorFilter(Color.argb(0.5f,233f,89f,28f), PorterDuff.Mode.SRC_IN);
-                TextView text = toastView.findViewById(android.R.id.message);
-                text.setTextColor(Color.WHITE);
-                toast.show();
-            }
-        } catch (InterruptedException e) {
-            Log.e("fr.aboucorp.variantchess",e.getMessage());
         }
     }
 }

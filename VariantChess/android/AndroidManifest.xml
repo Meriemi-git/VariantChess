@@ -21,7 +21,7 @@
             </intent-filter>
         </activity>
         <activity android:name="fr.aboucorp.variantchess.app.views.fragments.SignUpFragment"/>
-        <activity android:name="fr.aboucorp.variantchess.app.views.activities.BoardActivity"/>
+        <activity android:name="fr.aboucorp.variantchess.app.views.fragments.BoardFragment"/>
         <uses-library android:name="androidx.test.base" android:required="false" />
         <uses-library android:name="androidx.test.mock" android:required="false" />
         <meta-data android:name="com.google.android.gms.games.APP_ID"

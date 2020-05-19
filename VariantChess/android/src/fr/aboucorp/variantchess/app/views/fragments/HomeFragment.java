@@ -5,23 +5,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.heroiclabs.nakama.api.User;
-
-import java.util.concurrent.ExecutionException;
-
 import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
 import fr.aboucorp.variantchess.app.views.activities.MainActivity;
+import fr.aboucorp.variantchess.app.views.activities.VariantChessActivity;
 
 public class HomeFragment extends VariantChessFragment {
-    public Button btn_online_game;
-    public Button btn_local_game;
-    public Button btn_user_list;
+    public Button home_btn_online_game;
     private SessionManager sessionManager;
 
     public HomeFragment() {
@@ -43,23 +37,13 @@ public class HomeFragment extends VariantChessFragment {
 
     @Override
     protected void bindViews() {
-        this.btn_local_game =  getView().findViewById(R.id.btn_local_game);
-        this.btn_online_game =  getView().findViewById(R.id.btn_online_game);
-        this.btn_user_list =  getView().findViewById(R.id.btn_user_list);
+        this.home_btn_online_game =  getView().findViewById(R.id.home_btn_online_game);
     }
 
     @Override
     protected void bindListeners() {
-        //this.btn_user_list.setOnClickListener(v -> ((MainActivity)getActivity()).setFragment(UserListFragment.class,"userList",this.getArguments()));
-        this.btn_user_list.setOnClickListener(v -> {
-            try {
-                User user = sessionManager.makeJobOnSession();
-                Toast.makeText(getActivity(),user.getUsername(), Toast.LENGTH_LONG).show();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+        this.home_btn_online_game.setOnClickListener(v -> {
+            ((VariantChessActivity)getActivity()).setFragment(NewGameFragment.class,"newGame",getArguments());
         });
     }
 }

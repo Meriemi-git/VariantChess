@@ -8,7 +8,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.google.android.gms.common.SignInButton;
 import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.Email;
@@ -31,8 +30,6 @@ public class SignUpFragment extends VariantChessFragment implements Validator.Va
     public EditText txt_pwd;
 
     public Button btn_mail_connect;
-
-    public SignInButton btn_connexion_google;
 
     private Validator validator;
 
@@ -64,12 +61,10 @@ public class SignUpFragment extends VariantChessFragment implements Validator.Va
         this.txt_mail = getView().findViewById(R.id.signup_txt_mail);
         this.txt_pwd = getView().findViewById(R.id.signup_txt_pwd);
         this.btn_mail_connect = getView().findViewById(R.id.signup_btn_mail_connect);
-        this.btn_connexion_google = getView().findViewById(R.id.signup_btn_signup_google);
     }
 
     @Override
     protected void bindListeners() {
-        this.btn_connexion_google.setOnClickListener(v -> sessionManager.signUpWithGoogle());
         this.btn_mail_connect.setOnClickListener(v -> validator.validate());
     }
 

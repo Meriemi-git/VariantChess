@@ -1,36 +1,36 @@
 package fr.aboucorp.variantchess.app.multiplayer;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.core.os.ConfigurationCompat;
+
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.tasks.Task;
 import com.heroiclabs.nakama.Client;
 import com.heroiclabs.nakama.DefaultClient;
 import com.heroiclabs.nakama.DefaultSession;
-import com.heroiclabs.nakama.PermissionRead;
-import com.heroiclabs.nakama.PermissionWrite;
+import com.heroiclabs.nakama.MatchmakerTicket;
 import com.heroiclabs.nakama.Session;
-import com.heroiclabs.nakama.StorageObjectWrite;
+import com.heroiclabs.nakama.SocketClient;
 import com.heroiclabs.nakama.api.Rpc;
-import com.heroiclabs.nakama.api.StorageObjectAcks;
 import com.heroiclabs.nakama.api.User;
 
 import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 import java.util.concurrent.ExecutionException;
 
 import fr.aboucorp.variantchess.R;
+import fr.aboucorp.variantchess.app.exception.UsernameDuplicateException;
+import fr.aboucorp.variantchess.app.utils.ExceptionCauseCode;
 import fr.aboucorp.variantchess.app.utils.ResultType;
-import fr.aboucorp.variantchess.app.views.activities.MainActivity;
 import fr.aboucorp.variantchess.app.views.activities.VariantChessActivity;
-import io.grpc.StatusRuntimeException;
+import fr.aboucorp.variantchess.entities.GameMode;
 
 public class SessionManager {
     public static final String SHARED_PREFERENCE_NAME = "nakama";
@@ -40,7 +40,7 @@ public class SessionManager {
     public final Client client = new DefaultClient("defaultkey", "192.168.1.37", 7349, false);
     public Session session;
 
-    private SessionManager(MainActivity activity) {
+    private SessionManager(VariantChessActivity activity) {
         this.activity = activity;
         String appId = activity.getResources().getString(R.string.server_client_id);
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -52,53 +52,25 @@ public class SessionManager {
     }
 
     public User authentWithEmail(String mail, String password, int signType) throws ExecutionException, InterruptedException {
-        Metadata metadata = new Metadata();
+        Metadata<String> metadata = new Metadata();
         User connected;
         SharedPreferences pref = activity.getSharedPreferences(SHARED_PREFERENCE_NAME, Context.MODE_PRIVATE);
         if (signType == ResultType.SIGNUP) {
-            metadata.values.put("signType", "SIGNIN");
+            metadata.put("signType", "SIGNUP");
             connected = restoreSessionIfPossible(pref);
             if (connected == null) {
                 this.session = client.authenticateEmail(mail, password, false).get();
                 connected = this.client.getAccount(session).get().getUser();
             }
         } else {
-            metadata.values.put("signType", "SIGNIN");
-            this.session = client.authenticateEmail(mail, password, metadata.values).get();
+            metadata.put("signType", "SIGNIN");
+            this.session = client.authenticateEmail(mail, password, metadata).get();
             connected = this.client.getAccount(session).get().getUser();
         }
         pref.edit().putString("nk.session", session.getAuthToken()).apply();
         return connected;
     }
 
-
-    public User authentWithGoogle(String idToken, String mail, int signType) throws ExecutionException, InterruptedException {
-        Metadata metadata = new Metadata();
-        metadata.values.put("mail", mail);
-        User connected = null;
-        SharedPreferences pref = activity.getSharedPreferences(SHARED_PREFERENCE_NAME, Context.MODE_PRIVATE);
-        if (signType == ResultType.SIGNUP) {
-            metadata.values.put("signType", "SIGNUP");
-            //connected = restoreSessionIfPossible(pref);
-            if (connected == null) {
-                this.session = client.authenticateGoogle(idToken, false).get();
-                connected = this.client.getAccount(session).get().getUser();
-            }
-        } else {
-            metadata.values.put("signType", "SIGNIN");
-            this.session = client.authenticateGoogle(idToken, metadata.values).get();
-            registerGoogleMail(mail);
-            connected = this.client.getAccount(session).get().getUser();
-        }
-        pref.edit().putString("nk.session", session.getAuthToken()).apply();
-        return connected;
-    }
-
-    private void registerGoogleMail(String mail) throws ExecutionException, InterruptedException {
-        String json = "{\"mail\":\"" + mail + "\"}";
-        StorageObjectWrite googleMailObject = new StorageObjectWrite("user_infos", "mail", json, PermissionRead.OWNER_READ, PermissionWrite.OWNER_WRITE);
-        StorageObjectAcks acks = client.writeStorageObjects(session, googleMailObject).get();
-    }
 
     public User restoreSessionIfPossible(SharedPreferences pref) throws InterruptedException {
         // Lets check if we can restore a cached session.
@@ -119,54 +91,25 @@ public class SessionManager {
         return null;
     }
 
-    public static SessionManager getInstance(MainActivity activity) {
+    public static SessionManager getInstance(VariantChessActivity activity) {
         if (INSTANCE == null) {
             INSTANCE = new SessionManager(activity);
         }
         return INSTANCE;
     }
 
-    public void signInWithGoogle() {
-        Intent signInIntent = googleSignInClient.getSignInIntent();
-        activity.startActivityForResult(signInIntent, ResultType.SIGNIN);
-    }
-
-    public void handleSignInWithGoogleResult(Task<GoogleSignInAccount> task) {
-        GoogleSignInAccount account = null;
-        try {
-            account = task.getResult(ApiException.class);
-            authentWithGoogle(account.getIdToken(),account.getEmail(),ResultType.SIGNUP);
-            if(userExist(account.getEmail(),false)){
-                activity.requestForLink(account.getEmail(),account.getIdToken());
-                Toast.makeText(activity, "Can link account", Toast.LENGTH_LONG).show();
-            }else{
-                com.heroiclabs.nakama.api.User nakamaUser = authentWithGoogle(account.getIdToken(), account.getEmail(), ResultType.SIGNIN);
-                activity.userIsConnected(nakamaUser);
-            }
-        } catch (ApiException e) {
-            Log.e("fr.aboucorp.variantchess", "Exception message=" + e.getMessage());
-            Toast.makeText(activity, R.string.failed_login, Toast.LENGTH_LONG).show();
-        } catch (InterruptedException e) {
-            Log.e("fr.aboucorp.variantchess", "Exception message=" + e.getMessage());
-            Toast.makeText(activity, R.string.failed_login, Toast.LENGTH_LONG).show();
-        } catch (ExecutionException e) {
-            Log.e("fr.aboucorp.variantchess", "Exception message=" + e.getMessage());
-            if (e.getCause() instanceof StatusRuntimeException) {
-                Toast.makeText(activity, R.string.failed_login, Toast.LENGTH_LONG).show();
-            }
-        }
-    }
-
     private boolean userExist(String email, boolean searchGoogleAccount) {
         Metadata metadata = new Metadata();
-        metadata.values.put("email",email);
-        metadata.values.put("searchGoogleAccount",Boolean.toString(searchGoogleAccount));
+        metadata.put("email",email);
+        metadata.put("searchGoogleAccount",Boolean.toString(searchGoogleAccount));
         String rpcid = "user_exists";
         Rpc userExistsRpc = null;
         try {
-            userExistsRpc = client.rpc(session, rpcid, Metadata.getJsonFromMetadata(metadata)).get();
+            userExistsRpc = client.rpc(session, rpcid, metadata.getJsonFromMetadata()).get();
         } catch (ExecutionException e) {
-            e.printStackTrace();
+            if(ExceptionCauseCode.getCodeValueFromCause(e.getCause()) == ExceptionCauseCode.ALREADY_EXISTS){
+                Toast.makeText(activity, R.string.username_already_exists, Toast.LENGTH_LONG).show();
+            }
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -174,32 +117,10 @@ public class SessionManager {
         return Boolean.parseBoolean(userExistsRpc.getPayload());
     }
 
-    public void signInWithEmail(String mail, String password, String username) throws ExecutionException, InterruptedException {
+    public void signInWithEmail(String mail, String password) throws ExecutionException, InterruptedException {
         authentWithEmail(mail, password, ResultType.SIGNIN);
-        client.updateAccount(this.session, username);
         User connected = this.client.getAccount(this.session).get().getUser();
-        if(userExist(mail,false)){
-            activity.requestForLink(mail,null);
-            Toast.makeText(activity, "Can link account", Toast.LENGTH_LONG).show();
-        }else{
-            activity.userIsConnected(connected);
-        }
-    }
-
-    public void signUpWithGoogle() {
-        Intent signInIntent = googleSignInClient.getSignInIntent();
-        activity.startActivityForResult(signInIntent, ResultType.SIGNUP);
-    }
-
-    public void handleSignUpWithGoogleResult(Task<GoogleSignInAccount> task) {
-        try {
-            GoogleSignInAccount account = task.getResult(ApiException.class);
-            com.heroiclabs.nakama.api.User nakamaUser = authentWithGoogle(account.getIdToken(), account.getEmail(), ResultType.SIGNUP);
-            activity.userIsConnected(nakamaUser);
-        } catch (Exception e) {
-            Toast.makeText(activity, R.string.failed_login, Toast.LENGTH_LONG).show();
-            Log.e("fr.aboucorp.variantchess", "Exception message=" + e.getMessage());
-        }
+        activity.userIsConnected(connected);
     }
 
     public void signUpWithEmail(String mail, String password) {
@@ -211,31 +132,60 @@ public class SessionManager {
             Toast.makeText(activity, R.string.failed_login, Toast.LENGTH_LONG).show();
             Log.e("fr.aboucorp.variantchess", "Exception message=" + e.getMessage());
         }
-
     }
 
     public void destroySession() {
 
     }
 
-    public User makeJobOnSession() throws ExecutionException, InterruptedException {
-        return this.client.getAccount(session).get().getUser();
-    }
-
-    public void confirmLinkMailAccount(String mail,String password) {
+    public User updateDisplayName(String displayName) throws UsernameDuplicateException {
+        Metadata data = new Metadata();
+        String timeZone = TimeZone.getDefault().getDisplayName();
+        String langTag = Locale.getDefault().getDisplayLanguage();
+        data.put("displayName",displayName);
+        data.put("timeZone",timeZone);
+        data.put("langTag",langTag);
+        String rpcid = "update_user_infos";
         try {
-            this.client.linkEmail(session,mail,password).get();
+            Rpc call = client.rpc(session, rpcid, data.getJsonFromMetadata()).get();
+            return this.client.getAccount(session).get().getUser();
         } catch (ExecutionException e) {
-            Log.e("fr.aboucorp.variantchess",e.getMessage());
-            e.printStackTrace();
+            if(ExceptionCauseCode.getCodeValueFromCause(e.getCause()) == ExceptionCauseCode.ALREADY_EXISTS){
+               throw new UsernameDuplicateException(activity.getString(R.string.username_already_exists));
+            }
         } catch (InterruptedException e) {
-            Log.e("fr.aboucorp.variantchess",e.getMessage());
-            e.printStackTrace();
+            Log.e("fr.aboucorp.variantchess","Erro during updating account");
+            return null;
         }
+        return null;
     }
 
-    public void confirmLinkGoogleAccount(String mail,String password,String googleToken) throws ExecutionException, InterruptedException {
-        Session session = this.client.authenticateEmail(mail, password).get();
-        this.client.linkGoogle(session,googleToken).get();
+    public void launchMatchMaking(GameMode gamemode, MatchListener matchListener) throws ExecutionException, InterruptedException {
+        SharedPreferences pref = activity.getSharedPreferences(SHARED_PREFERENCE_NAME, Context.MODE_PRIVATE);
+        SocketClient matchmakingSocket = client.createSocket();
+        MatchMakingSocketListener socketListener = new MatchMakingSocketListener(matchListener);
+        matchmakingSocket.connect(session, socketListener).get();
+        String ticketString = pref.getString("nk.ticket", null);
+        if ( !TextUtils.isEmpty(ticketString) ) {
+            try {
+                matchmakingSocket.removeMatchmaker(ticketString).get();
+            }catch(ExecutionException | InterruptedException e)       {
+                Log.i("fr.aboucorp.variantchess","Cannot remove matchmaking");
+            }
+        }
+        Metadata<String> stringProps = new Metadata<>();
+        Metadata<Double> numProps = new Metadata<>();
+        Locale current = ConfigurationCompat.getLocales(activity.getResources().getConfiguration()).get(0);
+        stringProps.put("locale",current.getCountry());
+        stringProps.put("gamemode",gamemode.getName());
+        numProps.put("rank",1.0);
+        String query = "*";
+        int minCount = 2;
+        int maxCount = 2;
+        MatchmakerTicket matchmakerTicket = matchmakingSocket.addMatchmaker(
+                minCount, maxCount,query, stringProps, numProps).get();
+        pref.edit().putString("nk.ticket", matchmakerTicket.getTicket()).apply();
     }
 }
+
+

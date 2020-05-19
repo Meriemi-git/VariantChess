@@ -2,81 +2,80 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:gravity="center"
     android:orientation="vertical">
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingBottom="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
         android:text="@string/sign_in_lbl_account_creation"
-        android:textSize="24sp" />
+        android:gravity="center_horizontal"
+        app:autoSizeTextType="uniform"
+        app:autoSizeMaxTextSize="30sp"
+        app:autoSizeMinTextSize="12sp"
+        app:autoSizeStepGranularity="1sp" />
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:text="@string/signin_lbl_mail"
+        android:gravity="center_horizontal"
+        app:autoSizeTextType="uniform"
+        app:autoSizeMaxTextSize="20sp"
+        app:autoSizeMinTextSize="14sp"
+        app:autoSizeStepGranularity="1sp" />
 
     <EditText
-        android:id="@+id/register_username"
+        android:id="@+id/sign_in_mail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:gravity="center"
-        android:inputType="textPersonName"
-        android:layout_marginBottom="40dp"
-        android:text="@string/sign_in_hint_username" />
-    <EditText
-        android:id="@+id/register_mail"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:autofillHints=""
-        android:ems="10"
-        android:gravity="center"
+        android:gravity="center_horizontal"
         android:hint="@string/lbl_hint_email"
         android:inputType="textEmailAddress" />
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:text="@string/signin_lbl_password"
+        android:gravity="center_horizontal"
+        app:autoSizeTextType="uniform"
+        app:autoSizeMaxTextSize="20sp"
+        app:autoSizeMinTextSize="14sp"
+        app:autoSizeStepGranularity="1sp"  />
+
     <EditText
-        android:id="@+id/register_pwd"
+        android:id="@+id/sign_in_pwd"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:autofillHints=""
         android:ems="10"
-        android:gravity="center"
+        android:gravity="center_horizontal"
         android:hint="@string/lbl_hint_password"
         android:inputType="textPassword" />
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:text="@string/signin_lbl_confirm_password"
+        android:gravity="center_horizontal"
+        app:autoSizeTextType="uniform"
+        app:autoSizeMaxTextSize="20sp"
+        app:autoSizeMinTextSize="14sp"
+        app:autoSizeStepGranularity="1sp" />
+
     <EditText
-        android:id="@+id/register_confirm_pwd"
+        android:id="@+id/sign_in_btn_confirm_pwd"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:autofillHints=""
         android:ems="10"
-        android:gravity="center"
+        android:gravity="center_horizontal"
         android:hint="@string/lbl_hint_password"
         android:inputType="textPassword" />
-
-
     <Button
         android:id="@+id/register_btn_create_account"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/lbl_create_account"
-        android:textSize="18sp" />
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:paddingTop="40dp">
-
-        <TextView
-            android:id="@+id/textView3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingBottom="20dp"
-            android:text="@string/lbl_google_connect"
-            android:textSize="24sp" />
-
-        <com.google.android.gms.common.SignInButton
-            android:id="@+id/btn_signin_google"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-    </LinearLayout>
+        android:text="@string/lbl_create_account" />
 </LinearLayout>

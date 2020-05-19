@@ -154,7 +154,9 @@ dependencies {
     implementation 'com.mobsandgeeks:android-saripaar:+'
 
     // Testing Navigation
+
     androidTestImplementation "androidx.navigation:navigation-testing:$nav_version"
+
 
     // Google API
     implementation 'com.google.android.gms:play-services-auth:18.0.0'
@@ -175,7 +177,5 @@ dependencies {
     testImplementation "androidx.room:room-testing:$room_version"
     implementation 'androidx.recyclerview:recyclerview:1.2.0-alpha03'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
-
-
 }
 eclipse.project.name = appName + "-android"

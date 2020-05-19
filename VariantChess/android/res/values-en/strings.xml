@@ -7,8 +7,8 @@
     <string name="lbl_create_account">Create account</string>
     <string name="lbl_btn_facebook">Facebook</string>
     <string name="lbl_btn_google">Google</string>
-    <string name="lbl_hint_email">Your mail</string>
-    <string name="lbl_hint_password">Your password</string>
+    <string name="lbl_hint_email">example@test.com</string>
+    <string name="lbl_hint_password">8 character with numbers</string>
     <string name="app_id">737891246568</string>
     <string name="lbl_mail_connect">Connect with your mail</string>
     <string name="lbl_google_connect">Or with your Google account</string>
@@ -26,7 +26,6 @@
     <string name="user_info_dialog_title">User infos</string>
     <string name="general_close">Close</string>
     <string name="sign_in_lbl_account_creation">Create your account with your email</string>
-    <string name="sign_in_hint_username">Username</string>
     <string name="sign_in_error_duplicate_displayname">Username already taken</string>
     <string name="sign_in_error_duplicate_mail">This email is already taken</string>
     <string name="general_unconnected">Disconnected</string>
@@ -43,4 +42,17 @@
     <string name="general_password">Password</string>
     <string name="lbl_link_title">Link your account</string>
     <string name="link_google_message">"We found a google account for @. Login with it to link your account an signup autmatically with your Google account. "</string>
+    <string name="username_lbl_choose_username">Choose your username</string>
+    <string name="username_already_exists">This username is already taken</string>
+    <string name="username_hint_username">Username</string>
+    <string name="signin_lbl_mail">Enter your mail</string>
+    <string name="signin_lbl_password">Enter your password</string>
+    <string name="signin_lbl_confirm_password">Confirm your password</string>
+    <string name="online_lbl_gamemode">Select a game mode</string>
+    <string name="home_lbl_new_game">New game</string>
+    <string name="new_game_lbl_launch">Launch</string>
+    <string name="new_game_online">Online</string>
+    <string name="new_game_offline">Offline</string>
+    <string name="matchmaking_failed">Matchmaking error, please relaunch it.</string>
+    <string name="matchmaking_success">Match found</string>
 </resources>
