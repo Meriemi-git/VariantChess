@@ -6,11 +6,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
-import androidx.core.os.ConfigurationCompat;
 
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.heroiclabs.nakama.Client;
 import com.heroiclabs.nakama.DefaultClient;
 import com.heroiclabs.nakama.DefaultSession;
@@ -35,20 +31,12 @@ import fr.aboucorp.variantchess.entities.GameMode;
 public class SessionManager {
     public static final String SHARED_PREFERENCE_NAME = "nakama";
     private static SessionManager INSTANCE;
-    private GoogleSignInClient googleSignInClient;
     private final VariantChessActivity activity;
     public final Client client = new DefaultClient("defaultkey", "192.168.1.37", 7349, false);
     public Session session;
 
     private SessionManager(VariantChessActivity activity) {
         this.activity = activity;
-        String appId = activity.getResources().getString(R.string.server_client_id);
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(appId)
-                .requestEmail()
-                .requestProfile()
-                .build();
-        googleSignInClient = GoogleSignIn.getClient(activity, gso);
     }
 
     public User authentWithEmail(String mail, String password, int signType) throws ExecutionException, InterruptedException {
@@ -175,8 +163,8 @@ public class SessionManager {
         }
         Metadata<String> stringProps = new Metadata<>();
         Metadata<Double> numProps = new Metadata<>();
-        Locale current = ConfigurationCompat.getLocales(activity.getResources().getConfiguration()).get(0);
-        stringProps.put("locale",current.getCountry());
+        /*Locale current = Configuration.getLocales(activity.getResources().getConfiguration()).get(0);
+        stringProps.put("locale",current.getCountry());*/
         stringProps.put("gamemode",gamemode.getName());
         numProps.put("rank",1.0);
         String query = "*";

@@ -2,8 +2,15 @@ package fr.aboucorp.variantchess.app.views.fragments;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Switch;
@@ -31,84 +38,25 @@ import fr.aboucorp.variantchess.entities.events.models.TurnEvent;
 import fr.aboucorp.variantchess.entities.rules.ClassicRuleSet;
 import fr.aboucorp.variantchess.libgdx.Board3dManager;
 
-public class BoardFragment extends AndroidFragmentApplication implements GameEventSubscriber {
+public class BoardFragment extends AndroidFragmentApplication  {
 
-    public Button btn_end_turn;
-    public Button btn_test;
-    public Switch switch_tactical;
-    public GameEventManager eventManager;
-    private MatchManager matchManager;
-    private BoardManager boardManager;
-    private TextView lbl_turn;
-    private TextView party_logs;
-    private EditText fen_txt;
-    private Activity activity;
-
-    public BoardFragment(){
-        this.eventManager = GameEventManager.getINSTANCE();
-        this.eventManager.subscribe(fr.aboucorp.variantchess.entities.events.models.GameEvent.class,this,1);
-    }
+    private static Board3dManager board3dManager;
 
     @Override
-    public View initializeForView(ApplicationListener listener) {
-        bindViews();
-        bindListeners();
-        Board3dManager board3dManager = new Board3dManager();
-        Board classicBoard = new ClassicBoard();
-        fr.aboucorp.variantchess.entities.rules.ClassicRuleSet classicRules = new ClassicRuleSet(classicBoard);
-        boardManager = new ClassicBoardManager(board3dManager, classicBoard,classicRules);
-        this.matchManager = new MatchManager((VariantChessActivity) activity,boardManager);
-        InputAdapter inputAdapter = new GDXInputAdapter(board3dManager);
-        board3dManager.setAndroidInputAdapter(inputAdapter);
-        GDXGestureListener gestureListener = new GDXGestureListener(boardManager);
-        board3dManager.setAndroidListener(gestureListener);
-        this.bindViews();
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        return InitLibGdx();
+    }
+
+    private View InitLibGdx(){
         AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
-        View view =  initializeForView(board3dManager, config);
-        this.matchManager.startGame();
-        this.lbl_turn.setText("Turn of " + BoardFragment.this.matchManager.getPartyInfos());
+        View view = initializeForView(board3dManager, config);
+        ((AndroidBoardFragment)getParentFragment()).startGame();
         return view;
     }
 
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        this.activity = activity;
-    }
-
-
-    public void bindViews() {
-        this.btn_end_turn = this.activity.findViewById(R.id.btn_end_turn);
-        this.lbl_turn = this.activity.findViewById(R.id.lbl_turn);
-        this.party_logs = this.activity.findViewById(R.id.party_logs);
-        this.btn_test = this.activity.findViewById(R.id.btn_test);
-        this.fen_txt = this.activity.findViewById(R.id.fen_txt);
-        this.switch_tactical = this.activity.findViewById(R.id.switch_tactical);
-    }
-
-    public void bindListeners() {
-        btn_end_turn.setOnClickListener(v -> {
-           BoardFragment.this.matchManager.endTurn();
-           BoardFragment.this.lbl_turn.setText("Turn of " + BoardFragment.this.matchManager.getPartyInfos());
-        });
-        btn_test.setOnClickListener(v -> BoardFragment.this.matchManager.loadBoard(fen_txt.getText().toString().trim()));
-
-        switch_tactical.setOnClickListener(v -> BoardFragment.this.boardManager.toogleTacticalView());
-    }
-
-    @Override
-    public void receiveGameEvent(final GameEvent event) {
-        this.runOnUiThread(() -> {
-            if(event instanceof BoardEvent || event instanceof TurnEvent){
-                BoardFragment.this.party_logs.setText( BoardFragment.this.party_logs.getText() + "\nLOG :" + event.message);
-            }
-            BoardFragment.this.lbl_turn.setText("Turn of " + BoardFragment.this.matchManager.getPartyInfos());
-            Log.i("fr.aboucorp.variantchess",event.message);
-        });
-    }
-
-    @Override
-    public void startActivity(Intent intent) {
-
+    public static void setBoard3dManager(Board3dManager board3dManager) {
+        if(BoardFragment.board3dManager == null) {
+            BoardFragment.board3dManager = board3dManager;
+        }
     }
 }

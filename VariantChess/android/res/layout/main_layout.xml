@@ -1,17 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="start"
     android:orientation="vertical">
 
-    <androidx.appcompat.widget.Toolbar
+    <Toolbar
         android:id="@+id/main_toolbar"
         android:layout_width="match_parent"
-        android:layout_height="71dp"
-        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" >
+        android:layout_height="71dp">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -44,13 +41,13 @@
                 android:textSize="18sp" />
         </RelativeLayout>
 
-    </androidx.appcompat.widget.Toolbar>
+    </Toolbar>
 
-    <androidx.fragment.app.FragmentContainerView
+    <RelativeLayout
         android:id="@+id/fragment_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-    </androidx.fragment.app.FragmentContainerView>
+    </RelativeLayout>
 
 </LinearLayout>

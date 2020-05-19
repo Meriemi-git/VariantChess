@@ -77,11 +77,11 @@ public class Board3dManager extends ApplicationAdapter {
 
     public boolean tacticalViewEnabled;
 
-    private final fr.aboucorp.variantchess.libgdx.utils.ChessModelList chessSquareModels;
-    private final fr.aboucorp.variantchess.libgdx.utils.ChessModelList whitePieceModels;
-    private final fr.aboucorp.variantchess.libgdx.utils.ChessModelList blackPieceModels;
-    private final fr.aboucorp.variantchess.libgdx.utils.ChessModelList whiteDeadPieceModels;
-    private final fr.aboucorp.variantchess.libgdx.utils.ChessModelList blackDeadPieceModels;
+    private final ChessModelList chessSquareModels;
+    private final ChessModelList whitePieceModels;
+    private final ChessModelList blackPieceModels;
+    private final ChessModelList whiteDeadPieceModels;
+    private final ChessModelList blackDeadPieceModels;
     private final ArrayList<Piece> loadingPieces;
     private final ArrayList<ModelInstance> devStuff;
     public static Map<Class,String> assetPaths =  new HashMap<>();
@@ -127,7 +127,7 @@ public class Board3dManager extends ApplicationAdapter {
             this.doneLoading();
         }
         this.camController.update();
-        Gdx.gl.glClearColor(98 / 255f, 98 / 255f, 98 / 255f, 1);
+        Gdx.gl.glClearColor(42 / 255f, 79 / 255f, 110 / 255f, 1);
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
@@ -448,8 +448,10 @@ public class Board3dManager extends ApplicationAdapter {
      */
     private void initEnvironment(){
         this.environment = new Environment();
-        this.environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1f));
-        this.environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
+        this.environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 0.6f));
+        this.environment.set(new ColorAttribute(ColorAttribute.Specular, 0.4f, 0.4f, 0.4f, 1f));
+
+        this.environment.add(new DirectionalLight().set(0.6f, 0.6f, 0.6f, -1f, -0.8f, -0.2f));
     }
 
     /**

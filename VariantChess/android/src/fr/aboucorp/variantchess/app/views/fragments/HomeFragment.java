@@ -1,13 +1,13 @@
 package fr.aboucorp.variantchess.app.views.fragments;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
@@ -43,7 +43,7 @@ public class HomeFragment extends VariantChessFragment {
     @Override
     protected void bindListeners() {
         this.home_btn_online_game.setOnClickListener(v -> {
-            ((VariantChessActivity)getActivity()).setFragment(NewGameFragment.class,"newGame",getArguments());
+            ((VariantChessActivity)getActivity()).setFragment(new NewGameFragment(),"newGame");
         });
     }
 }

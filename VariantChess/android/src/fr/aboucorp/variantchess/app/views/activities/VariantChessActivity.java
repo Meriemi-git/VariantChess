@@ -1,13 +1,14 @@
 package fr.aboucorp.variantchess.app.views.activities;
 
+import android.app.Activity;
 import android.os.Bundle;
-
-import androidx.appcompat.app.AppCompatActivity;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 
 import com.heroiclabs.nakama.api.User;
 
-public abstract class VariantChessActivity extends AppCompatActivity {
-    public abstract void setFragment(Class fragmentClass, String tag, Bundle args);
+public abstract class VariantChessActivity extends FragmentActivity {
+    public abstract void setFragment(Fragment fragment, String tag);
 
     public abstract void userIsConnected(User nakamaUser);
 }

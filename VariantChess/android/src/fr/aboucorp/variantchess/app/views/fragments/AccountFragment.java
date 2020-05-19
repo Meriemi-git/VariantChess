@@ -36,7 +36,7 @@ public class AccountFragment extends VariantChessFragment {
 
     @Override
     protected void bindListeners() {
-        this.btn_connect.setOnClickListener(v -> ((MainActivity)getActivity()).setFragment(SignUpFragment.class,"signup",this.getArguments()));
-        this.btn_create.setOnClickListener(v -> ((MainActivity)getActivity()).setFragment(SignInFragment.class,"signin",this.getArguments()));
+        this.btn_connect.setOnClickListener(v -> ((MainActivity)getActivity()).setFragment(new SignUpFragment(),"signup"));
+        this.btn_create.setOnClickListener(v -> ((MainActivity)getActivity()).setFragment(new SignInFragment(),"signin"));
     }
 }

@@ -3,30 +3,29 @@ package fr.aboucorp.variantchess.app.views.activities;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
-import androidx.appcompat.widget.Toolbar;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.ViewModelProvider;
-
+import com.badlogic.gdx.backends.android.AndroidFragmentApplication;
 import com.heroiclabs.nakama.api.User;
 
 import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
-import fr.aboucorp.variantchess.app.viewmodel.UserViewModel;
 import fr.aboucorp.variantchess.app.views.fragments.AccountFragment;
 import fr.aboucorp.variantchess.app.views.fragments.HomeFragment;
 import fr.aboucorp.variantchess.app.views.fragments.UsernameFragment;
 
 import static fr.aboucorp.variantchess.app.multiplayer.SessionManager.SHARED_PREFERENCE_NAME;
 
-public class MainActivity extends VariantChessActivity {
-    private UserViewModel userViewModel;
+public class MainActivity extends VariantChessActivity implements AndroidFragmentApplication.Callbacks {
     private Toolbar toolbar;
     private SessionManager sessionManager;
 
@@ -35,10 +34,8 @@ public class MainActivity extends VariantChessActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_layout);
         setToolbar();
-        userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
         sessionManager = SessionManager.getInstance(this);
         SharedPreferences pref = getSharedPreferences(SHARED_PREFERENCE_NAME, Context.MODE_PRIVATE);
-        userViewModel.getConnected().observe(this, user ->invalidateOptionsMenu());
         User user;
         try {
             user = this.sessionManager.restoreSessionIfPossible(pref);
@@ -53,13 +50,13 @@ public class MainActivity extends VariantChessActivity {
     private void setToolbar() {
         toolbar = findViewById(R.id.main_toolbar);
         this.toolbar.setTitle(getString(R.string.app_name));
-        setSupportActionBar(toolbar);
+        setActionBar(toolbar);
     }
 
     @Override
-    public void setFragment(Class fragmentClass, String tag, Bundle args) {
+    public void setFragment(Fragment fragment, String tag) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.fragment_container, fragmentClass, args, tag);
+        fragmentTransaction.replace(R.id.fragment_container, fragment, tag);
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
     }
@@ -75,8 +72,8 @@ public class MainActivity extends VariantChessActivity {
     public boolean onPrepareOptionsMenu(Menu menu) {
         MenuItem disconnect = this.toolbar.getMenu().findItem(R.id.menu_action_disconnect);
         MenuItem profile = this.toolbar.getMenu().findItem(R.id.menu_action_profil);
-        disconnect.setVisible(userViewModel.getConnected().getValue() != null);
-        profile.setVisible(userViewModel.getConnected().getValue() != null);
+        //disconnect.setVisible(userViewModel.getConnected().getValue() != null);
+        //profile.setVisible(userViewModel.getConnected().getValue() != null);
         return true;
     }
 
@@ -89,8 +86,7 @@ public class MainActivity extends VariantChessActivity {
 
             case R.id.menu_action_disconnect:
                 this.sessionManager.destroySession();
-                this.userViewModel.setConnected(null);
-                this.setFragment(AccountFragment.class, "account", this.getIntent().getExtras());
+                this.setFragment(new AccountFragment(), "account");
                 TextView userText = toolbar.findViewById(R.id.lbl_display_name);
                 userText.setText(R.string.disconnect_message);
                 return true;
@@ -107,17 +103,21 @@ public class MainActivity extends VariantChessActivity {
 
     public void userIsConnected(User connected) {
         TextView userText = toolbar.findViewById(R.id.lbl_display_name);
-        this.userViewModel.setConnected(connected);
         if (connected != null) {
             if(TextUtils.isEmpty(connected.getDisplayName())){
-                setFragment(UsernameFragment.class, "username", getIntent().getExtras());
+                setFragment(new UsernameFragment(), "username");
             }else{
                 userText.setText(connected.getDisplayName());
-                setFragment(HomeFragment.class, "home", getIntent().getExtras());
+                setFragment(new HomeFragment(), "home");
                 Toast.makeText(this, R.string.connected, Toast.LENGTH_LONG).show();
             }
         } else {
-            setFragment(AccountFragment.class, "account", getIntent().getExtras());
+            setFragment(new AccountFragment(), "account");
         }
+    }
+
+    @Override
+    public void exit() {
+
     }
 }

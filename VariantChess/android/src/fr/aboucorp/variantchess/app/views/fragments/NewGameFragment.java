@@ -1,17 +1,17 @@
 package fr.aboucorp.variantchess.app.views.fragments;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.RadioButton;
 import android.widget.Spinner;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.widget.AppCompatRadioButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,8 +27,8 @@ public class NewGameFragment extends VariantChessFragment implements AdapterView
     private Spinner new_game_spinner;
     private Button new_game_btn_launch;
     private ProgressBar new_game_progress_bar;
-    private AppCompatRadioButton new_game_rdb_online;
-    private AppCompatRadioButton new_game_rdb_offline;
+    private RadioButton new_game_rdb_online;
+    private RadioButton new_game_rdb_offline;
 
 
     private SessionManager sessionManager;
@@ -76,7 +76,7 @@ public class NewGameFragment extends VariantChessFragment implements AdapterView
                 e.printStackTrace();
             }*/
         }else if(new_game_rdb_offline.isChecked()){
-            ((VariantChessActivity)getActivity()).setFragment(BoardFragment.class,"borad",getArguments());
+            ((VariantChessActivity)getActivity()).setFragment(new AndroidBoardFragment(),"board");
         }
     }
 
