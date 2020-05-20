@@ -27,7 +27,7 @@ import fr.aboucorp.variantchess.entities.events.models.LogEvent;
 import fr.aboucorp.variantchess.entities.events.models.MoveEvent;
 import fr.aboucorp.variantchess.entities.events.models.PartyEvent;
 
-public class MatchManager implements GameEventSubscriber, MatchListener {
+public class MatchManager implements GameEventSubscriber, MatchListener, BoardManager.BoardLoadingListener {
     private final BoardManager boardManager;
     private final TurnManager turnManager;
     private GameEventManager eventManager;
@@ -36,6 +36,7 @@ public class MatchManager implements GameEventSubscriber, MatchListener {
 
     public MatchManager(VariantChessActivity activity, BoardManager boardManager) {
         this.boardManager = boardManager;
+        this.boardManager.setBoardLoadingListener(this);
         this.turnManager = TurnManager.getINSTANCE();
         this.eventManager = GameEventManager.getINSTANCE();
         this.eventManager.subscribe(PartyEvent.class,this,1);
@@ -45,6 +46,10 @@ public class MatchManager implements GameEventSubscriber, MatchListener {
 
     public void startGame(){
         this.boardManager.createBoard();
+    }
+
+    @Override
+    public void OnBoardLoaded() {
         this.turnManager.newParty(ChessColor.WHITE);
     }
 
@@ -64,6 +69,12 @@ public class MatchManager implements GameEventSubscriber, MatchListener {
 
     public String getPartyInfos(){
         return this.turnManager.getTurnColor().name();
+    }
+
+
+    public void endParty() {
+        this.eventManager.clearSubscriptions();
+        this.boardManager.clearBoard();
     }
 
     @Override
@@ -132,4 +143,6 @@ public class MatchManager implements GameEventSubscriber, MatchListener {
     public void onStreamData(StreamData data) {
 
     }
+
+
 }

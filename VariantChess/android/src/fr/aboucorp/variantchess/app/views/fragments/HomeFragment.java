@@ -43,7 +43,7 @@ public class HomeFragment extends VariantChessFragment {
     @Override
     protected void bindListeners() {
         this.home_btn_online_game.setOnClickListener(v -> {
-            ((VariantChessActivity)getActivity()).setFragment(new NewGameFragment(),"newGame");
+            ((VariantChessActivity)getActivity()).setFragment(new GameFragment(),"newGame");
         });
     }
 }

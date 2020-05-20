@@ -4,6 +4,8 @@ import com.badlogic.gdx.graphics.Camera;
 
 import java.util.ArrayList;
 
+import fr.aboucorp.variantchess.app.listeners.GDXGestureListener;
+import fr.aboucorp.variantchess.app.listeners.GDXInputAdapter;
 import fr.aboucorp.variantchess.entities.ChessColor;
 import fr.aboucorp.variantchess.entities.Location;
 import fr.aboucorp.variantchess.entities.Piece;
@@ -25,16 +27,21 @@ import fr.aboucorp.variantchess.entities.rules.AbstractRuleSet;
 import fr.aboucorp.variantchess.entities.utils.SquareList;
 import fr.aboucorp.variantchess.libgdx.Board3dManager;
 import fr.aboucorp.variantchess.libgdx.models.ChessModel;
+import fr.aboucorp.variantchess.libgdx.utils.ChessModelList;
 
 public abstract class BoardManager implements GameEventSubscriber {
-    protected final fr.aboucorp.variantchess.entities.boards.Board board;
+    protected final Board board;
     protected final Board3dManager board3dManager;
+    private final GDXInputAdapter inputAdapter;
+    private final GDXGestureListener gestureListener;
     protected Piece selectedPiece;
     protected GameEventManager eventManager;
-    protected fr.aboucorp.variantchess.entities.Turn previousTurn;
+    protected  Turn previousTurn;
     protected Turn actualTurn;
     protected final AbstractRuleSet ruleSet;
     protected SquareList possiblesMoves;
+    protected BoardLoadingListener boardLoadingListener;
+
     private GameState gameState;
 
 
@@ -42,11 +49,12 @@ public abstract class BoardManager implements GameEventSubscriber {
         this.board = board;
         this.board3dManager = board3dManager;
         this.ruleSet = ruleSet;
+        inputAdapter = new GDXInputAdapter(board3dManager);
+        board3dManager.setAndroidInputAdapter(inputAdapter);
+        gestureListener = new GDXGestureListener(this);
+        board3dManager.setAndroidListener(gestureListener);
         this.gameState = GameState.SelectPiece;
         this.eventManager = GameEventManager.getINSTANCE();
-        this.eventManager.subscribe(PartyEvent.class, this, 1);
-        this.eventManager.subscribe(TurnEvent.class, this, 1);
-        this.eventManager.subscribe(PieceEvent.class, this, 1);
     }
 
 
@@ -63,7 +71,8 @@ public abstract class BoardManager implements GameEventSubscriber {
 
     protected abstract void manageTurnEnd();
 
-    void clearBoard() {
+    public void clearBoard() {
+        this.gameState = GameState.SelectPiece;
         this.selectedPiece = null;
         this.previousTurn = null;
         this.actualTurn = null;
@@ -71,7 +80,11 @@ public abstract class BoardManager implements GameEventSubscriber {
         this.board3dManager.clearBoard();
     }
 
-    public abstract void createBoard();
+    public void createBoard(){
+        this.eventManager.subscribe(PartyEvent.class, this, 1);
+        this.eventManager.subscribe(TurnEvent.class, this, 1);
+        this.eventManager.subscribe(PieceEvent.class, this, 1);
+    }
 
     public abstract ChessColor loadBoard(String fenString) throws FenStringBadFormatException;
 
@@ -83,7 +96,7 @@ public abstract class BoardManager implements GameEventSubscriber {
         this.gameState = GameState.SelectPiece;
     }
 
-    public ArrayList<ChessModel> getPiecesModelsFromActualTurn(){
+    public ChessModelList getPiecesModelsFromActualTurn(){
         if( this.actualTurn.getTurnColor() == ChessColor.BLACK){
             return this.getBlackPieceModels();
         }else {
@@ -91,16 +104,16 @@ public abstract class BoardManager implements GameEventSubscriber {
         }
     }
 
-    public abstract ArrayList<ChessModel> getBlackPieceModels();
+    public abstract ChessModelList getBlackPieceModels();
 
-    public abstract ArrayList<ChessModel> getWhitePieceModels();
+    public abstract ChessModelList getWhitePieceModels();
 
 
     public abstract Square getSquareFromLocation(Location location);
 
     public abstract ChessColor getWinner();
 
-    public abstract ArrayList<ChessModel> getPossibleSquareModels();
+    public abstract ChessModelList getPossibleSquareModels();
 
     public Camera getCamera() {
         return this.board3dManager.getCamera();
@@ -136,4 +149,14 @@ public abstract class BoardManager implements GameEventSubscriber {
     public boolean IsTacticalViewOn(){
         return this.board3dManager.tacticalViewEnabled;
     }
+
+    public void setBoardLoadingListener(BoardLoadingListener boardLoadingListener) {
+        this.boardLoadingListener = boardLoadingListener;
+    }
+
+    public interface BoardLoadingListener{
+        void OnBoardLoaded();
+    }
+
+
 }

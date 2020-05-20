@@ -1,6 +1,7 @@
 package fr.aboucorp.variantchess.app.managers.boards;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.utils.Array;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,9 +26,9 @@ import fr.aboucorp.variantchess.entities.events.models.PieceEvent;
 import fr.aboucorp.variantchess.entities.events.models.TurnStartEvent;
 import fr.aboucorp.variantchess.entities.rules.ClassicRuleSet;
 import fr.aboucorp.variantchess.entities.utils.SquareList;
+import fr.aboucorp.variantchess.libgdx.utils.ChessModelList;
 
 public class ClassicBoardManager extends BoardManager implements GameEventSubscriber {
-
 
     public ClassicBoardManager(Board3dManager board3dManager, Board board, fr.aboucorp.variantchess.entities.rules.ClassicRuleSet ruleSet) {
         super(board,board3dManager,ruleSet);
@@ -47,17 +48,22 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
     }
     @Override
     public void createBoard() {
+        super.createBoard();
         this.board.initBoard();
-        new Thread(() -> Gdx.app.postRunnable(() -> {
-            ClassicBoardManager.this.board3dManager.createSquares(ClassicBoardManager.this.board.getSquares());
-            ClassicBoardManager.this.board3dManager.createPieces(ClassicBoardManager.this.board.getWhitePieces());
-            ClassicBoardManager.this.board3dManager.createPieces(ClassicBoardManager.this.board.getBlackPieces());
-        })).start();
+        GdxPostRunner postRunner = new GdxPostRunner() {
+            @Override
+            public void execute() {
+                ClassicBoardManager.this.board3dManager.createSquares(ClassicBoardManager.this.board.getSquares());
+                ClassicBoardManager.this.board3dManager.createPieces(ClassicBoardManager.this.board.getWhitePieces());
+                ClassicBoardManager.this.board3dManager.createPieces(ClassicBoardManager.this.board.getBlackPieces());
+                boardLoadingListener.OnBoardLoaded();
+            }
+        };
+        postRunner.startAsync();
     }
 
     @Override
     public ChessColor loadBoard(String fenString) throws FenStringBadFormatException,NumberFormatException {
-
         String[] parts = fenString.trim().split(" ");
         if(parts.length < 5 || parts.length > 6){
             throw new FenStringBadFormatException("Cannot load game from fen string, fen string doesn't contains enought parts");
@@ -144,9 +150,11 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
 
     @Override
     protected void manageTurnStart(TurnStartEvent event) {
-        this.previousTurn = actualTurn;
+        if(actualTurn != null) {
+            this.previousTurn = actualTurn;
+        }
         this.actualTurn = event.turn;
-        this.eventManager.sendMessage(new LogEvent(this.getFenFromBoard()));
+        //this.eventManager.sendMessage(new LogEvent(this.getFenFromBoard()));
         GdxPostRunner runner = new GdxPostRunner() {
             @Override
             public void execute() {
@@ -232,7 +240,7 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
         return fenString.toString();
     }
 
-    public ArrayList<ChessModel> getPossibleSquareModels() {
+    public ChessModelList getPossibleSquareModels() {
         return this.board3dManager.getSquareModelsFromPossibleMoves(this.possiblesMoves);
     }
 
@@ -245,11 +253,11 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
         return null;
     }
 
-    public ArrayList<ChessModel> getBlackPieceModels() {
+    public ChessModelList getBlackPieceModels() {
         return this.board3dManager.getBlackPieceModels();
     }
 
-    public ArrayList<ChessModel> getWhitePieceModels() {
+    public ChessModelList getWhitePieceModels() {
         return this.board3dManager.getWhitePieceModels();
     }
 

@@ -58,4 +58,9 @@ public class GameEventManager {
         }
         return subscription;
     }
+
+    public void clearSubscriptions() {
+        this.SUBSCRIPTIONS = null;
+        INSTANCE = null;
+    }
 }

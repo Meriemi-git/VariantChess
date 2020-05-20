@@ -9,6 +9,7 @@ import java.util.ArrayList;
 
 import fr.aboucorp.variantchess.app.managers.boards.BoardManager;
 import fr.aboucorp.variantchess.libgdx.models.ChessModel;
+import fr.aboucorp.variantchess.libgdx.utils.ChessModelList;
 
 /**
  * Permet de trouver quel modèle 3D a été sélectionné en fonction des coordonnées du clic sur l'écran
@@ -24,11 +25,11 @@ public class TouchedModelFinder {
     }
 
 
-    public ChessModel getTouchedModel(float screenX, float screenY, ArrayList<ChessModel> models) {
+    public ChessModel getTouchedModel(float screenX, float screenY, ChessModelList models) {
         Ray ray = this.boardManager.getCamera().getPickRay(screenX, screenY);
         double distance = -1;
         int result = -1;
-        for (int i = 0; i < models.size(); i++) {
+        for (int i = 0; i < models.size; i++) {
             Vector3 position = new Vector3();
             final ChessModel piece = models.get(i);
             piece.transform.getTranslation(position);

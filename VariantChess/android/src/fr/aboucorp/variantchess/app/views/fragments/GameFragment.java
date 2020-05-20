@@ -23,7 +23,7 @@ import fr.aboucorp.variantchess.app.views.activities.MainActivity;
 import fr.aboucorp.variantchess.app.views.activities.VariantChessActivity;
 import fr.aboucorp.variantchess.entities.GameMode;
 
-public class NewGameFragment extends VariantChessFragment implements AdapterView.OnItemSelectedListener {
+public class GameFragment extends VariantChessFragment implements AdapterView.OnItemSelectedListener {
     private Spinner new_game_spinner;
     private Button new_game_btn_launch;
     private ProgressBar new_game_progress_bar;
@@ -76,7 +76,7 @@ public class NewGameFragment extends VariantChessFragment implements AdapterView
                 e.printStackTrace();
             }*/
         }else if(new_game_rdb_offline.isChecked()){
-            ((VariantChessActivity)getActivity()).setFragment(new AndroidBoardFragment(),"board");
+            ((VariantChessActivity)getActivity()).setFragment(new PartyFragment(),"androidBoard");
         }
     }
 
