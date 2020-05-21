@@ -5,12 +5,12 @@ import fr.aboucorp.variantchess.entities.enums.PieceId;
 import fr.aboucorp.variantchess.entities.moves.AbstractMoveSet;
 
 public abstract class Piece extends GameElement {
-    protected fr.aboucorp.variantchess.entities.moves.AbstractMoveSet moveSet;
+    protected AbstractMoveSet moveSet;
     private Square actualSquare;
-    private fr.aboucorp.variantchess.entities.enums.PieceId pieceId;
+    private PieceId pieceId;
     private boolean isFirstMove = true;
 
-    public Piece(Square square, ChessColor chessColor, fr.aboucorp.variantchess.entities.enums.PieceId pieceId){
+    public Piece(Square square, ChessColor chessColor, PieceId pieceId){
         super(square.getLocation(), chessColor);
         this.actualSquare = square;
         this.pieceId = pieceId;
@@ -33,6 +33,14 @@ public abstract class Piece extends GameElement {
         return isFirstMove;
     }
 
+    public void setFirstMove(boolean firstMove) {
+        isFirstMove = firstMove;
+    }
+
+    public void setActualSquare(Square actualSquare) {
+        this.actualSquare = actualSquare;
+    }
+
     public Square getSquare() {
         return actualSquare;
     }
@@ -42,6 +50,8 @@ public abstract class Piece extends GameElement {
         this.actualSquare = null;
         this.setLocation(null);
     }
+
+
 
     @Override
     public String toString() {
@@ -53,4 +63,6 @@ public abstract class Piece extends GameElement {
     }
 
     public abstract char fen();
+
+
 }

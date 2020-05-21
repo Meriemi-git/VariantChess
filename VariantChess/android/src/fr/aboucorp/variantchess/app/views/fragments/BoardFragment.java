@@ -45,4 +45,34 @@ public class BoardFragment extends AndroidFragmentApplication  {
     public interface BoardFragmentListener{
         void onBoardFragmentLoaded();
     }
+
+    @Override
+    public void exit() {
+        super.exit();
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
 }

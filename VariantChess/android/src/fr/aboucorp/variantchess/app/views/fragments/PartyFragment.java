@@ -17,17 +17,17 @@ import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
 
-import com.badlogic.gdx.InputAdapter;
+import java.io.FileDescriptor;
+import java.io.PrintWriter;
 
 import fr.aboucorp.variantchess.R;
-import fr.aboucorp.variantchess.app.listeners.GDXGestureListener;
-import fr.aboucorp.variantchess.app.listeners.GDXInputAdapter;
 import fr.aboucorp.variantchess.app.managers.MatchManager;
 import fr.aboucorp.variantchess.app.managers.boards.BoardManager;
 import fr.aboucorp.variantchess.app.managers.boards.ClassicBoardManager;
 import fr.aboucorp.variantchess.app.utils.FragmentTag;
 import fr.aboucorp.variantchess.app.views.activities.MainActivity;
 import fr.aboucorp.variantchess.app.views.activities.VariantChessActivity;
+import fr.aboucorp.variantchess.entities.PartyLifeCycle;
 import fr.aboucorp.variantchess.entities.boards.Board;
 import fr.aboucorp.variantchess.entities.boards.ClassicBoard;
 import fr.aboucorp.variantchess.entities.events.GameEventManager;
@@ -38,7 +38,7 @@ import fr.aboucorp.variantchess.entities.events.models.TurnEvent;
 import fr.aboucorp.variantchess.entities.rules.ClassicRuleSet;
 import fr.aboucorp.variantchess.libgdx.Board3dManager;
 
-public class PartyFragment extends VariantChessFragment implements GameEventSubscriber, BoardFragment.BoardFragmentListener {
+public class PartyFragment extends VariantChessFragment implements GameEventSubscriber, BoardFragment.BoardFragmentListener, PartyLifeCycle {
     public Button btn_end_turn;
     public Button btn_test;
     public Switch switch_tactical;
@@ -54,12 +54,11 @@ public class PartyFragment extends VariantChessFragment implements GameEventSubs
 
     public PartyFragment() {
         this.eventManager = GameEventManager.getINSTANCE();
-        this.eventManager.subscribe(GameEvent.class,this,1);
         board3dManager = new Board3dManager();
         Board classicBoard = new ClassicBoard();
         ClassicRuleSet classicRules = new ClassicRuleSet(classicBoard);
-        boardManager = new ClassicBoardManager(board3dManager, classicBoard,classicRules);
-        this.matchManager = new MatchManager((VariantChessActivity) getActivity(),boardManager);
+        boardManager = new ClassicBoardManager(board3dManager, classicBoard, classicRules);
+        this.matchManager = new MatchManager((VariantChessActivity) getActivity(), boardManager);
         boardFragment = new BoardFragment();
         boardFragment.setBoard3dManager(board3dManager);
         boardFragment.setBoardFragmentListener(this);
@@ -68,8 +67,8 @@ public class PartyFragment extends VariantChessFragment implements GameEventSubs
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof Activity){
-            activity=(Activity) context;
+        if (context instanceof Activity) {
+            activity = (Activity) context;
         }
 
     }
@@ -85,24 +84,27 @@ public class PartyFragment extends VariantChessFragment implements GameEventSubs
         bindViews();
         bindListeners();
         FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-        transaction.replace(R.id.board, boardFragment,FragmentTag.BOARD);
+        Fragment existingBoardFragment =  getChildFragmentManager().findFragmentByTag(FragmentTag.BOARD);
+        if(existingBoardFragment != null){
+            this.boardFragment = (BoardFragment) existingBoardFragment;
+        }
+        transaction.replace(R.id.board, boardFragment, FragmentTag.BOARD);
         transaction.commit();
-
     }
 
 
     public void bindViews() {
         this.btn_end_turn = getView().findViewById(R.id.btn_end_turn);
-        this.lbl_turn =  getView().findViewById(R.id.lbl_turn);
-        this.party_logs =  getView().findViewById(R.id.party_logs);
-        this.btn_test =  getView().findViewById(R.id.btn_test);
-        this.fen_txt =  getView().findViewById(R.id.fen_txt);
-        this.switch_tactical =  getView().findViewById(R.id.switch_tactical);
+        this.lbl_turn = getView().findViewById(R.id.lbl_turn);
+        this.party_logs = getView().findViewById(R.id.party_logs);
+        this.btn_test = getView().findViewById(R.id.btn_test);
+        this.fen_txt = getView().findViewById(R.id.fen_txt);
+        this.switch_tactical = getView().findViewById(R.id.switch_tactical);
     }
 
     public void bindListeners() {
         btn_end_turn.setOnClickListener(v -> {
-            PartyFragment.this.matchManager.endTurn();
+            PartyFragment.this.matchManager.endTurn(null);
             activity.runOnUiThread(() ->
                     PartyFragment.this.lbl_turn.setText("Turn of " + PartyFragment.this.matchManager.getPartyInfos()));
         });
@@ -113,7 +115,7 @@ public class PartyFragment extends VariantChessFragment implements GameEventSubs
 
     @Override
     public void receiveGameEvent(final GameEvent event) {
-        if(isAdded()) {
+        if (isAdded()) {
             activity.runOnUiThread(() -> {
                 if (event instanceof BoardEvent || event instanceof TurnEvent) {
                     PartyFragment.this.party_logs.setText(PartyFragment.this.party_logs.getText() + "\nLOG :" + event.message);
@@ -124,11 +126,6 @@ public class PartyFragment extends VariantChessFragment implements GameEventSubs
         }
     }
 
-    public void startGame() {
-        this.matchManager.startGame();
-        activity.runOnUiThread(() ->
-        this.lbl_turn.setText("Turn of " + PartyFragment.this.matchManager.getPartyInfos()));
-    }
 
     @Override
     public void onDestroy() {
@@ -138,22 +135,63 @@ public class PartyFragment extends VariantChessFragment implements GameEventSubs
     public boolean confirmExit() {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(activity);
         alertDialogBuilder.setMessage("If you exit the game you will loose the party");
-                alertDialogBuilder.setPositiveButton("yes",
-                        (dialog, arg1) -> endGame());
+        alertDialogBuilder.setPositiveButton("yes",
+                (dialog, arg1) -> stopParty());
 
-        alertDialogBuilder.setNegativeButton("No", (dialog, which) ->  dialog.dismiss());
+        alertDialogBuilder.setNegativeButton("No", (dialog, which) -> dialog.dismiss());
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
         return true;
     }
 
-    public void endGame(){
-        this.matchManager.endParty();
-        ((MainActivity)activity).setFragment(new HomeFragment(),FragmentTag.HOME);
+    @Override
+    public void onBoardFragmentLoaded() {
+        startParty();
     }
 
     @Override
-    public void onBoardFragmentLoaded() {
-        startGame();
+    public void startParty() {
+        this.eventManager.subscribe(GameEvent.class, this, 1);
+        this.matchManager.startParty();
+        activity.runOnUiThread(() ->
+                this.lbl_turn.setText("Turn of " + PartyFragment.this.matchManager.getPartyInfos()));
     }
+
+    @Override
+    public void stopParty() {
+        this.eventManager.unSubscribe(GameEvent.class, this);
+        this.matchManager.stopParty();
+        ((MainActivity) activity).setFragment(HomeFragment.class, FragmentTag.HOME);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+    }
+
 }

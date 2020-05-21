@@ -5,9 +5,10 @@ import java.util.Comparator;
 import java.util.Hashtable;
 import java.util.List;
 
+import fr.aboucorp.variantchess.entities.PartyLifeCycle;
 import fr.aboucorp.variantchess.entities.events.models.GameEvent;
 
-public class GameEventManager {
+public class GameEventManager implements PartyLifeCycle {
     private static GameEventManager INSTANCE;
     private static Hashtable<Class, List<Subscription>> SUBSCRIPTIONS;
     private GameEventManager(){
@@ -59,8 +60,12 @@ public class GameEventManager {
         return subscription;
     }
 
-    public void clearSubscriptions() {
-        this.SUBSCRIPTIONS = null;
-        INSTANCE = null;
+    @Override
+    public void startParty() {
+    }
+
+    @Override
+    public void stopParty() {
+        this.SUBSCRIPTIONS = new Hashtable<>();
     }
 }

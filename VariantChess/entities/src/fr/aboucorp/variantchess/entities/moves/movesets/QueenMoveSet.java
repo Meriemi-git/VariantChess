@@ -18,10 +18,10 @@ public class QueenMoveSet extends AbstractMoveSet {
     }
 
     @Override
-    protected fr.aboucorp.variantchess.entities.utils.SquareList getPossibleMoves(Piece piece, ChessColor turnColor) {
-        fr.aboucorp.variantchess.entities.utils.SquareList squares = new fr.aboucorp.variantchess.entities.utils.SquareList();
-        fr.aboucorp.variantchess.entities.utils.SquareList rookMoves  = rookMoveSet.getPossibleMoves(piece,turnColor);
-        fr.aboucorp.variantchess.entities.utils.SquareList bishopMoves = bishopMoveSet.getPossibleMoves(piece,turnColor);
+    protected SquareList getPossibleMoves(Piece piece, ChessColor turnColor) {
+        SquareList squares = new SquareList();
+        SquareList rookMoves  = rookMoveSet.getPossibleMoves(piece,turnColor);
+        SquareList bishopMoves = bishopMoveSet.getPossibleMoves(piece,turnColor);
         if(rookMoves != null){
             squares.addAll(rookMoves);
         }

@@ -31,7 +31,7 @@ public class Location implements Cloneable {
     }
 
     @Override
-    protected Location clone()  {
+    public Location clone()  {
         return new Location(this.x,this.y,this.z);
     }
 

@@ -3,8 +3,8 @@ package fr.aboucorp.variantchess.entities.utils;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import fr.aboucorp.variantchess.entities.Location;
 import fr.aboucorp.variantchess.entities.GameElement;
+import fr.aboucorp.variantchess.entities.Location;
 
 public abstract class ChessList<T extends fr.aboucorp.variantchess.entities.GameElement> extends ArrayList<T> {
 

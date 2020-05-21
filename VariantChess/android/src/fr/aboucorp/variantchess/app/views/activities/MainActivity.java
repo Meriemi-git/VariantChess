@@ -3,7 +3,6 @@ package fr.aboucorp.variantchess.app.views.activities;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -58,13 +57,21 @@ public class MainActivity extends VariantChessActivity implements AndroidFragmen
     }
 
     @Override
-    public void setFragment(Fragment newFragment , String fragmentTag) {
+    public void setFragment(Class<? extends Fragment> fragmentClass, String fragmentTag) {
+
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         Fragment existing = getSupportFragmentManager().findFragmentByTag(fragmentTag);
         if(existing != null){
             fragmentTransaction.replace(R.id.fragment_container, existing, fragmentTag);
         }else{
-            fragmentTransaction.replace(R.id.fragment_container, newFragment, fragmentTag);
+            try {
+                Fragment newFragment = fragmentClass.newInstance();
+                fragmentTransaction.replace(R.id.fragment_container, newFragment, fragmentTag);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            }
         }
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
@@ -96,7 +103,7 @@ public class MainActivity extends VariantChessActivity implements AndroidFragmen
 
             case R.id.menu_action_disconnect:
                 this.sessionManager.destroySession();
-                this.setFragment(new AccountFragment(), "account");
+                this.setFragment(AccountFragment.class, "account");
                 TextView userText = toolbar.findViewById(R.id.lbl_display_name);
                 userText.setText(R.string.disconnect_message);
                 return true;
@@ -115,14 +122,14 @@ public class MainActivity extends VariantChessActivity implements AndroidFragmen
         TextView userText = toolbar.findViewById(R.id.lbl_display_name);
         if (connected != null) {
             if(TextUtils.isEmpty(connected.getDisplayName())){
-                setFragment(new UsernameFragment(), "username");
+                setFragment(UsernameFragment.class, "username");
             }else{
                 userText.setText(connected.getDisplayName());
-                setFragment(new HomeFragment(), "home");
+                setFragment(HomeFragment.class, "home");
                 Toast.makeText(this, R.string.connected, Toast.LENGTH_LONG).show();
             }
         } else {
-            setFragment(new AccountFragment(), "account");
+            setFragment(AccountFragment.class, "account");
         }
     }
 

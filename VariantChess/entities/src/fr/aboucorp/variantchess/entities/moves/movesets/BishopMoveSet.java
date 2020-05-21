@@ -1,10 +1,10 @@
 package fr.aboucorp.variantchess.entities.moves.movesets;
 
-import fr.aboucorp.variantchess.entities.boards.ClassicBoard;
 import fr.aboucorp.variantchess.entities.ChessColor;
 import fr.aboucorp.variantchess.entities.Location;
 import fr.aboucorp.variantchess.entities.Piece;
 import fr.aboucorp.variantchess.entities.Square;
+import fr.aboucorp.variantchess.entities.boards.ClassicBoard;
 import fr.aboucorp.variantchess.entities.moves.AbstractMoveSet;
 import fr.aboucorp.variantchess.entities.utils.SquareList;
 
@@ -15,9 +15,9 @@ public class BishopMoveSet extends AbstractMoveSet {
     }
 
     @Override
-    protected fr.aboucorp.variantchess.entities.utils.SquareList getPossibleMoves(Piece piece, ChessColor turnColor) {
-        fr.aboucorp.variantchess.entities.utils.SquareList allSquares = classicBoard.getSquares();
-        fr.aboucorp.variantchess.entities.utils.SquareList validSquares = new fr.aboucorp.variantchess.entities.utils.SquareList();
+    protected SquareList getPossibleMoves(Piece piece, ChessColor turnColor) {
+        SquareList allSquares = classicBoard.getSquares();
+        SquareList validSquares = new SquareList();
         Location start = piece.getLocation();
         // top left direction
         for(float x = start.getX()+1, z = start.getZ()+1 ; x < 8 && z < 8; x++,z++ ){

@@ -15,8 +15,8 @@ public class RookMoveSet extends AbstractMoveSet {
     }
 
     @Override
-    protected fr.aboucorp.variantchess.entities.utils.SquareList getPossibleMoves(Piece piece, ChessColor turnColor) {
-        fr.aboucorp.variantchess.entities.utils.SquareList validSquares = new fr.aboucorp.variantchess.entities.utils.SquareList();
+    protected SquareList getPossibleMoves(Piece piece, ChessColor turnColor) {
+        SquareList validSquares = new SquareList();
         Location start = piece.getLocation();
         for(float x = start.getX()+1; x < 8 ; x++){
             Square validSquare = (Square) classicBoard.getSquares().getItemByLocation(new Location(x,0,start.getZ()));

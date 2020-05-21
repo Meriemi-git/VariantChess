@@ -6,11 +6,11 @@ public class Turn implements Comparable<Turn>{
 
     public final int turnNumber;
     public Duration duration;
-    public fr.aboucorp.variantchess.entities.Square to;
-    public fr.aboucorp.variantchess.entities.Square from;
-    public fr.aboucorp.variantchess.entities.Piece played;
-    public fr.aboucorp.variantchess.entities.Piece DeadPiece;
-    public final fr.aboucorp.variantchess.entities.Team team;
+    public Square to;
+    public Square from;
+    public Piece played;
+    public Piece DeadPiece;
+    public final Team team;
 
     public Turn(int turnNumber, Team team) {
         this.turnNumber = turnNumber;
@@ -21,23 +21,23 @@ public class Turn implements Comparable<Turn>{
         return this.team.getChessColor();
     }
 
-    public fr.aboucorp.variantchess.entities.Piece getDeadPiece() {
+    public Piece getDeadPiece() {
         return DeadPiece;
     }
 
-    public void setDeadPiece(fr.aboucorp.variantchess.entities.Piece deadPiece) {
+    public void setDeadPiece(Piece deadPiece) {
         DeadPiece = deadPiece;
     }
 
-    public fr.aboucorp.variantchess.entities.Square getTo() {
+    public Square getTo() {
         return to;
     }
 
-    public void setTo(fr.aboucorp.variantchess.entities.Square to) {
+    public void setTo(Square to) {
         this.to = to;
     }
 
-    public fr.aboucorp.variantchess.entities.Piece getPlayed() {
+    public Piece getPlayed() {
         return played;
     }
 
@@ -53,7 +53,7 @@ public class Turn implements Comparable<Turn>{
         this.duration = duration;
     }
 
-    public fr.aboucorp.variantchess.entities.Square getFrom() {
+    public Square getFrom() {
         return from;
     }
 

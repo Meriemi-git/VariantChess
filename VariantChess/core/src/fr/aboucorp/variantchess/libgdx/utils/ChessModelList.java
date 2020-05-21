@@ -2,7 +2,6 @@ package fr.aboucorp.variantchess.libgdx.utils;
 
 import com.badlogic.gdx.utils.Array;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 
 import fr.aboucorp.variantchess.entities.Location;

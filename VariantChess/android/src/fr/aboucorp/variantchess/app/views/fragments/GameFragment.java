@@ -12,12 +12,12 @@ import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.Spinner;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
 import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
+import fr.aboucorp.variantchess.app.utils.FragmentTag;
 import fr.aboucorp.variantchess.app.viewmodel.GameModeAdapter;
 import fr.aboucorp.variantchess.app.views.activities.MainActivity;
 import fr.aboucorp.variantchess.app.views.activities.VariantChessActivity;
@@ -76,7 +76,7 @@ public class GameFragment extends VariantChessFragment implements AdapterView.On
                 e.printStackTrace();
             }*/
         }else if(new_game_rdb_offline.isChecked()){
-            ((VariantChessActivity)getActivity()).setFragment(new PartyFragment(),"androidBoard");
+            ((VariantChessActivity)getActivity()).setFragment(PartyFragment.class, FragmentTag.PARTY);
         }
     }
 

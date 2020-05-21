@@ -18,6 +18,7 @@ import fr.aboucorp.variantchess.app.multiplayer.MatchListener;
 import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
 import fr.aboucorp.variantchess.app.views.activities.VariantChessActivity;
 import fr.aboucorp.variantchess.entities.ChessColor;
+import fr.aboucorp.variantchess.entities.PartyLifeCycle;
 import fr.aboucorp.variantchess.entities.enums.BoardEventType;
 import fr.aboucorp.variantchess.entities.events.GameEventManager;
 import fr.aboucorp.variantchess.entities.events.GameEventSubscriber;
@@ -27,7 +28,7 @@ import fr.aboucorp.variantchess.entities.events.models.LogEvent;
 import fr.aboucorp.variantchess.entities.events.models.MoveEvent;
 import fr.aboucorp.variantchess.entities.events.models.PartyEvent;
 
-public class MatchManager implements GameEventSubscriber, MatchListener, BoardManager.BoardLoadingListener {
+public class MatchManager implements GameEventSubscriber, MatchListener, BoardManager.BoardLoadingListener, PartyLifeCycle {
     private final BoardManager boardManager;
     private final TurnManager turnManager;
     private GameEventManager eventManager;
@@ -39,54 +40,57 @@ public class MatchManager implements GameEventSubscriber, MatchListener, BoardMa
         this.boardManager.setBoardLoadingListener(this);
         this.turnManager = TurnManager.getINSTANCE();
         this.eventManager = GameEventManager.getINSTANCE();
-        this.eventManager.subscribe(PartyEvent.class,this,1);
-        this.eventManager.subscribe(BoardEvent.class,this,1);
         this.sessionManager = SessionManager.getInstance(activity);
-    }
-
-    public void startGame(){
-        this.boardManager.createBoard();
     }
 
     @Override
     public void OnBoardLoaded() {
-        this.turnManager.newParty(ChessColor.WHITE);
+        this.eventManager.subscribe(PartyEvent.class,this,1);
+        this.eventManager.subscribe(BoardEvent.class,this,1);
+        this.turnManager.startParty();
     }
 
     public void loadBoard(String fenString){
         try {
             ChessColor color = this.boardManager.loadBoard(fenString);
-            this.turnManager.newParty(color);
+            this.turnManager.startAtTurnColor(color);
         } catch (Exception e) {
             e.printStackTrace();
             this.eventManager.sendMessage(new LogEvent(String.format("Error during parsing fen string. Message : %s",e.getMessage())));
         }
     }
 
-    public void endTurn() {
-        this.turnManager.endTurn();
+    public void endTurn(MoveEvent event) {
+        this.turnManager.endTurn(event);
+        this.turnManager.startTurn();
     }
 
     public String getPartyInfos(){
         return this.turnManager.getTurnColor().name();
     }
 
-
-    public void endParty() {
-        this.eventManager.clearSubscriptions();
-        this.boardManager.clearBoard();
-    }
-
     @Override
     public void receiveGameEvent(GameEvent event) {
         if(event instanceof PartyEvent){
             Log.i("fr.aboucorp.variantchess",event.message);
-        }else if(event instanceof BoardEvent && ((BoardEvent) event).type == fr.aboucorp.variantchess.entities.enums.BoardEventType.CHECKMATE){
+        }else if(event instanceof BoardEvent && ((BoardEvent) event).type == BoardEventType.CHECKMATE){
             ChessColor winner = boardManager.getWinner();
             this.eventManager.sendMessage(new PartyEvent(String.format("Game finished ! Winner : %s",winner != null ? winner.name() : "EQUALITY")));
         }else if(event instanceof MoveEvent && ((BoardEvent) event).type == BoardEventType.MOVE){
-            endTurn();
+            endTurn(((MoveEvent)event));
         }
+    }
+
+
+    @Override
+    public void startParty() {
+        this.boardManager.startParty();
+    }
+
+    @Override
+    public void stopParty() {
+        this.eventManager.stopParty();
+        this.boardManager.stopParty();
     }
 
     @Override

@@ -1,11 +1,11 @@
 package fr.aboucorp.variantchess.entities.moves.movesets;
 
-import fr.aboucorp.variantchess.entities.enums.BoardEventType;
 import fr.aboucorp.variantchess.entities.ChessColor;
 import fr.aboucorp.variantchess.entities.Location;
 import fr.aboucorp.variantchess.entities.Piece;
 import fr.aboucorp.variantchess.entities.Square;
 import fr.aboucorp.variantchess.entities.boards.ClassicBoard;
+import fr.aboucorp.variantchess.entities.enums.BoardEventType;
 import fr.aboucorp.variantchess.entities.enums.PieceId;
 import fr.aboucorp.variantchess.entities.events.models.EnPassantEvent;
 import fr.aboucorp.variantchess.entities.moves.AbstractMoveSet;
@@ -81,7 +81,7 @@ public class PawnMoveSet extends AbstractMoveSet {
 
     private boolean enPassantLeftIsPossible(Square diagLeft) {
         if (enPassantIsPossible() && diagLeft.getLocation().getX() == this.previousTurn.to.getLocation().getX()) {
-            this.eventManager.sendMessage(new EnPassantEvent("En passant", fr.aboucorp.variantchess.entities.enums.BoardEventType.EN_PASSANT, diagLeft));
+            this.eventManager.sendMessage(new EnPassantEvent("En passant", BoardEventType.EN_PASSANT, diagLeft));
             return true;
         }
         return false;

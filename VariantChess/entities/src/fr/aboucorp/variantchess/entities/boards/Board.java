@@ -1,7 +1,7 @@
 package fr.aboucorp.variantchess.entities.boards;
 
-import fr.aboucorp.variantchess.entities.exceptions.FenStringBadFormatException;
 import fr.aboucorp.variantchess.entities.ChessColor;
+import fr.aboucorp.variantchess.entities.exceptions.FenStringBadFormatException;
 import fr.aboucorp.variantchess.entities.utils.PieceList;
 import fr.aboucorp.variantchess.entities.utils.SquareList;
 

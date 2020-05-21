@@ -1,6 +1,5 @@
 package fr.aboucorp.variantchess.libgdx;
 
-import com.badlogic.gdx.Application;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
@@ -34,14 +33,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 
 import fr.aboucorp.variantchess.entities.ChessColor;
 import fr.aboucorp.variantchess.entities.GameElement;
 import fr.aboucorp.variantchess.entities.Location;
 import fr.aboucorp.variantchess.entities.Piece;
 import fr.aboucorp.variantchess.entities.Square;
-import fr.aboucorp.variantchess.entities.enums.PieceId;
 import fr.aboucorp.variantchess.entities.pieces.Bishop;
 import fr.aboucorp.variantchess.entities.pieces.King;
 import fr.aboucorp.variantchess.entities.pieces.Knight;
@@ -66,7 +63,6 @@ public class Board3dManager extends ApplicationAdapter {
      * Chargeur de modele 3D
      */
     private ModelBatch modelBatch;
-    private BitmapFont font;
     private SpriteBatch spriteBatch;
     /**
      * Camera de la vue 3D
@@ -100,38 +96,40 @@ public class Board3dManager extends ApplicationAdapter {
     private ModelBuilder modelBuilder;
     private AssetManager assets;
     private boolean boardIsLoading;
-    private fr.aboucorp.variantchess.libgdx.models.ChessModel selectedModel;
+    private ChessModel selectedModel;
     private Material3dManager material3dManager;
+    private TextureAtlas piecesAtlas;
 
     public Board3dManager() {
-        this.devStuff = new ArrayList<ModelInstance>();
+        this.devStuff = new ArrayList<>();
         this.material3dManager = Material3dManager.getInstance();
         this.whitePieceModels = new fr.aboucorp.variantchess.libgdx.utils.ChessModelList();
         this.whiteDeadPieceModels = new fr.aboucorp.variantchess.libgdx.utils.ChessModelList();
         this.blackPieceModels = new fr.aboucorp.variantchess.libgdx.utils.ChessModelList();
         this.blackDeadPieceModels = new fr.aboucorp.variantchess.libgdx.utils.ChessModelList();
         this.chessSquareModels = new fr.aboucorp.variantchess.libgdx.utils.ChessModelList();
-        this.loadingPieces = new ArrayList<Piece>();
-
+        this.loadingPieces = new ArrayList<>();
     }
 
     @Override
     public void create() {
         //Gdx.app.setLogLevel(Application.LOG_DEBUG);
-        this.assets = new AssetManager(new InternalFileHandleResolver());
+        if(this.assets == null) {
+            this.assets = new AssetManager(new InternalFileHandleResolver());
+        }
         this.modelBatch = new ModelBatch();
         this.spriteBatch = new SpriteBatch();
         this.modelBuilder = new ModelBuilder();
         this.initEnvironment();
         this.initCamera();
+        if(tacticalViewEnabled){
+            setTacticalCamera();
+        }
         InputMultiplexer multiplexer = new InputMultiplexer(new GestureDetector(androidListener), camController);
         multiplexer.addProcessor(androidInputAdapter);
         Gdx.input.setInputProcessor(multiplexer);
-        setPaths();
+        this.setPaths();
         this.loadModels();
-        font = new BitmapFont();
-        font.setColor(Color.RED);
-        //createAxis();
     }
 
     @Override
@@ -145,28 +143,28 @@ public class Board3dManager extends ApplicationAdapter {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         this.modelBatch.begin(camera);
-        for (fr.aboucorp.variantchess.libgdx.models.ChessModel piece : this.whitePieceModels) {
+        for (ChessModel piece : this.whitePieceModels) {
             if (piece.isVisible(this.camera) && !tacticalViewEnabled) {
                 modelBatch.render(piece, this.environment);
             }
         }
 
-        for (fr.aboucorp.variantchess.libgdx.models.ChessModel piece : this.blackPieceModels) {
+        for (ChessModel piece : this.blackPieceModels) {
             if (piece.isVisible(this.camera) && !tacticalViewEnabled) {
                 modelBatch.render(piece, this.environment);
             }
         }
-        for (fr.aboucorp.variantchess.libgdx.models.ChessModel deadPiece : this.whiteDeadPieceModels) {
+        for (ChessModel deadPiece : this.whiteDeadPieceModels) {
             if (deadPiece.isVisible(this.camera) && !tacticalViewEnabled) {
                 modelBatch.render(deadPiece, this.environment);
             }
         }
-        for (fr.aboucorp.variantchess.libgdx.models.ChessModel deadPiece : this.blackDeadPieceModels) {
+        for (ChessModel deadPiece : this.blackDeadPieceModels) {
             if (deadPiece.isVisible(this.camera) && !tacticalViewEnabled) {
                 modelBatch.render(deadPiece, this.environment);
             }
         }
-        for (fr.aboucorp.variantchess.libgdx.models.ChessModel squareModel : this.chessSquareModels) {
+        for (ChessModel squareModel : this.chessSquareModels) {
             if (squareModel.isVisible(this.camera)) {
                 modelBatch.render(squareModel, this.environment);
             }
@@ -178,12 +176,10 @@ public class Board3dManager extends ApplicationAdapter {
         if (tacticalViewEnabled) {
             displayPictures();
         }
-        //renderNumbers();
     }
 
     private void displayPictures() {
         this.spriteBatch.begin();
-        TextureAtlas piecesAtlas = this.assets.get(assetPaths.get(Piece.class), TextureAtlas.class);
         this.whitePieceModels.forEach(piece -> {
             Matrix4 tmpMat4 = new Matrix4();
             Vector3 squareCenter = new Vector3(piece.getLocation().getX() + 0.475f, piece.getLocation().getY(), piece.getLocation().getZ() - 0.5f);
@@ -195,7 +191,7 @@ public class Board3dManager extends ApplicationAdapter {
                     .rotate(0, 1, 0, 180);
 
             spriteBatch.setProjectionMatrix(tmpMat4.set(camera.combined).mul(textTransform));
-            TextureAtlas.AtlasRegion region = piecesAtlas.findRegion(getRegionNameFromPieceId(((fr.aboucorp.variantchess.libgdx.models.ChessPieceM) piece).id));
+            TextureAtlas.AtlasRegion region = piecesAtlas.findRegion(material3dManager.getRegionNameFromPieceId(((ChessPieceM) piece).id));
             Sprite pieceSprite = new Sprite(region);
             spriteBatch.draw(pieceSprite, 0, 0, 24, 24);
         });
@@ -211,7 +207,7 @@ public class Board3dManager extends ApplicationAdapter {
                     .rotate(0, 1, 0, 180);
 
             spriteBatch.setProjectionMatrix(tmpMat4.set(camera.combined).mul(textTransform));
-            TextureAtlas.AtlasRegion region = piecesAtlas.findRegion(getRegionNameFromPieceId(((fr.aboucorp.variantchess.libgdx.models.ChessPieceM) piece).id));
+            TextureAtlas.AtlasRegion region = piecesAtlas.findRegion(material3dManager.getRegionNameFromPieceId(((ChessPieceM) piece).id));
             Sprite pieceSprite = new Sprite(region);
             spriteBatch.draw(pieceSprite, 0, 0, 24, 24);
         });
@@ -226,7 +222,7 @@ public class Board3dManager extends ApplicationAdapter {
                     .rotate(0, 1, 0, 180);
 
             spriteBatch.setProjectionMatrix(tmpMat4.set(camera.combined).mul(textTransform));
-            TextureAtlas.AtlasRegion region = piecesAtlas.findRegion(getRegionNameFromPieceId(((fr.aboucorp.variantchess.libgdx.models.ChessPieceM) piece).id));
+            TextureAtlas.AtlasRegion region = piecesAtlas.findRegion(material3dManager.getRegionNameFromPieceId(((ChessPieceM) piece).id));
             Sprite pieceSprite = new Sprite(region);
             spriteBatch.draw(pieceSprite, 0, 0, 24, 24);
         });
@@ -241,96 +237,15 @@ public class Board3dManager extends ApplicationAdapter {
                     .rotate(0, 1, 0, 180);
 
             spriteBatch.setProjectionMatrix(tmpMat4.set(camera.combined).mul(textTransform));
-            TextureAtlas.AtlasRegion region = piecesAtlas.findRegion(getRegionNameFromPieceId(((fr.aboucorp.variantchess.libgdx.models.ChessPieceM) piece).id));
+            TextureAtlas.AtlasRegion region = piecesAtlas.findRegion(material3dManager.getRegionNameFromPieceId(((ChessPieceM) piece).id));
             Sprite pieceSprite = new Sprite(region);
             spriteBatch.draw(pieceSprite, 0, 0, 24, 24);
         });
         this.spriteBatch.end();
     }
 
-    private String getRegionNameFromPieceId(PieceId id) {
-        switch (id) {
-            case WK:
-                return "wk";
-            case WQ:
-                return "wq";
-            case WLN:
-                return "wrn";
-            case WRN:
-                return "wln";
-            case WRR:
-            case WLR:
-                return "wr";
-            case WRB:
-            case WLB:
-                return "wb";
-            case WP1:
-            case WP2:
-            case WP3:
-            case WP4:
-            case WP5:
-            case WP6:
-            case WP7:
-            case WP8:
-                return "wp";
-            case BK:
-                return "bk";
-            case BQ:
-                return "bq";
-            case BLN:
-                return "brn";
-            case BRN:
-                return "bln";
-            case BRR:
-            case BLR:
-                return "br";
-            case BRB:
-            case BLB:
-                return "bb";
-            case BP1:
-            case BP2:
-            case BP3:
-            case BP4:
-            case BP5:
-            case BP6:
-            case BP7:
-            case BP8:
-                return "bp";
-            default:
-                return "wp";
-        }
-    }
 
-    private void renderNumbers() {
-        this.spriteBatch.begin();
-        for (fr.aboucorp.variantchess.libgdx.models.ChessModel squareModel : this.chessSquareModels) {
-            Matrix4 tmpMat4 = new Matrix4();
-            Vector3 squareCenter2 = new Vector3(squareModel.getLocation().getX(), squareModel.getLocation().getY(), squareModel.getLocation().getZ());
-            Matrix4 textTransform = new Matrix4();
-            textTransform.idt()
-                    .translate(squareCenter2.add(new Vector3(0.25f, 0f, 0.25f)))
-                    .rotate(1, 0, 0, 90)
-                    .rotate(0, 1, 0, 180);
-
-            spriteBatch.setProjectionMatrix(tmpMat4.set(camera.combined).mul(textTransform));
-            font.draw(spriteBatch, ((fr.aboucorp.variantchess.libgdx.models.ChessSquareM) squareModel).getLabel(), 0, 0);
-        }
-        spriteBatch.end();
-    }
-
-    @Override
-    public void dispose() {
-        try {
-            this.modelBatch.dispose();
-            this.spriteBatch.dispose();
-            this.assets.dispose();
-            this.font.dispose();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void setPaths() {
+void setPaths() {
         assetPaths.put(Knight.class, "data/knight.g3db");
         assetPaths.put(King.class, "data/king.g3db");
         assetPaths.put(Queen.class, "data/queen.g3db");
@@ -351,14 +266,13 @@ public class Board3dManager extends ApplicationAdapter {
             } else {
                 material = new Material(ColorAttribute.createDiffuse(Color.WHITE));
             }
-            fr.aboucorp.variantchess.libgdx.models.ChessSquareM squareModel = new ChessSquareM(compositeModel, square.getLocation(), material, ((Square) square).getSquareLabel());
+            ChessSquareM squareModel = new ChessSquareM(compositeModel, square.getLocation(), material, ((Square) square).getSquareLabel());
             this.chessSquareModels.add(squareModel);
         }
 
     }
 
     private Model createModelFromParts() {
-        //Material defaultMat = new Material();
         int attr = VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal | VertexAttributes.Usage.TextureCoordinates;
         this.modelBuilder.begin();
         modelBuilder.node().id = "root";
@@ -397,7 +311,7 @@ public class Board3dManager extends ApplicationAdapter {
         Model queenModel = this.assets.get("data/queen.g3db", Model.class);
         Model kingModel = this.assets.get("data/king.g3db", Model.class);
         Model rookModel = this.assets.get("data/rook.g3db", Model.class);
-
+        piecesAtlas = this.assets.get(assetPaths.get(Piece.class), TextureAtlas.class);
         for (Iterator<Piece> iter = this.loadingPieces.iterator(); iter.hasNext(); ) {
             Piece piece = iter.next();
             Material material;
@@ -440,26 +354,11 @@ public class Board3dManager extends ApplicationAdapter {
         this.boardIsLoading = false;
     }
 
-    private void createAxis() {
-        Model arrowX = modelBuilder.createArrow(0f, 0f, 0, 10f, 0f, 0f, 0.1f, 0.1f, 5,
-                GL20.GL_TRIANGLES, new Material(ColorAttribute.createDiffuse(com.badlogic.gdx.graphics.Color.RED)),
-                VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
-        Model arrowY = modelBuilder.createArrow(0f, 0f, 0, 0f, 10f, 0f, 0.1f, 0.1f, 5,
-                GL20.GL_TRIANGLES, new Material(ColorAttribute.createDiffuse(com.badlogic.gdx.graphics.Color.BLUE)),
-                VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
-        Model arrowZ = modelBuilder.createArrow(0f, 0f, 0, 0f, 0f, 10f, 0.1f, 0.1f, 5,
-                GL20.GL_TRIANGLES, new Material(ColorAttribute.createDiffuse(com.badlogic.gdx.graphics.Color.GREEN)),
-                VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal);
-        this.devStuff.add(new ModelInstance(arrowX));
-        this.devStuff.add(new ModelInstance(arrowY));
-        this.devStuff.add(new ModelInstance(arrowZ));
-    }
-
     public void selectPiece(Piece touched) {
         if (this.selectedModel != null) {
             this.material3dManager.resetMaterial(this.selectedModel);
         }
-        fr.aboucorp.variantchess.libgdx.models.ChessModel pieceModel;
+        ChessModel pieceModel;
         if (touched.getChessColor() == ChessColor.BLACK) {
             pieceModel = this.blackPieceModels.getByLocation(touched.getLocation());
 
@@ -475,8 +374,8 @@ public class Board3dManager extends ApplicationAdapter {
             this.material3dManager.resetMaterial(this.selectedModel);
         }
         this.selectedModel = null;
-        for (Iterator<fr.aboucorp.variantchess.libgdx.models.ChessModel> iter = this.chessSquareModels.iterator(); iter.hasNext(); ) {
-            fr.aboucorp.variantchess.libgdx.models.ChessModel square = iter.next();
+        for (Iterator<ChessModel> iter = this.chessSquareModels.iterator(); iter.hasNext(); ) {
+            ChessModel square = iter.next();
             this.material3dManager.resetMaterial(square);
         }
     }
@@ -536,8 +435,7 @@ public class Board3dManager extends ApplicationAdapter {
     }
 
     public void moveToSquare(Piece piece, Square square) {
-        fr.aboucorp.variantchess.libgdx.models.ChessModel squareModel = this.getChessSquareModels().getByLocation(square.getLocation());
-        fr.aboucorp.variantchess.libgdx.models.ChessModel pieceModel;
+        ChessModel pieceModel;
         if (piece.getChessColor() == ChessColor.WHITE) {
             pieceModel = this.getWhitePieceModels().getByLocation(piece.getLocation());
         } else {
@@ -549,7 +447,7 @@ public class Board3dManager extends ApplicationAdapter {
     public ChessModelList getSquareModelsFromPossibleMoves(SquareList possiblesMoves) {
         ChessModelList possibleSquares = new ChessModelList();
         if (possiblesMoves != null) {
-            for (fr.aboucorp.variantchess.libgdx.models.ChessModel squareModel : getChessSquareModels()) {
+            for (ChessModel squareModel : getChessSquareModels()) {
                 for (Square square : possiblesMoves) {
                     if (squareModel.getLocation().equals(square.getLocation())) {
                         possibleSquares.add(squareModel);
@@ -593,6 +491,7 @@ public class Board3dManager extends ApplicationAdapter {
     }
 
     public void clearBoard() {
+        this.selectedModel = null;
         this.blackPieceModels.clear();
         this.whitePieceModels.clear();
         this.whiteDeadPieceModels.clear();
@@ -601,23 +500,34 @@ public class Board3dManager extends ApplicationAdapter {
         this.devStuff.clear();
     }
 
-    public void toogleTacticalView(ChessColor turnColor) {
+    public void toogleTacticalView() {
+        this.tacticalViewEnabled = !this.tacticalViewEnabled;
+        if (tacticalViewEnabled) {
+            setTacticalCamera();
+        } else {
+            set3DCamera();
+        }
+    }
+
+    private void set3DCamera() {
+        camera.direction.set(0, 0, 0);
+        camera.up.set(0, 1, 0);
+        this.camera.position.set(3.5f, 15f, -8f);
+        this.camera.lookAt(3.5f, 0, 3.5f);
+        this.camera.update();
+    }
+
+    private void setTacticalCamera() {
         camera.direction.set(0, 0, 0);
         this.camera.lookAt(3.5f, 0, 3.5f);
         camera.up.set(0, 1, 0);
-        if (tacticalViewEnabled) {
-            this.camera.position.set(3.5f, 15f, -8f);
-            this.camera.lookAt(3.5f, 0, 3.5f);
-        } else {
-            this.camera.position.set(new Vector3(3.475f, 20, 3.475f));
-            this.camera.lookAt(3.5f, 0, 3.5f);
-            this.camera.rotate(Vector3.Y, -45);
-            if (turnColor == ChessColor.BLACK) {
+        this.camera.position.set(new Vector3(3.475f, 20, 3.475f));
+        this.camera.lookAt(3.5f, 0, 3.5f);
+        this.camera.rotate(Vector3.Y, -45);
+            /*if (turnColor == ChessColor.BLACK) {
                 this.camera.rotate(Vector3.Y, -180);
-            }
-        }
+            }*/
         this.camera.update();
-        this.tacticalViewEnabled = !this.tacticalViewEnabled;
     }
 
     public void moveCameraOnNewTurn(ChessColor color) {
@@ -654,8 +564,20 @@ public class Board3dManager extends ApplicationAdapter {
         this.androidListener = androidListener;
     }
 
-    public void exit() {
-        Gdx.app.exit();
+    @Override
+    public void dispose() {
+        try {
+            Gdx.app.log("fr.aboucorp.variantchess.libgdx","dispose board3dManager");
+            //this.modelBatch.dispose();
+            //this.spriteBatch.dispose();
+            //this.assets.dispose();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
+    @Override
+    public void pause() {
+        super.pause();
+    }
 }

@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-
 import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
 import fr.aboucorp.variantchess.app.views.activities.MainActivity;
@@ -43,7 +42,7 @@ public class HomeFragment extends VariantChessFragment {
     @Override
     protected void bindListeners() {
         this.home_btn_online_game.setOnClickListener(v -> {
-            ((VariantChessActivity)getActivity()).setFragment(new GameFragment(),"newGame");
+            ((VariantChessActivity)getActivity()).setFragment(GameFragment.class,"newGame");
         });
     }
 }

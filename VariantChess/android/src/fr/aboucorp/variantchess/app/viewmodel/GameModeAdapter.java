@@ -8,7 +8,6 @@ import android.widget.ArrayAdapter;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 
-
 import java.util.List;
 
 import fr.aboucorp.variantchess.R;

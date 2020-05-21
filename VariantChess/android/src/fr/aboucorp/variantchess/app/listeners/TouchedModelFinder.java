@@ -5,8 +5,6 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.math.collision.Ray;
 
-import java.util.ArrayList;
-
 import fr.aboucorp.variantchess.app.managers.boards.BoardManager;
 import fr.aboucorp.variantchess.libgdx.models.ChessModel;
 import fr.aboucorp.variantchess.libgdx.utils.ChessModelList;

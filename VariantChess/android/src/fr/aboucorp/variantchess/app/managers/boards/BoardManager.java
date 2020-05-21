@@ -6,8 +6,10 @@ import java.util.ArrayList;
 
 import fr.aboucorp.variantchess.app.listeners.GDXGestureListener;
 import fr.aboucorp.variantchess.app.listeners.GDXInputAdapter;
+import fr.aboucorp.variantchess.app.utils.GdxPostRunner;
 import fr.aboucorp.variantchess.entities.ChessColor;
 import fr.aboucorp.variantchess.entities.Location;
+import fr.aboucorp.variantchess.entities.PartyLifeCycle;
 import fr.aboucorp.variantchess.entities.Piece;
 import fr.aboucorp.variantchess.entities.Square;
 import fr.aboucorp.variantchess.entities.Turn;
@@ -26,10 +28,9 @@ import fr.aboucorp.variantchess.entities.exceptions.FenStringBadFormatException;
 import fr.aboucorp.variantchess.entities.rules.AbstractRuleSet;
 import fr.aboucorp.variantchess.entities.utils.SquareList;
 import fr.aboucorp.variantchess.libgdx.Board3dManager;
-import fr.aboucorp.variantchess.libgdx.models.ChessModel;
 import fr.aboucorp.variantchess.libgdx.utils.ChessModelList;
 
-public abstract class BoardManager implements GameEventSubscriber {
+public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycle {
     protected final Board board;
     protected final Board3dManager board3dManager;
     private final GDXInputAdapter inputAdapter;
@@ -60,8 +61,8 @@ public abstract class BoardManager implements GameEventSubscriber {
 
     @Override
     public void receiveGameEvent(GameEvent event) {
-        if (event instanceof fr.aboucorp.variantchess.entities.events.models.TurnStartEvent) {
-            manageTurnStart((fr.aboucorp.variantchess.entities.events.models.TurnStartEvent) event);
+        if (event instanceof TurnStartEvent) {
+            manageTurnStart((TurnStartEvent) event);
         } else if (event instanceof TurnEndEvent) {
             manageTurnEnd();
         }
@@ -71,16 +72,19 @@ public abstract class BoardManager implements GameEventSubscriber {
 
     protected abstract void manageTurnEnd();
 
-    public void clearBoard() {
+    @Override
+    public void stopParty() {
         this.gameState = GameState.SelectPiece;
         this.selectedPiece = null;
         this.previousTurn = null;
         this.actualTurn = null;
         this.board.clearBoard();
         this.board3dManager.clearBoard();
+        this.ruleSet.moveNumber = 0;
     }
 
-    public void createBoard(){
+    @Override
+    public void startParty() {
         this.eventManager.subscribe(PartyEvent.class, this, 1);
         this.eventManager.subscribe(TurnEvent.class, this, 1);
         this.eventManager.subscribe(PieceEvent.class, this, 1);
@@ -107,7 +111,6 @@ public abstract class BoardManager implements GameEventSubscriber {
     public abstract ChessModelList getBlackPieceModels();
 
     public abstract ChessModelList getWhitePieceModels();
-
 
     public abstract Square getSquareFromLocation(Location location);
 
@@ -143,7 +146,13 @@ public abstract class BoardManager implements GameEventSubscriber {
     }
 
     public void toogleTacticalView(){
-        this.board3dManager.toogleTacticalView(this.actualTurn.getTurnColor());
+        GdxPostRunner runner = new GdxPostRunner() {
+            @Override
+            public void execute() {
+                BoardManager.this.board3dManager.toogleTacticalView();
+            }
+        };
+        runner.startAsync();
     }
 
     public boolean IsTacticalViewOn(){

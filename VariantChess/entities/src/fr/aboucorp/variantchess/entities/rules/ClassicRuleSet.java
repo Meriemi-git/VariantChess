@@ -22,6 +22,7 @@ import fr.aboucorp.variantchess.entities.events.models.PieceEvent;
 import fr.aboucorp.variantchess.entities.events.models.TurnEndEvent;
 import fr.aboucorp.variantchess.entities.events.models.TurnEvent;
 import fr.aboucorp.variantchess.entities.events.models.TurnStartEvent;
+import fr.aboucorp.variantchess.entities.utils.ChessList;
 import fr.aboucorp.variantchess.entities.utils.PieceList;
 
 public class ClassicRuleSet extends AbstractRuleSet implements GameEventSubscriber {
@@ -43,7 +44,7 @@ public class ClassicRuleSet extends AbstractRuleSet implements GameEventSubscrib
     public ClassicRuleSet(Board board) {
         this.board = board;
         this.eventManager = GameEventManager.getINSTANCE();
-        this.eventManager.subscribe(TurnEvent.class,this,1);
+        this.eventManager.subscribe(TurnEvent.class, this, 1);
     }
 
     public void isKingInCheck(Piece piece) {
@@ -51,7 +52,7 @@ public class ClassicRuleSet extends AbstractRuleSet implements GameEventSubscrib
             this.eventManager.sendMessage(new CheckOutEvent("King out of check", BoardEventType.CHECK_OUT, piece));
             this.kingIsInCheck = false;
         }
-        List<Piece> causingCheck = piece.getMoveSet().moveCauseCheck(actualTurn.getTurnColor());
+        ChessList<Piece> causingCheck = piece.getMoveSet().moveCauseCheck(actualTurn.getTurnColor());
         if (causingCheck.size() > 0) {
             this.kingIsInCheck = true;
             Piece kingInCheck = this.previousTurn.getTurnColor() == ChessColor.WHITE
@@ -71,7 +72,7 @@ public class ClassicRuleSet extends AbstractRuleSet implements GameEventSubscrib
         ChessColor turnColor = this.actualTurn.getTurnColor();
         Piece rookToMove = null;
         Square destination = null;
-        fr.aboucorp.variantchess.entities.enums.BoardEventType castlingType = null;
+        BoardEventType castlingType = null;
         if (this.whiteCanCastleQueen && turnColor == ChessColor.WHITE && square.getSquareLabel().equals("C1")) {
             rookToMove = this.board.getWhitePieces().getPieceById(PieceId.WLR);
             destination = this.board.getSquares().getSquareByLabel("D1");
@@ -93,26 +94,26 @@ public class ClassicRuleSet extends AbstractRuleSet implements GameEventSubscrib
             castlingType = BoardEventType.CASTLE_KING;
         }
         if (rookToMove != null && destination != null) {
-            this.eventManager.sendMessage(new CastlingEvent("Castling",castlingType,rookToMove,destination));
+            this.eventManager.sendMessage(new CastlingEvent("Castling", castlingType, rookToMove, destination));
         }
     }
 
     public void canCastle() {
         if (whiteCanCastleKingNow()) {
             this.whiteCanCastleKing = true;
-            this.eventManager.sendMessage(new fr.aboucorp.variantchess.entities.events.models.PieceEvent("White can castle on king side", BoardEventType.CASTLE_KING, this.board.getWhitePieces().getPieceById(PieceId.WK)));
+            this.eventManager.sendMessage(new PieceEvent("White can castle on king side", BoardEventType.CASTLE_KING, this.board.getWhitePieces().getPieceById(PieceId.WK)));
         } else {
             this.whiteCanCastleKing = false;
         }
         if (whiteCanCastleQueenNow()) {
             this.whiteCanCastleQueen = true;
-            this.eventManager.sendMessage(new fr.aboucorp.variantchess.entities.events.models.PieceEvent("White can castle on queen side", BoardEventType.CASTLE_QUEEN, this.board.getWhitePieces().getPieceById(PieceId.WK)));
+            this.eventManager.sendMessage(new PieceEvent("White can castle on queen side", BoardEventType.CASTLE_QUEEN, this.board.getWhitePieces().getPieceById(PieceId.WK)));
         } else {
             this.whiteCanCastleQueen = false;
         }
         if (blackCanCastleKingNow()) {
             this.blackCanCastleKing = true;
-            this.eventManager.sendMessage(new fr.aboucorp.variantchess.entities.events.models.PieceEvent("Black can castle on king side", BoardEventType.CASTLE_KING, this.board.getBlackPieces().getPieceById(PieceId.BK)));
+            this.eventManager.sendMessage(new PieceEvent("Black can castle on king side", BoardEventType.CASTLE_KING, this.board.getBlackPieces().getPieceById(PieceId.BK)));
         } else {
             this.blackCanCastleKing = false;
         }
@@ -155,7 +156,7 @@ public class ClassicRuleSet extends AbstractRuleSet implements GameEventSubscrib
 
     public boolean whiteCanCastleQueen() {
         return this.board.getWhitePieces().getPieceById(PieceId.WK).isFirstMove()
-                && this.board.getWhitePieces().getPieceById(PieceId.WLR).isFirstMove() ;
+                && this.board.getWhitePieces().getPieceById(PieceId.WLR).isFirstMove();
     }
 
     private boolean whiteCanCastleKingNow() {
@@ -175,7 +176,7 @@ public class ClassicRuleSet extends AbstractRuleSet implements GameEventSubscrib
     }
 
     private void fiftyMoveRule() {
-        if (previousTurn != null) {
+        if (previousTurn != null && previousTurn.played != null) {
             if (PieceId.isPawn(this.previousTurn.played.getPieceId()) || previousTurn.getDeadPiece() != null) {
                 this.fiftyMoveCounter = 0;
             } else {
@@ -229,11 +230,11 @@ public class ClassicRuleSet extends AbstractRuleSet implements GameEventSubscrib
     @Override
     public void receiveGameEvent(GameEvent event) {
         if (event instanceof EnPassantEvent) {
-            if (((EnPassantEvent) event).type == fr.aboucorp.variantchess.entities.enums.BoardEventType.EN_PASSANT) {
+            if (((EnPassantEvent) event).type == BoardEventType.EN_PASSANT) {
                 this.enPassant = ((EnPassantEvent) event).destination;
             }
-        }else if(event instanceof TurnStartEvent){
-            if(previousTurn != null) {
+        } else if (event instanceof TurnStartEvent) {
+            if (previousTurn != null) {
                 this.canClaimADraw();
                 this.canCastle();
                 isGameFinished();
@@ -243,9 +244,22 @@ public class ClassicRuleSet extends AbstractRuleSet implements GameEventSubscrib
             if (((TurnStartEvent) event).turn.getTurnColor() == ChessColor.WHITE) {
                 this.moveNumber++;
             }
-        }else if(event instanceof TurnEndEvent){
+        } else if (event instanceof TurnEndEvent) {
             this.enPassant = null;
         }
     }
 
+    @Override
+    public void clearRules() {
+        super.clearRules();
+        fiftyMoveCounter = 0;
+        whiteCanCastleKing = false;
+        whiteCanCastleQueen = false;
+        blackCanCastleKing = false;
+        blackCanCastleQueen = false;
+        kingIsInCheck = false;
+        enPassant = null;
+        previousTurn = null;
+        actualTurn = null;
+    }
 }
