@@ -10,13 +10,12 @@ import fr.aboucorp.variantchess.entities.enums.PieceId;
 import fr.aboucorp.variantchess.libgdx.models.ChessModel;
 
 public class Material3dManager {
-    private static Material3dManager INSTANCE;
     private Material selectedPieceMaterial;
     private Material occupiedMaterial;
     public boolean picturesLoading;
 
 
-    private Material3dManager() {
+    public Material3dManager() {
         this.selectedPieceMaterial = new Material();
         this.selectedPieceMaterial.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, 0.8f));
         this.selectedPieceMaterial.set(ColorAttribute.createDiffuse(Color.ROYAL));
@@ -35,13 +34,6 @@ public class Material3dManager {
 
     public void setSelectedMaterial(ChessModel model) {
         setMaterial(model,this.selectedPieceMaterial);
-    }
-
-    public static Material3dManager getInstance(){
-        if(INSTANCE == null){
-            INSTANCE = new Material3dManager();
-        }
-        return INSTANCE;
     }
 
     private void setMaterial(ChessModel model, Material material){

@@ -46,6 +46,8 @@ public class BoardFragment extends AndroidFragmentApplication  {
         void onBoardFragmentLoaded();
     }
 
+
+
     @Override
     public void exit() {
         super.exit();
@@ -74,5 +76,10 @@ public class BoardFragment extends AndroidFragmentApplication  {
     @Override
     public void onDestroy() {
         super.onDestroy();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
     }
 }

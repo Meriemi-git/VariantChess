@@ -102,12 +102,12 @@ public class Board3dManager extends ApplicationAdapter {
 
     public Board3dManager() {
         this.devStuff = new ArrayList<>();
-        this.material3dManager = Material3dManager.getInstance();
-        this.whitePieceModels = new fr.aboucorp.variantchess.libgdx.utils.ChessModelList();
-        this.whiteDeadPieceModels = new fr.aboucorp.variantchess.libgdx.utils.ChessModelList();
-        this.blackPieceModels = new fr.aboucorp.variantchess.libgdx.utils.ChessModelList();
-        this.blackDeadPieceModels = new fr.aboucorp.variantchess.libgdx.utils.ChessModelList();
-        this.chessSquareModels = new fr.aboucorp.variantchess.libgdx.utils.ChessModelList();
+        this.material3dManager =new Material3dManager();
+        this.whitePieceModels = new ChessModelList();
+        this.whiteDeadPieceModels = new ChessModelList();
+        this.blackPieceModels = new ChessModelList();
+        this.blackDeadPieceModels = new ChessModelList();
+        this.chessSquareModels = new ChessModelList();
         this.loadingPieces = new ArrayList<>();
     }
 
@@ -565,19 +565,14 @@ void setPaths() {
     }
 
     @Override
-    public void dispose() {
-        try {
-            Gdx.app.log("fr.aboucorp.variantchess.libgdx","dispose board3dManager");
-            //this.modelBatch.dispose();
-            //this.spriteBatch.dispose();
-            //this.assets.dispose();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
     public void pause() {
         super.pause();
+    }
+
+    public void exit() {
+        this.modelBatch.dispose();
+        this.spriteBatch.dispose();
+        this.assets.dispose();
+        Gdx.app.log("fr.aboucorp.variantchess","Exit VariantChess app");
     }
 }

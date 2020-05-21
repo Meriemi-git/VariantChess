@@ -30,6 +30,7 @@ import static fr.aboucorp.variantchess.app.multiplayer.SessionManager.SHARED_PRE
 public class MainActivity extends VariantChessActivity implements AndroidFragmentApplication.Callbacks {
     private Toolbar toolbar;
     private SessionManager sessionManager;
+    private PartyFragment partyFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,23 +59,23 @@ public class MainActivity extends VariantChessActivity implements AndroidFragmen
 
     @Override
     public void setFragment(Class<? extends Fragment> fragmentClass, String fragmentTag) {
-
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         Fragment existing = getSupportFragmentManager().findFragmentByTag(fragmentTag);
-        if(existing != null){
-            fragmentTransaction.replace(R.id.fragment_container, existing, fragmentTag);
-        }else{
-            try {
-                Fragment newFragment = fragmentClass.newInstance();
-                fragmentTransaction.replace(R.id.fragment_container, newFragment, fragmentTag);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (InstantiationException e) {
-                e.printStackTrace();
+        try {
+            if (existing == null) {
+                existing = fragmentClass.newInstance();
             }
+            if (existing instanceof PartyFragment) {
+                this.partyFragment = (PartyFragment) existing;
+            }
+            fragmentTransaction.replace(R.id.fragment_container, existing, fragmentTag);
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
         }
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
     }
 
 
@@ -121,9 +122,9 @@ public class MainActivity extends VariantChessActivity implements AndroidFragmen
     public void userIsConnected(User connected) {
         TextView userText = toolbar.findViewById(R.id.lbl_display_name);
         if (connected != null) {
-            if(TextUtils.isEmpty(connected.getDisplayName())){
+            if (TextUtils.isEmpty(connected.getDisplayName())) {
                 setFragment(UsernameFragment.class, "username");
-            }else{
+            } else {
                 userText.setText(connected.getDisplayName());
                 setFragment(HomeFragment.class, "home");
                 Toast.makeText(this, R.string.connected, Toast.LENGTH_LONG).show();
@@ -137,15 +138,28 @@ public class MainActivity extends VariantChessActivity implements AndroidFragmen
     public void onBackPressed() {
         FragmentManager manager = getSupportFragmentManager();
         PartyFragment fragment = (PartyFragment) manager.findFragmentByTag(FragmentTag.PARTY);
-        if(fragment != null && fragment.isVisible()) {
+        if (fragment != null && fragment.isVisible()) {
             fragment.confirmExit();
-        }else{
+        } else {
             super.onBackPressed();
         }
     }
 
     @Override
     public void exit() {
+        finish();
+    }
 
+    @Override
+    protected void onDestroy() {
+        if(partyFragment != null) {
+            this.partyFragment.exit();
+        }
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
     }
 }

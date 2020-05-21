@@ -165,11 +165,6 @@ public class PartyFragment extends VariantChessFragment implements GameEventSubs
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
     }
@@ -184,14 +179,7 @@ public class PartyFragment extends VariantChessFragment implements GameEventSubs
         super.onStop();
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
+    public void exit() {
+        this.board3dManager.exit();
     }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-    }
-
 }
