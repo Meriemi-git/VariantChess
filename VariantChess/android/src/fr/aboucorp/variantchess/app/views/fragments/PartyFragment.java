@@ -3,11 +3,13 @@ package fr.aboucorp.variantchess.app.views.fragments;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
+
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,8 +19,10 @@ import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
 
-import java.io.FileDescriptor;
-import java.io.PrintWriter;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.RecyclerView;
 
 import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.managers.MatchManager;
@@ -27,6 +31,7 @@ import fr.aboucorp.variantchess.app.managers.boards.ClassicBoardManager;
 import fr.aboucorp.variantchess.app.utils.FragmentTag;
 import fr.aboucorp.variantchess.app.views.activities.MainActivity;
 import fr.aboucorp.variantchess.app.views.activities.VariantChessActivity;
+import fr.aboucorp.variantchess.entities.Party;
 import fr.aboucorp.variantchess.entities.PartyLifeCycle;
 import fr.aboucorp.variantchess.entities.boards.Board;
 import fr.aboucorp.variantchess.entities.boards.ClassicBoard;
@@ -51,6 +56,7 @@ public class PartyFragment extends VariantChessFragment implements GameEventSubs
     private Board3dManager board3dManager;
     private Activity activity;
     private BoardFragment boardFragment;
+    private Party party;
 
     public PartyFragment() {
         this.eventManager = GameEventManager.getINSTANCE();
@@ -70,8 +76,8 @@ public class PartyFragment extends VariantChessFragment implements GameEventSubs
         if (context instanceof Activity) {
             activity = (Activity) context;
         }
-
     }
+
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -84,12 +90,11 @@ public class PartyFragment extends VariantChessFragment implements GameEventSubs
         bindViews();
         bindListeners();
         FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-        Fragment existingBoardFragment =  getChildFragmentManager().findFragmentByTag(FragmentTag.BOARD);
-        if(existingBoardFragment != null){
+        Fragment existingBoardFragment = getChildFragmentManager().findFragmentByTag(FragmentTag.BOARD);
+        if (existingBoardFragment != null) {
             this.boardFragment = (BoardFragment) existingBoardFragment;
         }
-        transaction.replace(R.id.board, boardFragment, FragmentTag.BOARD);
-        transaction.commit();
+        transaction.replace(R.id.board, boardFragment, FragmentTag.BOARD).commit();
     }
 
 
@@ -126,17 +131,11 @@ public class PartyFragment extends VariantChessFragment implements GameEventSubs
         }
     }
 
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
-
     public boolean confirmExit() {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(activity);
         alertDialogBuilder.setMessage("If you exit the game you will loose the party");
         alertDialogBuilder.setPositiveButton("yes",
-                (dialog, arg1) -> stopParty());
+                (dialog, arg1) -> stopParty(this.party));
 
         alertDialogBuilder.setNegativeButton("No", (dialog, which) -> dialog.dismiss());
         AlertDialog alertDialog = alertDialogBuilder.create();
@@ -146,21 +145,21 @@ public class PartyFragment extends VariantChessFragment implements GameEventSubs
 
     @Override
     public void onBoardFragmentLoaded() {
-        startParty();
+        startParty(this.party);
     }
 
     @Override
-    public void startParty() {
+    public void startParty(Party party) {
         this.eventManager.subscribe(GameEvent.class, this, 1);
-        this.matchManager.startParty();
+        this.matchManager.startParty(party);
         activity.runOnUiThread(() ->
                 this.lbl_turn.setText("Turn of " + PartyFragment.this.matchManager.getPartyInfos()));
     }
 
     @Override
-    public void stopParty() {
+    public void stopParty(Party party) {
         this.eventManager.unSubscribe(GameEvent.class, this);
-        this.matchManager.stopParty();
+        this.matchManager.stopParty(party);
         ((MainActivity) activity).setFragment(HomeFragment.class, FragmentTag.HOME);
     }
 
@@ -179,7 +178,33 @@ public class PartyFragment extends VariantChessFragment implements GameEventSubs
         super.onStop();
     }
 
-    public void exit() {
-        this.board3dManager.exit();
+    @Override
+    public void onDetach() {
+        super.onDetach();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        this.eventManager.unSubscribe(GameEvent.class, this);
+        this.eventManager.destroy();
+        Fragment fragment = this.getChildFragmentManager().findFragmentByTag(FragmentTag.BOARD);
+        if (fragment != null) {
+            this.getChildFragmentManager().beginTransaction().remove(fragment).commit();
+        }
+    }
+
+    public String getFenFromBoard() {
+        return this.boardManager.getFenFromBoard();
+    }
+
+    @Override
+    public void setArguments(@androidx.annotation.Nullable Bundle args) {
+        super.setArguments(args);
+        String fenArg = args.getString("fen");
+        if(!TextUtils.isEmpty(fenArg)){
+            this.party = new Party();
+            this.party.getFenMoves().push(fenArg);
+        }
     }
 }

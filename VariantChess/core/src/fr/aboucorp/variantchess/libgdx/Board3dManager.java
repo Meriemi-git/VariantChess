@@ -27,6 +27,8 @@ import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -68,6 +70,7 @@ public class Board3dManager extends ApplicationAdapter {
      * Camera de la vue 3D
      */
     private PerspectiveCamera camera;
+    private Viewport viewport;
     /**
      * Controller de la camera permettant à l'utilisateur de la faire pivoter
      */
@@ -121,13 +124,12 @@ public class Board3dManager extends ApplicationAdapter {
         this.spriteBatch = new SpriteBatch();
         this.modelBuilder = new ModelBuilder();
         this.initEnvironment();
-        this.initCamera();
+        this.initCamera(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
+        //viewport = new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), camera);
         if(tacticalViewEnabled){
             setTacticalCamera();
         }
-        InputMultiplexer multiplexer = new InputMultiplexer(new GestureDetector(androidListener), camController);
-        multiplexer.addProcessor(androidInputAdapter);
-        Gdx.input.setInputProcessor(multiplexer);
+
         this.setPaths();
         this.loadModels();
     }
@@ -406,8 +408,8 @@ void setPaths() {
     /**
      * Initialisation de la caméra pour la vue 3D
      */
-    private void initCamera() {
-        this.camera = new PerspectiveCamera(30, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+    private void initCamera(int width , int height) {
+        this.camera = new PerspectiveCamera(30, width, height);
         this.camera.position.set(3.5f, 15f, -5f);
         this.camera.lookAt(3.475f, 0, 3.475f);
         this.camera.near = 1f;
@@ -415,6 +417,9 @@ void setPaths() {
         this.camera.update();
         this.camController = new CameraInputController(camera);
         this.camController.target.set(new Vector3(3.5f, 0, 3.5f));
+        InputMultiplexer multiplexer = new InputMultiplexer(new GestureDetector(androidListener), camController);
+        multiplexer.addProcessor(androidInputAdapter);
+        Gdx.input.setInputProcessor(multiplexer);
     }
 
     public void moveSelectedPieceIntoSquare(Square square) {
@@ -564,15 +569,18 @@ void setPaths() {
         this.androidListener = androidListener;
     }
 
+
     @Override
-    public void pause() {
-        super.pause();
+    public void resize(int width, int height) {
+        this.initCamera(width, height);
     }
 
-    public void exit() {
+    @Override
+    public void dispose() {
         this.modelBatch.dispose();
         this.spriteBatch.dispose();
         this.assets.dispose();
         Gdx.app.log("fr.aboucorp.variantchess","Exit VariantChess app");
+        super.dispose();
     }
 }

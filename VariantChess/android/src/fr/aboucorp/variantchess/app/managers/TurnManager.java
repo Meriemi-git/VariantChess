@@ -3,6 +3,7 @@ package fr.aboucorp.variantchess.app.managers;
 import java.util.LinkedList;
 
 import fr.aboucorp.variantchess.entities.ChessColor;
+import fr.aboucorp.variantchess.entities.Party;
 import fr.aboucorp.variantchess.entities.PartyLifeCycle;
 import fr.aboucorp.variantchess.entities.Team;
 import fr.aboucorp.variantchess.entities.Turn;
@@ -65,7 +66,7 @@ public class TurnManager implements PartyLifeCycle {
     }
 
     @Override
-    public void startParty() {
+    public void startParty(Party party) {
         Team team = white;
         Turn firsTurn = new Turn(1,team);
         this.turns.add(firsTurn);
@@ -74,7 +75,7 @@ public class TurnManager implements PartyLifeCycle {
     }
 
     @Override
-    public void stopParty() {
+    public void stopParty(Party party) {
         this.turns = new LinkedList<>();
     }
 

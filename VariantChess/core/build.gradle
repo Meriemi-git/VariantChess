@@ -5,6 +5,13 @@ dependencies {
     implementation 'com.crashinvaders.vfx:gdx-vfx-core:+'
     implementation 'com.crashinvaders.vfx:gdx-vfx-effects:+'
 }
+
+repositories {
+    flatDir {
+        dirs 'libs'
+    }
+}
+
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 sourceSets.main.java.srcDirs = [ "src/" ]

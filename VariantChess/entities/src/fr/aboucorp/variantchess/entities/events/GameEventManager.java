@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.Hashtable;
 import java.util.List;
 
+import fr.aboucorp.variantchess.entities.Party;
 import fr.aboucorp.variantchess.entities.PartyLifeCycle;
 import fr.aboucorp.variantchess.entities.events.models.GameEvent;
 
@@ -61,11 +62,15 @@ public class GameEventManager implements PartyLifeCycle {
     }
 
     @Override
-    public void startParty() {
+    public void startParty(Party party) {
     }
 
     @Override
-    public void stopParty() {
+    public void stopParty(Party party) {
         this.SUBSCRIPTIONS = new Hashtable<>();
+    }
+
+    public void destroy(){
+        INSTANCE = null;
     }
 }

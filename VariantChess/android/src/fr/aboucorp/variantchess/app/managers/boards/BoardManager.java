@@ -9,6 +9,7 @@ import fr.aboucorp.variantchess.app.listeners.GDXInputAdapter;
 import fr.aboucorp.variantchess.app.utils.GdxPostRunner;
 import fr.aboucorp.variantchess.entities.ChessColor;
 import fr.aboucorp.variantchess.entities.Location;
+import fr.aboucorp.variantchess.entities.Party;
 import fr.aboucorp.variantchess.entities.PartyLifeCycle;
 import fr.aboucorp.variantchess.entities.Piece;
 import fr.aboucorp.variantchess.entities.Square;
@@ -73,7 +74,7 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
     protected abstract void manageTurnEnd();
 
     @Override
-    public void stopParty() {
+    public void stopParty(Party party) {
         this.gameState = GameState.SelectPiece;
         this.selectedPiece = null;
         this.previousTurn = null;
@@ -84,7 +85,7 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
     }
 
     @Override
-    public void startParty() {
+    public void startParty(Party party) {
         this.eventManager.subscribe(PartyEvent.class, this, 1);
         this.eventManager.subscribe(TurnEvent.class, this, 1);
         this.eventManager.subscribe(PieceEvent.class, this, 1);
@@ -167,5 +168,5 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
         void OnBoardLoaded();
     }
 
-
+    public abstract String getFenFromBoard();
 }

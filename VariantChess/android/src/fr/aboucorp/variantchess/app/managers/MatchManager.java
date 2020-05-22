@@ -18,6 +18,7 @@ import fr.aboucorp.variantchess.app.multiplayer.MatchListener;
 import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
 import fr.aboucorp.variantchess.app.views.activities.VariantChessActivity;
 import fr.aboucorp.variantchess.entities.ChessColor;
+import fr.aboucorp.variantchess.entities.Party;
 import fr.aboucorp.variantchess.entities.PartyLifeCycle;
 import fr.aboucorp.variantchess.entities.enums.BoardEventType;
 import fr.aboucorp.variantchess.entities.events.GameEventManager;
@@ -33,6 +34,7 @@ public class MatchManager implements GameEventSubscriber, MatchListener, BoardMa
     private final TurnManager turnManager;
     private GameEventManager eventManager;
     private SessionManager sessionManager;
+    private Party party;
 
 
     public MatchManager(VariantChessActivity activity, BoardManager boardManager) {
@@ -47,7 +49,7 @@ public class MatchManager implements GameEventSubscriber, MatchListener, BoardMa
     public void OnBoardLoaded() {
         this.eventManager.subscribe(PartyEvent.class,this,1);
         this.eventManager.subscribe(BoardEvent.class,this,1);
-        this.turnManager.startParty();
+        this.turnManager.startParty(this.party);
     }
 
     public void loadBoard(String fenString){
@@ -83,14 +85,15 @@ public class MatchManager implements GameEventSubscriber, MatchListener, BoardMa
 
 
     @Override
-    public void startParty() {
-        this.boardManager.startParty();
+    public void startParty(Party party) {
+        this.party = party;
+        this.boardManager.startParty(party);
     }
 
     @Override
-    public void stopParty() {
-        this.eventManager.stopParty();
-        this.boardManager.stopParty();
+    public void stopParty(Party party) {
+        this.eventManager.stopParty(party);
+        this.boardManager.stopParty(party);
     }
 
     @Override

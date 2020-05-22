@@ -106,8 +106,11 @@ public class ClassicBoard extends Board{
 
     @Override
     public void loadBoard(String fenString) throws FenStringBadFormatException {
+        if(this.chessSquares == null || this.chessSquares.size() == 0){
+            this.createSquares();
+        }
         String[] lines = fenString.split("/");
-        if(lines.length != 8){
+        if(lines.length != 9){
             throw new FenStringBadFormatException("Cannot load game from fen string, fen string doesn't contains enought lines");
         }
         createPiecesFromFen(lines);

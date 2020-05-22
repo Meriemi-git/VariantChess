@@ -5,6 +5,7 @@ import java.util.List;
 import fr.aboucorp.variantchess.app.utils.GdxPostRunner;
 import fr.aboucorp.variantchess.entities.ChessColor;
 import fr.aboucorp.variantchess.entities.Location;
+import fr.aboucorp.variantchess.entities.Party;
 import fr.aboucorp.variantchess.entities.Piece;
 import fr.aboucorp.variantchess.entities.Square;
 import fr.aboucorp.variantchess.entities.boards.Board;
@@ -23,7 +24,7 @@ import fr.aboucorp.variantchess.libgdx.Board3dManager;
 import fr.aboucorp.variantchess.libgdx.utils.ChessModelList;
 
 public class ClassicBoardManager extends BoardManager implements GameEventSubscriber {
-
+    private Party party;
     public ClassicBoardManager(Board3dManager board3dManager, Board board, ClassicRuleSet ruleSet) {
         super(board,board3dManager,ruleSet);
         this.eventManager.subscribe(EnPassantEvent.class, this, 1);
@@ -42,9 +43,20 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
     }
 
     @Override
-    public void startParty() {
-        super.startParty();
-        this.board.initBoard();
+    public void startParty(Party party) {
+        this.party = party;
+        super.startParty(party);
+        if(party == null){
+            this.board.initBoard();
+        }else{
+            try {
+                this.board.loadBoard(party.getFenMoves().getLast());
+            } catch (FenStringBadFormatException e) {
+                e.printStackTrace();
+            }
+        }
+
+
         GdxPostRunner postRunner = new GdxPostRunner() {
             @Override
             public void execute() {
@@ -67,7 +79,7 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
             @Override
             public void execute() {
                 try {
-                    ClassicBoardManager.super.stopParty();
+                    ClassicBoardManager.super.stopParty(party);
                     board.loadBoard(parts[0]);
                     ClassicBoardManager.this.board3dManager.createPieces(ClassicBoardManager.this.board.getWhitePieces());
                     ClassicBoardManager.this.board3dManager.createPieces(ClassicBoardManager.this.board.getBlackPieces());
@@ -182,7 +194,8 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
         return toBeEaten;
     }
 
-    private String getFenFromBoard() {
+    @Override
+    public String getFenFromBoard() {
         StringBuilder fenString = new StringBuilder();
         for (int z = 7; z >= 0; z--) {
             List<Square> lines = this.board.getSquares().getSquaresByLine(z);

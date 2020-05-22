@@ -2,17 +2,20 @@ package fr.aboucorp.variantchess.app.views.activities;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.Toolbar;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.badlogic.gdx.backends.android.AndroidFragmentApplication;
 import com.heroiclabs.nakama.api.User;
@@ -30,7 +33,6 @@ import static fr.aboucorp.variantchess.app.multiplayer.SessionManager.SHARED_PRE
 public class MainActivity extends VariantChessActivity implements AndroidFragmentApplication.Callbacks {
     private Toolbar toolbar;
     private SessionManager sessionManager;
-    private PartyFragment partyFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,8 +55,7 @@ public class MainActivity extends VariantChessActivity implements AndroidFragmen
     private void setToolbar() {
         toolbar = findViewById(R.id.main_toolbar);
         this.toolbar.setTitle(getString(R.string.app_name));
-        toolbar.setNavigationIcon(R.drawable.ic_action_name);
-        setActionBar(toolbar);
+        setSupportActionBar(toolbar);
     }
 
     @Override
@@ -65,11 +66,7 @@ public class MainActivity extends VariantChessActivity implements AndroidFragmen
             if (existing == null) {
                 existing = fragmentClass.newInstance();
             }
-            if (existing instanceof PartyFragment) {
-                this.partyFragment = (PartyFragment) existing;
-            }
             fragmentTransaction.replace(R.id.fragment_container, existing, fragmentTag);
-            fragmentTransaction.addToBackStack(null);
             fragmentTransaction.commit();
         } catch (IllegalAccessException e) {
             e.printStackTrace();
@@ -152,14 +149,29 @@ public class MainActivity extends VariantChessActivity implements AndroidFragmen
 
     @Override
     protected void onDestroy() {
-        if(partyFragment != null) {
-            this.partyFragment.exit();
-        }
         super.onDestroy();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+    }
+
+    @Override
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        PartyFragment fragment = (PartyFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.PARTY);
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        if (fragment != null) {
+
+            fragmentTransaction.remove(fragment);
+            fragmentTransaction.commit();
+        }
+        String fen = fragment.getFenFromBoard();
+        Bundle args = new Bundle();
+        args.putString("fen",fen);
+        fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_container,PartyFragment.class,args, FragmentTag.PARTY).commit();
+
     }
 }
