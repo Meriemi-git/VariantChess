@@ -90,6 +90,7 @@ public class PawnMoveSet extends AbstractMoveSet {
     private boolean enPassantIsPossible() {
         return ((this.piece.getChessColor() == ChessColor.WHITE && this.piece.getLocation().getZ() == 4)
                 || (this.piece.getChessColor() == ChessColor.BLACK && this.piece.getLocation().getZ() == 3))
+                && this.previousTurn.played != null
                 && PieceId.isPawn(this.previousTurn.played.getPieceId())
                 && Math.abs(this.previousTurn.to.getLocation().getZ() - this.previousTurn.from.getLocation().getZ()) == 2
                 && Math.abs(this.previousTurn.to.getLocation().getX() - this.piece.getLocation().getX()) == 1;
