@@ -14,20 +14,20 @@ public class Location implements Cloneable {
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof Location && ((Location) obj).getX() == x && ((Location) obj).getY() == y && ((Location) obj).getZ() == z;
+        return obj instanceof Location && ((Location) obj).getX() == this.x && ((Location) obj).getY() == this.y && ((Location) obj).getZ() == this.z;
     }
 
     public float getX() {
-        return x;
+        return this.x;
     }
 
     public float getY() {
-        return y;
+        return this.y;
     }
 
 
     public float getZ() {
-        return z;
+        return this.z;
     }
 
     @Override
@@ -37,6 +37,6 @@ public class Location implements Cloneable {
 
     @Override
     public String toString() {
-        return "[" + (char) (65 + (7 - x)) + (z+1) + "]";
+        return "[" + (char) (65 + (7 - this.x)) + (this.z +1) + "]";
     }
 }

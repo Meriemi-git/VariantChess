@@ -23,7 +23,7 @@ public class Pawn extends Piece {
     }
 
     public boolean isFirstMove() {
-        return isFirstMove;
+        return this.isFirstMove;
     }
 
     @Override

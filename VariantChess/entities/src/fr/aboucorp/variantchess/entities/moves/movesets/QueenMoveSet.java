@@ -20,8 +20,8 @@ public class QueenMoveSet extends AbstractMoveSet {
     @Override
     protected SquareList getPossibleMoves(Piece piece, ChessColor turnColor) {
         SquareList squares = new SquareList();
-        SquareList rookMoves  = rookMoveSet.getPossibleMoves(piece,turnColor);
-        SquareList bishopMoves = bishopMoveSet.getPossibleMoves(piece,turnColor);
+        SquareList rookMoves  = this.rookMoveSet.getPossibleMoves(piece,turnColor);
+        SquareList bishopMoves = this.bishopMoveSet.getPossibleMoves(piece,turnColor);
         if(rookMoves != null){
             squares.addAll(rookMoves);
         }
@@ -33,6 +33,6 @@ public class QueenMoveSet extends AbstractMoveSet {
 
     @Override
     public SquareList getThreats(Piece piece, ChessColor turnColor) {
-        return getPossibleMoves(piece,turnColor);
+        return this.getPossibleMoves(piece,turnColor);
     }
 }

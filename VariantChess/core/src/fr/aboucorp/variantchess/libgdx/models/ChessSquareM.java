@@ -14,6 +14,6 @@ public class ChessSquareM extends ChessModel {
         this.label = label;
     }
     public String getLabel() {
-        return label;
+        return this.label;
     }
 }

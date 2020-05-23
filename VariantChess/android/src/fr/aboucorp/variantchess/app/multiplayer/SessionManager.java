@@ -21,7 +21,7 @@ import java.util.TimeZone;
 import java.util.concurrent.ExecutionException;
 
 import fr.aboucorp.variantchess.R;
-import fr.aboucorp.variantchess.app.exception.UsernameDuplicateException;
+import fr.aboucorp.variantchess.app.exceptions.UsernameDuplicateException;
 import fr.aboucorp.variantchess.app.utils.ExceptionCauseCode;
 import fr.aboucorp.variantchess.app.utils.ResultType;
 import fr.aboucorp.variantchess.app.views.activities.VariantChessActivity;
@@ -31,30 +31,30 @@ public class SessionManager {
     public static final String SHARED_PREFERENCE_NAME = "nakama";
     private static SessionManager INSTANCE;
     private final VariantChessActivity activity;
-    public final Client client = new DefaultClient("defaultkey", "192.168.1.37", 7349, false);
-    public Session session;
+    private final Client client = new DefaultClient("defaultkey", "192.168.1.37", 7349, false);
+    private Session session;
 
     private SessionManager(VariantChessActivity activity) {
         this.activity = activity;
     }
 
-    public User authentWithEmail(String mail, String password, int signType) throws ExecutionException, InterruptedException {
+    private User authentWithEmail(String mail, String password, int signType) throws ExecutionException, InterruptedException {
         Metadata<String> metadata = new Metadata();
         User connected;
-        SharedPreferences pref = activity.getSharedPreferences(SHARED_PREFERENCE_NAME, Context.MODE_PRIVATE);
+        SharedPreferences pref = this.activity.getSharedPreferences(SHARED_PREFERENCE_NAME, Context.MODE_PRIVATE);
         if (signType == ResultType.SIGNUP) {
             metadata.put("signType", "SIGNUP");
-            connected = restoreSessionIfPossible(pref);
+            connected = this.restoreSessionIfPossible(pref);
             if (connected == null) {
-                this.session = client.authenticateEmail(mail, password, false).get();
-                connected = this.client.getAccount(session).get().getUser();
+                this.session = this.client.authenticateEmail(mail, password, false).get();
+                connected = this.client.getAccount(this.session).get().getUser();
             }
         } else {
             metadata.put("signType", "SIGNIN");
-            this.session = client.authenticateEmail(mail, password, metadata).get();
-            connected = this.client.getAccount(session).get().getUser();
+            this.session = this.client.authenticateEmail(mail, password, metadata).get();
+            connected = this.client.getAccount(this.session).get().getUser();
         }
-        pref.edit().putString("nk.session", session.getAuthToken()).apply();
+        pref.edit().putString("nk.session", this.session.getAuthToken()).apply();
         return connected;
     }
 
@@ -68,7 +68,7 @@ public class SessionManager {
                 // Session was valid and is restored now.
                 this.session = restoredSession;
                 try {
-                    return this.client.getAccount(session).get().getUser();
+                    return this.client.getAccount(this.session).get().getUser();
                 } catch (ExecutionException e) {
                     Log.i("fr.aboucorp.variantchess", e.getMessage());
                     return null;
@@ -92,10 +92,10 @@ public class SessionManager {
         String rpcid = "user_exists";
         Rpc userExistsRpc = null;
         try {
-            userExistsRpc = client.rpc(session, rpcid, metadata.getJsonFromMetadata()).get();
+            userExistsRpc = this.client.rpc(this.session, rpcid, metadata.getJsonFromMetadata()).get();
         } catch (ExecutionException e) {
             if(ExceptionCauseCode.getCodeValueFromCause(e.getCause()) == ExceptionCauseCode.ALREADY_EXISTS){
-                Toast.makeText(activity, R.string.username_already_exists, Toast.LENGTH_LONG).show();
+                Toast.makeText(this.activity, R.string.username_already_exists, Toast.LENGTH_LONG).show();
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -105,18 +105,18 @@ public class SessionManager {
     }
 
     public void signInWithEmail(String mail, String password) throws ExecutionException, InterruptedException {
-        authentWithEmail(mail, password, ResultType.SIGNIN);
+        this.authentWithEmail(mail, password, ResultType.SIGNIN);
         User connected = this.client.getAccount(this.session).get().getUser();
-        activity.userIsConnected(connected);
+        this.activity.userIsConnected(connected);
     }
 
     public void signUpWithEmail(String mail, String password) {
         User user = null;
         try {
-            user = authentWithEmail(mail, password, ResultType.SIGNUP);
-            activity.userIsConnected(user);
+            user = this.authentWithEmail(mail, password, ResultType.SIGNUP);
+            this.activity.userIsConnected(user);
         } catch (Exception e) {
-            Toast.makeText(activity, R.string.failed_login, Toast.LENGTH_LONG).show();
+            Toast.makeText(this.activity, R.string.failed_login, Toast.LENGTH_LONG).show();
             Log.e("fr.aboucorp.variantchess", "Exception message=" + e.getMessage());
         }
     }
@@ -134,11 +134,11 @@ public class SessionManager {
         data.put("langTag",langTag);
         String rpcid = "update_user_infos";
         try {
-            Rpc call = client.rpc(session, rpcid, data.getJsonFromMetadata()).get();
-            return this.client.getAccount(session).get().getUser();
+            Rpc call = this.client.rpc(this.session, rpcid, data.getJsonFromMetadata()).get();
+            return this.client.getAccount(this.session).get().getUser();
         } catch (ExecutionException e) {
             if(ExceptionCauseCode.getCodeValueFromCause(e.getCause()) == ExceptionCauseCode.ALREADY_EXISTS){
-               throw new UsernameDuplicateException(activity.getString(R.string.username_already_exists));
+               throw new UsernameDuplicateException(this.activity.getString(R.string.username_already_exists));
             }
         } catch (InterruptedException e) {
             Log.e("fr.aboucorp.variantchess","Erro during updating account");
@@ -148,10 +148,10 @@ public class SessionManager {
     }
 
     public void launchMatchMaking(GameMode gamemode, MatchListener matchListener) throws ExecutionException, InterruptedException {
-        SharedPreferences pref = activity.getSharedPreferences(SHARED_PREFERENCE_NAME, Context.MODE_PRIVATE);
-        SocketClient matchmakingSocket = client.createSocket();
+        SharedPreferences pref = this.activity.getSharedPreferences(SHARED_PREFERENCE_NAME, Context.MODE_PRIVATE);
+        SocketClient matchmakingSocket = this.client.createSocket();
         MatchMakingSocketListener socketListener = new MatchMakingSocketListener(matchListener);
-        matchmakingSocket.connect(session, socketListener).get();
+        matchmakingSocket.connect(this.session, socketListener).get();
         String ticketString = pref.getString("nk.ticket", null);
         if ( !TextUtils.isEmpty(ticketString) ) {
             try {

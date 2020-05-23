@@ -36,7 +36,7 @@ public enum PieceId {
     BLB(30),
     BRB(31);
 
-    public final double enumId;
+    private final double enumId;
 
     PieceId(int enumId){
         this.enumId = enumId;
@@ -50,11 +50,11 @@ public enum PieceId {
         return isWhitePawn(id) || isBlackPawn(id);
     }
 
-    public static boolean isWhitePawn(PieceId id){
+    private static boolean isWhitePawn(PieceId id){
         return id == WP1 || id == WP2 || id == WP3 || id == WP4 || id == WP5 || id == WP6 || id == WP7 || id == WP8;
     }
 
-    public static boolean isBlackPawn(PieceId id){
+    private static boolean isBlackPawn(PieceId id){
         return id == BP1 || id == BP2 || id == BP3 || id == BP4 || id == BP5 || id == BP6 || id == BP7 || id == BP8;
     }
 

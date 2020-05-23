@@ -5,12 +5,12 @@ import java.util.Comparator;
 import java.util.Hashtable;
 import java.util.List;
 
-import fr.aboucorp.variantchess.entities.Party;
+import fr.aboucorp.variantchess.entities.Match;
 import fr.aboucorp.variantchess.entities.PartyLifeCycle;
 import fr.aboucorp.variantchess.entities.events.models.GameEvent;
 
 public class GameEventManager implements PartyLifeCycle {
-    private Party party;
+    private Match match;
     private static GameEventManager INSTANCE;
     private static Hashtable<Class, List<Subscription>> SUBSCRIPTIONS;
     private GameEventManager(){
@@ -44,32 +44,32 @@ public class GameEventManager implements PartyLifeCycle {
 
     public void sendMessage(GameEvent event){
         List<Subscription> subscriptions = new ArrayList();
-        getSubscriptionsRec(event.getClass(),subscriptions);
+        this.getSubscriptionsRec(event.getClass(),subscriptions);
         subscriptions
                 .stream()
                 .sorted(Comparator.naturalOrder())
                 .forEachOrdered( sub -> sub.subscriber.receiveGameEvent(event));
     }
 
-    public  List<Subscription> getSubscriptionsRec(Class eventClass, List<Subscription> subscription) {
+    private List<Subscription> getSubscriptionsRec(Class eventClass, List<Subscription> subscription) {
         List<Subscription> subs = SUBSCRIPTIONS.get(eventClass);
         if(subs != null){
             subscription.addAll(subs);
         }
         if(!eventClass.getSuperclass().equals(Object.class)){
-            getSubscriptionsRec(eventClass.getSuperclass(),subscription);
+            this.getSubscriptionsRec(eventClass.getSuperclass(),subscription);
         }
         return subscription;
     }
 
     @Override
-    public void startParty(Party party) {
-        this.party = party;
+    public void startParty(Match match) {
+        this.match = match;
     }
 
     @Override
     public void stopParty() {
-        this.SUBSCRIPTIONS = new Hashtable<>();
+        SUBSCRIPTIONS = new Hashtable<>();
     }
 
     public void destroy(){

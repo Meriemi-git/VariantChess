@@ -19,17 +19,17 @@ public class GameModeAdapter extends ArrayAdapter implements SpinnerAdapter {
 
     public GameModeAdapter(Context context, List<GameMode> list) {
         super(context, 0 , list);
-        mContext = context;
-        moviesList = list;
+        this.mContext = context;
+        this.moviesList = list;
     }
 
     @Override
     public View getView(int position, View convertView,  ViewGroup parent) {
         View view = convertView;
         if(view == null)
-            view = LayoutInflater.from(mContext).inflate(R.layout.game_mode_list_item,parent,false);
+            view = LayoutInflater.from(this.mContext).inflate(R.layout.game_mode_list_item,parent,false);
 
-        GameMode currentGameMode = moviesList.get(position);
+        GameMode currentGameMode = this.moviesList.get(position);
 
         TextView name = view.findViewById(R.id.gamemode_lbl_name);
         name.setText(currentGameMode.getName());
@@ -41,8 +41,8 @@ public class GameModeAdapter extends ArrayAdapter implements SpinnerAdapter {
     }
 
     public View getDropDownView(int position, View convertView, ViewGroup parent) {
-        View view = LayoutInflater.from(mContext).inflate(R.layout.game_mode_list_item,parent,false);
-        GameMode currentGameMode = moviesList.get(position);
+        View view = LayoutInflater.from(this.mContext).inflate(R.layout.game_mode_list_item,parent,false);
+        GameMode currentGameMode = this.moviesList.get(position);
 
         TextView name = view.findViewById(R.id.gamemode_lbl_name);
         name.setText(currentGameMode.getName());
@@ -54,12 +54,12 @@ public class GameModeAdapter extends ArrayAdapter implements SpinnerAdapter {
 
     @Override
     public int getCount() {
-        return moviesList.size();
+        return this.moviesList.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return moviesList.get(position);
+        return this.moviesList.get(position);
     }
 
     @Override

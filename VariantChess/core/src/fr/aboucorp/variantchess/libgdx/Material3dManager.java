@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import fr.aboucorp.variantchess.entities.enums.PieceId;
 import fr.aboucorp.variantchess.libgdx.models.ChessModel;
 
-public class Material3dManager {
+class Material3dManager {
     private Material selectedPieceMaterial;
     private Material occupiedMaterial;
     public boolean picturesLoading;
@@ -33,7 +33,7 @@ public class Material3dManager {
     }
 
     public void setSelectedMaterial(ChessModel model) {
-        setMaterial(model,this.selectedPieceMaterial);
+        this.setMaterial(model,this.selectedPieceMaterial);
     }
 
     private void setMaterial(ChessModel model, Material material){
@@ -43,7 +43,7 @@ public class Material3dManager {
     }
 
     public void setOccupiedMaterial(ChessModel model) {
-        setMaterial(model,this.occupiedMaterial);
+        this.setMaterial(model,this.occupiedMaterial);
     }
 
     public String getRegionNameFromPieceId(PieceId id) {

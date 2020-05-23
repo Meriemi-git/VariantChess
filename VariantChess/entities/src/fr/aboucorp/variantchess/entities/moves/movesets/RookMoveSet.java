@@ -19,7 +19,7 @@ public class RookMoveSet extends AbstractMoveSet {
         SquareList validSquares = new SquareList();
         Location start = piece.getLocation();
         for(float x = start.getX()+1; x < 8 ; x++){
-            Square validSquare = (Square) classicBoard.getSquares().getItemByLocation(new Location(x,0,start.getZ()));
+            Square validSquare = (Square) this.classicBoard.getSquares().getItemByLocation(new Location(x,0,start.getZ()));
             if(validSquare != null && validSquare.getPiece() == null){
                 validSquares.add(validSquare);
             }else if(validSquare.getPiece().getChessColor() != turnColor){
@@ -31,7 +31,7 @@ public class RookMoveSet extends AbstractMoveSet {
         }
 
         for(float x = start.getX()-1 ; x >= 0 ; x--){
-            Square validSquare = (Square) classicBoard.getSquares().getItemByLocation(new Location(x,0,start.getZ()));
+            Square validSquare = (Square) this.classicBoard.getSquares().getItemByLocation(new Location(x,0,start.getZ()));
             if(validSquare != null && validSquare.getPiece() == null){
                 validSquares.add(validSquare);
             }else if(validSquare.getPiece().getChessColor() != turnColor){
@@ -43,7 +43,7 @@ public class RookMoveSet extends AbstractMoveSet {
         }
 
         for(float z = start.getZ()-1 ;  z >= 0; z-- ){
-            Square validSquare = (Square) classicBoard.getSquares().getItemByLocation(new Location(start.getX(),0,z));
+            Square validSquare = (Square) this.classicBoard.getSquares().getItemByLocation(new Location(start.getX(),0,z));
             if(validSquare != null && validSquare.getPiece() == null){
                 validSquares.add(validSquare);
             }else if(validSquare.getPiece().getChessColor() != turnColor){
@@ -55,7 +55,7 @@ public class RookMoveSet extends AbstractMoveSet {
         }
 
         for(float z = start.getZ()+1 ; z < 8; z++ ){
-            Square validSquare = (Square) classicBoard.getSquares().getItemByLocation(new Location(start.getX(),0,z));
+            Square validSquare = (Square) this.classicBoard.getSquares().getItemByLocation(new Location(start.getX(),0,z));
             if(validSquare != null && validSquare.getPiece() == null){
                 validSquares.add(validSquare);
             }else if(validSquare.getPiece().getChessColor() != turnColor){
@@ -70,6 +70,6 @@ public class RookMoveSet extends AbstractMoveSet {
 
     @Override
     public SquareList getThreats(Piece piece, ChessColor turnColor) {
-        return getPossibleMoves(piece,turnColor);
+        return this.getPossibleMoves(piece,turnColor);
     }
 }

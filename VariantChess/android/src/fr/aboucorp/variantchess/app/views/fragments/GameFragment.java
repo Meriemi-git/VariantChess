@@ -38,12 +38,12 @@ public class GameFragment extends VariantChessFragment implements AdapterView.On
         super.onViewCreated(view, savedInstanceState);
         this.bindViews();
         this.bindListeners();
-        this.sessionManager = SessionManager.getInstance((MainActivity) getActivity());
+        this.sessionManager = SessionManager.getInstance((MainActivity) this.getActivity());
         this.new_game_spinner.setOnItemSelectedListener(this);
         List<GameMode> modes = new ArrayList<>();
         modes.add(new GameMode("Classic","Normal gamemode with classic rules and bla and bla and bla and many test."));
         modes.add(new GameMode("Random","Normal gamemode with classic rules but pieces and randmly set at the start of the game"));
-        GameModeAdapter adpater = new GameModeAdapter(getActivity(),modes);
+        GameModeAdapter adpater = new GameModeAdapter(this.getActivity(),modes);
         this.new_game_spinner.setAdapter(adpater);
     }
 
@@ -54,20 +54,20 @@ public class GameFragment extends VariantChessFragment implements AdapterView.On
     }
     @Override
     protected void bindViews() {
-        this.new_game_spinner = getView().findViewById(R.id.new_game_spinner);
-        this.new_game_rdb_online = getView().findViewById(R.id.new_game_rdb_online);
-        this.new_game_rdb_offline = getView().findViewById(R.id.new_game_rdb_offline);
-        this.new_game_btn_launch = getView().findViewById(R.id.new_game_btn_launch);
-        this.new_game_progress_bar = getView().findViewById(R.id.new_game_progress_bar);
+        this.new_game_spinner = this.getView().findViewById(R.id.new_game_spinner);
+        this.new_game_rdb_online = this.getView().findViewById(R.id.new_game_rdb_online);
+        this.new_game_rdb_offline = this.getView().findViewById(R.id.new_game_rdb_offline);
+        this.new_game_btn_launch = this.getView().findViewById(R.id.new_game_btn_launch);
+        this.new_game_progress_bar = this.getView().findViewById(R.id.new_game_progress_bar);
     }
 
     @Override
     protected void bindListeners() {
-        new_game_btn_launch.setOnClickListener( v -> launchGame());
+        this.new_game_btn_launch.setOnClickListener(v -> this.launchGame());
     }
 
     private void launchGame() {
-        if(new_game_rdb_online.isChecked()){
+        if(this.new_game_rdb_online.isChecked()){
 /*            try {
                 this.sessionManager.launchMatchMaking((GameMode)this.new_game_spinner.getSelectedItem(),this);
                 this.new_game_progress_bar.setVisibility(View.VISIBLE);
@@ -75,8 +75,8 @@ public class GameFragment extends VariantChessFragment implements AdapterView.On
                 Toast.makeText(getActivity(),getActivity().getString(R.string.matchmaking_failed), Toast.LENGTH_LONG).show();
                 e.printStackTrace();
             }*/
-        }else if(new_game_rdb_offline.isChecked()){
-            ((VariantChessActivity)getActivity()).setFragment(PartyFragment.class, FragmentTag.PARTY);
+        }else if(this.new_game_rdb_offline.isChecked()){
+            ((VariantChessActivity) this.getActivity()).setFragment(MatchFragment.class, FragmentTag.MATCH);
         }
     }
 

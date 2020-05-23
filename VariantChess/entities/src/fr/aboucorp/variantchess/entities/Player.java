@@ -1,4 +1,4 @@
 package fr.aboucorp.variantchess.entities;
 
-public class Player {
+class Player {
 }

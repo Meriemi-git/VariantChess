@@ -13,9 +13,9 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 
-import fr.aboucorp.variantchess.app.exception.HashException;
+import fr.aboucorp.variantchess.app.exceptions.HashException;
 
-public class Encryptor {
+class Encryptor {
 
     public static String hash(String plainText) throws HashException {
         byte[] data = plainText.getBytes();

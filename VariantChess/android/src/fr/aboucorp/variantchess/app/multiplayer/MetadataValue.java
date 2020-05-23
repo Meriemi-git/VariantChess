@@ -1,8 +1,8 @@
 package fr.aboucorp.variantchess.app.multiplayer;
 
-public class MetadataValue {
-    public String name;
-    public String value;
+class MetadataValue {
+    private String name;
+    private String value;
 
     public MetadataValue(String name, String value) {
         this.name = name;
@@ -10,7 +10,7 @@ public class MetadataValue {
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public void setName(String name) {
@@ -18,7 +18,7 @@ public class MetadataValue {
     }
 
     public String getValue() {
-        return value;
+        return this.value;
     }
 
     public void setValue(String value) {

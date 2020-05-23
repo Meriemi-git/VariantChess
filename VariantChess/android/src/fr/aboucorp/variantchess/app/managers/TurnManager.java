@@ -3,7 +3,7 @@ package fr.aboucorp.variantchess.app.managers;
 import java.util.LinkedList;
 
 import fr.aboucorp.variantchess.entities.ChessColor;
-import fr.aboucorp.variantchess.entities.Party;
+import fr.aboucorp.variantchess.entities.Match;
 import fr.aboucorp.variantchess.entities.PartyLifeCycle;
 import fr.aboucorp.variantchess.entities.Team;
 import fr.aboucorp.variantchess.entities.Turn;
@@ -24,16 +24,18 @@ public class TurnManager implements PartyLifeCycle {
         this.turns = new LinkedList<>();
         this.eventManager = GameEventManager.getINSTANCE();
         this.white = new Team("white",ChessColor.WHITE);
-        this.black = new Team("white",ChessColor.BLACK);
+        this.black = new Team("black",ChessColor.BLACK);
     }
 
     public void startTurn(){
         Turn nextTurn;
+        Team team = null;
         if (this.turns.getLast().getTurnColor() == ChessColor.WHITE) {
-            nextTurn = new Turn(this.turns.size()+1,black);
+            team =  this.black;
         }else{
-            nextTurn = new Turn(this.turns.size()+1,white);
+            team =  this.white;
         }
+        nextTurn = new Turn(this.turns.size()+1, this.white);
         this.turns.add(nextTurn);
         String eventMessage = String.format("Next turn, color : %s",nextTurn.getTurnColor());
         this.eventManager.sendMessage(new TurnStartEvent(eventMessage,nextTurn));
@@ -52,7 +54,7 @@ public class TurnManager implements PartyLifeCycle {
 
     public ChessColor getTurnColor(){
         if(!this.turns.isEmpty()) {
-            return this.turns.getLast().team.getChessColor();
+            return this.turns.getLast().getTeam().getChessColor();
         }else{
             return ChessColor.WHITE;
         }
@@ -66,8 +68,8 @@ public class TurnManager implements PartyLifeCycle {
     }
 
     @Override
-    public void startParty(Party party) {
-        Team team = white;
+    public void startParty(Match match) {
+        Team team = this.white;
         Turn firsTurn = new Turn(1,team);
         this.turns.add(firsTurn);
         String eventMessage = String.format("Next turn, color : %s",firsTurn.getTurnColor());
@@ -80,7 +82,7 @@ public class TurnManager implements PartyLifeCycle {
     }
 
     public void startAtTurnColor(ChessColor color) {
-        Team team = color == ChessColor.WHITE ? white : black;
+        Team team = color == ChessColor.WHITE ? this.white : this.black;
         Turn firsTurn = new Turn(1,team);
         this.turns.add(firsTurn);
         String eventMessage = String.format("Turn color : %s",firsTurn.getTurnColor());

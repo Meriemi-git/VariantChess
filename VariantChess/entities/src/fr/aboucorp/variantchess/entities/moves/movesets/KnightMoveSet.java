@@ -19,7 +19,7 @@ public class KnightMoveSet extends AbstractMoveSet {
         SquareList validSquares = new SquareList();
         Location start = piece.getLocation();
 
-        for (Square square : classicBoard.getSquares()) {
+        for (Square square : this.classicBoard.getSquares()) {
             Location end = square.getLocation();
             if (end.getX() == start.getX() + 2
                     && (end.getZ() == start.getZ() + 1
@@ -55,6 +55,6 @@ public class KnightMoveSet extends AbstractMoveSet {
 
     @Override
     public SquareList getThreats(Piece piece, ChessColor turnColor) {
-        return getPossibleMoves(piece,turnColor);
+        return this.getPossibleMoves(piece,turnColor);
     }
 }

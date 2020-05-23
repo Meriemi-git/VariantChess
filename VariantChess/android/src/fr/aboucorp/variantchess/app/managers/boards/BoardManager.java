@@ -9,7 +9,7 @@ import fr.aboucorp.variantchess.app.listeners.GDXInputAdapter;
 import fr.aboucorp.variantchess.app.utils.GdxPostRunner;
 import fr.aboucorp.variantchess.entities.ChessColor;
 import fr.aboucorp.variantchess.entities.Location;
-import fr.aboucorp.variantchess.entities.Party;
+import fr.aboucorp.variantchess.entities.Match;
 import fr.aboucorp.variantchess.entities.PartyLifeCycle;
 import fr.aboucorp.variantchess.entities.Piece;
 import fr.aboucorp.variantchess.entities.Square;
@@ -34,8 +34,6 @@ import fr.aboucorp.variantchess.libgdx.utils.ChessModelList;
 public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycle {
     final Board board;
     final Board3dManager board3dManager;
-    private final GDXInputAdapter inputAdapter;
-    private final GDXGestureListener gestureListener;
     Piece selectedPiece;
     GameEventManager eventManager;
     Turn previousTurn;
@@ -51,9 +49,9 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
         this.board = board;
         this.board3dManager = board3dManager;
         this.ruleSet = ruleSet;
-        inputAdapter = new GDXInputAdapter(board3dManager);
+        GDXInputAdapter inputAdapter = new GDXInputAdapter(board3dManager);
         board3dManager.setAndroidInputAdapter(inputAdapter);
-        gestureListener = new GDXGestureListener(this);
+        GDXGestureListener gestureListener = new GDXGestureListener(this);
         board3dManager.setAndroidListener(gestureListener);
         this.gameState = GameState.SelectPiece;
         this.eventManager = GameEventManager.getINSTANCE();
@@ -63,9 +61,9 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
     @Override
     public void receiveGameEvent(GameEvent event) {
         if (event instanceof TurnStartEvent) {
-            manageTurnStart((TurnStartEvent) event);
+            this.manageTurnStart((TurnStartEvent) event);
         } else if (event instanceof TurnEndEvent) {
-            manageTurnEnd();
+            this.manageTurnEnd();
         }
     }
 
@@ -85,7 +83,7 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
     }
 
     @Override
-    public void startParty(Party party) {
+    public void startParty(Match match) {
         this.eventManager.subscribe(PartyEvent.class, this, 1);
         this.eventManager.subscribe(TurnEvent.class, this, 1);
         this.eventManager.subscribe(PieceEvent.class, this, 1);
@@ -124,7 +122,7 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
     }
 
     public GameState getGameState() {
-        return gameState;
+        return this.gameState;
     }
 
     public Piece getPieceFromLocation(Location location) {
@@ -141,7 +139,7 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
 
     public void selectSquare(Square to){
         Square from = this.selectedPiece.getSquare();
-        Piece deadPiece = moveToSquare(to);
+        Piece deadPiece = this.moveToSquare(to);
         String message = String.format("Move %s to %s",this.selectedPiece,to);
         this.eventManager.sendMessage(new MoveEvent(message,from,to, this.selectedPiece,deadPiece));
     }

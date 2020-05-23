@@ -12,7 +12,7 @@ import com.heroiclabs.nakama.StreamPresenceEvent;
 import com.heroiclabs.nakama.api.ChannelMessage;
 import com.heroiclabs.nakama.api.NotificationList;
 
-public class MatchMakingSocketListener extends AbstractSocketListener {
+class MatchMakingSocketListener extends AbstractSocketListener {
     private final MatchListener listener;
 
     public MatchMakingSocketListener(MatchListener listener) {

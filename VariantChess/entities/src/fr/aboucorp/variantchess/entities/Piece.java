@@ -30,11 +30,11 @@ public abstract class Piece extends GameElement {
     }
 
     public boolean isFirstMove() {
-        return isFirstMove;
+        return this.isFirstMove;
     }
 
     public void setFirstMove(boolean firstMove) {
-        isFirstMove = firstMove;
+        this.isFirstMove = firstMove;
     }
 
     public void setActualSquare(Square actualSquare) {
@@ -42,7 +42,7 @@ public abstract class Piece extends GameElement {
     }
 
     public Square getSquare() {
-        return actualSquare;
+        return this.actualSquare;
     }
 
     public void die(){
@@ -59,7 +59,7 @@ public abstract class Piece extends GameElement {
     }
 
     public AbstractMoveSet getMoveSet() {
-        return moveSet;
+        return this.moveSet;
     }
 
     public abstract char fen();

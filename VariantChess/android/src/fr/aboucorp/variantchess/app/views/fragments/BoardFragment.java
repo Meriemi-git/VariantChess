@@ -19,18 +19,18 @@ class BoardFragment extends AndroidFragmentApplication  {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return InitLibGdx();
+        return this.InitLibGdx();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        boardFragmentListener.onBoardFragmentLoaded();
+        this.boardFragmentListener.onBoardFragmentLoaded();
     }
 
     private View InitLibGdx(){
         AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
-        View view = initializeForView(board3dManager, config);
+        View view = this.initializeForView(this.board3dManager, config);
         return view;
     }
 

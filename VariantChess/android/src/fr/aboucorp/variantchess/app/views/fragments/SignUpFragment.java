@@ -24,12 +24,12 @@ import fr.aboucorp.variantchess.app.views.activities.MainActivity;
 public class SignUpFragment extends VariantChessFragment implements Validator.ValidationListener {
     @NotEmpty
     @Email
-    public EditText txt_mail;
+    private EditText txt_mail;
 
     @Password(min = 8, scheme = Password.Scheme.ALPHA_NUMERIC)
-    public EditText txt_pwd;
+    private EditText txt_pwd;
 
-    public Button btn_mail_connect;
+    private Button btn_mail_connect;
 
     private Validator validator;
 
@@ -48,24 +48,24 @@ public class SignUpFragment extends VariantChessFragment implements Validator.Va
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        sessionManager = SessionManager.getInstance((MainActivity) getActivity());
-        bindViews();
-        bindListeners();
-        validator = new Validator(this);
-        validator.setValidationListener(this);
+        this.sessionManager = SessionManager.getInstance((MainActivity) this.getActivity());
+        this.bindViews();
+        this.bindListeners();
+        this.validator = new Validator(this);
+        this.validator.setValidationListener(this);
 
     }
 
     @Override
     protected void bindViews() {
-        this.txt_mail = getView().findViewById(R.id.signup_txt_mail);
-        this.txt_pwd = getView().findViewById(R.id.signup_txt_pwd);
-        this.btn_mail_connect = getView().findViewById(R.id.signup_btn_mail_connect);
+        this.txt_mail = this.getView().findViewById(R.id.signup_txt_mail);
+        this.txt_pwd = this.getView().findViewById(R.id.signup_txt_pwd);
+        this.btn_mail_connect = this.getView().findViewById(R.id.signup_btn_mail_connect);
     }
 
     @Override
     protected void bindListeners() {
-        this.btn_mail_connect.setOnClickListener(v -> validator.validate());
+        this.btn_mail_connect.setOnClickListener(v -> this.validator.validate());
     }
 
     @Override
@@ -77,13 +77,13 @@ public class SignUpFragment extends VariantChessFragment implements Validator.Va
     public void onValidationFailed(List<ValidationError> errors) {
         for (ValidationError error : errors) {
             View view = error.getView();
-            String message = error.getCollatedErrorMessage(getActivity());
+            String message = error.getCollatedErrorMessage(this.getActivity());
 
             // Display error messages ;)
             if (view instanceof EditText) {
                 ((EditText) view).setError(message);
             } else {
-                Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
+                Toast.makeText(this.getActivity(), message, Toast.LENGTH_LONG).show();
             }
         }
     }

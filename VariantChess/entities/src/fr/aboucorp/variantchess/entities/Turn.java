@@ -4,13 +4,14 @@ import java.time.Duration;
 
 public class Turn implements Comparable<Turn>{
 
-    public final int turnNumber;
-    public Duration duration;
-    public Square to;
-    public Square from;
-    public Piece played;
-    public Piece DeadPiece;
-    public final Team team;
+    private final int turnNumber;
+    private Duration duration;
+    private Square to;
+    private Square from;
+    private Piece played;
+    private Piece deadPiece;
+    private final Team team;
+    private String fen;
 
     public Turn(int turnNumber, Team team) {
         this.turnNumber = turnNumber;
@@ -22,15 +23,15 @@ public class Turn implements Comparable<Turn>{
     }
 
     public Piece getDeadPiece() {
-        return DeadPiece;
+        return this.deadPiece;
     }
 
     public void setDeadPiece(Piece deadPiece) {
-        DeadPiece = deadPiece;
+        this.deadPiece = deadPiece;
     }
 
     public Square getTo() {
-        return to;
+        return this.to;
     }
 
     public void setTo(Square to) {
@@ -38,7 +39,7 @@ public class Turn implements Comparable<Turn>{
     }
 
     public Piece getPlayed() {
-        return played;
+        return this.played;
     }
 
     public void setPlayed(Piece played) {
@@ -46,7 +47,7 @@ public class Turn implements Comparable<Turn>{
     }
 
     public Duration getDuration() {
-        return duration;
+        return this.duration;
     }
 
     public void setDuration(Duration duration) {
@@ -54,11 +55,27 @@ public class Turn implements Comparable<Turn>{
     }
 
     public Square getFrom() {
-        return from;
+        return this.from;
     }
 
     public void setFrom(Square from) {
         this.from = from;
+    }
+
+    public int getTurnNumber() {
+        return this.turnNumber;
+    }
+
+    public Team getTeam() {
+        return this.team;
+    }
+
+    public String getFen() {
+        return this.fen;
+    }
+
+    public void setFen(String fen) {
+        this.fen = fen;
     }
 
     @Override

@@ -1,4 +1,4 @@
-package fr.aboucorp.variantchess.app.exception;
+package fr.aboucorp.variantchess.app.exceptions;
 
 
 public class UsernameDuplicateException extends Throwable {

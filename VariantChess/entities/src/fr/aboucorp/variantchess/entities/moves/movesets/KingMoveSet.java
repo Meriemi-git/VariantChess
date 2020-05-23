@@ -29,25 +29,25 @@ public class KingMoveSet extends AbstractMoveSet implements GameEventSubscriber 
 
     @Override
     protected SquareList getPossibleMoves(Piece piece, ChessColor turnColor) {
-        SquareList validSquares = getClassicMoves(piece,turnColor);
+        SquareList validSquares = this.getClassicMoves(piece,turnColor);
         if(piece.getChessColor() == turnColor) {
             if (turnColor == ChessColor.WHITE) {
-                Square c1 = classicBoard.getSquares().getSquareByLabel("C1");
-                Square g1 = classicBoard.getSquares().getSquareByLabel("G1");
-                this.eventManager.sendMessage(new LogEvent(String.format("GetPossibleMoves %s => canCastleQueenSide : %s ; canCastleKingSide : %s",this.actualTurn.getTurnColor(),canCastleQueenSide,canCastleKingSide)));
-                if (canCastleQueenSide && !this.isChecking && this.isLocationSafe(c1,turnColor)) {
+                Square c1 = this.classicBoard.getSquares().getSquareByLabel("C1");
+                Square g1 = this.classicBoard.getSquares().getSquareByLabel("G1");
+                this.eventManager.sendMessage(new LogEvent(String.format("GetPossibleMoves %s => canCastleQueenSide : %s ; canCastleKingSide : %s",this.actualTurn.getTurnColor(), this.canCastleQueenSide, this.canCastleKingSide)));
+                if (this.canCastleQueenSide && !this.isChecking && this.isLocationSafe(c1,turnColor)) {
                     validSquares.add(c1);
                 }
-                if (canCastleKingSide && !this.isChecking && isLocationSafe(g1,turnColor)) {
+                if (this.canCastleKingSide && !this.isChecking && this.isLocationSafe(g1,turnColor)) {
                     validSquares.add(g1);
                 }
             } else {
-                Square c8 = classicBoard.getSquares().getSquareByLabel("C8");
-                Square g8 = classicBoard.getSquares().getSquareByLabel("G8");
-                if (canCastleQueenSide && isLocationSafe(c8,turnColor)) {
+                Square c8 = this.classicBoard.getSquares().getSquareByLabel("C8");
+                Square g8 = this.classicBoard.getSquares().getSquareByLabel("G8");
+                if (this.canCastleQueenSide && this.isLocationSafe(c8,turnColor)) {
                     validSquares.add(c8);
                 }
-                if (canCastleKingSide && isLocationSafe(g8,turnColor)) {
+                if (this.canCastleKingSide && this.isLocationSafe(g8,turnColor)) {
                     validSquares.add(g8);
                 }
             }
@@ -57,7 +57,7 @@ public class KingMoveSet extends AbstractMoveSet implements GameEventSubscriber 
 
     @Override
     public SquareList getThreats(Piece piece, ChessColor turnColor) {
-        return getClassicMoves(piece,turnColor);
+        return this.getClassicMoves(piece,turnColor);
     }
 
     @Override
@@ -66,7 +66,7 @@ public class KingMoveSet extends AbstractMoveSet implements GameEventSubscriber 
         if(event instanceof PieceEvent && this.piece.getChessColor() == ((PieceEvent) event).piece.getChessColor()){
             this.canCastleQueenSide = ((PieceEvent) event).type == BoardEventType.CASTLE_QUEEN;
             this.canCastleKingSide = ((PieceEvent) event).type == BoardEventType.CASTLE_KING;
-            String logMessage = String.format("Piece event type : %s ;Turn color : %s ;canCastleQueenSide : %s ; canCastleKingSide : %s",((PieceEvent) event).type.name(), this.actualTurn.getTurnColor().name(),canCastleQueenSide,canCastleKingSide);
+            String logMessage = String.format("Piece event type : %s ;Turn color : %s ;canCastleQueenSide : %s ; canCastleKingSide : %s",((PieceEvent) event).type.name(), this.actualTurn.getTurnColor().name(), this.canCastleQueenSide, this.canCastleKingSide);
             this.eventManager.sendMessage(new LogEvent(logMessage));
         }
     }
@@ -76,9 +76,9 @@ public class KingMoveSet extends AbstractMoveSet implements GameEventSubscriber 
     private boolean isLocationSafe(Square square, ChessColor turnColor) {
         ChessList<Piece> pieces;
         if(turnColor == ChessColor.BLACK) {
-            pieces = classicBoard.getWhitePieces();
+            pieces = this.classicBoard.getWhitePieces();
         }else {
-            pieces = classicBoard.getBlackPieces();
+            pieces = this.classicBoard.getBlackPieces();
         }
         for (Piece piece: pieces) {
             ChessList<Square> squares = piece.getMoveSet().getThreats(piece,turnColor);
@@ -89,56 +89,56 @@ public class KingMoveSet extends AbstractMoveSet implements GameEventSubscriber 
         return true;
     }
 
-    public SquareList getClassicMoves(Piece piece, ChessColor turnColor){
-        SquareList allSquares = classicBoard.getSquares();
+    private SquareList getClassicMoves(Piece piece, ChessColor turnColor){
+        SquareList allSquares = this.classicBoard.getSquares();
         SquareList validSquares = new SquareList();
         Location start = piece.getLocation();
         Square up = (Square) allSquares.getItemByLocation(new Location(start.getX()+1,0,start.getZ()));
         if(up != null
                 && (up.getPiece() == null || up.getPiece().getChessColor() != turnColor)
-                && (turnColor != piece.getChessColor() || isLocationSafe(up,turnColor))){
+                && (turnColor != piece.getChessColor() || this.isLocationSafe(up,turnColor))){
             validSquares.add(up);
         }
         Square upRight = (Square) allSquares.getItemByLocation(new Location(start.getX()+1,0,start.getZ()-1));
         if(upRight != null
                 && (upRight.getPiece() == null || upRight.getPiece().getChessColor() != turnColor)
-                && (turnColor != piece.getChessColor() || isLocationSafe(upRight,turnColor))){
+                && (turnColor != piece.getChessColor() || this.isLocationSafe(upRight,turnColor))){
             validSquares.add(upRight);
         }
         Square upLeft = (Square) allSquares.getItemByLocation(new Location(start.getX()+1,0,start.getZ()+1));
         if(upLeft != null
                 && (upLeft.getPiece() == null || upLeft.getPiece().getChessColor() != turnColor)
-                && (turnColor != piece.getChessColor() || isLocationSafe(upLeft,turnColor))){
+                && (turnColor != piece.getChessColor() || this.isLocationSafe(upLeft,turnColor))){
             validSquares.add(upLeft);
         }
         Square down = (Square) allSquares.getItemByLocation(new Location(start.getX()-1,0,start.getZ()));
         if(down != null
                 && (down.getPiece() == null || down.getPiece().getChessColor() != turnColor)
-                && (turnColor != piece.getChessColor() || isLocationSafe(down,turnColor))){
+                && (turnColor != piece.getChessColor() || this.isLocationSafe(down,turnColor))){
             validSquares.add(down);
         }
         Square downLeft = (Square) allSquares.getItemByLocation(new Location(start.getX()-1,0,start.getZ()+1));
         if(downLeft != null
                 && (downLeft.getPiece() == null || downLeft.getPiece().getChessColor() != turnColor)
-                && (turnColor != piece.getChessColor() || isLocationSafe(downLeft,turnColor))) {
+                && (turnColor != piece.getChessColor() || this.isLocationSafe(downLeft,turnColor))) {
             validSquares.add(downLeft);
         }
         Square downRight = (Square) allSquares.getItemByLocation(new Location(start.getX()-1,0,start.getZ()-1));
         if(downRight != null
                 && (downRight.getPiece() == null || downRight.getPiece().getChessColor() != turnColor)
-                && (turnColor != piece.getChessColor() || isLocationSafe(downRight,turnColor))){
+                && (turnColor != piece.getChessColor() || this.isLocationSafe(downRight,turnColor))){
             validSquares.add(downRight);
         }
         Square left = (Square) allSquares.getItemByLocation(new Location(start.getX(),0,start.getZ()+1));
         if(left != null
                 && (left.getPiece() == null || left.getPiece().getChessColor() != turnColor)
-                && (turnColor != piece.getChessColor() || isLocationSafe(left,turnColor))){
+                && (turnColor != piece.getChessColor() || this.isLocationSafe(left,turnColor))){
             validSquares.add(left);
         }
         Square right = (Square) allSquares.getItemByLocation(new Location(start.getX(),0,start.getZ()-1));
         if(right != null
                 && (right.getPiece() == null || right.getPiece().getChessColor() != turnColor)
-                && (turnColor != piece.getChessColor() || isLocationSafe(right,turnColor))){
+                && (turnColor != piece.getChessColor() || this.isLocationSafe(right,turnColor))){
             validSquares.add(right);
         }
         return validSquares;
@@ -147,7 +147,7 @@ public class KingMoveSet extends AbstractMoveSet implements GameEventSubscriber 
     @Override
     public void clear() {
         super.clear();
-        canCastleKingSide = false;
-        canCastleQueenSide = false;
+        this.canCastleKingSide = false;
+        this.canCastleQueenSide = false;
     }
 }

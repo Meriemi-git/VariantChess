@@ -16,7 +16,7 @@ public class GameMode {
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public void setName(String name) {
@@ -24,7 +24,7 @@ public class GameMode {
     }
 
     public String getDescription() {
-        return description;
+        return this.description;
     }
 
     public void setDescription(String description) {
@@ -32,7 +32,7 @@ public class GameMode {
     }
 
     public AbstractRuleSet getRuleSet() {
-        return ruleSet;
+        return this.ruleSet;
     }
 
     public void setRuleSet(AbstractRuleSet ruleSet) {

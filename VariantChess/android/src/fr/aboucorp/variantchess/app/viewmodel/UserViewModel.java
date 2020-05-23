@@ -11,7 +11,7 @@ import com.heroiclabs.nakama.api.User;
 
 import java.util.List;
 
-public class UserViewModel extends AndroidViewModel {
+class UserViewModel extends AndroidViewModel {
     private MutableLiveData<User> connected = new MutableLiveData<>();
     public UserViewModel(@NonNull Application application) {
         super(application);
@@ -22,7 +22,7 @@ public class UserViewModel extends AndroidViewModel {
     }
 
     public LiveData<User> getConnected() {
-        return connected;
+        return this.connected;
     }
 
     public void setConnected(User connected) {

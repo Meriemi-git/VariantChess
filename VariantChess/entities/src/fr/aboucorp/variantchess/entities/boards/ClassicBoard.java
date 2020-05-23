@@ -54,30 +54,30 @@ public class ClassicBoard extends Board{
 
     private void createWhitePieces(){
         for(int  i = 0 ; i < 8 ; i++){
-            this.whitePieces.add(createPawn(new Location(i,0,1), ChessColor.WHITE, PieceId.get(i)));
+            this.whitePieces.add(this.createPawn(new Location(i,0,1), ChessColor.WHITE, PieceId.get(i)));
         }
-        this.whitePieces.add(createKnight(new Location(6,0,0), ChessColor.WHITE, PieceId.WRN));
-        this.whitePieces.add(createKnight(new Location(1,0,0), ChessColor.WHITE, PieceId.WLN));
-        this.whitePieces.add(createBishop(new Location(5,0,0), ChessColor.WHITE, PieceId.WRB));
-        this.whitePieces.add(createBishop(new Location(2,0,0), ChessColor.WHITE, PieceId.WLB));
-        this.whitePieces.add(createQueen(new Location(4,0,0), ChessColor.WHITE, PieceId.WQ));
-        this.whitePieces.add(createKing(new Location(3,0,0), ChessColor.WHITE, PieceId.WK));
-        this.whitePieces.add(createRook(new Location(7,0,0), ChessColor.WHITE, PieceId.WLR));
-        this.whitePieces.add(createRook(new Location(0,0,0), ChessColor.WHITE, PieceId.WRR));
+        this.whitePieces.add(this.createKnight(new Location(6,0,0), ChessColor.WHITE, PieceId.WRN));
+        this.whitePieces.add(this.createKnight(new Location(1,0,0), ChessColor.WHITE, PieceId.WLN));
+        this.whitePieces.add(this.createBishop(new Location(5,0,0), ChessColor.WHITE, PieceId.WRB));
+        this.whitePieces.add(this.createBishop(new Location(2,0,0), ChessColor.WHITE, PieceId.WLB));
+        this.whitePieces.add(this.createQueen(new Location(4,0,0), ChessColor.WHITE, PieceId.WQ));
+        this.whitePieces.add(this.createKing(new Location(3,0,0), ChessColor.WHITE, PieceId.WK));
+        this.whitePieces.add(this.createRook(new Location(7,0,0), ChessColor.WHITE, PieceId.WLR));
+        this.whitePieces.add(this.createRook(new Location(0,0,0), ChessColor.WHITE, PieceId.WRR));
     }
 
     private void createBlackPieces(){
         for(int  i = 0 ; i < 8 ; i++){
-            this.blackPieces.add(createPawn(new Location(i,0,6), ChessColor.BLACK, PieceId.get(i+10)));
+            this.blackPieces.add(this.createPawn(new Location(i,0,6), ChessColor.BLACK, PieceId.get(i+10)));
         }
-        this.blackPieces.add(createKnight(new Location(6,0,7), ChessColor.BLACK, PieceId.BRN));
-        this.blackPieces.add(createKnight(new Location(1,0,7), ChessColor.BLACK, PieceId.BLN));
-        this.blackPieces.add(createBishop(new Location(5,0,7), ChessColor.BLACK, PieceId.BLB));
-        this.blackPieces.add(createBishop(new Location(2,0,7), ChessColor.BLACK, PieceId.BRB));
-        this.blackPieces.add(createQueen(new Location(4,0,7), ChessColor.BLACK, PieceId.BQ));
-        this.blackPieces.add(createKing(new Location(3,0,7), ChessColor.BLACK, PieceId.BK));
-        this.blackPieces.add(createRook(new Location(7,0,7), ChessColor.BLACK, PieceId.BLR));
-        this.blackPieces.add(createRook(new Location(0,0,7), ChessColor.BLACK, PieceId.BRR));
+        this.blackPieces.add(this.createKnight(new Location(6,0,7), ChessColor.BLACK, PieceId.BRN));
+        this.blackPieces.add(this.createKnight(new Location(1,0,7), ChessColor.BLACK, PieceId.BLN));
+        this.blackPieces.add(this.createBishop(new Location(5,0,7), ChessColor.BLACK, PieceId.BLB));
+        this.blackPieces.add(this.createBishop(new Location(2,0,7), ChessColor.BLACK, PieceId.BRB));
+        this.blackPieces.add(this.createQueen(new Location(4,0,7), ChessColor.BLACK, PieceId.BQ));
+        this.blackPieces.add(this.createKing(new Location(3,0,7), ChessColor.BLACK, PieceId.BK));
+        this.blackPieces.add(this.createRook(new Location(7,0,7), ChessColor.BLACK, PieceId.BLR));
+        this.blackPieces.add(this.createRook(new Location(0,0,7), ChessColor.BLACK, PieceId.BRR));
     }
 
     private Knight createKnight(Location location, ChessColor color, PieceId pieceID){
@@ -113,7 +113,7 @@ public class ClassicBoard extends Board{
         if(lines.length != 9){
             throw new FenStringBadFormatException("Cannot load game from fen string, fen string doesn't contains enought lines");
         }
-        createPiecesFromFen(lines);
+        this.createPiecesFromFen(lines);
     }
 
     private void createPiecesFromFen(String[] lines) throws FenStringBadFormatException {
@@ -125,46 +125,46 @@ public class ClassicBoard extends Board{
                 int zPos = 7-i;
                 switch(lines[i].charAt(j)){
                     case 'p':
-                        this.blackPieces.add(createPawn(new Location(xPos,0,zPos), ChessColor.BLACK, PieceId.get(xPos)));
+                        this.blackPieces.add(this.createPawn(new Location(xPos,0,zPos), ChessColor.BLACK, PieceId.get(xPos)));
                         break;
                     case 'P':
-                        this.whitePieces.add(createPawn(new Location(xPos,0,zPos), ChessColor.WHITE, PieceId.get(xPos+10)));
+                        this.whitePieces.add(this.createPawn(new Location(xPos,0,zPos), ChessColor.WHITE, PieceId.get(xPos+10)));
                         break;
                     case 'r':
-                        this.blackPieces.add(createRook(new Location(xPos,0,zPos), ChessColor.BLACK,firstBR ? PieceId.BLR: PieceId.BRR));
+                        this.blackPieces.add(this.createRook(new Location(xPos,0,zPos), ChessColor.BLACK,firstBR ? PieceId.BLR: PieceId.BRR));
                         firstBR = false;
                         break;
                     case 'R':
-                        this.whitePieces.add(createRook(new Location(xPos,0,zPos), ChessColor.WHITE,firstWR ? PieceId.WLR: PieceId.WRR));
+                        this.whitePieces.add(this.createRook(new Location(xPos,0,zPos), ChessColor.WHITE,firstWR ? PieceId.WLR: PieceId.WRR));
                         firstWR = false;
                         break;
                     case 'b':
-                        this.blackPieces.add(createBishop(new Location(xPos,0,zPos), ChessColor.BLACK,firstBB ? PieceId.BLB: PieceId.BRB));
+                        this.blackPieces.add(this.createBishop(new Location(xPos,0,zPos), ChessColor.BLACK,firstBB ? PieceId.BLB: PieceId.BRB));
                         firstBB = false;
                         break;
                     case 'B':
-                        this.whitePieces.add(createBishop(new Location(xPos,0,zPos), ChessColor.WHITE,firstWB ? PieceId.WLB: PieceId.WRB));
+                        this.whitePieces.add(this.createBishop(new Location(xPos,0,zPos), ChessColor.WHITE,firstWB ? PieceId.WLB: PieceId.WRB));
                         firstWB = false;
                         break;
                     case 'n':
-                        this.blackPieces.add(createKnight(new Location(xPos,0,zPos), ChessColor.BLACK,firstBN ? PieceId.BLN: PieceId.BRN));
+                        this.blackPieces.add(this.createKnight(new Location(xPos,0,zPos), ChessColor.BLACK,firstBN ? PieceId.BLN: PieceId.BRN));
                         firstBN = false;
                         break;
                     case 'N':
-                        this.whitePieces.add(createKnight(new Location(xPos,0,zPos), ChessColor.WHITE,firstWN ? PieceId.WLN: PieceId.WRN));
+                        this.whitePieces.add(this.createKnight(new Location(xPos,0,zPos), ChessColor.WHITE,firstWN ? PieceId.WLN: PieceId.WRN));
                         firstWN = false;
                         break;
                     case 'k':
-                        this.blackPieces.add(createKing(new Location(xPos,0,zPos), ChessColor.BLACK, PieceId.BK));
+                        this.blackPieces.add(this.createKing(new Location(xPos,0,zPos), ChessColor.BLACK, PieceId.BK));
                         break;
                     case 'K':
-                        this.whitePieces.add(createKing(new Location(xPos,0,zPos), ChessColor.WHITE, PieceId.WK));
+                        this.whitePieces.add(this.createKing(new Location(xPos,0,zPos), ChessColor.WHITE, PieceId.WK));
                         break;
                     case 'q':
-                        this.blackPieces.add(createQueen(new Location(xPos,0,zPos), ChessColor.BLACK, PieceId.BQ));
+                        this.blackPieces.add(this.createQueen(new Location(xPos,0,zPos), ChessColor.BLACK, PieceId.BQ));
                         break;
                     case 'Q':
-                        this.whitePieces.add(createQueen(new Location(xPos,0,zPos), ChessColor.WHITE, PieceId.WQ));
+                        this.whitePieces.add(this.createQueen(new Location(xPos,0,zPos), ChessColor.WHITE, PieceId.WQ));
                         break;
                     default:
                         try {
@@ -185,22 +185,22 @@ public class ClassicBoard extends Board{
 
     @Override
     public SquareList getSquares() {
-        return chessSquares;
+        return this.chessSquares;
     }
 
     @Override
     public PieceList getBlackPieces() {
-        return blackPieces;
+        return this.blackPieces;
     }
 
     @Override
     public PieceList getWhitePieces() {
-        return whitePieces;
+        return this.whitePieces;
     }
 
     @Override
     public PieceList getPiecesByColor(ChessColor color){
-        return color == ChessColor.WHITE ? getWhitePieces() : getBlackPieces();
+        return color == ChessColor.WHITE ? this.getWhitePieces() : this.getBlackPieces();
     }
 
     @Override

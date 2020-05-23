@@ -17,13 +17,13 @@ public abstract class ChessModel extends ModelInstance {
     private Vector3 center = new Vector3();
     private Vector3 dimensions = new Vector3();
 
-    public ChessModel(Model model, Location location, Material originalMaterial) {
+    ChessModel(Model model, Location location, Material originalMaterial) {
         super(model,location.getX(),location.getY(),location.getZ());
         this.originalMaterial = originalMaterial;
         this.location = location.clone();
-        calculateBoundingBox(boundingBox);
-        this.boundingBox.getCenter(center);
-        this.boundingBox.getDimensions(dimensions);
+        this.calculateBoundingBox(this.boundingBox);
+        this.boundingBox.getCenter(this.center);
+        this.boundingBox.getDimensions(this.dimensions);
     }
 
     public void move(Location location) {
@@ -33,22 +33,22 @@ public abstract class ChessModel extends ModelInstance {
 
     public boolean isVisible(final Camera cam) {
         Vector3 position = new Vector3();
-        transform.getTranslation(position);
+        this.transform.getTranslation(position);
         position.add(this.center);
         return cam.frustum.boundsInFrustum(position,this.dimensions);
     }
 
 
     public Material getOriginalMaterial() {
-        return originalMaterial;
+        return this.originalMaterial;
     }
 
     public Location getLocation() {
-        return location;
+        return this.location;
     }
 
     public BoundingBox getBoundingBox() {
-        return boundingBox;
+        return this.boundingBox;
     }
 
     public void setBoundingBox(BoundingBox boundingBox) {
@@ -56,10 +56,10 @@ public abstract class ChessModel extends ModelInstance {
     }
 
     public Vector3 getCenter() {
-        return center;
+        return this.center;
     }
 
     public Vector3 getDimensions() {
-        return dimensions;
+        return this.dimensions;
     }
 }

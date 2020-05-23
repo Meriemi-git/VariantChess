@@ -16,10 +16,8 @@ import com.heroiclabs.nakama.api.NotificationList;
 import fr.aboucorp.variantchess.app.listeners.MatchEventListener;
 import fr.aboucorp.variantchess.app.managers.boards.BoardManager;
 import fr.aboucorp.variantchess.app.multiplayer.MatchListener;
-import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
-import fr.aboucorp.variantchess.app.views.activities.VariantChessActivity;
 import fr.aboucorp.variantchess.entities.ChessColor;
-import fr.aboucorp.variantchess.entities.Party;
+import fr.aboucorp.variantchess.entities.Match;
 import fr.aboucorp.variantchess.entities.PartyLifeCycle;
 import fr.aboucorp.variantchess.entities.enums.BoardEventType;
 import fr.aboucorp.variantchess.entities.events.GameEventManager;
@@ -29,31 +27,30 @@ import fr.aboucorp.variantchess.entities.events.models.GameEvent;
 import fr.aboucorp.variantchess.entities.events.models.LogEvent;
 import fr.aboucorp.variantchess.entities.events.models.MoveEvent;
 import fr.aboucorp.variantchess.entities.events.models.PartyEvent;
+import fr.aboucorp.variantchess.entities.events.models.TurnEndEvent;
 
 public class MatchManager implements GameEventSubscriber, MatchListener, BoardManager.BoardLoadingListener, PartyLifeCycle {
     private final BoardManager boardManager;
     private final TurnManager turnManager;
     private GameEventManager eventManager;
-    private SessionManager sessionManager;
-    private Party party;
     private final MatchEventListener eventListener;
 
+    private Match match;
 
-    public MatchManager(VariantChessActivity activity, BoardManager boardManager, MatchEventListener eventListener) {
+
+    public MatchManager(BoardManager boardManager, MatchEventListener eventListener) {
         this.boardManager = boardManager;
         this.eventListener = eventListener;
         this.boardManager.setBoardLoadingListener(this);
         this.turnManager = TurnManager.getINSTANCE();
         this.eventManager = GameEventManager.getINSTANCE();
-        this.sessionManager = SessionManager.getInstance(activity);
-
     }
 
     @Override
     public void OnBoardLoaded() {
         this.eventManager.subscribe(PartyEvent.class,this,1);
         this.eventManager.subscribe(BoardEvent.class,this,1);
-        this.turnManager.startParty(this.party);
+        this.turnManager.startParty(this.match);
     }
 
     public void loadBoard(String fenString){
@@ -81,18 +78,20 @@ public class MatchManager implements GameEventSubscriber, MatchListener, BoardMa
         if(event instanceof PartyEvent){
             Log.i("fr.aboucorp.variantchess",event.message);
         }else if(event instanceof BoardEvent && ((BoardEvent) event).type == BoardEventType.CHECKMATE){
-            ChessColor winner = boardManager.getWinner();
+            ChessColor winner = this.boardManager.getWinner();
             this.eventManager.sendMessage(new PartyEvent(String.format("Game finished ! Winner : %s",winner != null ? winner.name() : "EQUALITY")));
         }else if(event instanceof MoveEvent && ((BoardEvent) event).type == BoardEventType.MOVE){
-            endTurn(((MoveEvent)event));
+            this.endTurn(((MoveEvent)event));
+        }else if(event instanceof TurnEndEvent){
+            match.getTurns().push(((TurnEndEvent) event).turn);
         }
     }
 
 
     @Override
-    public void startParty(Party party) {
-        this.party = party;
-        this.boardManager.startParty(party);
+    public void startParty(Match match) {
+        this.match = match;
+        this.boardManager.startParty(match);
     }
 
     @Override

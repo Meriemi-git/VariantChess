@@ -14,7 +14,7 @@ public class Team {
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public void setName(String name) {
@@ -22,7 +22,7 @@ public class Team {
     }
 
     public List<Player> getPlayers() {
-        return players;
+        return this.players;
     }
 
     public void setPlayers(List<Player> players) {
@@ -30,6 +30,6 @@ public class Team {
     }
 
     public ChessColor getChessColor() {
-        return chessColor;
+        return this.chessColor;
     }
 }

@@ -14,7 +14,7 @@ import fr.aboucorp.variantchess.app.views.activities.MainActivity;
 import fr.aboucorp.variantchess.app.views.activities.VariantChessActivity;
 
 public class HomeFragment extends VariantChessFragment {
-    public Button home_btn_online_game;
+    private Button home_btn_online_game;
     private SessionManager sessionManager;
 
     public HomeFragment() {
@@ -25,7 +25,7 @@ public class HomeFragment extends VariantChessFragment {
         super.onViewCreated(view, savedInstanceState);
         this.bindViews();
         this.bindListeners();
-        this.sessionManager = SessionManager.getInstance((MainActivity) getActivity());
+        this.sessionManager = SessionManager.getInstance((MainActivity) this.getActivity());
     }
 
     @Override
@@ -36,13 +36,13 @@ public class HomeFragment extends VariantChessFragment {
 
     @Override
     protected void bindViews() {
-        this.home_btn_online_game =  getView().findViewById(R.id.home_btn_online_game);
+        this.home_btn_online_game = this.getView().findViewById(R.id.home_btn_online_game);
     }
 
     @Override
     protected void bindListeners() {
         this.home_btn_online_game.setOnClickListener(v -> {
-            ((VariantChessActivity)getActivity()).setFragment(GameFragment.class,"newGame");
+            ((VariantChessActivity) this.getActivity()).setFragment(GameFragment.class,"newGame");
         });
     }
 }

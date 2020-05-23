@@ -20,9 +20,9 @@ public class GDXGestureListener implements GestureDetector.GestureListener {
 
     @Override
     public boolean touchDown(float screenX, float screenY, int pointer, int button) {
-        switch (boardManager.getGameState()) {
+        switch (this.boardManager.getGameState()) {
             case SelectPiece:
-                ChessModel touchedModel = touchedModelFinder.getTouchedModel(screenX, screenY, this.boardManager.getPiecesModelsFromActualTurn());
+                ChessModel touchedModel = this.touchedModelFinder.getTouchedModel(screenX, screenY, this.boardManager.getPiecesModelsFromActualTurn());
                 if (touchedModel != null) {
                     Piece touchedPiece = this.boardManager.getPieceFromLocation(touchedModel.getLocation());
                     if (touchedPiece != null) {
@@ -33,7 +33,7 @@ public class GDXGestureListener implements GestureDetector.GestureListener {
                 }
                 break;
             case SelectCase:
-                ChessModel otherModel = touchedModelFinder.getTouchedModel(screenX, screenY, this.boardManager.getPiecesModelsFromActualTurn());
+                ChessModel otherModel = this.touchedModelFinder.getTouchedModel(screenX, screenY, this.boardManager.getPiecesModelsFromActualTurn());
                 if (otherModel != null) {
                     Piece otherTouchedPiece = this.boardManager.getPieceFromLocation(otherModel.getLocation());
                     if (otherTouchedPiece != null) {
@@ -41,7 +41,7 @@ public class GDXGestureListener implements GestureDetector.GestureListener {
                         this.boardManager.selectPiece(otherTouchedPiece);
                     }
                 } else {
-                    ChessModel squareModel = touchedModelFinder.getTouchedModel(screenX, screenY, this.boardManager.getPossibleSquareModels());
+                    ChessModel squareModel = this.touchedModelFinder.getTouchedModel(screenX, screenY, this.boardManager.getPossibleSquareModels());
                     if(squareModel != null) {
                         Square square = this.boardManager.getSquareFromLocation(squareModel.getLocation());
                         if (square != null) {

@@ -16,7 +16,7 @@ import com.mobsandgeeks.saripaar.annotation.NotEmpty;
 import java.util.List;
 
 import fr.aboucorp.variantchess.R;
-import fr.aboucorp.variantchess.app.exception.UsernameDuplicateException;
+import fr.aboucorp.variantchess.app.exceptions.UsernameDuplicateException;
 import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
 import fr.aboucorp.variantchess.app.views.activities.MainActivity;
 import fr.aboucorp.variantchess.app.views.activities.VariantChessActivity;
@@ -38,22 +38,22 @@ public class UsernameFragment extends VariantChessFragment  implements Validator
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        bindViews();
-        bindListeners();
-        validator = new Validator(this);
-        validator.setValidationListener(this);
-        sessionManager = SessionManager.getInstance((MainActivity) getActivity());
+        this.bindViews();
+        this.bindListeners();
+        this.validator = new Validator(this);
+        this.validator.setValidationListener(this);
+        this.sessionManager = SessionManager.getInstance((MainActivity) this.getActivity());
     }
 
     @Override
     protected void bindViews() {
-        this.username_btn_validate =  getView().findViewById(R.id.username_btn_validate);
-        this.username_txt_username =  getView().findViewById(R.id.username_txt_username);
+        this.username_btn_validate = this.getView().findViewById(R.id.username_btn_validate);
+        this.username_txt_username = this.getView().findViewById(R.id.username_txt_username);
     }
 
     @Override
     protected void bindListeners() {
-        username_btn_validate.setOnClickListener(v -> validator.validate());
+        this.username_btn_validate.setOnClickListener(v -> this.validator.validate());
     }
 
 
@@ -61,9 +61,9 @@ public class UsernameFragment extends VariantChessFragment  implements Validator
     public void onValidationSucceeded() {
         try {
             User user = this.sessionManager.updateDisplayName(this.username_txt_username.getText().toString());
-            ((VariantChessActivity)getActivity()).userIsConnected(user);
+            ((VariantChessActivity) this.getActivity()).userIsConnected(user);
         } catch (UsernameDuplicateException e) {
-            Toast.makeText(getActivity(), R.string.username_already_exists, Toast.LENGTH_LONG).show();
+            Toast.makeText(this.getActivity(), R.string.username_already_exists, Toast.LENGTH_LONG).show();
         }
     }
 
@@ -71,11 +71,11 @@ public class UsernameFragment extends VariantChessFragment  implements Validator
     public void onValidationFailed(List<ValidationError> errors) {
         for (ValidationError error : errors) {
             View view = error.getView();
-            String message = error.getCollatedErrorMessage(getActivity());
+            String message = error.getCollatedErrorMessage(this.getActivity());
             if (view instanceof EditText) {
                 ((EditText) view).setError(message);
             } else {
-                Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
+                Toast.makeText(this.getActivity(), message, Toast.LENGTH_LONG).show();
             }
         }
     }

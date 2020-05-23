@@ -5,6 +5,6 @@ public abstract class AbstractRuleSet {
     public int moveNumber = 0;
 
     void clearRules(){
-        moveNumber = 0;
+        this.moveNumber = 0;
     }
 }

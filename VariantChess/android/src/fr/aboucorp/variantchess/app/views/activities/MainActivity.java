@@ -25,7 +25,7 @@ import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
 import fr.aboucorp.variantchess.app.utils.FragmentTag;
 import fr.aboucorp.variantchess.app.views.fragments.AccountFragment;
 import fr.aboucorp.variantchess.app.views.fragments.HomeFragment;
-import fr.aboucorp.variantchess.app.views.fragments.PartyFragment;
+import fr.aboucorp.variantchess.app.views.fragments.MatchFragment;
 import fr.aboucorp.variantchess.app.views.fragments.UsernameFragment;
 
 import static fr.aboucorp.variantchess.app.multiplayer.SessionManager.SHARED_PREFERENCE_NAME;
@@ -37,14 +37,14 @@ public class MainActivity extends VariantChessActivity implements AndroidFragmen
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main_layout);
-        setToolbar();
-        sessionManager = SessionManager.getInstance(this);
-        SharedPreferences pref = getSharedPreferences(SHARED_PREFERENCE_NAME, Context.MODE_PRIVATE);
+        this.setContentView(R.layout.main_layout);
+        this.setToolbar();
+        this.sessionManager = SessionManager.getInstance(this);
+        SharedPreferences pref = this.getSharedPreferences(SHARED_PREFERENCE_NAME, Context.MODE_PRIVATE);
         User user;
         try {
             user = this.sessionManager.restoreSessionIfPossible(pref);
-            userIsConnected(user);
+            this.userIsConnected(user);
         } catch (Exception e) {
             Log.e("fr.aboucorp.variantchess", e.getMessage());
             e.printStackTrace();
@@ -53,15 +53,15 @@ public class MainActivity extends VariantChessActivity implements AndroidFragmen
 
 
     private void setToolbar() {
-        toolbar = findViewById(R.id.main_toolbar);
-        this.toolbar.setTitle(getString(R.string.app_name));
-        setSupportActionBar(toolbar);
+        this.toolbar = this.findViewById(R.id.main_toolbar);
+        this.toolbar.setTitle(this.getString(R.string.app_name));
+        this.setSupportActionBar(this.toolbar);
     }
 
     @Override
     public void setFragment(Class<? extends Fragment> fragmentClass, String fragmentTag) {
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        Fragment existing = getSupportFragmentManager().findFragmentByTag(fragmentTag);
+        FragmentTransaction fragmentTransaction = this.getSupportFragmentManager().beginTransaction();
+        Fragment existing = this.getSupportFragmentManager().findFragmentByTag(fragmentTag);
         try {
             if (existing == null) {
                 existing = fragmentClass.newInstance();
@@ -79,7 +79,7 @@ public class MainActivity extends VariantChessActivity implements AndroidFragmen
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main_menu, menu);
+        this.getMenuInflater().inflate(R.menu.main_menu, menu);
         return true;
     }
 
@@ -102,7 +102,7 @@ public class MainActivity extends VariantChessActivity implements AndroidFragmen
             case R.id.menu_action_disconnect:
                 this.sessionManager.destroySession();
                 this.setFragment(AccountFragment.class, "account");
-                TextView userText = toolbar.findViewById(R.id.lbl_display_name);
+                TextView userText = this.toolbar.findViewById(R.id.lbl_display_name);
                 userText.setText(R.string.disconnect_message);
                 return true;
             case R.id.menu_action_settings:
@@ -117,24 +117,24 @@ public class MainActivity extends VariantChessActivity implements AndroidFragmen
     }
 
     public void userIsConnected(User connected) {
-        TextView userText = toolbar.findViewById(R.id.lbl_display_name);
+        TextView userText = this.toolbar.findViewById(R.id.lbl_display_name);
         if (connected != null) {
             if (TextUtils.isEmpty(connected.getDisplayName())) {
-                setFragment(UsernameFragment.class, "username");
+                this.setFragment(UsernameFragment.class, "username");
             } else {
                 userText.setText(connected.getDisplayName());
-                setFragment(HomeFragment.class, "home");
+                this.setFragment(HomeFragment.class, "home");
                 Toast.makeText(this, R.string.connected, Toast.LENGTH_LONG).show();
             }
         } else {
-            setFragment(AccountFragment.class, "account");
+            this.setFragment(AccountFragment.class, "account");
         }
     }
 
     @Override
     public void onBackPressed() {
-        FragmentManager manager = getSupportFragmentManager();
-        PartyFragment fragment = (PartyFragment) manager.findFragmentByTag(FragmentTag.PARTY);
+        FragmentManager manager = this.getSupportFragmentManager();
+        MatchFragment fragment = (MatchFragment) manager.findFragmentByTag(FragmentTag.MATCH);
         if (fragment != null && fragment.isVisible()) {
             fragment.confirmExit();
         } else {
@@ -144,7 +144,7 @@ public class MainActivity extends VariantChessActivity implements AndroidFragmen
 
     @Override
     public void exit() {
-        finish();
+        this.finish();
     }
 
     @Override
@@ -160,8 +160,8 @@ public class MainActivity extends VariantChessActivity implements AndroidFragmen
     @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        PartyFragment fragment = (PartyFragment) getSupportFragmentManager().findFragmentByTag(FragmentTag.PARTY);
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        MatchFragment fragment = (MatchFragment) this.getSupportFragmentManager().findFragmentByTag(FragmentTag.MATCH);
+        FragmentTransaction fragmentTransaction = this.getSupportFragmentManager().beginTransaction();
         if (fragment != null) {
 
             fragmentTransaction.remove(fragment);
@@ -170,8 +170,8 @@ public class MainActivity extends VariantChessActivity implements AndroidFragmen
         String fen = fragment.getFenFromBoard();
         Bundle args = new Bundle();
         args.putString("fen",fen);
-        fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.fragment_container,PartyFragment.class,args, FragmentTag.PARTY).commit();
+        fragmentTransaction = this.getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_container, MatchFragment.class,args, FragmentTag.MATCH).commit();
 
     }
 }

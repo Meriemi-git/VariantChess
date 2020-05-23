@@ -14,7 +14,7 @@ import fr.aboucorp.variantchess.libgdx.utils.ChessModelList;
  * Created by Doremus on 04/02/2017.
  */
 
-public class TouchedModelFinder {
+class TouchedModelFinder {
 
     private BoardManager boardManager;
 

@@ -126,8 +126,8 @@ public class Board3dManager extends ApplicationAdapter {
         this.initEnvironment();
         this.initCamera(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
         //viewport = new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), camera);
-        if(tacticalViewEnabled){
-            setTacticalCamera();
+        if(this.tacticalViewEnabled){
+            this.setTacticalCamera();
         }
 
         this.setPaths();
@@ -144,39 +144,39 @@ public class Board3dManager extends ApplicationAdapter {
         Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-        this.modelBatch.begin(camera);
+        this.modelBatch.begin(this.camera);
         for (ChessModel piece : this.whitePieceModels) {
-            if (piece.isVisible(this.camera) && !tacticalViewEnabled) {
-                modelBatch.render(piece, this.environment);
+            if (piece.isVisible(this.camera) && !this.tacticalViewEnabled) {
+                this.modelBatch.render(piece, this.environment);
             }
         }
 
         for (ChessModel piece : this.blackPieceModels) {
-            if (piece.isVisible(this.camera) && !tacticalViewEnabled) {
-                modelBatch.render(piece, this.environment);
+            if (piece.isVisible(this.camera) && !this.tacticalViewEnabled) {
+                this.modelBatch.render(piece, this.environment);
             }
         }
         for (ChessModel deadPiece : this.whiteDeadPieceModels) {
-            if (deadPiece.isVisible(this.camera) && !tacticalViewEnabled) {
-                modelBatch.render(deadPiece, this.environment);
+            if (deadPiece.isVisible(this.camera) && !this.tacticalViewEnabled) {
+                this.modelBatch.render(deadPiece, this.environment);
             }
         }
         for (ChessModel deadPiece : this.blackDeadPieceModels) {
-            if (deadPiece.isVisible(this.camera) && !tacticalViewEnabled) {
-                modelBatch.render(deadPiece, this.environment);
+            if (deadPiece.isVisible(this.camera) && !this.tacticalViewEnabled) {
+                this.modelBatch.render(deadPiece, this.environment);
             }
         }
         for (ChessModel squareModel : this.chessSquareModels) {
             if (squareModel.isVisible(this.camera)) {
-                modelBatch.render(squareModel, this.environment);
+                this.modelBatch.render(squareModel, this.environment);
             }
         }
         for (ModelInstance stuff : this.devStuff) {
-            modelBatch.render(stuff, this.environment);
+            this.modelBatch.render(stuff, this.environment);
         }
         this.modelBatch.end();
-        if (tacticalViewEnabled) {
-            displayPictures();
+        if (this.tacticalViewEnabled) {
+            this.displayPictures();
         }
     }
 
@@ -192,10 +192,10 @@ public class Board3dManager extends ApplicationAdapter {
                     .rotate(1, 0, 0, 90)
                     .rotate(0, 1, 0, 180);
 
-            spriteBatch.setProjectionMatrix(tmpMat4.set(camera.combined).mul(textTransform));
-            TextureAtlas.AtlasRegion region = piecesAtlas.findRegion(material3dManager.getRegionNameFromPieceId(((ChessPieceM) piece).id));
+            this.spriteBatch.setProjectionMatrix(tmpMat4.set(this.camera.combined).mul(textTransform));
+            TextureAtlas.AtlasRegion region = this.piecesAtlas.findRegion(this.material3dManager.getRegionNameFromPieceId(((ChessPieceM) piece).id));
             Sprite pieceSprite = new Sprite(region);
-            spriteBatch.draw(pieceSprite, 0, 0, 24, 24);
+            this.spriteBatch.draw(pieceSprite, 0, 0, 24, 24);
         });
 
         this.blackPieceModels.forEach(piece -> {
@@ -208,10 +208,10 @@ public class Board3dManager extends ApplicationAdapter {
                     .rotate(1, 0, 0, 90)
                     .rotate(0, 1, 0, 180);
 
-            spriteBatch.setProjectionMatrix(tmpMat4.set(camera.combined).mul(textTransform));
-            TextureAtlas.AtlasRegion region = piecesAtlas.findRegion(material3dManager.getRegionNameFromPieceId(((ChessPieceM) piece).id));
+            this.spriteBatch.setProjectionMatrix(tmpMat4.set(this.camera.combined).mul(textTransform));
+            TextureAtlas.AtlasRegion region = this.piecesAtlas.findRegion(this.material3dManager.getRegionNameFromPieceId(((ChessPieceM) piece).id));
             Sprite pieceSprite = new Sprite(region);
-            spriteBatch.draw(pieceSprite, 0, 0, 24, 24);
+            this.spriteBatch.draw(pieceSprite, 0, 0, 24, 24);
         });
         this.whiteDeadPieceModels.forEach(piece -> {
             Matrix4 tmpMat4 = new Matrix4();
@@ -223,10 +223,10 @@ public class Board3dManager extends ApplicationAdapter {
                     .rotate(1, 0, 0, 90)
                     .rotate(0, 1, 0, 180);
 
-            spriteBatch.setProjectionMatrix(tmpMat4.set(camera.combined).mul(textTransform));
-            TextureAtlas.AtlasRegion region = piecesAtlas.findRegion(material3dManager.getRegionNameFromPieceId(((ChessPieceM) piece).id));
+            this.spriteBatch.setProjectionMatrix(tmpMat4.set(this.camera.combined).mul(textTransform));
+            TextureAtlas.AtlasRegion region = this.piecesAtlas.findRegion(this.material3dManager.getRegionNameFromPieceId(((ChessPieceM) piece).id));
             Sprite pieceSprite = new Sprite(region);
-            spriteBatch.draw(pieceSprite, 0, 0, 24, 24);
+            this.spriteBatch.draw(pieceSprite, 0, 0, 24, 24);
         });
         this.blackDeadPieceModels.forEach(piece -> {
             Matrix4 tmpMat4 = new Matrix4();
@@ -238,10 +238,10 @@ public class Board3dManager extends ApplicationAdapter {
                     .rotate(1, 0, 0, 90)
                     .rotate(0, 1, 0, 180);
 
-            spriteBatch.setProjectionMatrix(tmpMat4.set(camera.combined).mul(textTransform));
-            TextureAtlas.AtlasRegion region = piecesAtlas.findRegion(material3dManager.getRegionNameFromPieceId(((ChessPieceM) piece).id));
+            this.spriteBatch.setProjectionMatrix(tmpMat4.set(this.camera.combined).mul(textTransform));
+            TextureAtlas.AtlasRegion region = this.piecesAtlas.findRegion(this.material3dManager.getRegionNameFromPieceId(((ChessPieceM) piece).id));
             Sprite pieceSprite = new Sprite(region);
-            spriteBatch.draw(pieceSprite, 0, 0, 24, 24);
+            this.spriteBatch.draw(pieceSprite, 0, 0, 24, 24);
         });
         this.spriteBatch.end();
     }
@@ -259,7 +259,7 @@ private void setPaths() {
 
     public void createSquares(List<Square> squares) {
         this.modelBuilder = new ModelBuilder();
-        Model compositeModel = createModelFromParts();
+        Model compositeModel = this.createModelFromParts();
 
         for (GameElement square : squares) {
             Material material;
@@ -277,7 +277,7 @@ private void setPaths() {
     private Model createModelFromParts() {
         int attr = VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal | VertexAttributes.Usage.TextureCoordinates;
         this.modelBuilder.begin();
-        modelBuilder.node().id = "root";
+        this.modelBuilder.node().id = "root";
         MeshPartBuilder top = this.modelBuilder.part("top", GL20.GL_TRIANGLES, attr, new Material());
         top.rect(-0.5f, 0f, -0.5f, -0.5f, 0f, 0.5f, 0.5f, 0f, 0.5f, 0.5f, 0f, -0.5f, 0, 1, 0);
         MeshPartBuilder other = this.modelBuilder.part("others", GL20.GL_TRIANGLES, attr, new Material());
@@ -286,7 +286,7 @@ private void setPaths() {
         other.rect(0.5f, 0f, 0.5f, -0.5f, 0f, 0.5f, -0.5f, -0.1f, 0.5f, 0.5f, -0.1f, 0.5f, 0, 0, 1);
         other.rect(-0.5f, 0f, 0.5f, -0.5f, 0f, -0.5f, -0.5f, -0.1f, -0.5f, -0.5f, -0.1f, 0.5f, 1, 0, 0);
         other.rect(-0.5f, -0.1f, -0.5f, 0.5f, -0.1f, -0.5f, 0.5f, -0.1f, 0.5f, -0.5f, -0.1f, 0.5f, 0, -1, 0);
-        return modelBuilder.end();
+        return this.modelBuilder.end();
     }
 
     public void createPieces(List<Piece> pieces) {
@@ -313,7 +313,7 @@ private void setPaths() {
         Model queenModel = this.assets.get("data/queen.g3db", Model.class);
         Model kingModel = this.assets.get("data/king.g3db", Model.class);
         Model rookModel = this.assets.get("data/rook.g3db", Model.class);
-        piecesAtlas = this.assets.get(assetPaths.get(Piece.class), TextureAtlas.class);
+        this.piecesAtlas = this.assets.get(assetPaths.get(Piece.class), TextureAtlas.class);
         for (Iterator<Piece> iter = this.loadingPieces.iterator(); iter.hasNext(); ) {
             Piece piece = iter.next();
             Material material;
@@ -372,7 +372,7 @@ private void setPaths() {
     }
 
     public void resetSelection() {
-        if (selectedModel != null) {
+        if (this.selectedModel != null) {
             this.material3dManager.resetMaterial(this.selectedModel);
         }
         this.selectedModel = null;
@@ -383,11 +383,11 @@ private void setPaths() {
     }
 
     public fr.aboucorp.variantchess.libgdx.utils.ChessModelList getWhitePieceModels() {
-        return whitePieceModels;
+        return this.whitePieceModels;
     }
 
     public fr.aboucorp.variantchess.libgdx.utils.ChessModelList getBlackPieceModels() {
-        return blackPieceModels;
+        return this.blackPieceModels;
     }
 
     private ChessModelList getChessSquareModels() {
@@ -415,10 +415,10 @@ private void setPaths() {
         this.camera.near = 1f;
         this.camera.far = 300f;
         this.camera.update();
-        this.camController = new CameraInputController(camera);
+        this.camController = new CameraInputController(this.camera);
         this.camController.target.set(new Vector3(3.5f, 0, 3.5f));
-        InputMultiplexer multiplexer = new InputMultiplexer(new GestureDetector(androidListener), camController);
-        multiplexer.addProcessor(androidInputAdapter);
+        InputMultiplexer multiplexer = new InputMultiplexer(new GestureDetector(this.androidListener), this.camController);
+        multiplexer.addProcessor(this.androidInputAdapter);
         Gdx.input.setInputProcessor(multiplexer);
     }
 
@@ -452,7 +452,7 @@ private void setPaths() {
     public ChessModelList getSquareModelsFromPossibleMoves(SquareList possiblesMoves) {
         ChessModelList possibleSquares = new ChessModelList();
         if (possiblesMoves != null) {
-            for (ChessModel squareModel : getChessSquareModels()) {
+            for (ChessModel squareModel : this.getChessSquareModels()) {
                 for (Square square : possiblesMoves) {
                     if (squareModel.getLocation().equals(square.getLocation())) {
                         possibleSquares.add(squareModel);
@@ -465,12 +465,12 @@ private void setPaths() {
 
     public void unHighlightSquares(SquareList possiblesMoves) {
         for (Square square : possiblesMoves) {
-            this.material3dManager.resetMaterial(getChessSquareModels().getByLocation(square.getLocation()));
+            this.material3dManager.resetMaterial(this.getChessSquareModels().getByLocation(square.getLocation()));
             if (square.getPiece() != null) {
                 if (square.getPiece().getChessColor() == ChessColor.WHITE) {
-                    this.material3dManager.resetMaterial(getWhitePieceModels().getByLocation(square.getPiece().getLocation()));
+                    this.material3dManager.resetMaterial(this.getWhitePieceModels().getByLocation(square.getPiece().getLocation()));
                 } else {
-                    this.material3dManager.resetMaterial(getBlackPieceModels().getByLocation(square.getPiece().getLocation()));
+                    this.material3dManager.resetMaterial(this.getBlackPieceModels().getByLocation(square.getPiece().getLocation()));
                 }
             }
         }
@@ -479,15 +479,15 @@ private void setPaths() {
     public void moveToEven(Piece piece) {
         ChessModel eatenPiece;
         if (piece.getChessColor() == ChessColor.WHITE) {
-            eatenPiece = getWhitePieceModels().removeByLocation(piece.getLocation());
-            int xpos = 7 + (whiteDeadPieceModels.size < 8 ? 1 : 2);
-            int zpos = whiteDeadPieceModels.size < 8 ? 7 - whiteDeadPieceModels.size : 7 - (whiteDeadPieceModels.size - 8);
+            eatenPiece = this.getWhitePieceModels().removeByLocation(piece.getLocation());
+            int xpos = 7 + (this.whiteDeadPieceModels.size < 8 ? 1 : 2);
+            int zpos = this.whiteDeadPieceModels.size < 8 ? 7 - this.whiteDeadPieceModels.size : 7 - (this.whiteDeadPieceModels.size - 8);
             eatenPiece.move(new Location(xpos, 0, zpos));
             this.whiteDeadPieceModels.add(eatenPiece);
         } else {
-            eatenPiece = getBlackPieceModels().removeByLocation(piece.getLocation());
-            int xpos = 0 - (blackDeadPieceModels.size < 8 ? 1 : 2);
-            int zpos = blackDeadPieceModels.size < 8 ? blackDeadPieceModels.size : blackDeadPieceModels.size - 8;
+            eatenPiece = this.getBlackPieceModels().removeByLocation(piece.getLocation());
+            int xpos = 0 - (this.blackDeadPieceModels.size < 8 ? 1 : 2);
+            int zpos = this.blackDeadPieceModels.size < 8 ? this.blackDeadPieceModels.size : this.blackDeadPieceModels.size - 8;
             eatenPiece.move(new Location(xpos, 0, zpos));
             this.blackDeadPieceModels.add(eatenPiece);
         }
@@ -507,25 +507,25 @@ private void setPaths() {
 
     public void toogleTacticalView() {
         this.tacticalViewEnabled = !this.tacticalViewEnabled;
-        if (tacticalViewEnabled) {
-            setTacticalCamera();
+        if (this.tacticalViewEnabled) {
+            this.setTacticalCamera();
         } else {
-            set3DCamera();
+            this.set3DCamera();
         }
     }
 
     private void set3DCamera() {
-        camera.direction.set(0, 0, 0);
-        camera.up.set(0, 1, 0);
+        this.camera.direction.set(0, 0, 0);
+        this.camera.up.set(0, 1, 0);
         this.camera.position.set(3.5f, 15f, -8f);
         this.camera.lookAt(3.5f, 0, 3.5f);
         this.camera.update();
     }
 
     private void setTacticalCamera() {
-        camera.direction.set(0, 0, 0);
+        this.camera.direction.set(0, 0, 0);
         this.camera.lookAt(3.5f, 0, 3.5f);
-        camera.up.set(0, 1, 0);
+        this.camera.up.set(0, 1, 0);
         this.camera.position.set(new Vector3(3.475f, 20, 3.475f));
         this.camera.lookAt(3.5f, 0, 3.5f);
         this.camera.rotate(Vector3.Y, -45);
@@ -538,12 +538,12 @@ private void setPaths() {
     public void moveCameraOnNewTurn(ChessColor color) {
         this.camera.direction.set(0, 0, 0);
         this.camera.up.set(0, 1, 0);
-        if (tacticalViewEnabled) {
+        if (this.tacticalViewEnabled) {
 
             this.camera.position.set(3.5f, 20f, 3.5f);
             this.camera.lookAt(new Vector3(3.5f, 0, 3.5f));
             if (color == ChessColor.WHITE) {
-                camera.update();
+                this.camera.update();
                 this.camera.rotate(Vector3.Y, 180);
             }
         } else {
@@ -558,7 +558,7 @@ private void setPaths() {
     }
 
     public PerspectiveCamera getCamera() {
-        return camera;
+        return this.camera;
     }
 
     public void setAndroidInputAdapter(InputAdapter androidInputAdapter) {

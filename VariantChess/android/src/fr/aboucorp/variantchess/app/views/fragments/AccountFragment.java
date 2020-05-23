@@ -24,19 +24,19 @@ public class AccountFragment extends VariantChessFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        bindViews();
-        bindListeners();
+        this.bindViews();
+        this.bindListeners();
 
     }
     @Override
     protected void bindViews() {
-        this.btn_create = getView().findViewById(R.id.btn_create);
-        this.btn_connect =  getView().findViewById(R.id.btn_connect);
+        this.btn_create = this.getView().findViewById(R.id.btn_create);
+        this.btn_connect = this.getView().findViewById(R.id.btn_connect);
     }
 
     @Override
     protected void bindListeners() {
-        this.btn_connect.setOnClickListener(v -> ((MainActivity)getActivity()).setFragment(SignUpFragment.class,"signup"));
-        this.btn_create.setOnClickListener(v -> ((MainActivity)getActivity()).setFragment(SignInFragment.class,"signin"));
+        this.btn_connect.setOnClickListener(v -> ((MainActivity) this.getActivity()).setFragment(SignUpFragment.class,"signup"));
+        this.btn_create.setOnClickListener(v -> ((MainActivity) this.getActivity()).setFragment(SignInFragment.class,"signin"));
     }
 }

@@ -25,19 +25,19 @@ import fr.aboucorp.variantchess.app.views.activities.MainActivity;
 
 public class SignInFragment extends VariantChessFragment  implements Validator.ValidationListener {
 
-    public Button btn_register;
+    private Button btn_register;
 
     @Email
     @NotEmpty
-    public EditText txt_mail;
+    private EditText txt_mail;
 
     @NotEmpty
     @Password(min = 8, scheme = Password.Scheme.ALPHA_NUMERIC)
-    public EditText txt_pwd;
+    private EditText txt_pwd;
 
     @NotEmpty
     @ConfirmPassword
-    public EditText txt_condifm_pwd;
+    private EditText txt_condifm_pwd;
 
     private Validator validator;
 
@@ -52,37 +52,37 @@ public class SignInFragment extends VariantChessFragment  implements Validator.V
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        bindViews();
-        bindListeners();
-        validator = new Validator(this);
-        validator.setValidationListener(this);
-        sessionManager = SessionManager.getInstance((MainActivity) getActivity());
+        this.bindViews();
+        this.bindListeners();
+        this.validator = new Validator(this);
+        this.validator.setValidationListener(this);
+        this.sessionManager = SessionManager.getInstance((MainActivity) this.getActivity());
     }
 
     @Override
     protected void bindViews() {
-        this.txt_mail =  getView().findViewById(R.id.sign_in_mail);
-        this.txt_pwd =  getView().findViewById(R.id.sign_in_pwd);
-        this.txt_condifm_pwd =  getView().findViewById(R.id.sign_in_btn_confirm_pwd);
-        this.btn_register =  getView().findViewById(R.id.register_btn_create_account);
+        this.txt_mail = this.getView().findViewById(R.id.sign_in_mail);
+        this.txt_pwd = this.getView().findViewById(R.id.sign_in_pwd);
+        this.txt_condifm_pwd = this.getView().findViewById(R.id.sign_in_btn_confirm_pwd);
+        this.btn_register = this.getView().findViewById(R.id.register_btn_create_account);
     }
 
     @Override
     protected void bindListeners() {
-        this.btn_register.setOnClickListener(v -> validator.validate());
+        this.btn_register.setOnClickListener(v -> this.validator.validate());
     }
 
     @Override
     public void onValidationSucceeded() {
         try {
-            this.sessionManager.signInWithEmail(txt_mail.getText().toString(),txt_pwd.getText().toString());
+            this.sessionManager.signInWithEmail(this.txt_mail.getText().toString(), this.txt_pwd.getText().toString());
         } catch (ExecutionException e) {
             Log.i("fr.aboucorp.variantchess","ExecutionException during mail signin message : " + e.getMessage());
-            Toast.makeText(getActivity(), R.string.error_during_signin, Toast.LENGTH_LONG).show();
+            Toast.makeText(this.getActivity(), R.string.error_during_signin, Toast.LENGTH_LONG).show();
             e.printStackTrace();
         } catch (InterruptedException e) {
             Log.i("fr.aboucorp.variantchess","InterruptedException during mail signin message : " + e.getMessage());
-            Toast.makeText(getActivity(), R.string.error_during_signin, Toast.LENGTH_LONG).show();
+            Toast.makeText(this.getActivity(), R.string.error_during_signin, Toast.LENGTH_LONG).show();
             e.printStackTrace();
         }
     }
@@ -91,11 +91,11 @@ public class SignInFragment extends VariantChessFragment  implements Validator.V
     public void onValidationFailed(List<ValidationError> errors) {
         for (ValidationError error : errors) {
             View view = error.getView();
-            String message = error.getCollatedErrorMessage(getActivity());
+            String message = error.getCollatedErrorMessage(this.getActivity());
             if (view instanceof EditText) {
                 ((EditText) view).setError(message);
             } else {
-                Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
+                Toast.makeText(this.getActivity(), message, Toast.LENGTH_LONG).show();
             }
         }
     }

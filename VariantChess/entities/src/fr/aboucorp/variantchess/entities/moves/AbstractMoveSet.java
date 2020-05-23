@@ -61,13 +61,13 @@ public abstract class AbstractMoveSet implements GameEventSubscriber {
             this.previousTurn = this.actualTurn;
             this.actualTurn = ((TurnStartEvent) event).turn;
             if (((TurnStartEvent) event).turn.getTurnColor() == this.piece.getChessColor()) {
-                this.nextMoves = calculateNextMoves(((TurnStartEvent) event).turn.getTurnColor());
+                this.nextMoves = this.calculateNextMoves(((TurnStartEvent) event).turn.getTurnColor());
             }
         }
     }
 
     public SquareList calculateNextMoves(ChessColor turnColor) {
-        if (isChecking) {
+        if (this.isChecking) {
             return this.calculateUncheckingMoves(turnColor);
         } else {
             return this.getPossibleMoves(this.piece, turnColor);
@@ -103,8 +103,8 @@ public abstract class AbstractMoveSet implements GameEventSubscriber {
 
     public ChessList<Piece> moveCauseCheck(ChessColor color) {
         ChessList<Piece> causingChecks = new PieceList();
-        for (Piece piece : classicBoard.getPiecesByColor(color)) {
-             Piece causingCheck = moveCausingSingleCheck(piece, color);
+        for (Piece piece : this.classicBoard.getPiecesByColor(color)) {
+             Piece causingCheck = this.moveCausingSingleCheck(piece, color);
              if(causingCheck != null) {
                  causingChecks.add(causingCheck);
              }
@@ -129,15 +129,15 @@ public abstract class AbstractMoveSet implements GameEventSubscriber {
     public abstract SquareList getThreats(Piece piece, ChessColor turnColor);
 
     public SquareList getNextMoves() {
-        return nextMoves;
+        return this.nextMoves;
     }
 
     public void clear(){
-        isChecking = false;
-        kingInCheck = null;
-        checkingPieces = new ArrayList<>();
-        nextMoves = new SquareList();
-        actualTurn = null;
-        previousTurn = null;
+        this.isChecking = false;
+        this.kingInCheck = null;
+        this.checkingPieces = new ArrayList<>();
+        this.nextMoves = new SquareList();
+        this.actualTurn = null;
+        this.previousTurn = null;
     }
 }
