@@ -39,4 +39,21 @@ public class Location implements Cloneable {
     public String toString() {
         return "[" + (char) (65 + (7 - this.x)) + (this.z +1) + "]";
     }
+
+    public String getStringValue() {
+       return "(" + x +","+ y + "," + z + ")";
+    }
+
+    public static Location fromString(String string) throws NumberFormatException{
+        try {
+            String[] stringValues = string.substring(1, string.length() - 2).split(",");
+            float x = Float.parseFloat(stringValues[0]);
+            float y = Float.parseFloat(stringValues[0]);
+            float z = Float.parseFloat(stringValues[0]);
+            return new Location(x,y,z);
+        }catch(Exception ex){
+            throw new NumberFormatException("Error during location string parsing");
+        }
+    }
+
 }

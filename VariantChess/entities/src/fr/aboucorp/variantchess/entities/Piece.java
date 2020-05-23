@@ -55,7 +55,7 @@ public abstract class Piece extends GameElement {
 
     @Override
     public String toString() {
-        return this.pieceId.toString() + " [" + (this.actualSquare != null ? this.actualSquare.getSquareLabel() : "EVEN") + "]";
+        return this.pieceId.toString();
     }
 
     public AbstractMoveSet getMoveSet() {

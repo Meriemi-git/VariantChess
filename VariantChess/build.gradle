@@ -1,6 +1,4 @@
 buildscript {
-    
-
     repositories {
         mavenLocal()
         mavenCentral()
@@ -64,5 +62,5 @@ project(":core") {
 }
 
 project(":entities") {
-    apply plugin: "java-library"
+    apply plugin: "java"
 }

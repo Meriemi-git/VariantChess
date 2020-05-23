@@ -2,47 +2,52 @@ package fr.aboucorp.variantchess.entities;
 
 import java.time.Duration;
 
+import fr.aboucorp.variantchess.entities.enums.PieceId;
+
 public class Turn implements Comparable<Turn>{
 
-    private final int turnNumber;
-    private Duration duration;
-    private Square to;
-    private Square from;
-    private Piece played;
-    private Piece deadPiece;
-    private final Team team;
-    private String fen;
+    protected int turnNumber;
+    protected Duration duration;
+    protected Location to;
+    protected Location from;
+    protected PieceId played;
+    protected PieceId deadPiece;
+    protected Player player;
+    protected String fen;
 
-    public Turn(int turnNumber, Team team) {
+    public Turn(int turnNumber, Player player) {
         this.turnNumber = turnNumber;
-        this.team = team;
+        this.player = player;
+    }
+
+    public Turn() {
     }
 
     public ChessColor getTurnColor(){
-        return this.team.getChessColor();
+        return this.player.getColor();
     }
 
-    public Piece getDeadPiece() {
+    public PieceId getDeadPiece() {
         return this.deadPiece;
     }
 
-    public void setDeadPiece(Piece deadPiece) {
+    public void setDeadPiece(PieceId deadPiece) {
         this.deadPiece = deadPiece;
     }
 
-    public Square getTo() {
+    public Location getTo() {
         return this.to;
     }
 
-    public void setTo(Square to) {
+    public void setTo(Location to) {
         this.to = to;
     }
 
-    public Piece getPlayed() {
+    public PieceId getPlayed() {
         return this.played;
     }
 
-    public void setPlayed(Piece played) {
+    public void setPlayed(PieceId played) {
         this.played = played;
     }
 
@@ -54,11 +59,11 @@ public class Turn implements Comparable<Turn>{
         this.duration = duration;
     }
 
-    public Square getFrom() {
+    public Location getFrom() {
         return this.from;
     }
 
-    public void setFrom(Square from) {
+    public void setFrom(Location from) {
         this.from = from;
     }
 
@@ -66,8 +71,8 @@ public class Turn implements Comparable<Turn>{
         return this.turnNumber;
     }
 
-    public Team getTeam() {
-        return this.team;
+    public Player getPlayer() {
+        return this.player;
     }
 
     public String getFen() {

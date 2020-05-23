@@ -34,16 +34,15 @@ import fr.aboucorp.variantchess.libgdx.utils.ChessModelList;
 public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycle {
     final Board board;
     final Board3dManager board3dManager;
+    final AbstractRuleSet ruleSet;
     Piece selectedPiece;
     GameEventManager eventManager;
     Turn previousTurn;
     Turn actualTurn;
-    final AbstractRuleSet ruleSet;
     SquareList possiblesMoves;
     BoardLoadingListener boardLoadingListener;
 
     private GameState gameState;
-
 
     BoardManager(Board board, Board3dManager board3dManager, AbstractRuleSet ruleSet) {
         this.board = board;
@@ -72,6 +71,13 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
     protected abstract void manageTurnEnd();
 
     @Override
+    public void startParty(Match match) {
+        this.eventManager.subscribe(PartyEvent.class, this, 1);
+        this.eventManager.subscribe(TurnEvent.class, this, 1);
+        this.eventManager.subscribe(PieceEvent.class, this, 1);
+    }
+
+    @Override
     public void stopParty() {
         this.gameState = GameState.SelectPiece;
         this.selectedPiece = null;
@@ -82,27 +88,33 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
         this.ruleSet.moveNumber = 0;
     }
 
-    @Override
-    public void startParty(Match match) {
-        this.eventManager.subscribe(PartyEvent.class, this, 1);
-        this.eventManager.subscribe(TurnEvent.class, this, 1);
-        this.eventManager.subscribe(PieceEvent.class, this, 1);
-    }
-
     public abstract ChessColor loadBoard(String fenString) throws FenStringBadFormatException;
 
-    public void selectPiece(Piece touched){
+    public void selectPiece(Piece touched) {
+        this.selectedPiece = touched;
         this.gameState = GameState.SelectCase;
     }
 
-    public void unHighlight(){
+    public void selectSquare(Square to) {
+        Square from = this.selectedPiece.getSquare();
+        Piece deadPiece = this.moveToSquare(to);
+        String message = String.format("Move %s from %s to %s", this.selectedPiece,from, to);
+        this.eventManager.sendMessage(new MoveEvent(
+                message
+                , from.getLocation()
+                , to.getLocation()
+                , this.selectedPiece.getPieceId()
+                , deadPiece != null ? deadPiece.getPieceId() : null));
+    }
+
+    public void unHighlight() {
         this.gameState = GameState.SelectPiece;
     }
 
-    public ChessModelList getPiecesModelsFromActualTurn(){
-        if( this.actualTurn.getTurnColor() == ChessColor.BLACK){
+    public ChessModelList getPiecesModelsFromActualTurn() {
+        if (this.actualTurn.getTurnColor() == ChessColor.BLACK) {
             return this.getBlackPieceModels();
-        }else {
+        } else {
             return this.getWhitePieceModels();
         }
     }
@@ -135,16 +147,11 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
         return pieces.stream().filter(p -> p.getLocation().equals(location)).findFirst().get();
     }
 
+
+
     protected abstract Piece moveToSquare(Square to);
 
-    public void selectSquare(Square to){
-        Square from = this.selectedPiece.getSquare();
-        Piece deadPiece = this.moveToSquare(to);
-        String message = String.format("Move %s to %s",this.selectedPiece,to);
-        this.eventManager.sendMessage(new MoveEvent(message,from,to, this.selectedPiece,deadPiece));
-    }
-
-    public void toogleTacticalView(){
+    public void toogleTacticalView() {
         GdxPostRunner runner = new GdxPostRunner() {
             @Override
             public void execute() {
@@ -154,7 +161,7 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
         runner.startAsync();
     }
 
-    public boolean IsTacticalViewOn(){
+    public boolean IsTacticalViewOn() {
         return this.board3dManager.tacticalViewEnabled;
     }
 
@@ -162,9 +169,9 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
         this.boardLoadingListener = boardLoadingListener;
     }
 
-    public interface BoardLoadingListener{
+    public abstract String getFenFromBoard();
+
+    public interface BoardLoadingListener {
         void OnBoardLoaded();
     }
-
-    public abstract String getFenFromBoard();
 }

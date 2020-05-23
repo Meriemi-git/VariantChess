@@ -19,6 +19,7 @@ import fr.aboucorp.variantchess.app.multiplayer.MatchListener;
 import fr.aboucorp.variantchess.entities.ChessColor;
 import fr.aboucorp.variantchess.entities.Match;
 import fr.aboucorp.variantchess.entities.PartyLifeCycle;
+import fr.aboucorp.variantchess.entities.Turn;
 import fr.aboucorp.variantchess.entities.enums.BoardEventType;
 import fr.aboucorp.variantchess.entities.events.GameEventManager;
 import fr.aboucorp.variantchess.entities.events.GameEventSubscriber;
@@ -28,6 +29,7 @@ import fr.aboucorp.variantchess.entities.events.models.LogEvent;
 import fr.aboucorp.variantchess.entities.events.models.MoveEvent;
 import fr.aboucorp.variantchess.entities.events.models.PartyEvent;
 import fr.aboucorp.variantchess.entities.events.models.TurnEndEvent;
+import fr.aboucorp.variantchess.entities.events.models.TurnEvent;
 
 public class MatchManager implements GameEventSubscriber, MatchListener, BoardManager.BoardLoadingListener, PartyLifeCycle {
     private final BoardManager boardManager;
@@ -48,20 +50,18 @@ public class MatchManager implements GameEventSubscriber, MatchListener, BoardMa
 
     @Override
     public void OnBoardLoaded() {
-        this.eventManager.subscribe(PartyEvent.class,this,1);
-        this.eventManager.subscribe(BoardEvent.class,this,1);
+        this.eventManager.subscribe(GameEvent.class,this,1);
         this.turnManager.startParty(this.match);
     }
 
-    public void loadBoard(String fenString){
+    public void loadBoard(Turn turn){
         try {
-            ChessColor color = this.boardManager.loadBoard(fenString);
-            this.turnManager.startAtTurnColor(color);
+            this.turnManager.startAtTurn(turn.getTurnNumber()+1);
         } catch (Exception e) {
             e.printStackTrace();
-            this.eventManager.sendMessage(new LogEvent(String.format("Error during parsing fen string. Message : %s",e.getMessage())));
         }
     }
+
 
     public void endTurn(MoveEvent event) {
         this.turnManager.endTurn(event);
@@ -82,8 +82,6 @@ public class MatchManager implements GameEventSubscriber, MatchListener, BoardMa
             this.eventManager.sendMessage(new PartyEvent(String.format("Game finished ! Winner : %s",winner != null ? winner.name() : "EQUALITY")));
         }else if(event instanceof MoveEvent && ((BoardEvent) event).type == BoardEventType.MOVE){
             this.endTurn(((MoveEvent)event));
-        }else if(event instanceof TurnEndEvent){
-            match.getTurns().push(((TurnEndEvent) event).turn);
         }
     }
 

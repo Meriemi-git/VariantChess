@@ -6,6 +6,7 @@ import fr.aboucorp.variantchess.entities.Piece;
 import fr.aboucorp.variantchess.entities.Square;
 import fr.aboucorp.variantchess.entities.boards.ClassicBoard;
 import fr.aboucorp.variantchess.entities.enums.BoardEventType;
+import fr.aboucorp.variantchess.entities.enums.PieceId;
 import fr.aboucorp.variantchess.entities.events.GameEventManager;
 import fr.aboucorp.variantchess.entities.events.GameEventSubscriber;
 import fr.aboucorp.variantchess.entities.events.models.GameEvent;
@@ -34,7 +35,6 @@ public class KingMoveSet extends AbstractMoveSet implements GameEventSubscriber 
             if (turnColor == ChessColor.WHITE) {
                 Square c1 = this.classicBoard.getSquares().getSquareByLabel("C1");
                 Square g1 = this.classicBoard.getSquares().getSquareByLabel("G1");
-                this.eventManager.sendMessage(new LogEvent(String.format("GetPossibleMoves %s => canCastleQueenSide : %s ; canCastleKingSide : %s",this.actualTurn.getTurnColor(), this.canCastleQueenSide, this.canCastleKingSide)));
                 if (this.canCastleQueenSide && !this.isChecking && this.isLocationSafe(c1,turnColor)) {
                     validSquares.add(c1);
                 }
@@ -63,11 +63,9 @@ public class KingMoveSet extends AbstractMoveSet implements GameEventSubscriber 
     @Override
     public void receiveGameEvent(GameEvent event) {
         super.receiveGameEvent(event);
-        if(event instanceof PieceEvent && this.piece.getChessColor() == ((PieceEvent) event).piece.getChessColor()){
+        if(event instanceof PieceEvent && this.piece.getChessColor() == PieceId.getColor(((PieceEvent) event).played)){
             this.canCastleQueenSide = ((PieceEvent) event).type == BoardEventType.CASTLE_QUEEN;
             this.canCastleKingSide = ((PieceEvent) event).type == BoardEventType.CASTLE_KING;
-            String logMessage = String.format("Piece event type : %s ;Turn color : %s ;canCastleQueenSide : %s ; canCastleKingSide : %s",((PieceEvent) event).type.name(), this.actualTurn.getTurnColor().name(), this.canCastleQueenSide, this.canCastleKingSide);
-            this.eventManager.sendMessage(new LogEvent(logMessage));
         }
     }
 

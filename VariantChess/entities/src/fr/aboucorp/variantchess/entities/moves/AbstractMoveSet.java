@@ -18,6 +18,7 @@ import fr.aboucorp.variantchess.entities.events.models.GameEvent;
 import fr.aboucorp.variantchess.entities.events.models.PieceEvent;
 import fr.aboucorp.variantchess.entities.events.models.TurnEvent;
 import fr.aboucorp.variantchess.entities.events.models.TurnStartEvent;
+import fr.aboucorp.variantchess.entities.moves.movesets.KingMoveSet;
 import fr.aboucorp.variantchess.entities.pieces.King;
 import fr.aboucorp.variantchess.entities.utils.ChessList;
 import fr.aboucorp.variantchess.entities.utils.PieceList;
@@ -29,7 +30,7 @@ public abstract class AbstractMoveSet implements GameEventSubscriber {
     protected final Piece piece;
     protected final ClassicBoard classicBoard;
     protected boolean isChecking;
-    private King kingInCheck;
+    private PieceId kingInCheck;
     private List<Piece> checkingPieces;
     private SquareList nextMoves;
     protected Turn actualTurn;
@@ -46,15 +47,15 @@ public abstract class AbstractMoveSet implements GameEventSubscriber {
     @Override
     public void receiveGameEvent(GameEvent event) {
         if (event instanceof PieceEvent) {
-            if (event instanceof CheckInEvent && ((CheckInEvent) event).piece.getChessColor() == this.piece.getChessColor()) {
+            if (event instanceof CheckInEvent && PieceId.getColor(((CheckInEvent) event).played) == this.piece.getChessColor()) {
                 this.isChecking = true;
-                this.kingInCheck = (King) ((CheckInEvent) event).piece;
+                this.kingInCheck = ((CheckInEvent) event).played;
                 this.checkingPieces = ((CheckInEvent) event).checkingPieces;
-            } else if(event instanceof CheckOutEvent && ((CheckOutEvent) event).piece.getChessColor() == this.piece.getChessColor()) {
+            } else if(event instanceof CheckOutEvent &&  PieceId.getColor(((CheckOutEvent) event).played) == this.piece.getChessColor()) {
                 this.isChecking = false;
                 this.kingInCheck = null;
                 this.checkingPieces = null;
-            } else if (((PieceEvent) event).type == BoardEventType.DEATH && ((PieceEvent) event).piece.getPieceId() == this.piece.getPieceId()) {
+            } else if (((PieceEvent) event).type == BoardEventType.DEATH && ((PieceEvent) event).played == this.piece.getPieceId()) {
                 this.eventManager.unSubscribe(GameEvent.class, this);
             }
         } else if (event instanceof TurnStartEvent) {
@@ -78,6 +79,7 @@ public abstract class AbstractMoveSet implements GameEventSubscriber {
         SquareList uncheckingMoves = new SquareList();
         Square originalPosition = this.piece.getSquare();
         ChessColor oppositeColor = turnColor == ChessColor.WHITE ? ChessColor.BLACK : ChessColor.WHITE;
+        KingMoveSet kingMoveSet = (KingMoveSet) this.classicBoard.getPieceById(this.kingInCheck).getMoveSet();
         for (Square checkedMove : this.getPossibleMoves(this.piece, turnColor)) {
             Piece originalPiece = checkedMove.getPiece();
             if (this.checkingPieces.size() == 1 && checkedMove.equals(this.checkingPieces.get(0).getSquare())) {
@@ -87,7 +89,7 @@ public abstract class AbstractMoveSet implements GameEventSubscriber {
                 this.piece.move(checkedMove);
                 boolean isUnchecking = true;
                 for (Piece ckecking : this.checkingPieces) {
-                    if (this.kingInCheck.getMoveSet().moveCausingSingleCheck(ckecking, oppositeColor) != null) {
+                    if (  kingMoveSet.moveCausingSingleCheck(ckecking, oppositeColor) != null) {
                         isUnchecking = false;
                     }
                 }
@@ -112,7 +114,7 @@ public abstract class AbstractMoveSet implements GameEventSubscriber {
         return causingChecks;
     }
 
-    private Piece moveCausingSingleCheck(Piece piece, ChessColor color) {
+    protected Piece moveCausingSingleCheck(Piece piece, ChessColor color) {
         for (Square possibleMove : piece.getMoveSet().getPossibleMoves(piece, color)) {
             if (possibleMove.getPiece() != null) {
                 if ((color == ChessColor.WHITE && possibleMove.getPiece().getPieceId() == PieceId.BK)

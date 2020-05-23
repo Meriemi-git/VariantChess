@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import fr.aboucorp.variantchess.entities.ChessColor;
 import fr.aboucorp.variantchess.entities.Match;
 import fr.aboucorp.variantchess.entities.PartyLifeCycle;
-import fr.aboucorp.variantchess.entities.Team;
+import fr.aboucorp.variantchess.entities.Player;
 import fr.aboucorp.variantchess.entities.Turn;
 import fr.aboucorp.variantchess.entities.events.GameEventManager;
 import fr.aboucorp.variantchess.entities.events.models.MoveEvent;
@@ -17,27 +17,25 @@ public class TurnManager implements PartyLifeCycle {
     private static TurnManager INSTANCE;
     private LinkedList<Turn> turns;
     private GameEventManager eventManager;
-    private final Team white;
-    private final Team black;
+    private Player whitePlayer;
+    private Player blackPlayer;
 
     private TurnManager() {
         this.turns = new LinkedList<>();
         this.eventManager = GameEventManager.getINSTANCE();
-        this.white = new Team("white",ChessColor.WHITE);
-        this.black = new Team("black",ChessColor.BLACK);
     }
 
     public void startTurn(){
         Turn nextTurn;
-        Team team = null;
+        Player player = null;
         if (this.turns.getLast().getTurnColor() == ChessColor.WHITE) {
-            team =  this.black;
+            player =  this.blackPlayer;
         }else{
-            team =  this.white;
+            player =  this.whitePlayer;
         }
-        nextTurn = new Turn(this.turns.size()+1, this.white);
+        nextTurn = new Turn(this.turns.size()+1, player);
         this.turns.add(nextTurn);
-        String eventMessage = String.format("Next turn, color : %s",nextTurn.getTurnColor());
+        String eventMessage = String.format("Turn %s, color : %s",nextTurn.getTurnNumber(), nextTurn.getTurnColor());
         this.eventManager.sendMessage(new TurnStartEvent(eventMessage,nextTurn));
     }
 
@@ -54,7 +52,7 @@ public class TurnManager implements PartyLifeCycle {
 
     public ChessColor getTurnColor(){
         if(!this.turns.isEmpty()) {
-            return this.turns.getLast().getTeam().getChessColor();
+            return this.turns.getLast().getPlayer().getColor();
         }else{
             return ChessColor.WHITE;
         }
@@ -69,10 +67,11 @@ public class TurnManager implements PartyLifeCycle {
 
     @Override
     public void startParty(Match match) {
-        Team team = this.white;
-        Turn firsTurn = new Turn(1,team);
+        this.whitePlayer = match.getWhitePlayer();
+        this.blackPlayer = match.getBlackPlayer();
+        Turn firsTurn = new Turn(1,match.getWhitePlayer());
         this.turns.add(firsTurn);
-        String eventMessage = String.format("Next turn, color : %s",firsTurn.getTurnColor());
+        String eventMessage = String.format("Turn %s color : %s",firsTurn.getTurnNumber(), firsTurn.getTurnColor());
         this.eventManager.sendMessage(new TurnStartEvent(eventMessage,firsTurn));
     }
 
@@ -81,9 +80,9 @@ public class TurnManager implements PartyLifeCycle {
         this.turns = new LinkedList<>();
     }
 
-    public void startAtTurnColor(ChessColor color) {
-        Team team = color == ChessColor.WHITE ? this.white : this.black;
-        Turn firsTurn = new Turn(1,team);
+    public void startAtTurn(int turnNumber) {
+        Player player = turnNumber % 2 == 1 ? this.whitePlayer : this.blackPlayer;
+        Turn firsTurn = new Turn(turnNumber,player);
         this.turns.add(firsTurn);
         String eventMessage = String.format("Turn color : %s",firsTurn.getTurnColor());
         this.eventManager.sendMessage(new TurnStartEvent(eventMessage,firsTurn));

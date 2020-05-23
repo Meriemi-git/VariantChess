@@ -1,6 +1,8 @@
 package fr.aboucorp.variantchess.entities.boards;
 
 import fr.aboucorp.variantchess.entities.ChessColor;
+import fr.aboucorp.variantchess.entities.Piece;
+import fr.aboucorp.variantchess.entities.enums.PieceId;
 import fr.aboucorp.variantchess.entities.exceptions.FenStringBadFormatException;
 import fr.aboucorp.variantchess.entities.utils.PieceList;
 import fr.aboucorp.variantchess.entities.utils.SquareList;
@@ -20,4 +22,6 @@ public abstract class Board {
     public abstract PieceList getPiecesByColor(ChessColor color);
 
     public abstract void clearBoard();
+
+    public abstract Piece getPieceById(PieceId played);
 }

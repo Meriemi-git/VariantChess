@@ -6,12 +6,10 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -23,6 +21,7 @@ import fr.aboucorp.variantchess.app.listeners.MatchEventListener;
 import fr.aboucorp.variantchess.app.managers.MatchManager;
 import fr.aboucorp.variantchess.app.managers.boards.BoardManager;
 import fr.aboucorp.variantchess.app.managers.boards.ClassicBoardManager;
+import fr.aboucorp.variantchess.app.parcelables.MatchP;
 import fr.aboucorp.variantchess.app.utils.FragmentTag;
 import fr.aboucorp.variantchess.app.views.activities.MainActivity;
 import fr.aboucorp.variantchess.entities.Match;
@@ -32,17 +31,16 @@ import fr.aboucorp.variantchess.entities.boards.ClassicBoard;
 import fr.aboucorp.variantchess.entities.events.GameEventSubscriber;
 import fr.aboucorp.variantchess.entities.events.models.BoardEvent;
 import fr.aboucorp.variantchess.entities.events.models.GameEvent;
+import fr.aboucorp.variantchess.entities.events.models.TurnEndEvent;
 import fr.aboucorp.variantchess.entities.events.models.TurnEvent;
 import fr.aboucorp.variantchess.entities.rules.ClassicRuleSet;
 import fr.aboucorp.variantchess.libgdx.Board3dManager;
 
 public class MatchFragment extends VariantChessFragment implements GameEventSubscriber, BoardFragment.BoardFragmentListener, PartyLifeCycle, MatchEventListener {
     private Button btn_end_turn;
-    private Button btn_test;
     private Switch switch_tactical;
     private TextView lbl_turn;
     private TextView party_logs;
-    private EditText fen_txt;
 
     private MatchManager matchManager;
     private BoardManager boardManager;
@@ -51,7 +49,7 @@ public class MatchFragment extends VariantChessFragment implements GameEventSubs
     private Activity activity;
     private BoardFragment boardFragment;
 
-    private Match match;
+    private MatchP matchP;
 
     public MatchFragment() {
         this.board3dManager = new Board3dManager();
@@ -95,8 +93,6 @@ public class MatchFragment extends VariantChessFragment implements GameEventSubs
         this.btn_end_turn = this.getView().findViewById(R.id.btn_end_turn);
         this.lbl_turn = this.getView().findViewById(R.id.lbl_turn);
         this.party_logs = this.getView().findViewById(R.id.party_logs);
-        this.btn_test = this.getView().findViewById(R.id.btn_test);
-        this.fen_txt = this.getView().findViewById(R.id.fen_txt);
         this.switch_tactical = this.getView().findViewById(R.id.switch_tactical);
     }
 
@@ -106,8 +102,6 @@ public class MatchFragment extends VariantChessFragment implements GameEventSubs
             this.activity.runOnUiThread(() ->
                     MatchFragment.this.lbl_turn.setText("Turn of " + MatchFragment.this.matchManager.getPartyInfos()));
         });
-        this.btn_test.setOnClickListener(v -> MatchFragment.this.matchManager.loadBoard(this.fen_txt.getText().toString().trim()));
-
         this.switch_tactical.setOnClickListener(v -> MatchFragment.this.boardManager.toogleTacticalView());
     }
 
@@ -135,7 +129,7 @@ public class MatchFragment extends VariantChessFragment implements GameEventSubs
 
     @Override
     public void onBoardFragmentLoaded() {
-        this.startParty(this.match);
+        this.startParty(this.matchP);
     }
 
     @Override
@@ -148,7 +142,7 @@ public class MatchFragment extends VariantChessFragment implements GameEventSubs
     @Override
     public void stopParty() {
         this.matchManager.stopParty();
-        ((MainActivity) this.activity).setFragment(HomeFragment.class, FragmentTag.HOME);
+        ((MainActivity) this.activity).setFragment(HomeFragment.class, FragmentTag.HOME,null);
     }
 
     @Override
@@ -167,16 +161,14 @@ public class MatchFragment extends VariantChessFragment implements GameEventSubs
     @Override
     public void setArguments(@androidx.annotation.Nullable Bundle args) {
         super.setArguments(args);
-        String fenArg = args != null ? args.getString("fen") : null;
-        if(!TextUtils.isEmpty(fenArg)){
-            this.match = new Match();
-            this.match.getFenMoves().push(fenArg);
-        }
+        this.matchP = args != null ? args.getParcelable("matchP") : null;
     }
 
     @Override
     public void OnMatchEvent(GameEvent event) {
-        this.activity.runOnUiThread(() ->
-                this.party_logs.append(event.message));
+        if(!(event instanceof TurnEvent)) {
+            this.activity.runOnUiThread(() ->
+                    this.party_logs.append("\n" + event.message));
+        }
     }
 }

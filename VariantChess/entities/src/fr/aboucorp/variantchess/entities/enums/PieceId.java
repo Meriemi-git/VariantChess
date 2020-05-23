@@ -2,6 +2,10 @@ package fr.aboucorp.variantchess.entities.enums;
 
 import java.util.Arrays;
 
+import fr.aboucorp.variantchess.entities.ChessColor;
+import fr.aboucorp.variantchess.entities.Piece;
+import fr.aboucorp.variantchess.entities.boards.Board;
+
 public enum PieceId {
     WP1(0),
     WP2(1),
@@ -58,4 +62,10 @@ public enum PieceId {
         return id == BP1 || id == BP2 || id == BP3 || id == BP4 || id == BP5 || id == BP6 || id == BP7 || id == BP8;
     }
 
+    public static ChessColor getColor(PieceId pieceId){
+        if(isWhitePawn(pieceId)){
+            return ChessColor.WHITE;
+        }
+        return ChessColor.BLACK;
+    }
 }

@@ -2,6 +2,7 @@ package fr.aboucorp.variantchess.entities.boards;
 
 import fr.aboucorp.variantchess.entities.ChessColor;
 import fr.aboucorp.variantchess.entities.Location;
+import fr.aboucorp.variantchess.entities.Piece;
 import fr.aboucorp.variantchess.entities.Square;
 import fr.aboucorp.variantchess.entities.enums.PieceId;
 import fr.aboucorp.variantchess.entities.exceptions.FenStringBadFormatException;
@@ -210,5 +211,14 @@ public class ClassicBoard extends Board{
         this.blackDeadPieces = new PieceList();
         this.whiteDeadPieces = new PieceList();
         this.chessSquares = new SquareList();
+    }
+
+    @Override
+    public Piece getPieceById(PieceId pieceId) {
+        Piece piece = this.whitePieces.getPieceById(pieceId);
+        if(piece == null){
+            piece = this.blackPieces.getPieceById(pieceId);
+        }
+        return piece;
     }
 }

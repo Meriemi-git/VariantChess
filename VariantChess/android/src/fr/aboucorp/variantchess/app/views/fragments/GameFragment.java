@@ -17,10 +17,13 @@ import java.util.List;
 
 import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
+import fr.aboucorp.variantchess.app.parcelables.MatchP;
+import fr.aboucorp.variantchess.app.parcelables.PlayerP;
 import fr.aboucorp.variantchess.app.utils.FragmentTag;
 import fr.aboucorp.variantchess.app.viewmodel.GameModeAdapter;
 import fr.aboucorp.variantchess.app.views.activities.MainActivity;
 import fr.aboucorp.variantchess.app.views.activities.VariantChessActivity;
+import fr.aboucorp.variantchess.entities.ChessColor;
 import fr.aboucorp.variantchess.entities.GameMode;
 
 public class GameFragment extends VariantChessFragment implements AdapterView.OnItemSelectedListener {
@@ -76,7 +79,12 @@ public class GameFragment extends VariantChessFragment implements AdapterView.On
                 e.printStackTrace();
             }*/
         }else if(this.new_game_rdb_offline.isChecked()){
-            ((VariantChessActivity) this.getActivity()).setFragment(MatchFragment.class, FragmentTag.MATCH);
+            MatchP matchP = new MatchP();
+            matchP.setBlackPlayer(new PlayerP("BlackPlayer", ChessColor.BLACK));
+            matchP.setWhitePlayer(new PlayerP("WhitePlayer", ChessColor.WHITE));
+            Bundle args = new Bundle();
+            args.putParcelable("matchP",matchP);
+            ((VariantChessActivity) this.getActivity()).setFragment(MatchFragment.class, FragmentTag.MATCH,args);
         }
     }
 

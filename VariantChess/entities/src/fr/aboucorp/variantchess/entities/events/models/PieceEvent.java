@@ -1,12 +1,13 @@
 package fr.aboucorp.variantchess.entities.events.models;
 
-import fr.aboucorp.variantchess.entities.Piece;
+import fr.aboucorp.variantchess.entities.ChessColor;
 import fr.aboucorp.variantchess.entities.enums.BoardEventType;
+import fr.aboucorp.variantchess.entities.enums.PieceId;
 
 public class PieceEvent extends BoardEvent {
-    public Piece piece;
-    public PieceEvent(String eventMessage, BoardEventType type, Piece piece) {
+    public PieceId played;
+    public PieceEvent(String eventMessage, BoardEventType type, PieceId played) {
         super(eventMessage, type);
-        this.piece = piece;
+        this.played = played;
     }
 }

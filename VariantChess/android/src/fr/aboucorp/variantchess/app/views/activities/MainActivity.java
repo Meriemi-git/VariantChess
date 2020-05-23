@@ -59,12 +59,15 @@ public class MainActivity extends VariantChessActivity implements AndroidFragmen
     }
 
     @Override
-    public void setFragment(Class<? extends Fragment> fragmentClass, String fragmentTag) {
+    public void setFragment(Class<? extends Fragment> fragmentClass, String fragmentTag,Bundle args) {
         FragmentTransaction fragmentTransaction = this.getSupportFragmentManager().beginTransaction();
         Fragment existing = this.getSupportFragmentManager().findFragmentByTag(fragmentTag);
         try {
             if (existing == null) {
                 existing = fragmentClass.newInstance();
+            }
+            if(args != null){
+                existing.setArguments(args);
             }
             fragmentTransaction.replace(R.id.fragment_container, existing, fragmentTag);
             fragmentTransaction.commit();
@@ -101,7 +104,7 @@ public class MainActivity extends VariantChessActivity implements AndroidFragmen
 
             case R.id.menu_action_disconnect:
                 this.sessionManager.destroySession();
-                this.setFragment(AccountFragment.class, "account");
+                this.setFragment(AccountFragment.class, "account",null);
                 TextView userText = this.toolbar.findViewById(R.id.lbl_display_name);
                 userText.setText(R.string.disconnect_message);
                 return true;
@@ -120,14 +123,14 @@ public class MainActivity extends VariantChessActivity implements AndroidFragmen
         TextView userText = this.toolbar.findViewById(R.id.lbl_display_name);
         if (connected != null) {
             if (TextUtils.isEmpty(connected.getDisplayName())) {
-                this.setFragment(UsernameFragment.class, "username");
+                this.setFragment(UsernameFragment.class, "username",null);
             } else {
                 userText.setText(connected.getDisplayName());
-                this.setFragment(HomeFragment.class, "home");
+                this.setFragment(HomeFragment.class, "home",null);
                 Toast.makeText(this, R.string.connected, Toast.LENGTH_LONG).show();
             }
         } else {
-            this.setFragment(AccountFragment.class, "account");
+            this.setFragment(AccountFragment.class, "account",null);
         }
     }
 
