@@ -10,6 +10,7 @@ import fr.aboucorp.variantchess.entities.PartyLifeCycle;
 import fr.aboucorp.variantchess.entities.events.models.GameEvent;
 
 public class GameEventManager implements PartyLifeCycle {
+    private Party party;
     private static GameEventManager INSTANCE;
     private static Hashtable<Class, List<Subscription>> SUBSCRIPTIONS;
     private GameEventManager(){
@@ -63,10 +64,11 @@ public class GameEventManager implements PartyLifeCycle {
 
     @Override
     public void startParty(Party party) {
+        this.party = party;
     }
 
     @Override
-    public void stopParty(Party party) {
+    public void stopParty() {
         this.SUBSCRIPTIONS = new Hashtable<>();
     }
 

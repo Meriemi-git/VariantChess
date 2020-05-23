@@ -12,7 +12,7 @@ import com.badlogic.gdx.backends.android.AndroidFragmentApplication;
 
 import fr.aboucorp.variantchess.libgdx.Board3dManager;
 
-public class BoardFragment extends AndroidFragmentApplication  {
+class BoardFragment extends AndroidFragmentApplication  {
 
     private Board3dManager board3dManager;
     private BoardFragmentListener boardFragmentListener;

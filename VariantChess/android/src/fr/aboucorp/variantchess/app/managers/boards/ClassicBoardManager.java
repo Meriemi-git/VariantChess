@@ -24,7 +24,9 @@ import fr.aboucorp.variantchess.libgdx.Board3dManager;
 import fr.aboucorp.variantchess.libgdx.utils.ChessModelList;
 
 public class ClassicBoardManager extends BoardManager implements GameEventSubscriber {
+
     private Party party;
+
     public ClassicBoardManager(Board3dManager board3dManager, Board board, ClassicRuleSet ruleSet) {
         super(board,board3dManager,ruleSet);
         this.eventManager.subscribe(EnPassantEvent.class, this, 1);
@@ -79,7 +81,7 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
             @Override
             public void execute() {
                 try {
-                    ClassicBoardManager.super.stopParty(party);
+                    ClassicBoardManager.super.stopParty();
                     board.loadBoard(parts[0]);
                     ClassicBoardManager.this.board3dManager.createPieces(ClassicBoardManager.this.board.getWhitePieces());
                     ClassicBoardManager.this.board3dManager.createPieces(ClassicBoardManager.this.board.getBlackPieces());

@@ -13,6 +13,7 @@ import com.heroiclabs.nakama.StreamPresenceEvent;
 import com.heroiclabs.nakama.api.ChannelMessage;
 import com.heroiclabs.nakama.api.NotificationList;
 
+import fr.aboucorp.variantchess.app.listeners.MatchEventListener;
 import fr.aboucorp.variantchess.app.managers.boards.BoardManager;
 import fr.aboucorp.variantchess.app.multiplayer.MatchListener;
 import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
@@ -35,14 +36,17 @@ public class MatchManager implements GameEventSubscriber, MatchListener, BoardMa
     private GameEventManager eventManager;
     private SessionManager sessionManager;
     private Party party;
+    private final MatchEventListener eventListener;
 
 
-    public MatchManager(VariantChessActivity activity, BoardManager boardManager) {
+    public MatchManager(VariantChessActivity activity, BoardManager boardManager, MatchEventListener eventListener) {
         this.boardManager = boardManager;
+        this.eventListener = eventListener;
         this.boardManager.setBoardLoadingListener(this);
         this.turnManager = TurnManager.getINSTANCE();
         this.eventManager = GameEventManager.getINSTANCE();
         this.sessionManager = SessionManager.getInstance(activity);
+
     }
 
     @Override
@@ -73,6 +77,7 @@ public class MatchManager implements GameEventSubscriber, MatchListener, BoardMa
 
     @Override
     public void receiveGameEvent(GameEvent event) {
+        this.eventListener.OnMatchEvent(event);
         if(event instanceof PartyEvent){
             Log.i("fr.aboucorp.variantchess",event.message);
         }else if(event instanceof BoardEvent && ((BoardEvent) event).type == BoardEventType.CHECKMATE){
@@ -91,9 +96,9 @@ public class MatchManager implements GameEventSubscriber, MatchListener, BoardMa
     }
 
     @Override
-    public void stopParty(Party party) {
-        this.eventManager.stopParty(party);
-        this.boardManager.stopParty(party);
+    public void stopParty() {
+        this.eventManager.stopParty();
+        this.boardManager.stopParty();
     }
 
     @Override

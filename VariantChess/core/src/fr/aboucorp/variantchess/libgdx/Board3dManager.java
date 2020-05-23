@@ -74,7 +74,7 @@ public class Board3dManager extends ApplicationAdapter {
     /**
      * Controller de la camera permettant à l'utilisateur de la faire pivoter
      */
-    public CameraInputController camController;
+    private CameraInputController camController;
     /**
      * Environnement 3D pour l'affichage des modèles
      */
@@ -94,7 +94,7 @@ public class Board3dManager extends ApplicationAdapter {
     private final ChessModelList blackDeadPieceModels;
     private final ArrayList<Piece> loadingPieces;
     private final ArrayList<ModelInstance> devStuff;
-    public static Map<Class, String> assetPaths = new HashMap<>();
+    private static Map<Class, String> assetPaths = new HashMap<>();
 
     private ModelBuilder modelBuilder;
     private AssetManager assets;
@@ -247,7 +247,7 @@ public class Board3dManager extends ApplicationAdapter {
     }
 
 
-void setPaths() {
+private void setPaths() {
         assetPaths.put(Knight.class, "data/knight.g3db");
         assetPaths.put(King.class, "data/king.g3db");
         assetPaths.put(Queen.class, "data/queen.g3db");
@@ -306,7 +306,7 @@ void setPaths() {
         this.boardIsLoading = true;
     }
 
-    public void doneLoading() {
+    private void doneLoading() {
         Model knightModel = this.assets.get("data/knight.g3db", Model.class);
         Model bishopModel = this.assets.get("data/bishop.g3db", Model.class);
         Model pawnModel = this.assets.get("data/pawn.g3db", Model.class);
@@ -390,7 +390,7 @@ void setPaths() {
         return blackPieceModels;
     }
 
-    public ChessModelList getChessSquareModels() {
+    private ChessModelList getChessSquareModels() {
         return this.chessSquareModels;
     }
 

@@ -29,13 +29,13 @@ public abstract class AbstractMoveSet implements GameEventSubscriber {
     protected final Piece piece;
     protected final ClassicBoard classicBoard;
     protected boolean isChecking;
-    protected King kingInCheck;
-    protected List<Piece> checkingPieces;
-    protected SquareList nextMoves;
+    private King kingInCheck;
+    private List<Piece> checkingPieces;
+    private SquareList nextMoves;
     protected Turn actualTurn;
     protected Turn previousTurn;
 
-    public AbstractMoveSet(Piece piece, ClassicBoard classicBoard) {
+    protected AbstractMoveSet(Piece piece, ClassicBoard classicBoard) {
         this.piece = piece;
         this.classicBoard = classicBoard;
         this.eventManager = GameEventManager.getINSTANCE();

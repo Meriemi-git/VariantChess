@@ -4,7 +4,7 @@ public abstract class AbstractRuleSet {
 
     public int moveNumber = 0;
 
-    public void clearRules(){
+    void clearRules(){
         moveNumber = 0;
     }
 }

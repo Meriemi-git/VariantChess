@@ -32,22 +32,22 @@ import fr.aboucorp.variantchess.libgdx.Board3dManager;
 import fr.aboucorp.variantchess.libgdx.utils.ChessModelList;
 
 public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycle {
-    protected final Board board;
-    protected final Board3dManager board3dManager;
+    final Board board;
+    final Board3dManager board3dManager;
     private final GDXInputAdapter inputAdapter;
     private final GDXGestureListener gestureListener;
-    protected Piece selectedPiece;
-    protected GameEventManager eventManager;
-    protected  Turn previousTurn;
-    protected Turn actualTurn;
-    protected final AbstractRuleSet ruleSet;
-    protected SquareList possiblesMoves;
-    protected BoardLoadingListener boardLoadingListener;
+    Piece selectedPiece;
+    GameEventManager eventManager;
+    Turn previousTurn;
+    Turn actualTurn;
+    final AbstractRuleSet ruleSet;
+    SquareList possiblesMoves;
+    BoardLoadingListener boardLoadingListener;
 
     private GameState gameState;
 
 
-    public BoardManager(Board board, Board3dManager board3dManager, AbstractRuleSet ruleSet) {
+    BoardManager(Board board, Board3dManager board3dManager, AbstractRuleSet ruleSet) {
         this.board = board;
         this.board3dManager = board3dManager;
         this.ruleSet = ruleSet;
@@ -74,7 +74,7 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
     protected abstract void manageTurnEnd();
 
     @Override
-    public void stopParty(Party party) {
+    public void stopParty() {
         this.gameState = GameState.SelectPiece;
         this.selectedPiece = null;
         this.previousTurn = null;
@@ -109,9 +109,9 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
         }
     }
 
-    public abstract ChessModelList getBlackPieceModels();
+    protected abstract ChessModelList getBlackPieceModels();
 
-    public abstract ChessModelList getWhitePieceModels();
+    protected abstract ChessModelList getWhitePieceModels();
 
     public abstract Square getSquareFromLocation(Location location);
 
@@ -137,7 +137,7 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
         return pieces.stream().filter(p -> p.getLocation().equals(location)).findFirst().get();
     }
 
-    public abstract Piece moveToSquare(Square to);
+    protected abstract Piece moveToSquare(Square to);
 
     public void selectSquare(Square to){
         Square from = this.selectedPiece.getSquare();

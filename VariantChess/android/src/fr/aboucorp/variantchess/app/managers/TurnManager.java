@@ -75,7 +75,7 @@ public class TurnManager implements PartyLifeCycle {
     }
 
     @Override
-    public void stopParty(Party party) {
+    public void stopParty() {
         this.turns = new LinkedList<>();
     }
 

@@ -11,8 +11,8 @@ import fr.aboucorp.variantchess.app.views.activities.MainActivity;
 
 public class AccountFragment extends VariantChessFragment {
 
-    public Button btn_create;
-    public Button btn_connect;
+    private Button btn_create;
+    private Button btn_connect;
 
 
     @Override
