@@ -49,11 +49,11 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
     public void startParty(Match match) {
         this.match = match;
         super.startParty(match);
-        if (match.getTurns().size() == 0) {
+        if (match.turns.size() == 0) {
             this.board.initBoard();
         } else {
             try {
-                this.board.loadBoard(match.getTurns().getLast().getFen());
+                this.board.loadBoard(match.turns.getLast().getFen());
             } catch (FenStringBadFormatException e) {
                 e.printStackTrace();
             }

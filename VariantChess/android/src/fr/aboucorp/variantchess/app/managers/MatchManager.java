@@ -16,6 +16,7 @@ import com.heroiclabs.nakama.api.NotificationList;
 import fr.aboucorp.variantchess.app.listeners.MatchEventListener;
 import fr.aboucorp.variantchess.app.managers.boards.BoardManager;
 import fr.aboucorp.variantchess.app.multiplayer.MatchListener;
+import fr.aboucorp.variantchess.app.parcelables.MatchP;
 import fr.aboucorp.variantchess.entities.ChessColor;
 import fr.aboucorp.variantchess.entities.Match;
 import fr.aboucorp.variantchess.entities.PartyLifeCycle;
@@ -25,11 +26,8 @@ import fr.aboucorp.variantchess.entities.events.GameEventManager;
 import fr.aboucorp.variantchess.entities.events.GameEventSubscriber;
 import fr.aboucorp.variantchess.entities.events.models.BoardEvent;
 import fr.aboucorp.variantchess.entities.events.models.GameEvent;
-import fr.aboucorp.variantchess.entities.events.models.LogEvent;
 import fr.aboucorp.variantchess.entities.events.models.MoveEvent;
 import fr.aboucorp.variantchess.entities.events.models.PartyEvent;
-import fr.aboucorp.variantchess.entities.events.models.TurnEndEvent;
-import fr.aboucorp.variantchess.entities.events.models.TurnEvent;
 
 public class MatchManager implements GameEventSubscriber, MatchListener, BoardManager.BoardLoadingListener, PartyLifeCycle {
     private final BoardManager boardManager;
@@ -37,7 +35,7 @@ public class MatchManager implements GameEventSubscriber, MatchListener, BoardMa
     private GameEventManager eventManager;
     private final MatchEventListener eventListener;
 
-    private Match match;
+    private MatchP match;
 
 
     public MatchManager(BoardManager boardManager, MatchEventListener eventListener) {
@@ -64,7 +62,8 @@ public class MatchManager implements GameEventSubscriber, MatchListener, BoardMa
 
 
     public void endTurn(MoveEvent event) {
-        this.turnManager.endTurn(event);
+        Turn turn = this.turnManager.endTurn(event,this.boardManager.getFenFromBoard());
+        this.match.getTurns().push(turn);
         this.turnManager.startTurn();
     }
 
@@ -88,7 +87,7 @@ public class MatchManager implements GameEventSubscriber, MatchListener, BoardMa
 
     @Override
     public void startParty(Match match) {
-        this.match = match;
+        this.match = (MatchP) match;
         this.boardManager.startParty(match);
     }
 

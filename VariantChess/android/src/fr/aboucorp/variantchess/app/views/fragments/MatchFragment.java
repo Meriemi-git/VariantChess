@@ -31,7 +31,6 @@ import fr.aboucorp.variantchess.entities.boards.ClassicBoard;
 import fr.aboucorp.variantchess.entities.events.GameEventSubscriber;
 import fr.aboucorp.variantchess.entities.events.models.BoardEvent;
 import fr.aboucorp.variantchess.entities.events.models.GameEvent;
-import fr.aboucorp.variantchess.entities.events.models.TurnEndEvent;
 import fr.aboucorp.variantchess.entities.events.models.TurnEvent;
 import fr.aboucorp.variantchess.entities.rules.ClassicRuleSet;
 import fr.aboucorp.variantchess.libgdx.Board3dManager;
@@ -78,6 +77,7 @@ public class MatchFragment extends VariantChessFragment implements GameEventSubs
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         this.bindViews();
         this.bindListeners();
         FragmentTransaction transaction = this.getChildFragmentManager().beginTransaction();
@@ -161,7 +161,7 @@ public class MatchFragment extends VariantChessFragment implements GameEventSubs
     @Override
     public void setArguments(@androidx.annotation.Nullable Bundle args) {
         super.setArguments(args);
-        this.matchP = args != null ? args.getParcelable("matchP") : null;
+        this.matchP = args != null ? args.getParcelable("matchP") : new MatchP();
     }
 
     @Override
@@ -170,5 +170,9 @@ public class MatchFragment extends VariantChessFragment implements GameEventSubs
             this.activity.runOnUiThread(() ->
                     this.party_logs.append("\n" + event.message));
         }
+    }
+
+    public MatchP getMatchP() {
+        return this.matchP;
     }
 }

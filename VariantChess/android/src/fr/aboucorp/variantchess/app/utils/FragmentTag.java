@@ -9,4 +9,5 @@ public final class FragmentTag {
     public static final String SIGNIN = "signin";
     public static final String SIGNUP = "signup";
     public static final String USERNAME = "username";
+    public static final String SETTINGS = "settings";
 }

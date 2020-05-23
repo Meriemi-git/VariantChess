@@ -2,6 +2,7 @@ package fr.aboucorp.variantchess.app.managers;
 
 import java.util.LinkedList;
 
+import fr.aboucorp.variantchess.app.parcelables.MatchP;
 import fr.aboucorp.variantchess.entities.ChessColor;
 import fr.aboucorp.variantchess.entities.Match;
 import fr.aboucorp.variantchess.entities.PartyLifeCycle;
@@ -39,14 +40,16 @@ public class TurnManager implements PartyLifeCycle {
         this.eventManager.sendMessage(new TurnStartEvent(eventMessage,nextTurn));
     }
 
-    public void endTurn(MoveEvent event){
+    public Turn endTurn(MoveEvent event, String fenFromBoard){
         if(event !=null) {
             this.turns.getLast().setPlayed(event.played);
+            this.turns.getLast().setFen(fenFromBoard);
             this.turns.getLast().setTo(event.to);
             this.turns.getLast().setFrom( event.from);
             this.turns.getLast().setDeadPiece(event.deadPiece);
         }
         this.eventManager.sendMessage(new TurnEndEvent("Ending turn",this.turns.getLast()));
+        return this.turns.getLast();
     }
 
 
@@ -67,12 +70,26 @@ public class TurnManager implements PartyLifeCycle {
 
     @Override
     public void startParty(Match match) {
-        this.whitePlayer = match.getWhitePlayer();
-        this.blackPlayer = match.getBlackPlayer();
-        Turn firsTurn = new Turn(1,match.getWhitePlayer());
-        this.turns.add(firsTurn);
-        String eventMessage = String.format("Turn %s color : %s",firsTurn.getTurnNumber(), firsTurn.getTurnColor());
-        this.eventManager.sendMessage(new TurnStartEvent(eventMessage,firsTurn));
+        this.whitePlayer = ((MatchP)match).getWhitePlayer();
+        this.blackPlayer = ((MatchP)match).getBlackPlayer();
+        Player player;
+        int turnNumber;
+        if(((MatchP)match).getTurns().size() > 0){
+            this.turns.addAll(((MatchP)match).getTurns());
+            if( this.turns.getLast().getPlayer().getColor() == ChessColor.WHITE){
+                player = this.blackPlayer;
+            }else{
+                player = this.whitePlayer;
+            }
+            turnNumber = ((MatchP)match).getTurns().size() + 1;
+        }else{
+            player = whitePlayer;
+            turnNumber = 1;
+        }
+        Turn turn = new Turn(turnNumber,player);
+        this.turns.add(turn);
+        String eventMessage = String.format("Turn %s color : %s",turn.getTurnNumber(), turn.getTurnColor());
+        this.eventManager.sendMessage(new TurnStartEvent(eventMessage,turn));
     }
 
     @Override

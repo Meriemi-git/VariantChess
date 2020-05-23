@@ -3,17 +3,10 @@ package fr.aboucorp.variantchess.entities;
 import java.util.LinkedList;
 
 public class Match{
-    protected LinkedList<Turn> turns = new LinkedList<>();
-    protected Player whitePlayer;
-    protected Player blackPlayer;
+    public LinkedList<Turn> turns = new LinkedList<>();
+    public Player whitePlayer;
+    public Player blackPlayer;
 
-    public LinkedList<Turn> getTurns() {
-        return this.turns;
-    }
-
-    public void setTurns(LinkedList<Turn> turns) {
-        this.turns = turns;
-    }
 
     public void setWhitePlayer(Player whitePlayer) {
         this.whitePlayer = whitePlayer;
@@ -29,5 +22,13 @@ public class Match{
 
     public Player getWhitePlayer() {
         return whitePlayer;
+    }
+
+    public LinkedList<Turn> getTurns() {
+        return this.turns;
+    }
+
+    public void setTurns(LinkedList<Turn> turns) {
+        this.turns = turns;
     }
 }

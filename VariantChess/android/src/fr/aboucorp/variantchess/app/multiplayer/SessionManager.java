@@ -122,7 +122,9 @@ public class SessionManager {
     }
 
     public void destroySession() {
-
+        this.client.disconnect();
+        SharedPreferences pref = this.activity.getSharedPreferences(SHARED_PREFERENCE_NAME, Context.MODE_PRIVATE);
+        pref.edit().putString("nk.session", null).apply();
     }
 
     public User updateDisplayName(String displayName) throws UsernameDuplicateException {

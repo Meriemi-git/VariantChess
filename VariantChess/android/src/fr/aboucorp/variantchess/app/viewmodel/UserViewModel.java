@@ -11,7 +11,7 @@ import com.heroiclabs.nakama.api.User;
 
 import java.util.List;
 
-class UserViewModel extends AndroidViewModel {
+public class UserViewModel extends AndroidViewModel {
     private MutableLiveData<User> connected = new MutableLiveData<>();
     public UserViewModel(@NonNull Application application) {
         super(application);

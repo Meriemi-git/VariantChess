@@ -8,6 +8,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,16 +17,20 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.badlogic.gdx.backends.android.AndroidFragmentApplication;
 import com.heroiclabs.nakama.api.User;
 
 import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
+import fr.aboucorp.variantchess.app.parcelables.MatchP;
 import fr.aboucorp.variantchess.app.utils.FragmentTag;
+import fr.aboucorp.variantchess.app.viewmodel.UserViewModel;
 import fr.aboucorp.variantchess.app.views.fragments.AccountFragment;
 import fr.aboucorp.variantchess.app.views.fragments.HomeFragment;
 import fr.aboucorp.variantchess.app.views.fragments.MatchFragment;
+import fr.aboucorp.variantchess.app.views.fragments.SettingsFragment;
 import fr.aboucorp.variantchess.app.views.fragments.UsernameFragment;
 
 import static fr.aboucorp.variantchess.app.multiplayer.SessionManager.SHARED_PREFERENCE_NAME;
@@ -33,6 +38,7 @@ import static fr.aboucorp.variantchess.app.multiplayer.SessionManager.SHARED_PRE
 public class MainActivity extends VariantChessActivity implements AndroidFragmentApplication.Callbacks {
     private Toolbar toolbar;
     private SessionManager sessionManager;
+    private UserViewModel userViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +47,7 @@ public class MainActivity extends VariantChessActivity implements AndroidFragmen
         this.setToolbar();
         this.sessionManager = SessionManager.getInstance(this);
         SharedPreferences pref = this.getSharedPreferences(SHARED_PREFERENCE_NAME, Context.MODE_PRIVATE);
+        userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
         User user;
         try {
             user = this.sessionManager.restoreSessionIfPossible(pref);
@@ -51,25 +58,42 @@ public class MainActivity extends VariantChessActivity implements AndroidFragmen
         }
     }
 
-
     private void setToolbar() {
         this.toolbar = this.findViewById(R.id.main_toolbar);
         this.toolbar.setTitle(this.getString(R.string.app_name));
+        this.toolbar.setSubtitle("Disconnected");
         this.setSupportActionBar(this.toolbar);
+        this.toolbar.setNavigationOnClickListener(v -> this.onBackPressed());
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(false);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_arrow_back);
+    }
+
+    private void updateConnectionUI(User user) {
+        if(user != null){
+            this.toolbar.setSubtitle(user.getDisplayName());
+        }else{
+            this.toolbar.setSubtitle("Disconnected");
+        }
+        MenuItem disconnect = this.toolbar.getMenu().findItem(R.id.menu_action_disconnect);
+        MenuItem profile = this.toolbar.getMenu().findItem(R.id.menu_action_profil);
+        disconnect.setVisible(user != null);
+        profile.setVisible(user != null);
     }
 
     @Override
-    public void setFragment(Class<? extends Fragment> fragmentClass, String fragmentTag,Bundle args) {
+    public void setFragment(Class<? extends Fragment> fragmentClass, String fragmentTag, Bundle args) {
         FragmentTransaction fragmentTransaction = this.getSupportFragmentManager().beginTransaction();
         Fragment existing = this.getSupportFragmentManager().findFragmentByTag(fragmentTag);
         try {
             if (existing == null) {
                 existing = fragmentClass.newInstance();
             }
-            if(args != null){
+            if (args != null) {
                 existing.setArguments(args);
             }
             fragmentTransaction.replace(R.id.fragment_container, existing, fragmentTag);
+            fragmentTransaction.addToBackStack(fragmentTag);
             fragmentTransaction.commit();
         } catch (IllegalAccessException e) {
             e.printStackTrace();
@@ -78,6 +102,46 @@ public class MainActivity extends VariantChessActivity implements AndroidFragmen
         }
     }
 
+    public void userIsConnected(User connected) {
+        if (connected != null) {
+            if (TextUtils.isEmpty(connected.getDisplayName())) {
+                this.setFragment(UsernameFragment.class, "username", null);
+            } else {
+                userViewModel.setConnected(connected);
+                this.setFragment(HomeFragment.class, "home", null);
+                Toast.makeText(this, R.string.connected, Toast.LENGTH_LONG).show();
+            }
+        } else {
+            this.setFragment(AccountFragment.class, "account", null);
+        }
+    }
+
+    @Override
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        MatchFragment fragment = (MatchFragment) this.getSupportFragmentManager().findFragmentByTag(FragmentTag.MATCH);
+        FragmentTransaction fragmentTransaction = this.getSupportFragmentManager().beginTransaction();
+        Bundle args = new Bundle();
+        if (fragment != null) {
+            fragmentTransaction.remove(fragment);
+            fragmentTransaction.commit();
+            MatchP matchP = fragment.getMatchP();
+            args.putParcelable("matchP", matchP);
+        }
+        fragmentTransaction = this.getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_container, MatchFragment.class, args, FragmentTag.MATCH).commit();
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -88,10 +152,11 @@ public class MainActivity extends VariantChessActivity implements AndroidFragmen
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
+        userViewModel.getConnected().observe(this, connected -> MainActivity.this.updateConnectionUI(connected));
         MenuItem disconnect = this.toolbar.getMenu().findItem(R.id.menu_action_disconnect);
         MenuItem profile = this.toolbar.getMenu().findItem(R.id.menu_action_profil);
-        //disconnect.setVisible(userViewModel.getConnected().getValue() != null);
-        //profile.setVisible(userViewModel.getConnected().getValue() != null);
+        disconnect.setVisible(userViewModel.getConnected().getValue() != null);
+        profile.setVisible(userViewModel.getConnected().getValue() != null);
         return true;
     }
 
@@ -99,38 +164,17 @@ public class MainActivity extends VariantChessActivity implements AndroidFragmen
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_action_profil:
-                // User chose the "Settings" item, show the app settings UI...
                 return true;
-
             case R.id.menu_action_disconnect:
                 this.sessionManager.destroySession();
-                this.setFragment(AccountFragment.class, "account",null);
-                TextView userText = this.toolbar.findViewById(R.id.lbl_display_name);
-                userText.setText(R.string.disconnect_message);
+                this.userViewModel.setConnected(null);
+                this.setFragment(AccountFragment.class, "account", null);
                 return true;
             case R.id.menu_action_settings:
-                // User chose the "Favorite" action, mark the current item
-                // as a favorite...
+                setFragment(SettingsFragment.class, FragmentTag.SETTINGS, null);
                 return true;
             default:
-                // If we got here, the user's action was not recognized.
-                // Invoke the superclass to handle it.
                 return super.onOptionsItemSelected(item);
-        }
-    }
-
-    public void userIsConnected(User connected) {
-        TextView userText = this.toolbar.findViewById(R.id.lbl_display_name);
-        if (connected != null) {
-            if (TextUtils.isEmpty(connected.getDisplayName())) {
-                this.setFragment(UsernameFragment.class, "username",null);
-            } else {
-                userText.setText(connected.getDisplayName());
-                this.setFragment(HomeFragment.class, "home",null);
-                Toast.makeText(this, R.string.connected, Toast.LENGTH_LONG).show();
-            }
-        } else {
-            this.setFragment(AccountFragment.class, "account",null);
         }
     }
 
@@ -148,33 +192,5 @@ public class MainActivity extends VariantChessActivity implements AndroidFragmen
     @Override
     public void exit() {
         this.finish();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-    }
-
-    @Override
-    public void onConfigurationChanged(@NonNull Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        MatchFragment fragment = (MatchFragment) this.getSupportFragmentManager().findFragmentByTag(FragmentTag.MATCH);
-        FragmentTransaction fragmentTransaction = this.getSupportFragmentManager().beginTransaction();
-        if (fragment != null) {
-
-            fragmentTransaction.remove(fragment);
-            fragmentTransaction.commit();
-        }
-        String fen = fragment.getFenFromBoard();
-        Bundle args = new Bundle();
-        args.putString("fen",fen);
-        fragmentTransaction = this.getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.fragment_container, MatchFragment.class,args, FragmentTag.MATCH).commit();
-
     }
 }

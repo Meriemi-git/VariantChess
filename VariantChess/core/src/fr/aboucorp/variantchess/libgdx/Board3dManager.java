@@ -114,7 +114,6 @@ public class Board3dManager extends ApplicationAdapter {
 
     @Override
     public void create() {
-        //Gdx.app.setLogLevel(Application.LOG_DEBUG);
         if(this.assets == null) {
             this.assets = new AssetManager(new InternalFileHandleResolver());
         }
@@ -123,7 +122,6 @@ public class Board3dManager extends ApplicationAdapter {
         this.modelBuilder = new ModelBuilder();
         this.initEnvironment();
         this.initCamera(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
-        //viewport = new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), camera);
         if(this.tacticalViewEnabled){
             this.setTacticalCamera();
         }
