@@ -33,16 +33,15 @@ public class MatchManager implements GameEventSubscriber, MatchListener, BoardMa
     private final BoardManager boardManager;
     private final TurnManager turnManager;
     private GameEventManager eventManager;
-    private final MatchEventListener eventListener;
+    private MatchEventListener eventListener;
 
     private MatchP match;
 
 
-    public MatchManager(BoardManager boardManager, MatchEventListener eventListener) {
+    public MatchManager(BoardManager boardManager) {
         this.boardManager = boardManager;
-        this.eventListener = eventListener;
         this.boardManager.setBoardLoadingListener(this);
-        this.turnManager = TurnManager.getINSTANCE();
+        this.turnManager =  new TurnManager();
         this.eventManager = GameEventManager.getINSTANCE();
     }
 
@@ -52,18 +51,8 @@ public class MatchManager implements GameEventSubscriber, MatchListener, BoardMa
         this.turnManager.startParty(this.match);
     }
 
-    public void loadBoard(Turn turn){
-        try {
-            this.turnManager.startAtTurn(turn.getTurnNumber()+1);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-
     public void endTurn(MoveEvent event) {
-        Turn turn = this.turnManager.endTurn(event,this.boardManager.getFenFromBoard());
-        this.match.getTurns().push(turn);
+        this.turnManager.endTurn(event,this.boardManager.getFenFromBoard());
         this.turnManager.startTurn();
     }
 
@@ -83,7 +72,6 @@ public class MatchManager implements GameEventSubscriber, MatchListener, BoardMa
             this.endTurn(((MoveEvent)event));
         }
     }
-
 
     @Override
     public void startParty(Match match) {
@@ -152,5 +140,7 @@ public class MatchManager implements GameEventSubscriber, MatchListener, BoardMa
 
     }
 
-
+    public void setEventListener(MatchEventListener eventListener) {
+        this.eventListener = eventListener;
+    }
 }

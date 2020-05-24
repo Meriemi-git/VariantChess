@@ -119,7 +119,7 @@ public class ClassicBoard extends Board{
 
     private void createPiecesFromFen(String[] lines) throws FenStringBadFormatException {
         boolean firstWN = true, firstBN = true, firstWB = true, firstBB = true,firstWR = true,firstBR = true;
-        for(int i = 0 ; i < lines.length;i++){
+        for(int i = 0 ; i < lines.length-1;i++){
             int caseIndex = 0;
             for(int j = 0 ;  j < lines[i].length() ; j++){
                 int xPos = 7-caseIndex;
@@ -175,7 +175,7 @@ public class ClassicBoard extends Board{
                             }
                             caseIndex = caseIndex + emptyCells-1;
                         }catch (Exception ex){
-                            throw new FenStringBadFormatException("Incorrect Number of empty cells");
+                            throw new FenStringBadFormatException(ex.getMessage());
                         }
                         break;
                 }

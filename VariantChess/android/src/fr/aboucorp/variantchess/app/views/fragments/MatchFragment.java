@@ -55,10 +55,9 @@ public class MatchFragment extends VariantChessFragment implements GameEventSubs
         Board classicBoard = new ClassicBoard();
         ClassicRuleSet classicRules = new ClassicRuleSet(classicBoard);
         this.boardManager = new ClassicBoardManager(this.board3dManager, classicBoard, classicRules);
-        this.matchManager = new MatchManager(this.boardManager,this);
+        this.matchManager = new MatchManager(this.boardManager);
         this.boardFragment = new BoardFragment();
         this.boardFragment.setBoard3dManager(this.board3dManager);
-        this.boardFragment.setBoardFragmentListener(this);
     }
 
     @Override
@@ -71,6 +70,7 @@ public class MatchFragment extends VariantChessFragment implements GameEventSubs
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        setRetainInstance(false);
         View view = inflater.inflate(R.layout.board_layout, container, false);
         return view;
     }
@@ -80,6 +80,8 @@ public class MatchFragment extends VariantChessFragment implements GameEventSubs
         super.onViewCreated(view, savedInstanceState);
         this.bindViews();
         this.bindListeners();
+        this.matchManager.setEventListener(this);
+        this.boardFragment.setBoardFragmentListener(this);
         FragmentTransaction transaction = this.getChildFragmentManager().beginTransaction();
         Fragment existingBoardFragment = this.getChildFragmentManager().findFragmentByTag(FragmentTag.BOARD);
         if (existingBoardFragment != null) {
@@ -135,8 +137,6 @@ public class MatchFragment extends VariantChessFragment implements GameEventSubs
     @Override
     public void startParty(Match match) {
         this.matchManager.startParty(match);
-        this.activity.runOnUiThread(() ->
-                this.lbl_turn.setText("Turn of " + MatchFragment.this.matchManager.getPartyInfos()));
     }
 
     @Override
@@ -147,15 +147,14 @@ public class MatchFragment extends VariantChessFragment implements GameEventSubs
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
+        this.boardFragment.setBoardFragmentListener(null);
+        this.matchManager.setEventListener(null);
+        this.matchManager.stopParty();
         Fragment fragment = this.getChildFragmentManager().findFragmentByTag(FragmentTag.BOARD);
         if (fragment != null) {
             this.getChildFragmentManager().beginTransaction().remove(fragment).commit();
         }
-    }
-
-    public String getFenFromBoard() {
-        return this.boardManager.getFenFromBoard();
+        super.onDestroy();
     }
 
     @Override

@@ -93,7 +93,7 @@ public class MainActivity extends VariantChessActivity implements AndroidFragmen
                 existing.setArguments(args);
             }
             fragmentTransaction.replace(R.id.fragment_container, existing, fragmentTag);
-            fragmentTransaction.addToBackStack(fragmentTag);
+            //fragmentTransaction.addToBackStack(fragmentTag);
             fragmentTransaction.commit();
         } catch (IllegalAccessException e) {
             e.printStackTrace();
@@ -121,16 +121,14 @@ public class MainActivity extends VariantChessActivity implements AndroidFragmen
         super.onConfigurationChanged(newConfig);
         MatchFragment fragment = (MatchFragment) this.getSupportFragmentManager().findFragmentByTag(FragmentTag.MATCH);
         FragmentTransaction fragmentTransaction = this.getSupportFragmentManager().beginTransaction();
-        Bundle args = new Bundle();
         if (fragment != null) {
-            fragmentTransaction.remove(fragment);
-            fragmentTransaction.commit();
+            Bundle args = new Bundle();
             MatchP matchP = fragment.getMatchP();
             args.putParcelable("matchP", matchP);
+            fragmentTransaction.remove(fragment).commit();
+            fragmentTransaction = this.getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.replace(R.id.fragment_container, MatchFragment.class, args, FragmentTag.MATCH).commit();
         }
-        fragmentTransaction = this.getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.fragment_container, MatchFragment.class, args, FragmentTag.MATCH).commit();
-
     }
 
     @Override
