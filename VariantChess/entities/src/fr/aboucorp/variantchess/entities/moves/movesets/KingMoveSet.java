@@ -18,14 +18,12 @@ import fr.aboucorp.variantchess.entities.utils.SquareList;
 
 public class KingMoveSet extends AbstractMoveSet implements GameEventSubscriber {
 
-    private GameEventManager eventManager;
 
     private boolean canCastleKingSide;
     private boolean canCastleQueenSide;
 
-    public KingMoveSet(Piece thisPiece, ClassicBoard classicBoard) {
-        super(thisPiece, classicBoard);
-        this.eventManager = GameEventManager.getINSTANCE();
+    public KingMoveSet(Piece thisPiece, ClassicBoard classicBoard,GameEventManager gameEventManager) {
+        super(thisPiece, classicBoard,gameEventManager);
     }
 
     @Override

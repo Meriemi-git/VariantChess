@@ -13,14 +13,14 @@ import fr.aboucorp.variantchess.entities.events.models.TurnStartEvent;
 
 public class TurnManager implements PartyLifeCycle {
 
-    private GameEventManager eventManager;
+    private GameEventManager gameEventManager;
     private Player whitePlayer;
     private Player blackPlayer;
     private Match match;
     private Turn current;
 
-    public TurnManager() {
-        this.eventManager = GameEventManager.getINSTANCE();
+    public TurnManager(GameEventManager gameEventManager) {
+        this.gameEventManager = gameEventManager;
     }
 
 
@@ -33,7 +33,7 @@ public class TurnManager implements PartyLifeCycle {
             this.current.setDeadPiece(event.deadPiece);
             this.match.getTurns().add(this.current);
         }
-        this.eventManager.sendMessage(new TurnEndEvent("Ending turn", this.match.getTurns().getLast()));
+        this.gameEventManager.sendMessage(new TurnEndEvent("Ending turn", this.match.getTurns().getLast()));
     }
 
 
@@ -60,7 +60,7 @@ public class TurnManager implements PartyLifeCycle {
         nextTurn = new Turn(this.match.getTurns().size() + 1, player);
         this.current = nextTurn;
         String eventMessage = String.format("Turn %s, color : %s", nextTurn.getTurnNumber(), nextTurn.getTurnColor());
-        this.eventManager.sendMessage(new TurnStartEvent(eventMessage, nextTurn));
+        this.gameEventManager.sendMessage(new TurnStartEvent(eventMessage, nextTurn));
     }
 
     @Override

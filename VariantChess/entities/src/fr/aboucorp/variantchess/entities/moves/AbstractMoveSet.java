@@ -26,7 +26,7 @@ import fr.aboucorp.variantchess.entities.utils.SquareList;
 
 public abstract class AbstractMoveSet implements GameEventSubscriber {
 
-    protected GameEventManager eventManager;
+    protected final GameEventManager eventManager;
     protected final Piece piece;
     protected final ClassicBoard classicBoard;
     protected boolean isChecking;
@@ -36,10 +36,10 @@ public abstract class AbstractMoveSet implements GameEventSubscriber {
     protected Turn actualTurn;
     protected Turn previousTurn;
 
-    protected AbstractMoveSet(Piece piece, ClassicBoard classicBoard) {
+    protected AbstractMoveSet(Piece piece, ClassicBoard classicBoard,GameEventManager gameEventManager) {
         this.piece = piece;
         this.classicBoard = classicBoard;
-        this.eventManager = GameEventManager.getINSTANCE();
+        this.eventManager = gameEventManager;
         this.eventManager.subscribe(PieceEvent.class, this, 1);
         this.eventManager.subscribe(TurnEvent.class, this, 1);
     }

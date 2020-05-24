@@ -5,13 +5,14 @@ import fr.aboucorp.variantchess.entities.Location;
 import fr.aboucorp.variantchess.entities.Piece;
 import fr.aboucorp.variantchess.entities.Square;
 import fr.aboucorp.variantchess.entities.boards.ClassicBoard;
+import fr.aboucorp.variantchess.entities.events.GameEventManager;
 import fr.aboucorp.variantchess.entities.moves.AbstractMoveSet;
 import fr.aboucorp.variantchess.entities.utils.SquareList;
 
 public class KnightMoveSet extends AbstractMoveSet {
 
-    public KnightMoveSet(Piece thisPiece, ClassicBoard classicBoard) {
-        super(thisPiece, classicBoard);
+    public KnightMoveSet(Piece thisPiece, ClassicBoard classicBoard, GameEventManager gameEventManager) {
+        super(thisPiece, classicBoard,gameEventManager);
     }
 
     @Override

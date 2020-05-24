@@ -32,19 +32,19 @@ import fr.aboucorp.variantchess.libgdx.Board3dManager;
 import fr.aboucorp.variantchess.libgdx.utils.ChessModelList;
 
 public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycle {
-    final Board board;
-    final Board3dManager board3dManager;
-    final AbstractRuleSet ruleSet;
-    Piece selectedPiece;
-    GameEventManager eventManager;
-    Turn previousTurn;
-    Turn actualTurn;
-    SquareList possiblesMoves;
-    BoardLoadingListener boardLoadingListener;
+    protected final Board board;
+    protected final Board3dManager board3dManager;
+    protected final AbstractRuleSet ruleSet;
+    protected Piece selectedPiece;
+    protected final GameEventManager gameEventManager;
+    protected Turn previousTurn;
+    protected Turn actualTurn;
+    protected SquareList possiblesMoves;
+    protected BoardLoadingListener boardLoadingListener;
 
     private GameState gameState;
 
-    BoardManager(Board board, Board3dManager board3dManager, AbstractRuleSet ruleSet) {
+    BoardManager(Board board, Board3dManager board3dManager, AbstractRuleSet ruleSet, GameEventManager gameEventManager) {
         this.board = board;
         this.board3dManager = board3dManager;
         this.ruleSet = ruleSet;
@@ -53,7 +53,7 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
         GDXGestureListener gestureListener = new GDXGestureListener(this);
         board3dManager.setAndroidListener(gestureListener);
         this.gameState = GameState.SelectPiece;
-        this.eventManager = GameEventManager.getINSTANCE();
+        this.gameEventManager = gameEventManager;
     }
 
 
@@ -72,9 +72,9 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
 
     @Override
     public void startParty(Match match) {
-        this.eventManager.subscribe(PartyEvent.class, this, 1);
-        this.eventManager.subscribe(TurnEvent.class, this, 1);
-        this.eventManager.subscribe(PieceEvent.class, this, 1);
+        this.gameEventManager.subscribe(PartyEvent.class, this, 1);
+        this.gameEventManager.subscribe(TurnEvent.class, this, 1);
+        this.gameEventManager.subscribe(PieceEvent.class, this, 1);
     }
 
     @Override
@@ -105,7 +105,7 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
         Square from = this.selectedPiece.getSquare();
         Piece deadPiece = this.moveToSquare(to);
         String message = String.format("Move %s from %s to %s", this.selectedPiece,from, to);
-        this.eventManager.sendMessage(new MoveEvent(
+        this.gameEventManager.sendMessage(new MoveEvent(
                 message
                 , from.getLocation()
                 , to.getLocation()

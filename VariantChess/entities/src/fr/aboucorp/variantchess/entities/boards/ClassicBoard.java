@@ -5,6 +5,7 @@ import fr.aboucorp.variantchess.entities.Location;
 import fr.aboucorp.variantchess.entities.Piece;
 import fr.aboucorp.variantchess.entities.Square;
 import fr.aboucorp.variantchess.entities.enums.PieceId;
+import fr.aboucorp.variantchess.entities.events.GameEventManager;
 import fr.aboucorp.variantchess.entities.exceptions.FenStringBadFormatException;
 import fr.aboucorp.variantchess.entities.pieces.Bishop;
 import fr.aboucorp.variantchess.entities.pieces.King;
@@ -23,7 +24,8 @@ public class ClassicBoard extends Board{
     private PieceList whitePieces;
     private PieceList whiteDeadPieces;
 
-    public ClassicBoard(){
+    public ClassicBoard(GameEventManager gameEventManager){
+        super(gameEventManager);
         this.chessSquares = new SquareList();
         this.blackPieces = new PieceList();
         this.whitePieces = new PieceList();
@@ -82,27 +84,27 @@ public class ClassicBoard extends Board{
     }
 
     private Knight createKnight(Location location, ChessColor color, PieceId pieceID){
-        return new Knight((Square) this.chessSquares.getItemByLocation(location), color,pieceID,this);
+        return new Knight((Square) this.chessSquares.getItemByLocation(location), color,pieceID,this,this.gameEventManager);
     }
 
     private Bishop createBishop(Location location, ChessColor color, PieceId pieceID){
-        return new Bishop((Square) this.chessSquares.getItemByLocation(location), color,pieceID,this);
+        return new Bishop((Square) this.chessSquares.getItemByLocation(location), color,pieceID,this,this.gameEventManager);
     }
 
     private Rook createRook(Location location, ChessColor color, PieceId pieceID){
-        return new Rook((Square) this.chessSquares.getItemByLocation(location), color,pieceID,this);
+        return new Rook((Square) this.chessSquares.getItemByLocation(location), color,pieceID,this,this.gameEventManager);
     }
 
     private Queen createQueen(Location location, ChessColor color, PieceId pieceID){
-        return new Queen((Square) this.chessSquares.getItemByLocation(location), color,pieceID,this);
+        return new Queen((Square) this.chessSquares.getItemByLocation(location), color,pieceID,this,this.gameEventManager);
     }
 
     private King createKing(Location location, ChessColor color, PieceId pieceID){
-        return new King((Square) this.chessSquares.getItemByLocation(location), color,pieceID,this);
+        return new King((Square) this.chessSquares.getItemByLocation(location), color,pieceID,this,this.gameEventManager);
     }
 
     private Pawn createPawn(Location location, ChessColor color, PieceId pieceID){
-        return new Pawn((Square) this.chessSquares.getItemByLocation(location), color,pieceID,this);
+        return new Pawn((Square) this.chessSquares.getItemByLocation(location), color,pieceID,this,this.gameEventManager);
     }
 
     @Override

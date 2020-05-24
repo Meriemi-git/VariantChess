@@ -36,20 +36,18 @@ public class ClassicRuleSet extends AbstractRuleSet implements GameEventSubscrib
     public boolean blackCanCastleQueen;
     private boolean kingIsInCheck;
     public Square enPassant;
-    private fr.aboucorp.variantchess.entities.Turn previousTurn;
+    private Turn previousTurn;
     private Turn actualTurn;
 
-    private GameEventManager eventManager;
-
-    public ClassicRuleSet(Board board) {
+    public ClassicRuleSet(Board board, GameEventManager gameEventManager) {
         this.board = board;
-        this.eventManager = GameEventManager.getINSTANCE();
-        this.eventManager.subscribe(TurnEvent.class, this, 1);
+        this.gameEventManager = gameEventManager;
+        this.gameEventManager.subscribe(TurnEvent.class, this, 1);
     }
 
     public void isKingInCheck(Piece piece) {
         if (this.kingIsInCheck) {
-            this.eventManager.sendMessage(new CheckOutEvent("King out of check", BoardEventType.CHECK_OUT, piece.getPieceId()));
+            this.gameEventManager.sendMessage(new CheckOutEvent("King out of check", BoardEventType.CHECK_OUT, piece.getPieceId()));
             this.kingIsInCheck = false;
         }
         ChessList<Piece> causingCheck = piece.getMoveSet().moveCauseCheck(this.actualTurn.getTurnColor());
@@ -58,7 +56,7 @@ public class ClassicRuleSet extends AbstractRuleSet implements GameEventSubscrib
             Piece kingInCheck = this.previousTurn.getTurnColor() == ChessColor.WHITE
                     ? this.board.getWhitePieces().getPieceById(PieceId.WK)
                     : this.board.getBlackPieces().getPieceById(PieceId.BK);
-            this.eventManager.sendMessage(new CheckInEvent("King is in check", BoardEventType.CHECK_IN, kingInCheck.getPieceId(), causingCheck));
+            this.gameEventManager.sendMessage(new CheckInEvent("King is in check", BoardEventType.CHECK_IN, kingInCheck.getPieceId(), causingCheck));
         }
     }
 
@@ -94,32 +92,32 @@ public class ClassicRuleSet extends AbstractRuleSet implements GameEventSubscrib
             castlingType = BoardEventType.CASTLE_KING;
         }
         if (rookToMove != null && destination != null) {
-            this.eventManager.sendMessage(new CastlingEvent("Castling", castlingType, rookToMove.getPieceId(), destination));
+            this.gameEventManager.sendMessage(new CastlingEvent("Castling", castlingType, rookToMove.getPieceId(), destination));
         }
     }
 
     private void canCastle() {
         if (this.whiteCanCastleKingNow()) {
             this.whiteCanCastleKing = true;
-            this.eventManager.sendMessage(new PieceEvent("White can castle on king side", BoardEventType.CASTLE_KING, PieceId.WK));
+            this.gameEventManager.sendMessage(new PieceEvent("White can castle on king side", BoardEventType.CASTLE_KING, PieceId.WK));
         } else {
             this.whiteCanCastleKing = false;
         }
         if (this.whiteCanCastleQueenNow()) {
             this.whiteCanCastleQueen = true;
-            this.eventManager.sendMessage(new PieceEvent("White can castle on queen side", BoardEventType.CASTLE_QUEEN, PieceId.WK));
+            this.gameEventManager.sendMessage(new PieceEvent("White can castle on queen side", BoardEventType.CASTLE_QUEEN, PieceId.WK));
         } else {
             this.whiteCanCastleQueen = false;
         }
         if (this.blackCanCastleKingNow()) {
             this.blackCanCastleKing = true;
-            this.eventManager.sendMessage(new PieceEvent("Black can castle on king side", BoardEventType.CASTLE_KING,PieceId.BK));
+            this.gameEventManager.sendMessage(new PieceEvent("Black can castle on king side", BoardEventType.CASTLE_KING,PieceId.BK));
         } else {
             this.blackCanCastleKing = false;
         }
         if (this.blackCanCastleQueenNow()) {
             this.blackCanCastleQueen = true;
-            this.eventManager.sendMessage(new PieceEvent("Black can castle on queen side", BoardEventType.CASTLE_QUEEN, PieceId.BK));
+            this.gameEventManager.sendMessage(new PieceEvent("Black can castle on queen side", BoardEventType.CASTLE_QUEEN, PieceId.BK));
         } else {
             this.blackCanCastleQueen = false;
         }
@@ -184,7 +182,7 @@ public class ClassicRuleSet extends AbstractRuleSet implements GameEventSubscrib
             }
         }
         if (this.fiftyMoveCounter >= FIFTY_MOVE_RULE_NUMBER * 2) {
-            this.eventManager.sendMessage(new PartyEvent("Player can claim a draw following the fifty move rule "));
+            this.gameEventManager.sendMessage(new PartyEvent("Player can claim a draw following the fifty move rule "));
         }
     }
 
@@ -198,9 +196,9 @@ public class ClassicRuleSet extends AbstractRuleSet implements GameEventSubscrib
             }
             if (cantMove) {
                 if (this.kingIsInCheck) {
-                    this.eventManager.sendMessage(new BoardEvent("Game is finished", BoardEventType.MATE));
+                    this.gameEventManager.sendMessage(new BoardEvent("Game is finished", BoardEventType.MATE));
                 } else {
-                    this.eventManager.sendMessage(new BoardEvent("Game is finished", BoardEventType.DRAW));
+                    this.gameEventManager.sendMessage(new BoardEvent("Game is finished", BoardEventType.DRAW));
                 }
             }
         }

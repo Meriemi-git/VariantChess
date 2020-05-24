@@ -3,6 +3,7 @@ package fr.aboucorp.variantchess.entities.moves.movesets;
 import fr.aboucorp.variantchess.entities.ChessColor;
 import fr.aboucorp.variantchess.entities.Piece;
 import fr.aboucorp.variantchess.entities.boards.ClassicBoard;
+import fr.aboucorp.variantchess.entities.events.GameEventManager;
 import fr.aboucorp.variantchess.entities.moves.AbstractMoveSet;
 import fr.aboucorp.variantchess.entities.utils.SquareList;
 
@@ -11,10 +12,10 @@ public class QueenMoveSet extends AbstractMoveSet {
     private RookMoveSet rookMoveSet;
     private BishopMoveSet bishopMoveSet;
 
-    public QueenMoveSet(Piece thisPiece, ClassicBoard classicBoard) {
-        super(thisPiece, classicBoard);
-        this.rookMoveSet = new RookMoveSet(thisPiece, classicBoard);
-        this.bishopMoveSet = new BishopMoveSet(thisPiece, classicBoard);
+    public QueenMoveSet(Piece thisPiece, ClassicBoard classicBoard, GameEventManager gameEventManager) {
+        super(thisPiece, classicBoard,gameEventManager);
+        this.rookMoveSet = new RookMoveSet(thisPiece, classicBoard,gameEventManager);
+        this.bishopMoveSet = new BishopMoveSet(thisPiece, classicBoard,gameEventManager);
     }
 
     @Override

@@ -28,6 +28,7 @@ import fr.aboucorp.variantchess.entities.Match;
 import fr.aboucorp.variantchess.entities.PartyLifeCycle;
 import fr.aboucorp.variantchess.entities.boards.Board;
 import fr.aboucorp.variantchess.entities.boards.ClassicBoard;
+import fr.aboucorp.variantchess.entities.events.GameEventManager;
 import fr.aboucorp.variantchess.entities.events.GameEventSubscriber;
 import fr.aboucorp.variantchess.entities.events.models.BoardEvent;
 import fr.aboucorp.variantchess.entities.events.models.GameEvent;
@@ -51,11 +52,12 @@ public class MatchFragment extends VariantChessFragment implements GameEventSubs
     private MatchP matchP;
 
     public MatchFragment() {
+        GameEventManager gameEventManager = new GameEventManager();
         this.board3dManager = new Board3dManager();
-        Board classicBoard = new ClassicBoard();
-        ClassicRuleSet classicRules = new ClassicRuleSet(classicBoard);
-        this.boardManager = new ClassicBoardManager(this.board3dManager, classicBoard, classicRules);
-        this.matchManager = new MatchManager(this.boardManager);
+        Board classicBoard = new ClassicBoard(gameEventManager);
+        ClassicRuleSet classicRules = new ClassicRuleSet(classicBoard,gameEventManager);
+        this.boardManager = new ClassicBoardManager(this.board3dManager, classicBoard, classicRules,gameEventManager);
+        this.matchManager = new MatchManager(this.boardManager,gameEventManager);
         this.boardFragment = new BoardFragment();
         this.boardFragment.setBoard3dManager(this.board3dManager);
     }

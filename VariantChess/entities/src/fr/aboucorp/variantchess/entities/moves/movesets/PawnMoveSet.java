@@ -7,14 +7,15 @@ import fr.aboucorp.variantchess.entities.Square;
 import fr.aboucorp.variantchess.entities.boards.ClassicBoard;
 import fr.aboucorp.variantchess.entities.enums.BoardEventType;
 import fr.aboucorp.variantchess.entities.enums.PieceId;
+import fr.aboucorp.variantchess.entities.events.GameEventManager;
 import fr.aboucorp.variantchess.entities.events.models.EnPassantEvent;
 import fr.aboucorp.variantchess.entities.moves.AbstractMoveSet;
 import fr.aboucorp.variantchess.entities.utils.SquareList;
 
 public class PawnMoveSet extends AbstractMoveSet {
 
-    public PawnMoveSet(Piece thisPiece, ClassicBoard classicBoard) {
-        super(thisPiece, classicBoard);
+    public PawnMoveSet(Piece thisPiece, ClassicBoard classicBoard, GameEventManager gameEventManager) {
+        super(thisPiece, classicBoard,gameEventManager);
     }
 
     @Override

@@ -38,11 +38,11 @@ public class MatchManager implements GameEventSubscriber, MatchListener, BoardMa
     private MatchP match;
 
 
-    public MatchManager(BoardManager boardManager) {
+    public MatchManager(BoardManager boardManager,GameEventManager gameEventManager) {
+        this.eventManager = gameEventManager;
         this.boardManager = boardManager;
         this.boardManager.setBoardLoadingListener(this);
-        this.turnManager =  new TurnManager();
-        this.eventManager = GameEventManager.getINSTANCE();
+        this.turnManager = new TurnManager(gameEventManager);
     }
 
     @Override

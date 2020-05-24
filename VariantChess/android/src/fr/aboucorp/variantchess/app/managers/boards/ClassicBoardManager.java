@@ -11,6 +11,7 @@ import fr.aboucorp.variantchess.entities.Square;
 import fr.aboucorp.variantchess.entities.Turn;
 import fr.aboucorp.variantchess.entities.boards.Board;
 import fr.aboucorp.variantchess.entities.enums.BoardEventType;
+import fr.aboucorp.variantchess.entities.events.GameEventManager;
 import fr.aboucorp.variantchess.entities.events.GameEventSubscriber;
 import fr.aboucorp.variantchess.entities.events.models.CastlingEvent;
 import fr.aboucorp.variantchess.entities.events.models.EnPassantEvent;
@@ -28,9 +29,9 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
 
     private Match match;
 
-    public ClassicBoardManager(Board3dManager board3dManager, Board board, ClassicRuleSet ruleSet) {
-        super(board, board3dManager, ruleSet);
-        this.eventManager.subscribe(EnPassantEvent.class, this, 1);
+    public ClassicBoardManager(Board3dManager board3dManager, Board board, ClassicRuleSet ruleSet, GameEventManager gameEventManager) {
+        super(board, board3dManager, ruleSet, gameEventManager);
+        this.gameEventManager.subscribe(EnPassantEvent.class, this, 1);
     }
 
     @Override
@@ -191,7 +192,7 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
             }
             this.board3dManager.moveToEven(toBeEaten);
             String eventMessage = String.format("Piece %s die on %s", toBeEaten.getPieceId().name(), toBeEaten.getLocation());
-            this.eventManager.sendMessage(new PieceEvent(eventMessage, BoardEventType.DEATH, toBeEaten.getPieceId()));
+            this.gameEventManager.sendMessage(new PieceEvent(eventMessage, BoardEventType.DEATH, toBeEaten.getPieceId()));
             toBeEaten.die();
         }
         return toBeEaten;

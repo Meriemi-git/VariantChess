@@ -11,17 +11,10 @@ import fr.aboucorp.variantchess.entities.events.models.GameEvent;
 
 public class GameEventManager implements PartyLifeCycle {
     private Match match;
-    private static GameEventManager INSTANCE;
     private static Hashtable<Class, List<Subscription>> SUBSCRIPTIONS;
-    private GameEventManager(){
-    }
 
-    public static GameEventManager getINSTANCE() {
-        if(INSTANCE == null){
-            INSTANCE = new GameEventManager();
-            SUBSCRIPTIONS = new Hashtable();
-        }
-        return INSTANCE;
+    public GameEventManager(){
+        SUBSCRIPTIONS = new Hashtable();
     }
 
     public void subscribe(Class gameEventType, GameEventSubscriber subscriber,int priority){
@@ -69,10 +62,5 @@ public class GameEventManager implements PartyLifeCycle {
 
     @Override
     public void stopParty() {
-        SUBSCRIPTIONS = new Hashtable<>();
-    }
-
-    public void destroy(){
-        INSTANCE = null;
     }
 }

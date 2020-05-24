@@ -1,7 +1,9 @@
 package fr.aboucorp.variantchess.entities.rules;
 
-public abstract class AbstractRuleSet {
+import fr.aboucorp.variantchess.entities.events.GameEventManager;
 
+public abstract class AbstractRuleSet {
+    protected GameEventManager gameEventManager;
     public int moveNumber = 0;
 
     void clearRules(){
