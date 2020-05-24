@@ -9,13 +9,11 @@ import fr.aboucorp.variantchess.entities.Match;
 
 public class MatchP extends Match implements Parcelable {
 
-    protected LinkedList<TurnP> turns = new LinkedList<>();
-
     public MatchP() {
     }
 
     protected MatchP(Parcel in) {
-        in.readTypedList(this.turns,TurnP.CREATOR);
+        in.readTypedList(this.turns,TurnP.CREATORTurn);
     }
 
     public static final Creator<MatchP> CREATOR = new Creator<MatchP>() {

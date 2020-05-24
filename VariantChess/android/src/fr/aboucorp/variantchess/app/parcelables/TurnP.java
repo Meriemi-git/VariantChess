@@ -14,9 +14,6 @@ public class TurnP extends Turn implements Parcelable {
 
     protected PlayerP player;
 
-    public TurnP(int turnNumber, PlayerP player) {
-        super(turnNumber, player);
-    }
 
     protected TurnP(Parcel in) {
         super.deadPiece = Enum.valueOf(PieceId.class,in.readString());
@@ -38,6 +35,19 @@ public class TurnP extends Turn implements Parcelable {
         @Override
         public TurnP[] newArray(int size) {
             return new TurnP[size];
+        }
+    };
+
+    public static final Creator<Turn> CREATORTurn = new Creator<Turn>() {
+        @Override
+        public Turn createFromParcel(Parcel in) {
+            return new TurnP(in);
+
+        }
+
+        @Override
+        public Turn[] newArray(int size) {
+            return new Turn[size];
         }
     };
 

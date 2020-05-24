@@ -3,7 +3,7 @@ package fr.aboucorp.variantchess.entities;
 import java.util.LinkedList;
 
 public class Match{
-    public LinkedList<Turn> turns = new LinkedList<>();
+    public LinkedList turns = new LinkedList<>();
     public Player whitePlayer;
     public Player blackPlayer;
 

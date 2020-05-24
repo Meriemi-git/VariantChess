@@ -8,6 +8,7 @@ import fr.aboucorp.variantchess.entities.Location;
 import fr.aboucorp.variantchess.entities.Match;
 import fr.aboucorp.variantchess.entities.Piece;
 import fr.aboucorp.variantchess.entities.Square;
+import fr.aboucorp.variantchess.entities.Turn;
 import fr.aboucorp.variantchess.entities.boards.Board;
 import fr.aboucorp.variantchess.entities.enums.BoardEventType;
 import fr.aboucorp.variantchess.entities.events.GameEventSubscriber;
@@ -53,7 +54,7 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
             this.board.initBoard();
         } else {
             try {
-                this.board.loadBoard(match.turns.getLast().getFen());
+                this.board.loadBoard(((Turn)match.turns.getLast()).getFen());
             } catch (FenStringBadFormatException e) {
                 e.printStackTrace();
             }
