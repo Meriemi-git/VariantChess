@@ -168,7 +168,7 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
     }
 
     public boolean IsTacticalViewOn() {
-        return this.board3dManager.tacticalViewEnabled;
+        return this.board3dManager.isTacticalViewEnabled();
     }
 
     public void setBoardLoadingListener(BoardLoadingListener boardLoadingListener) {

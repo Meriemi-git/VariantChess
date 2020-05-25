@@ -32,6 +32,7 @@ import fr.aboucorp.variantchess.app.views.fragments.HomeFragment;
 import fr.aboucorp.variantchess.app.views.fragments.MatchFragment;
 import fr.aboucorp.variantchess.app.views.fragments.SettingsFragment;
 import fr.aboucorp.variantchess.app.views.fragments.UsernameFragment;
+import fr.aboucorp.variantchess.entities.Match;
 
 import static fr.aboucorp.variantchess.app.multiplayer.SessionManager.SHARED_PREFERENCE_NAME;
 
@@ -93,7 +94,7 @@ public class MainActivity extends VariantChessActivity implements AndroidFragmen
                 existing.setArguments(args);
             }
             fragmentTransaction.replace(R.id.fragment_container, existing, fragmentTag);
-            //fragmentTransaction.addToBackStack(fragmentTag);
+            fragmentTransaction.addToBackStack(fragmentTag);
             fragmentTransaction.commit();
         } catch (IllegalAccessException e) {
             e.printStackTrace();
@@ -179,9 +180,9 @@ public class MainActivity extends VariantChessActivity implements AndroidFragmen
     @Override
     public void onBackPressed() {
         FragmentManager manager = this.getSupportFragmentManager();
-        MatchFragment fragment = (MatchFragment) manager.findFragmentByTag(FragmentTag.MATCH);
-        if (fragment != null && fragment.isVisible()) {
-            fragment.confirmExit();
+        MatchFragment matchFragment = (MatchFragment) manager.findFragmentByTag(FragmentTag.MATCH);
+        if (matchFragment != null && matchFragment.isVisible()) {
+            matchFragment.confirmExit();
         } else {
             super.onBackPressed();
         }
@@ -191,4 +192,6 @@ public class MainActivity extends VariantChessActivity implements AndroidFragmen
     public void exit() {
         this.finish();
     }
+
+
 }

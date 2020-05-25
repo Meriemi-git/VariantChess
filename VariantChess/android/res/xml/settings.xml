@@ -2,6 +2,6 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <SwitchPreference
         android:defaultValue="false"
-        android:key="switch_preference_1"
+        android:key="preference_switch_tactical"
         android:title="@string/settings_tactical_view_lbl" />
 </PreferenceScreen>

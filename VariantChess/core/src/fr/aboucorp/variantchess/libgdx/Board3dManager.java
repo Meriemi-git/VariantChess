@@ -26,7 +26,6 @@ import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.viewport.Viewport;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -63,27 +62,32 @@ public class Board3dManager extends ApplicationAdapter {
      * Chargeur de modele 3D
      */
     private ModelBatch modelBatch;
+
     private SpriteBatch spriteBatch;
+
     /**
      * Camera de la vue 3D
      */
     private PerspectiveCamera camera;
-    private Viewport viewport;
+
     /**
      * Controller de la camera permettant à l'utilisateur de la faire pivoter
      */
     private CameraInputController camController;
+
     /**
      * Environnement 3D pour l'affichage des modèles
      */
     private Environment environment;
+
     /**
      * Ecouteur d'évènement au clic sur la fenêtre
      */
     private InputAdapter androidInputAdapter;
+
     private GestureDetector.GestureListener androidListener;
 
-    public boolean tacticalViewEnabled;
+    private boolean tacticalViewEnabled;
 
     private final ChessModelList chessSquareModels;
     private final ChessModelList whitePieceModels;
@@ -114,9 +118,7 @@ public class Board3dManager extends ApplicationAdapter {
 
     @Override
     public void create() {
-        if(this.assets == null) {
-            this.assets = new AssetManager(new InternalFileHandleResolver());
-        }
+        this.assets = new AssetManager(new InternalFileHandleResolver());
         this.modelBatch = new ModelBatch();
         this.spriteBatch = new SpriteBatch();
         this.modelBuilder = new ModelBuilder();
@@ -125,7 +127,6 @@ public class Board3dManager extends ApplicationAdapter {
         if(this.tacticalViewEnabled){
             this.setTacticalCamera();
         }
-
         this.setPaths();
         this.loadModels();
     }
@@ -303,51 +304,55 @@ private void setPaths() {
     }
 
     private void doneLoading() {
-        Model knightModel = this.assets.get("data/knight.g3db", Model.class);
-        Model bishopModel = this.assets.get("data/bishop.g3db", Model.class);
-        Model pawnModel = this.assets.get("data/pawn.g3db", Model.class);
-        Model queenModel = this.assets.get("data/queen.g3db", Model.class);
-        Model kingModel = this.assets.get("data/king.g3db", Model.class);
-        Model rookModel = this.assets.get("data/rook.g3db", Model.class);
-        this.piecesAtlas = this.assets.get(assetPaths.get(Piece.class), TextureAtlas.class);
-        for (Iterator<Piece> iter = this.loadingPieces.iterator(); iter.hasNext(); ) {
-            Piece piece = iter.next();
-            Material material;
-            if (piece.getChessColor() == ChessColor.WHITE) {
-                material = new Material(ColorAttribute.createDiffuse(Color.WHITE));
-            } else {
-                material = new Material(ColorAttribute.createDiffuse(Color.GRAY));
-            }
-            ChessPieceM model = null;
-            if (piece instanceof Rook) {
-                model = new RookM(rookModel, piece.getLocation(), material, piece.getPieceId());
-            } else if (piece instanceof Pawn) {
-                model = new PawnM(pawnModel, piece.getLocation(), material, piece.getPieceId());
-            } else if (piece instanceof Knight) {
-                model = new KnightM(knightModel, piece.getLocation(), material, piece.getPieceId());
+        try {
+            Model knightModel = this.assets.get("data/knight.g3db", Model.class);
+            Model bishopModel = this.assets.get("data/bishop.g3db", Model.class);
+            Model pawnModel = this.assets.get("data/pawn.g3db", Model.class);
+            Model queenModel = this.assets.get("data/queen.g3db", Model.class);
+            Model kingModel = this.assets.get("data/king.g3db", Model.class);
+            Model rookModel = this.assets.get("data/rook.g3db", Model.class);
+            this.piecesAtlas = this.assets.get(assetPaths.get(Piece.class), TextureAtlas.class);
+            for (Iterator<Piece> iter = this.loadingPieces.iterator(); iter.hasNext(); ) {
+                Piece piece = iter.next();
+                Material material;
                 if (piece.getChessColor() == ChessColor.WHITE) {
-                    model.transform.rotate(Vector3.Y, -90);
+                    material = new Material(ColorAttribute.createDiffuse(Color.WHITE));
                 } else {
-                    model.transform.rotate(Vector3.Y, 90);
+                    material = new Material(ColorAttribute.createDiffuse(Color.GRAY));
                 }
-            } else if (piece instanceof Bishop) {
-                model = new BishopM(bishopModel, piece.getLocation(), material, piece.getPieceId());
-                if (piece.getChessColor() == ChessColor.WHITE) {
-                    model.transform.rotate(Vector3.Y, -90);
+                ChessPieceM model = null;
+                if (piece instanceof Rook) {
+                    model = new RookM(rookModel, piece.getLocation(), material, piece.getPieceId());
+                } else if (piece instanceof Pawn) {
+                    model = new PawnM(pawnModel, piece.getLocation(), material, piece.getPieceId());
+                } else if (piece instanceof Knight) {
+                    model = new KnightM(knightModel, piece.getLocation(), material, piece.getPieceId());
+                    if (piece.getChessColor() == ChessColor.WHITE) {
+                        model.transform.rotate(Vector3.Y, -90);
+                    } else {
+                        model.transform.rotate(Vector3.Y, 90);
+                    }
+                } else if (piece instanceof Bishop) {
+                    model = new BishopM(bishopModel, piece.getLocation(), material, piece.getPieceId());
+                    if (piece.getChessColor() == ChessColor.WHITE) {
+                        model.transform.rotate(Vector3.Y, -90);
+                    } else {
+                        model.transform.rotate(Vector3.Y, 90);
+                    }
+                } else if (piece instanceof King) {
+                    model = new KingM(kingModel, piece.getLocation(), material, piece.getPieceId());
+                } else if (piece instanceof Queen) {
+                    model = new QueenM(queenModel, piece.getLocation(), material, piece.getPieceId());
+                }
+                if (piece.getChessColor() == ChessColor.BLACK) {
+                    this.blackPieceModels.add(model);
                 } else {
-                    model.transform.rotate(Vector3.Y, 90);
+                    this.whitePieceModels.add(model);
                 }
-            } else if (piece instanceof King) {
-                model = new KingM(kingModel, piece.getLocation(), material, piece.getPieceId());
-            } else if (piece instanceof Queen) {
-                model = new QueenM(queenModel, piece.getLocation(), material, piece.getPieceId());
+                iter.remove();
             }
-            if (piece.getChessColor() == ChessColor.BLACK) {
-                this.blackPieceModels.add(model);
-            } else {
-                this.whitePieceModels.add(model);
-            }
-            iter.remove();
+        }catch(Exception ex){
+            ex.printStackTrace();
         }
         this.boardIsLoading = false;
     }
@@ -565,7 +570,6 @@ private void setPaths() {
         this.androidListener = androidListener;
     }
 
-
     @Override
     public void resize(int width, int height) {
         this.initCamera(width, height);
@@ -576,7 +580,21 @@ private void setPaths() {
         this.modelBatch.dispose();
         this.spriteBatch.dispose();
         this.assets.dispose();
+        Gdx.app.log("fr.aboucorp.variantchess","dispose Board3D");
+    }
+
+    public boolean isTacticalViewEnabled() {
+        return this.tacticalViewEnabled;
+    }
+
+    public void setTacticalViewEnabled(boolean tacticalViewEnabled) {
+        this.tacticalViewEnabled = tacticalViewEnabled;
+    }
+
+    public void exit() {
+        this.modelBatch.dispose();
+        this.spriteBatch.dispose();
+        this.assets.dispose();
         Gdx.app.log("fr.aboucorp.variantchess","Exit VariantChess app");
-        super.dispose();
     }
 }

@@ -3,6 +3,7 @@ package fr.aboucorp.variantchess.app.views.fragments;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -15,6 +16,7 @@ import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.preference.PreferenceManager;
 
 import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.listeners.MatchEventListener;
@@ -72,7 +74,6 @@ public class MatchFragment extends VariantChessFragment implements GameEventSubs
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        setRetainInstance(false);
         View view = inflater.inflate(R.layout.board_layout, container, false);
         return view;
     }
@@ -144,6 +145,7 @@ public class MatchFragment extends VariantChessFragment implements GameEventSubs
     @Override
     public void stopParty() {
         this.matchManager.stopParty();
+        this.board3dManager.exit();
         ((MainActivity) this.activity).setFragment(HomeFragment.class, FragmentTag.HOME,null);
     }
 
