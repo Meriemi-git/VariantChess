@@ -6,7 +6,6 @@ import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.math.collision.Ray;
 
 import fr.aboucorp.variantchess.app.managers.boards.BoardManager;
-import fr.aboucorp.variantchess.libgdx.models.ChessModel;
 import fr.aboucorp.variantchess.libgdx.models.GraphicsGameElement;
 import fr.aboucorp.variantchess.libgdx.utils.GraphicGameArray;
 
@@ -47,7 +46,14 @@ class TouchedModelFinder {
         return models.get(result);
     }
 
-    public ChessModel getTouched2DModel(float screenX, float screenY, GraphicGameArray models) {
+    public GraphicsGameElement getTouched2DModel(float screenX, float screenY, GraphicGameArray models) {
+        Ray ray = this.boardManager.getCamera().getPickRay(screenX, screenY);
+        for (int i = 0; i < models.size; i++) {
+            final GraphicsGameElement element = models.get(i);
+            if (Intersector.intersectRayBoundsFast(ray, new Vector3(element.getLocation().getX(), 0, element.getLocation().getZ()), new Vector3(1, 1, 1))) {
+                return element;
+            }
+        }
         return null;
     }
 }
