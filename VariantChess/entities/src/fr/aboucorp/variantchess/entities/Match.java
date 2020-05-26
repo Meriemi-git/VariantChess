@@ -1,8 +1,9 @@
 package fr.aboucorp.variantchess.entities;
 
+import java.io.Serializable;
 import java.util.LinkedList;
 
-public class Match{
+public class Match implements Serializable {
     public LinkedList turns = new LinkedList<>();
     public Player whitePlayer;
     public Player blackPlayer;

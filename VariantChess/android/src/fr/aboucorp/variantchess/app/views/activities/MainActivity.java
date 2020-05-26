@@ -2,41 +2,32 @@ package fr.aboucorp.variantchess.app.views.activities;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.badlogic.gdx.backends.android.AndroidFragmentApplication;
 import com.heroiclabs.nakama.api.User;
 
 import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
-import fr.aboucorp.variantchess.app.parcelables.MatchP;
 import fr.aboucorp.variantchess.app.utils.FragmentTag;
 import fr.aboucorp.variantchess.app.viewmodel.UserViewModel;
 import fr.aboucorp.variantchess.app.views.fragments.AccountFragment;
 import fr.aboucorp.variantchess.app.views.fragments.HomeFragment;
-import fr.aboucorp.variantchess.app.views.fragments.MatchFragment;
 import fr.aboucorp.variantchess.app.views.fragments.SettingsFragment;
 import fr.aboucorp.variantchess.app.views.fragments.UsernameFragment;
-import fr.aboucorp.variantchess.entities.Match;
 
 import static fr.aboucorp.variantchess.app.multiplayer.SessionManager.SHARED_PREFERENCE_NAME;
 
-public class MainActivity extends VariantChessActivity implements AndroidFragmentApplication.Callbacks {
+public class MainActivity extends VariantChessActivity  {
     private Toolbar toolbar;
     private SessionManager sessionManager;
     private UserViewModel userViewModel;
@@ -49,10 +40,9 @@ public class MainActivity extends VariantChessActivity implements AndroidFragmen
         this.sessionManager = SessionManager.getInstance(this);
         SharedPreferences pref = this.getSharedPreferences(SHARED_PREFERENCE_NAME, Context.MODE_PRIVATE);
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
-        User user;
         try {
-            user = this.sessionManager.restoreSessionIfPossible(pref);
-            this.userIsConnected(user);
+            this.sessionManager.restoreSessionIfPossible(pref);
+            this.userIsConnected(this.sessionManager.getUser());
         } catch (Exception e) {
             Log.e("fr.aboucorp.variantchess", e.getMessage());
             e.printStackTrace();
@@ -65,9 +55,8 @@ public class MainActivity extends VariantChessActivity implements AndroidFragmen
         this.toolbar.setSubtitle("Disconnected");
         this.setSupportActionBar(this.toolbar);
         this.toolbar.setNavigationOnClickListener(v -> this.onBackPressed());
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(false);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_arrow_back);
+        this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        this.getSupportActionBar().setHomeButtonEnabled(true);
     }
 
     private void updateConnectionUI(User user) {
@@ -96,9 +85,7 @@ public class MainActivity extends VariantChessActivity implements AndroidFragmen
             fragmentTransaction.replace(R.id.fragment_container, existing, fragmentTag);
             fragmentTransaction.addToBackStack(fragmentTag);
             fragmentTransaction.commit();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
+        } catch (IllegalAccessException | InstantiationException e) {
             e.printStackTrace();
         }
     }
@@ -118,44 +105,18 @@ public class MainActivity extends VariantChessActivity implements AndroidFragmen
     }
 
     @Override
-    public void onConfigurationChanged(@NonNull Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        MatchFragment fragment = (MatchFragment) this.getSupportFragmentManager().findFragmentByTag(FragmentTag.MATCH);
-        FragmentTransaction fragmentTransaction = this.getSupportFragmentManager().beginTransaction();
-        if (fragment != null) {
-            Bundle args = new Bundle();
-            MatchP matchP = fragment.getMatchP();
-            args.putParcelable("matchP", matchP);
-            fragmentTransaction.remove(fragment).commit();
-            fragmentTransaction = this.getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.replace(R.id.fragment_container, MatchFragment.class, args, FragmentTag.MATCH).commit();
-        }
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         this.getMenuInflater().inflate(R.menu.main_menu, menu);
         return true;
     }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        userViewModel.getConnected().observe(this, connected -> MainActivity.this.updateConnectionUI(connected));
+        this.userViewModel.getConnected().observe(this, MainActivity.this::updateConnectionUI);
         MenuItem disconnect = this.toolbar.getMenu().findItem(R.id.menu_action_disconnect);
         MenuItem profile = this.toolbar.getMenu().findItem(R.id.menu_action_profil);
-        disconnect.setVisible(userViewModel.getConnected().getValue() != null);
-        profile.setVisible(userViewModel.getConnected().getValue() != null);
+        disconnect.setVisible(this.userViewModel.getConnected().getValue() != null);
+        profile.setVisible(this.userViewModel.getConnected().getValue() != null);
         return true;
     }
 
@@ -179,19 +140,7 @@ public class MainActivity extends VariantChessActivity implements AndroidFragmen
 
     @Override
     public void onBackPressed() {
-        FragmentManager manager = this.getSupportFragmentManager();
-        MatchFragment matchFragment = (MatchFragment) manager.findFragmentByTag(FragmentTag.MATCH);
-        if (matchFragment != null && matchFragment.isVisible()) {
-            matchFragment.confirmExit();
-        } else {
-            super.onBackPressed();
-        }
+       super.onBackPressed();
     }
-
-    @Override
-    public void exit() {
-        this.finish();
-    }
-
 
 }

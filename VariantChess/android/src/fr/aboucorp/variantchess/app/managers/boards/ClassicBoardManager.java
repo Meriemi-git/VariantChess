@@ -60,8 +60,6 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
                 e.printStackTrace();
             }
         }
-
-
         GdxPostRunner postRunner = new GdxPostRunner() {
             @Override
             public void execute() {

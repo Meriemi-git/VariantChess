@@ -1,7 +1,9 @@
 package fr.aboucorp.variantchess.entities;
 
 
-public class Player {
+import java.io.Serializable;
+
+public class Player implements Serializable {
     protected String name;
     protected ChessColor color;
 

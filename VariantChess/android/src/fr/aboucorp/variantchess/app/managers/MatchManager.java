@@ -16,11 +16,9 @@ import com.heroiclabs.nakama.api.NotificationList;
 import fr.aboucorp.variantchess.app.listeners.MatchEventListener;
 import fr.aboucorp.variantchess.app.managers.boards.BoardManager;
 import fr.aboucorp.variantchess.app.multiplayer.MatchListener;
-import fr.aboucorp.variantchess.app.parcelables.MatchP;
 import fr.aboucorp.variantchess.entities.ChessColor;
 import fr.aboucorp.variantchess.entities.Match;
 import fr.aboucorp.variantchess.entities.PartyLifeCycle;
-import fr.aboucorp.variantchess.entities.Turn;
 import fr.aboucorp.variantchess.entities.enums.BoardEventType;
 import fr.aboucorp.variantchess.entities.events.GameEventManager;
 import fr.aboucorp.variantchess.entities.events.GameEventSubscriber;
@@ -35,7 +33,7 @@ public class MatchManager implements GameEventSubscriber, MatchListener, BoardMa
     private GameEventManager eventManager;
     private MatchEventListener eventListener;
 
-    private MatchP match;
+    private Match match;
 
 
     public MatchManager(BoardManager boardManager,GameEventManager gameEventManager) {
@@ -75,13 +73,12 @@ public class MatchManager implements GameEventSubscriber, MatchListener, BoardMa
 
     @Override
     public void startParty(Match match) {
-        this.match = (MatchP) match;
+        this.match = match;
         this.boardManager.startParty(match);
     }
 
     @Override
     public void stopParty() {
-        this.eventManager.stopParty();
         this.boardManager.stopParty();
     }
 

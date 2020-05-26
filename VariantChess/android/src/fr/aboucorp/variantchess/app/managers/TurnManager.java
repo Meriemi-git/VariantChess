@@ -25,14 +25,14 @@ public class TurnManager implements PartyLifeCycle {
 
 
     public void endTurn(MoveEvent event, String fenFromBoard) {
+        this.current.setFen(fenFromBoard);
         if (event != null) {
             this.current.setPlayed(event.played);
-            this.current.setFen(fenFromBoard);
             this.current.setTo(event.to);
             this.current.setFrom(event.from);
             this.current.setDeadPiece(event.deadPiece);
-            this.match.getTurns().add(this.current);
         }
+        this.match.getTurns().add(this.current);
         this.gameEventManager.sendMessage(new TurnEndEvent("Ending turn", this.match.getTurns().getLast()));
     }
 

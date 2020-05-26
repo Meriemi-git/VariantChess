@@ -84,13 +84,6 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
         this.previousTurn = null;
         this.actualTurn = null;
         this.board.clearBoard();
-        GdxPostRunner postRunner = new GdxPostRunner() {
-            @Override
-            protected void execute() {
-                //BoardManager.this.board3dManager.clearBoard();
-            }
-        };
-        postRunner.startAsync();
         this.ruleSet.moveNumber = 0;
     }
 

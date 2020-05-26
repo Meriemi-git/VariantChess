@@ -1,10 +1,11 @@
 package fr.aboucorp.variantchess.entities;
 
+import java.io.Serializable;
 import java.time.Duration;
 
 import fr.aboucorp.variantchess.entities.enums.PieceId;
 
-public class Turn implements Comparable<Turn>{
+public class Turn implements Comparable<Turn>, Serializable {
 
     protected int turnNumber;
     protected Duration duration;

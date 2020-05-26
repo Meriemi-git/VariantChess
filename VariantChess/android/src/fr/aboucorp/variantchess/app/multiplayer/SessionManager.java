@@ -1,5 +1,6 @@
 package fr.aboucorp.variantchess.app.multiplayer;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.text.TextUtils;
@@ -30,36 +31,36 @@ import fr.aboucorp.variantchess.entities.GameMode;
 public class SessionManager {
     public static final String SHARED_PREFERENCE_NAME = "nakama";
     private static SessionManager INSTANCE;
-    private final VariantChessActivity activity;
+    private final Activity activity;
     private final Client client = new DefaultClient("defaultkey", "192.168.1.37", 7349, false);
     private Session session;
+    private User user;
 
-    private SessionManager(VariantChessActivity activity) {
+    private SessionManager(Activity activity) {
         this.activity = activity;
     }
 
-    private User authentWithEmail(String mail, String password, int signType) throws ExecutionException, InterruptedException {
+    private void authentWithEmail(String mail, String password, int signType) throws ExecutionException, InterruptedException {
         Metadata<String> metadata = new Metadata();
-        User connected;
+
         SharedPreferences pref = this.activity.getSharedPreferences(SHARED_PREFERENCE_NAME, Context.MODE_PRIVATE);
         if (signType == ResultType.SIGNUP) {
             metadata.put("signType", "SIGNUP");
-            connected = this.restoreSessionIfPossible(pref);
-            if (connected == null) {
+            this.restoreSessionIfPossible(pref);
+            if (this.user == null) {
                 this.session = this.client.authenticateEmail(mail, password, false).get();
-                connected = this.client.getAccount(this.session).get().getUser();
+                this.user = this.client.getAccount(this.session).get().getUser();
             }
         } else {
             metadata.put("signType", "SIGNIN");
             this.session = this.client.authenticateEmail(mail, password, metadata).get();
-            connected = this.client.getAccount(this.session).get().getUser();
+            this.user = this.client.getAccount(this.session).get().getUser();
         }
         pref.edit().putString("nk.session", this.session.getAuthToken()).apply();
-        return connected;
     }
 
 
-    public User restoreSessionIfPossible(SharedPreferences pref) throws InterruptedException {
+    public void restoreSessionIfPossible(SharedPreferences pref) throws InterruptedException {
         // Lets check if we can restore a cached session.
         String sessionString = pref.getString("nk.session", null);
         if (sessionString != null && !sessionString.isEmpty()) {
@@ -68,17 +69,15 @@ public class SessionManager {
                 // Session was valid and is restored now.
                 this.session = restoredSession;
                 try {
-                    return this.client.getAccount(this.session).get().getUser();
+                    this.user =  this.client.getAccount(this.session).get().getUser();
                 } catch (ExecutionException e) {
                     Log.i("fr.aboucorp.variantchess", e.getMessage());
-                    return null;
                 }
             }
         }
-        return null;
     }
 
-    public static SessionManager getInstance(VariantChessActivity activity) {
+    public static SessionManager getInstance(Activity activity) {
         if (INSTANCE == null) {
             INSTANCE = new SessionManager(activity);
         }
@@ -107,14 +106,13 @@ public class SessionManager {
     public void signInWithEmail(String mail, String password) throws ExecutionException, InterruptedException {
         this.authentWithEmail(mail, password, ResultType.SIGNIN);
         User connected = this.client.getAccount(this.session).get().getUser();
-        this.activity.userIsConnected(connected);
+        ((VariantChessActivity)this.activity).userIsConnected(connected);
     }
 
     public void signUpWithEmail(String mail, String password) {
-        User user = null;
         try {
-            user = this.authentWithEmail(mail, password, ResultType.SIGNUP);
-            this.activity.userIsConnected(user);
+            this.authentWithEmail(mail, password, ResultType.SIGNUP);
+            ((VariantChessActivity)this.activity).userIsConnected(user);
         } catch (Exception e) {
             Toast.makeText(this.activity, R.string.failed_login, Toast.LENGTH_LONG).show();
             Log.e("fr.aboucorp.variantchess", "Exception message=" + e.getMessage());
@@ -174,6 +172,10 @@ public class SessionManager {
         MatchmakerTicket matchmakerTicket = matchmakingSocket.addMatchmaker(
                 minCount, maxCount,query, stringProps, numProps).get();
         pref.edit().putString("nk.ticket", matchmakerTicket.getTicket()).apply();
+    }
+
+    public User getUser() {
+        return this.user;
     }
 }
 

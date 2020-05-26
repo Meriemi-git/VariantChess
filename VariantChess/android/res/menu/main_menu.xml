@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Settings, should always be in the overflow -->
     <item android:id="@+id/menu_action_profil"
         android:title="@string/menu_action_profil"
-        android:showAsAction="never" />
+        app:showAsAction="never" />
     <item android:id="@+id/menu_action_settings"
         android:title="@string/menu_action_settings"
-        android:showAsAction="never"/>
+        app:showAsAction="never" />
     <item android:id="@+id/menu_action_disconnect"
         android:title="@string/general_disconnect"
-        android:showAsAction="never"/>
+        app:showAsAction="never" />
 
 </menu>

@@ -21,6 +21,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name="fr.aboucorp.variantchess.app.views.activities.BoardActivity"
+            android:configChanges="keyboard|keyboardHidden|navigation|screenSize|screenLayout"
+            android:screenOrientation="fullSensor">
+        </activity>
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />

@@ -1,5 +1,6 @@
 package fr.aboucorp.variantchess.app.views.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -17,14 +18,13 @@ import java.util.List;
 
 import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
-import fr.aboucorp.variantchess.app.parcelables.MatchP;
-import fr.aboucorp.variantchess.app.parcelables.PlayerP;
-import fr.aboucorp.variantchess.app.utils.FragmentTag;
 import fr.aboucorp.variantchess.app.viewmodel.GameModeAdapter;
+import fr.aboucorp.variantchess.app.views.activities.BoardActivity;
 import fr.aboucorp.variantchess.app.views.activities.MainActivity;
-import fr.aboucorp.variantchess.app.views.activities.VariantChessActivity;
 import fr.aboucorp.variantchess.entities.ChessColor;
 import fr.aboucorp.variantchess.entities.GameMode;
+import fr.aboucorp.variantchess.entities.Match;
+import fr.aboucorp.variantchess.entities.Player;
 
 public class GameFragment extends VariantChessFragment implements AdapterView.OnItemSelectedListener {
     private Spinner new_game_spinner;
@@ -79,12 +79,14 @@ public class GameFragment extends VariantChessFragment implements AdapterView.On
                 e.printStackTrace();
             }*/
         }else if(this.new_game_rdb_offline.isChecked()){
-            MatchP matchP = new MatchP();
-            matchP.setBlackPlayer(new PlayerP("BlackPlayer", ChessColor.BLACK));
-            matchP.setWhitePlayer(new PlayerP("WhitePlayer", ChessColor.WHITE));
+            Match matchP = new Match();
+            matchP.setBlackPlayer(new Player("BlackPlayer", ChessColor.BLACK));
+            matchP.setWhitePlayer(new Player("WhitePlayer", ChessColor.WHITE));
             Bundle args = new Bundle();
-            args.putParcelable("matchP",matchP);
-            ((VariantChessActivity) this.getActivity()).setFragment(MatchFragment.class, FragmentTag.MATCH,args);
+            args.putSerializable("match",matchP);
+            Intent intent = new Intent(getActivity(), BoardActivity.class);
+            intent.putExtras(args);
+            startActivity(intent);
         }
     }
 

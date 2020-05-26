@@ -9,8 +9,7 @@ import fr.aboucorp.variantchess.entities.Match;
 import fr.aboucorp.variantchess.entities.PartyLifeCycle;
 import fr.aboucorp.variantchess.entities.events.models.GameEvent;
 
-public class GameEventManager implements PartyLifeCycle {
-    private Match match;
+public class GameEventManager {
     private static Hashtable<Class, List<Subscription>> SUBSCRIPTIONS;
 
     public GameEventManager(){
@@ -55,12 +54,4 @@ public class GameEventManager implements PartyLifeCycle {
         return subscription;
     }
 
-    @Override
-    public void startParty(Match match) {
-        this.match = match;
-    }
-
-    @Override
-    public void stopParty() {
-    }
 }

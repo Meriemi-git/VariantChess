@@ -47,6 +47,7 @@ public abstract class GdxPostRunner {
                 this.execute();
             } catch (Exception ex) {
                 Log.e("fr.aboucorp.variantchess",ex.getMessage());
+                ex.printStackTrace();
             }
         })).start();
     }

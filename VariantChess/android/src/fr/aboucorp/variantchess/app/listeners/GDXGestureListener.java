@@ -65,7 +65,6 @@ public class GDXGestureListener implements GestureDetector.GestureListener {
 
     @Override
     public boolean longPress(float x, float y) {
-
         return false;
     }
 

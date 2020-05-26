@@ -592,9 +592,7 @@ private void setPaths() {
     }
 
     public void exit() {
-        this.modelBatch.dispose();
-        this.spriteBatch.dispose();
-        this.assets.dispose();
+        Gdx.app.exit();
         Gdx.app.log("fr.aboucorp.variantchess","Exit VariantChess app");
     }
 }
