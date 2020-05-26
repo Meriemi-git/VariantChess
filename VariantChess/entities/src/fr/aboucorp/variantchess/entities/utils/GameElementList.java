@@ -6,7 +6,7 @@ import java.util.Iterator;
 import fr.aboucorp.variantchess.entities.GameElement;
 import fr.aboucorp.variantchess.entities.Location;
 
-public abstract class ChessList<T extends fr.aboucorp.variantchess.entities.GameElement> extends ArrayList<T> {
+public abstract class GameElementList<T extends GameElement> extends ArrayList<T> {
 
     public fr.aboucorp.variantchess.entities.GameElement getItemByLocation(Location location) {
       for(GameElement element : this){

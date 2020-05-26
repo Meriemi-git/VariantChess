@@ -6,7 +6,9 @@ import com.badlogic.gdx.math.Vector2;
 import fr.aboucorp.variantchess.app.managers.boards.BoardManager;
 import fr.aboucorp.variantchess.entities.Piece;
 import fr.aboucorp.variantchess.entities.Square;
+import fr.aboucorp.variantchess.entities.enums.GameState;
 import fr.aboucorp.variantchess.libgdx.models.ChessModel;
+import fr.aboucorp.variantchess.libgdx.models.GraphicsGameElement;
 
 
 public class GDXGestureListener implements GestureDetector.GestureListener {
@@ -20,42 +22,54 @@ public class GDXGestureListener implements GestureDetector.GestureListener {
 
     @Override
     public boolean touchDown(float screenX, float screenY, int pointer, int button) {
-        switch (this.boardManager.getGameState()) {
-            case SelectPiece:
-                ChessModel touchedModel = this.touchedModelFinder.getTouchedModel(screenX, screenY, this.boardManager.getPiecesModelsFromActualTurn());
-                if (touchedModel != null) {
-                    Piece touchedPiece = this.boardManager.getPieceFromLocation(touchedModel.getLocation());
-                    if (touchedPiece != null) {
-                        this.boardManager.selectPiece(touchedPiece);
-                    } else {
-                        this.boardManager.unHighlight();
-                    }
-                }
-                break;
-            case SelectCase:
-                ChessModel otherModel = this.touchedModelFinder.getTouchedModel(screenX, screenY, this.boardManager.getPiecesModelsFromActualTurn());
-                if (otherModel != null) {
-                    Piece otherTouchedPiece = this.boardManager.getPieceFromLocation(otherModel.getLocation());
-                    if (otherTouchedPiece != null) {
-                        this.boardManager.unHighlight();
-                        this.boardManager.selectPiece(otherTouchedPiece);
-                    }
-                } else {
-                    ChessModel squareModel = this.touchedModelFinder.getTouchedModel(screenX, screenY, this.boardManager.getPossibleSquareModels());
-                    if(squareModel != null) {
-                        Square square = this.boardManager.getSquareFromLocation(squareModel.getLocation());
-                        if (square != null) {
-                            this.boardManager.selectSquare(square);
-                        }
-                    }else {
-                        this.boardManager.unHighlight();
-                    }
-                }
-                break;
-                default:
-                    break;
+        if(this.boardManager.IsTacticalViewOn()){
+            this.reactOn2DModelTouched(this.boardManager.getGameState(),screenX,screenY);
+        }else{
+            this.reactOn3DModelTouched(this.boardManager.getGameState(),screenX,screenY);
         }
         return this.boardManager.IsTacticalViewOn();
+    }
+
+    private void reactOn2DModelTouched(GameState gameState, float screenX, float screenY) {
+        if (gameState == GameState.SelectPiece) {
+            ChessModel touchedModel = this.touchedModelFinder.getTouched2DModel(screenX, screenY, this.boardManager.get2DModelsForTurn());
+        } else if (gameState == GameState.SelectCase) {
+
+        }
+    }
+
+
+    private void reactOn3DModelTouched(GameState gameState, float screenX, float screenY) {
+        if(gameState == GameState.SelectPiece){
+            GraphicsGameElement piece = this.touchedModelFinder.getTouched3DModel(screenX, screenY, this.boardManager.get3DModelsForTurn());
+            if (piece != null) {
+                Piece touchedPiece = this.boardManager.getPieceFromLocation(piece.getLocation());
+                if (touchedPiece != null) {
+                    this.boardManager.selectPiece(touchedPiece);
+                } else {
+                    this.boardManager.unHighlight();
+                }
+            }
+        }else if(gameState == GameState.SelectCase){
+            GraphicsGameElement otherPiece = this.touchedModelFinder.getTouched3DModel(screenX, screenY, this.boardManager.get3DModelsForTurn());
+            if (otherPiece != null) {
+                Piece otherTouchedPiece = this.boardManager.getPieceFromLocation(otherPiece.getLocation());
+                if (otherTouchedPiece != null) {
+                    this.boardManager.unHighlight();
+                    this.boardManager.selectPiece(otherTouchedPiece);
+                }
+            } else {
+                GraphicsGameElement square = this.touchedModelFinder.getTouched3DModel(screenX, screenY, this.boardManager.getPossibleSquareModels());
+                if(square != null) {
+                    Square touchedSquare = this.boardManager.getSquareFromLocation(square.getLocation());
+                    if (touchedSquare != null) {
+                        this.boardManager.selectSquare(touchedSquare);
+                    }
+                }else {
+                    this.boardManager.unHighlight();
+                }
+            }
+        }
     }
 
     @Override

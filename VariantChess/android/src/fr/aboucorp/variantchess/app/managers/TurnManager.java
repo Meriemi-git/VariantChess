@@ -46,7 +46,7 @@ public class TurnManager implements PartyLifeCycle {
         this.match = match;
         this.whitePlayer = match.getWhitePlayer();
         this.blackPlayer = match.getBlackPlayer();
-        startTurn();
+        this.startTurn();
     }
 
     public void startTurn() {

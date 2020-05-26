@@ -10,10 +10,9 @@ import fr.aboucorp.variantchess.entities.enums.PieceId;
 import fr.aboucorp.variantchess.entities.events.GameEventManager;
 import fr.aboucorp.variantchess.entities.events.GameEventSubscriber;
 import fr.aboucorp.variantchess.entities.events.models.GameEvent;
-import fr.aboucorp.variantchess.entities.events.models.LogEvent;
 import fr.aboucorp.variantchess.entities.events.models.PieceEvent;
 import fr.aboucorp.variantchess.entities.moves.AbstractMoveSet;
-import fr.aboucorp.variantchess.entities.utils.ChessList;
+import fr.aboucorp.variantchess.entities.utils.GameElementList;
 import fr.aboucorp.variantchess.entities.utils.SquareList;
 
 public class KingMoveSet extends AbstractMoveSet implements GameEventSubscriber {
@@ -70,14 +69,14 @@ public class KingMoveSet extends AbstractMoveSet implements GameEventSubscriber 
 
 
     private boolean isLocationSafe(Square square, ChessColor turnColor) {
-        ChessList<Piece> pieces;
+        GameElementList<Piece> pieces;
         if(turnColor == ChessColor.BLACK) {
             pieces = this.classicBoard.getWhitePieces();
         }else {
             pieces = this.classicBoard.getBlackPieces();
         }
         for (Piece piece: pieces) {
-            ChessList<Square> squares = piece.getMoveSet().getThreats(piece,turnColor);
+            GameElementList<Square> squares = piece.getMoveSet().getThreats(piece,turnColor);
             if(squares != null && squares.getItemByLocation(square.getLocation()) != null){
                 return false;
             }

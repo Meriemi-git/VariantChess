@@ -41,7 +41,7 @@ public class GameFragment extends VariantChessFragment implements AdapterView.On
         super.onViewCreated(view, savedInstanceState);
         this.bindViews();
         this.bindListeners();
-        this.sessionManager = SessionManager.getInstance((MainActivity) this.getActivity());
+        this.sessionManager = SessionManager.getInstance(this.getActivity());
         this.new_game_spinner.setOnItemSelectedListener(this);
         List<GameMode> modes = new ArrayList<>();
         modes.add(new GameMode("Classic","Normal gamemode with classic rules and bla and bla and bla and many test."));
@@ -84,9 +84,9 @@ public class GameFragment extends VariantChessFragment implements AdapterView.On
             matchP.setWhitePlayer(new Player("WhitePlayer", ChessColor.WHITE));
             Bundle args = new Bundle();
             args.putSerializable("match",matchP);
-            Intent intent = new Intent(getActivity(), BoardActivity.class);
+            Intent intent = new Intent(this.getActivity(), BoardActivity.class);
             intent.putExtras(args);
-            startActivity(intent);
+            this.startActivity(intent);
         }
     }
 

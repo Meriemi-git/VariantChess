@@ -22,7 +22,7 @@ public class Match implements Serializable {
     }
 
     public Player getWhitePlayer() {
-        return whitePlayer;
+        return this.whitePlayer;
     }
 
     public LinkedList<Turn> getTurns() {

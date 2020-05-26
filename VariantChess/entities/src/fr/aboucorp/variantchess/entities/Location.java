@@ -41,7 +41,7 @@ public class Location implements Cloneable {
     }
 
     public String getStringValue() {
-       return "(" + x +","+ y + "," + z + ")";
+       return "(" + this.x +","+ this.y + "," + this.z + ")";
     }
 
     public static Location fromString(String string) throws NumberFormatException{

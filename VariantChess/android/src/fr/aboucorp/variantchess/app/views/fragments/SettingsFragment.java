@@ -9,6 +9,6 @@ import fr.aboucorp.variantchess.R;
 public class SettingsFragment extends PreferenceFragmentCompat {
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-        setPreferencesFromResource(R.xml.settings, rootKey);
+        this.setPreferencesFromResource(R.xml.settings, rootKey);
     }
 }

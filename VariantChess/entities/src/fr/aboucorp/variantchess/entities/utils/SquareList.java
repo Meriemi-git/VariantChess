@@ -5,7 +5,7 @@ import java.util.List;
 
 import fr.aboucorp.variantchess.entities.Square;
 
-public class SquareList extends ChessList<Square> {
+public class SquareList extends GameElementList<Square> {
     public Square getSquareByLabel(String label){
         for(Square square : this){
             if(square.getSquareLabel().toLowerCase().equals(label.toLowerCase())){

@@ -48,7 +48,7 @@ public class SignUpFragment extends VariantChessFragment implements Validator.Va
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        this.sessionManager = SessionManager.getInstance((MainActivity) this.getActivity());
+        this.sessionManager = SessionManager.getInstance(this.getActivity());
         this.bindViews();
         this.bindListeners();
         this.validator = new Validator(this);

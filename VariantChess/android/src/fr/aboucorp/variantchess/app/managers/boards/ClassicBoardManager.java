@@ -23,7 +23,7 @@ import fr.aboucorp.variantchess.entities.exceptions.FenStringBadFormatException;
 import fr.aboucorp.variantchess.entities.rules.ClassicRuleSet;
 import fr.aboucorp.variantchess.entities.utils.SquareList;
 import fr.aboucorp.variantchess.libgdx.Board3dManager;
-import fr.aboucorp.variantchess.libgdx.utils.ChessModelList;
+import fr.aboucorp.variantchess.libgdx.utils.GraphicGameArray;
 
 public class ClassicBoardManager extends BoardManager implements GameEventSubscriber {
 
@@ -248,7 +248,7 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
         return fenString.toString();
     }
 
-    public ChessModelList getPossibleSquareModels() {
+    public GraphicGameArray getPossibleSquareModels() {
         return this.board3dManager.getSquareModelsFromPossibleMoves(this.possiblesMoves);
     }
 
@@ -261,13 +261,6 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
         return null;
     }
 
-    public ChessModelList getBlackPieceModels() {
-        return this.board3dManager.getBlackPieceModels();
-    }
-
-    public ChessModelList getWhitePieceModels() {
-        return this.board3dManager.getWhitePieceModels();
-    }
 
     public ChessColor getWinner() {
         return ((ClassicRuleSet) this.ruleSet).getWinner();

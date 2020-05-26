@@ -1,7 +1,5 @@
 package fr.aboucorp.variantchess.entities.rules;
 
-import java.util.List;
-
 import fr.aboucorp.variantchess.entities.ChessColor;
 import fr.aboucorp.variantchess.entities.Piece;
 import fr.aboucorp.variantchess.entities.Square;
@@ -22,7 +20,7 @@ import fr.aboucorp.variantchess.entities.events.models.PieceEvent;
 import fr.aboucorp.variantchess.entities.events.models.TurnEndEvent;
 import fr.aboucorp.variantchess.entities.events.models.TurnEvent;
 import fr.aboucorp.variantchess.entities.events.models.TurnStartEvent;
-import fr.aboucorp.variantchess.entities.utils.ChessList;
+import fr.aboucorp.variantchess.entities.utils.GameElementList;
 import fr.aboucorp.variantchess.entities.utils.PieceList;
 
 public class ClassicRuleSet extends AbstractRuleSet implements GameEventSubscriber {
@@ -50,7 +48,7 @@ public class ClassicRuleSet extends AbstractRuleSet implements GameEventSubscrib
             this.gameEventManager.sendMessage(new CheckOutEvent("King out of check", BoardEventType.CHECK_OUT, piece.getPieceId()));
             this.kingIsInCheck = false;
         }
-        ChessList<Piece> causingCheck = piece.getMoveSet().moveCauseCheck(this.actualTurn.getTurnColor());
+        GameElementList<Piece> causingCheck = piece.getMoveSet().moveCauseCheck(this.actualTurn.getTurnColor());
         if (causingCheck.size() > 0) {
             this.kingIsInCheck = true;
             Piece kingInCheck = this.previousTurn.getTurnColor() == ChessColor.WHITE

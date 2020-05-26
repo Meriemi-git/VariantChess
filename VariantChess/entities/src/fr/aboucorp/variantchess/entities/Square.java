@@ -5,7 +5,7 @@ public class Square extends GameElement {
 
     private String squareLabel;
     private char columnLetter;
-    private fr.aboucorp.variantchess.entities.Piece piece;
+    private Piece piece;
 
     public Square(Location location, ChessColor chessColor) {
         super(location, chessColor);
@@ -18,7 +18,7 @@ public class Square extends GameElement {
         return '[' + this.squareLabel + ']';
     }
 
-    public fr.aboucorp.variantchess.entities.Piece getPiece() {
+    public Piece getPiece() {
         return this.piece;
     }
 

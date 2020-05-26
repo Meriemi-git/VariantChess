@@ -7,7 +7,8 @@ import com.badlogic.gdx.math.collision.Ray;
 
 import fr.aboucorp.variantchess.app.managers.boards.BoardManager;
 import fr.aboucorp.variantchess.libgdx.models.ChessModel;
-import fr.aboucorp.variantchess.libgdx.utils.ChessModelList;
+import fr.aboucorp.variantchess.libgdx.models.GraphicsGameElement;
+import fr.aboucorp.variantchess.libgdx.utils.GraphicGameArray;
 
 /**
  * Permet de trouver quel modèle 3D a été sélectionné en fonction des coordonnées du clic sur l'écran
@@ -23,15 +24,15 @@ class TouchedModelFinder {
     }
 
 
-    public ChessModel getTouchedModel(float screenX, float screenY, ChessModelList models) {
+    public GraphicsGameElement getTouched3DModel(float screenX, float screenY, GraphicGameArray models) {
         Ray ray = this.boardManager.getCamera().getPickRay(screenX, screenY);
         double distance = -1;
         int result = -1;
         for (int i = 0; i < models.size; i++) {
             Vector3 position = new Vector3();
-            final ChessModel piece = models.get(i);
-            piece.transform.getTranslation(position);
-            BoundingBox box = piece.calculateBoundingBox(new BoundingBox()).mul(piece.transform.cpy());
+            final GraphicsGameElement element = models.get(i);
+            element.getModel3d().transform.getTranslation(position);
+            BoundingBox box =  element.getModel3d().calculateBoundingBox(new BoundingBox()).mul( element.getModel3d().transform.cpy());
             position.add(box.getCenter(new Vector3()));
             double dist2 = ray.origin.dst2(position);
             if (distance > 0f && dist2 > distance) continue;
@@ -44,5 +45,9 @@ class TouchedModelFinder {
             return null;
         }
         return models.get(result);
+    }
+
+    public ChessModel getTouched2DModel(float screenX, float screenY, GraphicGameArray models) {
+        return null;
     }
 }

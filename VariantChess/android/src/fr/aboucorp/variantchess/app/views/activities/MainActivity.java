@@ -39,7 +39,7 @@ public class MainActivity extends VariantChessActivity  {
         this.setToolbar();
         this.sessionManager = SessionManager.getInstance(this);
         SharedPreferences pref = this.getSharedPreferences(SHARED_PREFERENCE_NAME, Context.MODE_PRIVATE);
-        userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
+        this.userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
         try {
             this.sessionManager.restoreSessionIfPossible(pref);
             this.userIsConnected(this.sessionManager.getUser());
@@ -95,7 +95,7 @@ public class MainActivity extends VariantChessActivity  {
             if (TextUtils.isEmpty(connected.getDisplayName())) {
                 this.setFragment(UsernameFragment.class, "username", null);
             } else {
-                userViewModel.setConnected(connected);
+                this.userViewModel.setConnected(connected);
                 this.setFragment(HomeFragment.class, "home", null);
                 Toast.makeText(this, R.string.connected, Toast.LENGTH_LONG).show();
             }
@@ -131,7 +131,7 @@ public class MainActivity extends VariantChessActivity  {
                 this.setFragment(AccountFragment.class, "account", null);
                 return true;
             case R.id.menu_action_settings:
-                setFragment(SettingsFragment.class, FragmentTag.SETTINGS, null);
+                this.setFragment(SettingsFragment.class, FragmentTag.SETTINGS, null);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

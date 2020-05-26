@@ -50,11 +50,11 @@ public class BoardActivity extends AndroidApplication implements GameEventSubscr
     @Override
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.board_layout);
+        this.setContentView(R.layout.board_layout);
         if(savedInstanceState != null){
             this.match = (Match) savedInstanceState.getSerializable("match");
         }else{
-            this.match = (Match) getIntent().getExtras().getSerializable("match");
+            this.match = (Match) this.getIntent().getExtras().getSerializable("match");
         }
         this.bindViews();
         this.bindListeners();
@@ -71,7 +71,7 @@ public class BoardActivity extends AndroidApplication implements GameEventSubscr
     private void setToolbar() {
         this.toolbar = this.findViewById(R.id.main_toolbar);
         this.toolbar.setTitle(this.getString(R.string.app_name));
-        this.toolbar.setSubtitle(this.user != null ? user.getDisplayName() : "Disconnected");
+        this.toolbar.setSubtitle(this.user != null ? this.user.getDisplayName() : "Disconnected");
         this.setActionBar(this.toolbar);
         this.toolbar.setNavigationOnClickListener(v -> this.onBackPressed());
         this.getActionBar().setDisplayHomeAsUpEnabled(true);
@@ -89,7 +89,7 @@ public class BoardActivity extends AndroidApplication implements GameEventSubscr
     }
 
     private void bindViews() {
-        this.board_panel = findViewById(R.id.board);
+        this.board_panel = this.findViewById(R.id.board);
         this.btn_end_turn = this.findViewById(R.id.btn_end_turn);
         this.lbl_turn = this.findViewById(R.id.lbl_turn);
         this.party_logs = this.findViewById(R.id.party_logs);
@@ -105,7 +105,7 @@ public class BoardActivity extends AndroidApplication implements GameEventSubscr
         this.boardManager = new ClassicBoardManager(this.board3dManager, classicBoard, classicRules,gameEventManager);
         this.matchManager = new MatchManager(this.boardManager,gameEventManager);
         AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
-        board_panel.addView(initializeForView(board3dManager, config));
+        this.board_panel.addView(this.initializeForView(this.board3dManager, config));
     }
 
     @Override

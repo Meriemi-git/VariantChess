@@ -112,7 +112,7 @@ public class SessionManager {
     public void signUpWithEmail(String mail, String password) {
         try {
             this.authentWithEmail(mail, password, ResultType.SIGNUP);
-            ((VariantChessActivity)this.activity).userIsConnected(user);
+            ((VariantChessActivity)this.activity).userIsConnected(this.user);
         } catch (Exception e) {
             Toast.makeText(this.activity, R.string.failed_login, Toast.LENGTH_LONG).show();
             Log.e("fr.aboucorp.variantchess", "Exception message=" + e.getMessage());

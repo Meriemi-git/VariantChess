@@ -56,7 +56,7 @@ public class SignInFragment extends VariantChessFragment  implements Validator.V
         this.bindListeners();
         this.validator = new Validator(this);
         this.validator.setValidationListener(this);
-        this.sessionManager = SessionManager.getInstance((MainActivity) this.getActivity());
+        this.sessionManager = SessionManager.getInstance(this.getActivity());
     }
 
     @Override

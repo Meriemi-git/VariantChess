@@ -19,8 +19,7 @@ import fr.aboucorp.variantchess.entities.events.models.PieceEvent;
 import fr.aboucorp.variantchess.entities.events.models.TurnEvent;
 import fr.aboucorp.variantchess.entities.events.models.TurnStartEvent;
 import fr.aboucorp.variantchess.entities.moves.movesets.KingMoveSet;
-import fr.aboucorp.variantchess.entities.pieces.King;
-import fr.aboucorp.variantchess.entities.utils.ChessList;
+import fr.aboucorp.variantchess.entities.utils.GameElementList;
 import fr.aboucorp.variantchess.entities.utils.PieceList;
 import fr.aboucorp.variantchess.entities.utils.SquareList;
 
@@ -103,8 +102,8 @@ public abstract class AbstractMoveSet implements GameEventSubscriber {
         return uncheckingMoves;
     }
 
-    public ChessList<Piece> moveCauseCheck(ChessColor color) {
-        ChessList<Piece> causingChecks = new PieceList();
+    public GameElementList<Piece> moveCauseCheck(ChessColor color) {
+        GameElementList<Piece> causingChecks = new PieceList();
         for (Piece piece : this.classicBoard.getPiecesByColor(color)) {
              Piece causingCheck = this.moveCausingSingleCheck(piece, color);
              if(causingCheck != null) {

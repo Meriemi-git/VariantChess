@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 
 import fr.aboucorp.variantchess.entities.enums.PieceId;
 import fr.aboucorp.variantchess.libgdx.models.ChessModel;
+import fr.aboucorp.variantchess.libgdx.models.GraphicsGameElement;
 
 class Material3dManager {
     private Material selectedPieceMaterial;
@@ -26,24 +27,38 @@ class Material3dManager {
     }
 
 
-    public void resetMaterial(ChessModel piece) {
-        Material oldMat = piece.materials.get(0);
-        oldMat.clear();
-        oldMat.set(piece.getOriginalMaterial());
+    public void resetMaterial(GraphicsGameElement element, boolean isTactical) {
+        if(isTactical){
+            // TODO
+        }else{
+            Material oldMat = element.getModel3d().materials.get(0);
+            oldMat.clear();
+            oldMat.set(element.getModel3d().getOriginalMaterial());
+        }
+
     }
 
-    public void setSelectedMaterial(ChessModel model) {
-        this.setMaterial(model,this.selectedPieceMaterial);
+    public void setSelectedMaterial(GraphicsGameElement element, boolean isTactical) {
+        if(isTactical){
+            // TODO
+        }else {
+            this.set3DMaterial(element.getModel3d(),this.selectedPieceMaterial);
+        }
+
     }
 
-    private void setMaterial(ChessModel model, Material material){
+    private void set3DMaterial(ChessModel model, Material material){
         Material actualMaterial = model.materials.get(0);
         actualMaterial.clear();
         actualMaterial.set(material);
     }
 
-    public void setOccupiedMaterial(ChessModel model) {
-        this.setMaterial(model,this.occupiedMaterial);
+    public void setOccupiedMaterial(GraphicsGameElement element, boolean isTactical) {
+        if(isTactical){
+            // TODO
+        }else {
+            this.set3DMaterial(element.getModel3d(),this.occupiedMaterial);
+        }
     }
 
     public String getRegionNameFromPieceId(PieceId id) {

@@ -17,7 +17,6 @@ import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
-import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
@@ -38,6 +37,7 @@ import fr.aboucorp.variantchess.entities.GameElement;
 import fr.aboucorp.variantchess.entities.Location;
 import fr.aboucorp.variantchess.entities.Piece;
 import fr.aboucorp.variantchess.entities.Square;
+import fr.aboucorp.variantchess.entities.enums.PieceId;
 import fr.aboucorp.variantchess.entities.pieces.Bishop;
 import fr.aboucorp.variantchess.entities.pieces.King;
 import fr.aboucorp.variantchess.entities.pieces.Knight;
@@ -48,13 +48,14 @@ import fr.aboucorp.variantchess.entities.utils.SquareList;
 import fr.aboucorp.variantchess.libgdx.models.ChessModel;
 import fr.aboucorp.variantchess.libgdx.models.ChessPieceM;
 import fr.aboucorp.variantchess.libgdx.models.ChessSquareM;
+import fr.aboucorp.variantchess.libgdx.models.GraphicsGameElement;
 import fr.aboucorp.variantchess.libgdx.models.pieces.BishopM;
 import fr.aboucorp.variantchess.libgdx.models.pieces.KingM;
 import fr.aboucorp.variantchess.libgdx.models.pieces.KnightM;
 import fr.aboucorp.variantchess.libgdx.models.pieces.PawnM;
 import fr.aboucorp.variantchess.libgdx.models.pieces.QueenM;
 import fr.aboucorp.variantchess.libgdx.models.pieces.RookM;
-import fr.aboucorp.variantchess.libgdx.utils.ChessModelList;
+import fr.aboucorp.variantchess.libgdx.utils.GraphicGameArray;
 
 public class Board3dManager extends ApplicationAdapter {
 
@@ -89,30 +90,28 @@ public class Board3dManager extends ApplicationAdapter {
 
     private boolean tacticalViewEnabled;
 
-    private final ChessModelList chessSquareModels;
-    private final ChessModelList whitePieceModels;
-    private final ChessModelList blackPieceModels;
-    private final ChessModelList whiteDeadPieceModels;
-    private final ChessModelList blackDeadPieceModels;
+    private final GraphicGameArray chessSquareModels;
+    private final GraphicGameArray whitePieceModels;
+    private final GraphicGameArray blackPieceModels;
+    private final GraphicGameArray whiteDeadPieceModels;
+    private final GraphicGameArray blackDeadPieceModels;
     private final ArrayList<Piece> loadingPieces;
-    private final ArrayList<ModelInstance> devStuff;
     private static Map<Class, String> assetPaths = new HashMap<>();
 
     private ModelBuilder modelBuilder;
     private AssetManager assets;
     private boolean boardIsLoading;
-    private ChessModel selectedModel;
+    private GraphicsGameElement selectedModel;
     private Material3dManager material3dManager;
     private TextureAtlas piecesAtlas;
 
     public Board3dManager() {
-        this.devStuff = new ArrayList<>();
         this.material3dManager =new Material3dManager();
-        this.whitePieceModels = new ChessModelList();
-        this.whiteDeadPieceModels = new ChessModelList();
-        this.blackPieceModels = new ChessModelList();
-        this.blackDeadPieceModels = new ChessModelList();
-        this.chessSquareModels = new ChessModelList();
+        this.whitePieceModels = new GraphicGameArray();
+        this.whiteDeadPieceModels = new GraphicGameArray();
+        this.blackPieceModels = new GraphicGameArray();
+        this.blackDeadPieceModels = new GraphicGameArray();
+        this.chessSquareModels = new GraphicGameArray();
         this.loadingPieces = new ArrayList<>();
     }
 
@@ -142,35 +141,33 @@ public class Board3dManager extends ApplicationAdapter {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         this.modelBatch.begin(this.camera);
-        for (ChessModel piece : this.whitePieceModels) {
+        for (GraphicsGameElement piece : this.whitePieceModels) {
             if (piece.isVisible(this.camera) && !this.tacticalViewEnabled) {
-                this.modelBatch.render(piece, this.environment);
+                this.modelBatch.render(piece.getModel3d(), this.environment);
             }
         }
 
-        for (ChessModel piece : this.blackPieceModels) {
+        for (GraphicsGameElement piece : this.blackPieceModels) {
             if (piece.isVisible(this.camera) && !this.tacticalViewEnabled) {
-                this.modelBatch.render(piece, this.environment);
+                this.modelBatch.render(piece.getModel3d(), this.environment);
             }
         }
-        for (ChessModel deadPiece : this.whiteDeadPieceModels) {
+        for (GraphicsGameElement deadPiece : this.whiteDeadPieceModels) {
             if (deadPiece.isVisible(this.camera) && !this.tacticalViewEnabled) {
-                this.modelBatch.render(deadPiece, this.environment);
+                this.modelBatch.render(deadPiece.getModel3d(), this.environment);
             }
         }
-        for (ChessModel deadPiece : this.blackDeadPieceModels) {
+        for (GraphicsGameElement deadPiece : this.blackDeadPieceModels) {
             if (deadPiece.isVisible(this.camera) && !this.tacticalViewEnabled) {
-                this.modelBatch.render(deadPiece, this.environment);
+                this.modelBatch.render(deadPiece.getModel3d(), this.environment);
             }
         }
-        for (ChessModel squareModel : this.chessSquareModels) {
+        for (GraphicsGameElement squareModel : this.chessSquareModels) {
             if (squareModel.isVisible(this.camera)) {
-                this.modelBatch.render(squareModel, this.environment);
+                this.modelBatch.render(squareModel.getModel3d(), this.environment);
             }
         }
-        for (ModelInstance stuff : this.devStuff) {
-            this.modelBatch.render(stuff, this.environment);
-        }
+
         this.modelBatch.end();
         if (this.tacticalViewEnabled) {
             this.displayPictures();
@@ -190,7 +187,8 @@ public class Board3dManager extends ApplicationAdapter {
                     .rotate(0, 1, 0, 180);
 
             this.spriteBatch.setProjectionMatrix(tmpMat4.set(this.camera.combined).mul(textTransform));
-            TextureAtlas.AtlasRegion region = this.piecesAtlas.findRegion(this.material3dManager.getRegionNameFromPieceId(((ChessPieceM) piece).id));
+            String id = this.material3dManager.getRegionNameFromPieceId(((ChessPieceM) piece.getModel3d()).id);
+            TextureAtlas.AtlasRegion region = this.piecesAtlas.findRegion(id);
             Sprite pieceSprite = new Sprite(region);
             this.spriteBatch.draw(pieceSprite, 0, 0, 24, 24);
         });
@@ -206,7 +204,8 @@ public class Board3dManager extends ApplicationAdapter {
                     .rotate(0, 1, 0, 180);
 
             this.spriteBatch.setProjectionMatrix(tmpMat4.set(this.camera.combined).mul(textTransform));
-            TextureAtlas.AtlasRegion region = this.piecesAtlas.findRegion(this.material3dManager.getRegionNameFromPieceId(((ChessPieceM) piece).id));
+            String id = this.material3dManager.getRegionNameFromPieceId(((ChessPieceM) piece.getModel3d()).id);
+            TextureAtlas.AtlasRegion region = this.piecesAtlas.findRegion(id);
             Sprite pieceSprite = new Sprite(region);
             this.spriteBatch.draw(pieceSprite, 0, 0, 24, 24);
         });
@@ -221,7 +220,8 @@ public class Board3dManager extends ApplicationAdapter {
                     .rotate(0, 1, 0, 180);
 
             this.spriteBatch.setProjectionMatrix(tmpMat4.set(this.camera.combined).mul(textTransform));
-            TextureAtlas.AtlasRegion region = this.piecesAtlas.findRegion(this.material3dManager.getRegionNameFromPieceId(((ChessPieceM) piece).id));
+            String id = this.material3dManager.getRegionNameFromPieceId(((ChessPieceM) piece.getModel3d()).id);
+            TextureAtlas.AtlasRegion region = this.piecesAtlas.findRegion(id);
             Sprite pieceSprite = new Sprite(region);
             this.spriteBatch.draw(pieceSprite, 0, 0, 24, 24);
         });
@@ -236,7 +236,8 @@ public class Board3dManager extends ApplicationAdapter {
                     .rotate(0, 1, 0, 180);
 
             this.spriteBatch.setProjectionMatrix(tmpMat4.set(this.camera.combined).mul(textTransform));
-            TextureAtlas.AtlasRegion region = this.piecesAtlas.findRegion(this.material3dManager.getRegionNameFromPieceId(((ChessPieceM) piece).id));
+            String id = this.material3dManager.getRegionNameFromPieceId(((ChessPieceM) piece.getModel3d()).id);
+            TextureAtlas.AtlasRegion region = this.piecesAtlas.findRegion(id);
             Sprite pieceSprite = new Sprite(region);
             this.spriteBatch.draw(pieceSprite, 0, 0, 24, 24);
         });
@@ -266,7 +267,9 @@ private void setPaths() {
                 material = new Material(ColorAttribute.createDiffuse(Color.WHITE));
             }
             ChessSquareM squareModel = new ChessSquareM(compositeModel, square.getLocation(), material, ((Square) square).getSquareLabel());
-            this.chessSquareModels.add(squareModel);
+            GraphicsGameElement element = new GraphicsGameElement(square.getLocation());
+            element.setModel3d(squareModel);
+            this.chessSquareModels.add(element);
         }
 
     }
@@ -304,94 +307,104 @@ private void setPaths() {
     }
 
     private void doneLoading() {
-        try {
-            Model knightModel = this.assets.get("data/knight.g3db", Model.class);
-            Model bishopModel = this.assets.get("data/bishop.g3db", Model.class);
-            Model pawnModel = this.assets.get("data/pawn.g3db", Model.class);
-            Model queenModel = this.assets.get("data/queen.g3db", Model.class);
-            Model kingModel = this.assets.get("data/king.g3db", Model.class);
-            Model rookModel = this.assets.get("data/rook.g3db", Model.class);
-            this.piecesAtlas = this.assets.get(assetPaths.get(Piece.class), TextureAtlas.class);
-            for (Iterator<Piece> iter = this.loadingPieces.iterator(); iter.hasNext(); ) {
-                Piece piece = iter.next();
-                Material material;
-                if (piece.getChessColor() == ChessColor.WHITE) {
-                    material = new Material(ColorAttribute.createDiffuse(Color.WHITE));
-                } else {
-                    material = new Material(ColorAttribute.createDiffuse(Color.GRAY));
-                }
-                ChessPieceM model = null;
-                if (piece instanceof Rook) {
-                    model = new RookM(rookModel, piece.getLocation(), material, piece.getPieceId());
-                } else if (piece instanceof Pawn) {
-                    model = new PawnM(pawnModel, piece.getLocation(), material, piece.getPieceId());
-                } else if (piece instanceof Knight) {
-                    model = new KnightM(knightModel, piece.getLocation(), material, piece.getPieceId());
-                    if (piece.getChessColor() == ChessColor.WHITE) {
-                        model.transform.rotate(Vector3.Y, -90);
-                    } else {
-                        model.transform.rotate(Vector3.Y, 90);
-                    }
-                } else if (piece instanceof Bishop) {
-                    model = new BishopM(bishopModel, piece.getLocation(), material, piece.getPieceId());
-                    if (piece.getChessColor() == ChessColor.WHITE) {
-                        model.transform.rotate(Vector3.Y, -90);
-                    } else {
-                        model.transform.rotate(Vector3.Y, 90);
-                    }
-                } else if (piece instanceof King) {
-                    model = new KingM(kingModel, piece.getLocation(), material, piece.getPieceId());
-                } else if (piece instanceof Queen) {
-                    model = new QueenM(queenModel, piece.getLocation(), material, piece.getPieceId());
-                }
-                if (piece.getChessColor() == ChessColor.BLACK) {
-                    this.blackPieceModels.add(model);
-                } else {
-                    this.whitePieceModels.add(model);
-                }
-                iter.remove();
-            }
-        }catch(Exception ex){
-            ex.printStackTrace();
+        if(this.tacticalViewEnabled){
+            this.load3dModels();
+        }else{
+            this.load2dModels();
         }
         this.boardIsLoading = false;
     }
 
+    private void load2dModels() {
+        this.piecesAtlas = this.assets.get(assetPaths.get(Piece.class), TextureAtlas.class);
+
+    }
+
+    private void load3dModels() {
+        Model knightModel = this.assets.get("data/knight.g3db", Model.class);
+        Model bishopModel = this.assets.get("data/bishop.g3db", Model.class);
+        Model pawnModel = this.assets.get("data/pawn.g3db", Model.class);
+        Model queenModel = this.assets.get("data/queen.g3db", Model.class);
+        Model kingModel = this.assets.get("data/king.g3db", Model.class);
+        Model rookModel = this.assets.get("data/rook.g3db", Model.class);
+        for (Iterator<Piece> iter = this.loadingPieces.iterator(); iter.hasNext(); ) {
+            Piece piece = iter.next();
+            Material material;
+            if (piece.getChessColor() == ChessColor.WHITE) {
+                material = new Material(ColorAttribute.createDiffuse(Color.WHITE));
+            } else {
+                material = new Material(ColorAttribute.createDiffuse(Color.GRAY));
+            }
+            ChessPieceM model = null;
+            if (piece instanceof Rook) {
+                model = new RookM(rookModel, piece.getLocation(), material, piece.getPieceId());
+            } else if (piece instanceof Pawn) {
+                model = new PawnM(pawnModel, piece.getLocation(), material, piece.getPieceId());
+            } else if (piece instanceof Knight) {
+                model = new KnightM(knightModel, piece.getLocation(), material, piece.getPieceId());
+                if (piece.getChessColor() == ChessColor.WHITE) {
+                    model.transform.rotate(Vector3.Y, -90);
+                } else {
+                    model.transform.rotate(Vector3.Y, 90);
+                }
+            } else if (piece instanceof Bishop) {
+                model = new BishopM(bishopModel, piece.getLocation(), material, piece.getPieceId());
+                if (piece.getChessColor() == ChessColor.WHITE) {
+                    model.transform.rotate(Vector3.Y, -90);
+                } else {
+                    model.transform.rotate(Vector3.Y, 90);
+                }
+            } else if (piece instanceof King) {
+                model = new KingM(kingModel, piece.getLocation(), material, piece.getPieceId());
+            } else if (piece instanceof Queen) {
+                model = new QueenM(queenModel, piece.getLocation(), material, piece.getPieceId());
+            }
+            GraphicsGameElement element = new GraphicsGameElement(model.getLocation());
+            element.setModel3d(model);
+            if (piece.getChessColor() == ChessColor.BLACK) {
+                this.blackPieceModels.add(element);
+            } else {
+                this.whitePieceModels.add(element);
+            }
+            iter.remove();
+        }
+    }
+
     public void selectPiece(Piece touched) {
         if (this.selectedModel != null) {
-            this.material3dManager.resetMaterial(this.selectedModel);
+            this.material3dManager.resetMaterial(this.selectedModel, this.tacticalViewEnabled);
         }
-        ChessModel pieceModel;
+        GraphicsGameElement element;
         if (touched.getChessColor() == ChessColor.BLACK) {
-            pieceModel = this.blackPieceModels.getByLocation(touched.getLocation());
+            element = this.blackPieceModels.getByLocation(touched.getLocation());
 
         } else {
-            pieceModel = this.whitePieceModels.getByLocation(touched.getLocation());
+            element = this.whitePieceModels.getByLocation(touched.getLocation());
         }
-        this.material3dManager.setSelectedMaterial(pieceModel);
-        this.selectedModel = pieceModel;
+        this.material3dManager.setSelectedMaterial(element, this.tacticalViewEnabled);
+        this.selectedModel = element;
     }
 
     public void resetSelection() {
         if (this.selectedModel != null) {
-            this.material3dManager.resetMaterial(this.selectedModel);
+            this.material3dManager.resetMaterial(this.selectedModel, this.tacticalViewEnabled);
         }
         this.selectedModel = null;
-        for (Iterator<ChessModel> iter = this.chessSquareModels.iterator(); iter.hasNext(); ) {
-            ChessModel square = iter.next();
-            this.material3dManager.resetMaterial(square);
+        for (Iterator<GraphicsGameElement> iter = this.chessSquareModels.iterator(); iter.hasNext(); ) {
+            GraphicsGameElement square = iter.next();
+            this.material3dManager.resetMaterial(square, this.tacticalViewEnabled);
         }
     }
 
-    public fr.aboucorp.variantchess.libgdx.utils.ChessModelList getWhitePieceModels() {
+    public GraphicGameArray getWhitePieceModels() {
         return this.whitePieceModels;
     }
 
-    public fr.aboucorp.variantchess.libgdx.utils.ChessModelList getBlackPieceModels() {
+    public GraphicGameArray getBlackPieceModels() {
         return this.blackPieceModels;
     }
 
-    private ChessModelList getChessSquareModels() {
+    private GraphicGameArray getChessSquareModels() {
         return this.chessSquareModels;
     }
 
@@ -424,39 +437,39 @@ private void setPaths() {
     }
 
     public void moveSelectedPieceIntoSquare(Square square) {
-        this.selectedModel.move(square.getLocation());
+        this.move(this.selectedModel,square.getLocation());
     }
 
     public void highlightEmptySquareFromLocation(Square square) {
-        this.material3dManager.setSelectedMaterial(this.chessSquareModels.getByLocation(square.getLocation()));
+        this.material3dManager.setSelectedMaterial(this.chessSquareModels.getByLocation(square.getLocation()), this.tacticalViewEnabled);
     }
 
     public void highlightOccupiedSquareFromLocation(Square square) {
-        this.material3dManager.setOccupiedMaterial(this.chessSquareModels.getByLocation(square.getLocation()));
+        this.material3dManager.setOccupiedMaterial(this.chessSquareModels.getByLocation(square.getLocation()), this.tacticalViewEnabled);
         if (square.getPiece().getChessColor() == ChessColor.WHITE) {
-            this.material3dManager.setOccupiedMaterial(this.getWhitePieceModels().getByLocation(square.getPiece().getLocation()));
+            this.material3dManager.setOccupiedMaterial(this.getWhitePieceModels().getByLocation(square.getPiece().getLocation()), this.tacticalViewEnabled);
         } else {
-            this.material3dManager.setOccupiedMaterial(this.getBlackPieceModels().getByLocation(square.getPiece().getLocation()));
+            this.material3dManager.setOccupiedMaterial(this.getBlackPieceModels().getByLocation(square.getPiece().getLocation()), this.tacticalViewEnabled);
         }
     }
 
     public void moveToSquare(Piece piece, Square square) {
-        ChessModel pieceModel;
+        GraphicsGameElement element;
         if (piece.getChessColor() == ChessColor.WHITE) {
-            pieceModel = this.getWhitePieceModels().getByLocation(piece.getLocation());
+            element = this.getWhitePieceModels().getByLocation(piece.getLocation());
         } else {
-            pieceModel = this.getBlackPieceModels().getByLocation(piece.getLocation());
+            element = this.getBlackPieceModels().getByLocation(piece.getLocation());
         }
-        pieceModel.move(square.getLocation());
+        this.move(element,square.getLocation());
     }
 
-    public ChessModelList getSquareModelsFromPossibleMoves(SquareList possiblesMoves) {
-        ChessModelList possibleSquares = new ChessModelList();
+    public GraphicGameArray getSquareModelsFromPossibleMoves(SquareList possiblesMoves) {
+        GraphicGameArray possibleSquares = new GraphicGameArray();
         if (possiblesMoves != null) {
-            for (ChessModel squareModel : this.getChessSquareModels()) {
+            for (GraphicsGameElement element : this.getChessSquareModels()) {
                 for (Square square : possiblesMoves) {
-                    if (squareModel.getLocation().equals(square.getLocation())) {
-                        possibleSquares.add(squareModel);
+                    if (element.getLocation().equals(square.getLocation())) {
+                        possibleSquares.add(element);
                     }
                 }
             }
@@ -466,34 +479,46 @@ private void setPaths() {
 
     public void unHighlightSquares(SquareList possiblesMoves) {
         for (Square square : possiblesMoves) {
-            this.material3dManager.resetMaterial(this.getChessSquareModels().getByLocation(square.getLocation()));
+            this.material3dManager.resetMaterial(this.getChessSquareModels().getByLocation(square.getLocation()), this.tacticalViewEnabled);
             if (square.getPiece() != null) {
                 if (square.getPiece().getChessColor() == ChessColor.WHITE) {
-                    this.material3dManager.resetMaterial(this.getWhitePieceModels().getByLocation(square.getPiece().getLocation()));
+                    this.material3dManager.resetMaterial(this.getWhitePieceModels().getByLocation(square.getPiece().getLocation()), this.tacticalViewEnabled);
                 } else {
-                    this.material3dManager.resetMaterial(this.getBlackPieceModels().getByLocation(square.getPiece().getLocation()));
+                    this.material3dManager.resetMaterial(this.getBlackPieceModels().getByLocation(square.getPiece().getLocation()), this.tacticalViewEnabled);
                 }
             }
         }
     }
 
-    public void moveToEven(Piece piece) {
-        ChessModel eatenPiece;
-        if (piece.getChessColor() == ChessColor.WHITE) {
-            eatenPiece = this.getWhitePieceModels().removeByLocation(piece.getLocation());
-            int xpos = 7 + (this.whiteDeadPieceModels.size < 8 ? 1 : 2);
-            int zpos = this.whiteDeadPieceModels.size < 8 ? 7 - this.whiteDeadPieceModels.size : 7 - (this.whiteDeadPieceModels.size - 8);
-            eatenPiece.move(new Location(xpos, 0, zpos));
-            this.whiteDeadPieceModels.add(eatenPiece);
-        } else {
-            eatenPiece = this.getBlackPieceModels().removeByLocation(piece.getLocation());
-            int xpos = 0 - (this.blackDeadPieceModels.size < 8 ? 1 : 2);
-            int zpos = this.blackDeadPieceModels.size < 8 ? this.blackDeadPieceModels.size : this.blackDeadPieceModels.size - 8;
-            eatenPiece.move(new Location(xpos, 0, zpos));
-            this.blackDeadPieceModels.add(eatenPiece);
+    private void move(GraphicsGameElement element, Location location){
+        if(this.tacticalViewEnabled){
+            element.move2D(location);
+        }else {
+            element.move3D(location);
         }
-        this.material3dManager.resetMaterial(eatenPiece);
-        eatenPiece.transform.rotate(Vector3.Y, 180);
+    }
+
+    public void moveToEven(Piece piece) {
+        if(this.tacticalViewEnabled){
+            // TODO
+        }else {
+            GraphicsGameElement eatenPiece;
+            if (piece.getChessColor() == ChessColor.WHITE) {
+                eatenPiece = this.getWhitePieceModels().removeByLocation(piece.getLocation());
+                int xpos = 7 + (this.whiteDeadPieceModels.size < 8 ? 1 : 2);
+                int zpos = this.whiteDeadPieceModels.size < 8 ? 7 - this.whiteDeadPieceModels.size : 7 - (this.whiteDeadPieceModels.size - 8);
+                this.move(eatenPiece, new Location(xpos, 0, zpos));
+                this.whiteDeadPieceModels.add(eatenPiece);
+            } else {
+                eatenPiece = this.getBlackPieceModels().removeByLocation(piece.getLocation());
+                int xpos = 0 - (this.blackDeadPieceModels.size < 8 ? 1 : 2);
+                int zpos = this.blackDeadPieceModels.size < 8 ? this.blackDeadPieceModels.size : this.blackDeadPieceModels.size - 8;
+                this.move(eatenPiece, new Location(xpos, 0, zpos));
+                this.blackDeadPieceModels.add(eatenPiece);
+            }
+            this.material3dManager.resetMaterial(eatenPiece, this.tacticalViewEnabled);
+            eatenPiece.getModel3d().transform.rotate(Vector3.Y, 180);
+        }
     }
 
     public void clearBoard() {
@@ -503,7 +528,6 @@ private void setPaths() {
         this.whiteDeadPieceModels.clear();
         this.blackDeadPieceModels.clear();
         this.chessSquareModels.clear();
-        this.devStuff.clear();
     }
 
     public void toogleTacticalView() {

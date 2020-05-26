@@ -25,7 +25,7 @@ public class HomeFragment extends VariantChessFragment {
         super.onViewCreated(view, savedInstanceState);
         this.bindViews();
         this.bindListeners();
-        this.sessionManager = SessionManager.getInstance((MainActivity) this.getActivity());
+        this.sessionManager = SessionManager.getInstance(this.getActivity());
     }
 
     @Override

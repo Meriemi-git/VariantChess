@@ -29,7 +29,7 @@ import fr.aboucorp.variantchess.entities.exceptions.FenStringBadFormatException;
 import fr.aboucorp.variantchess.entities.rules.AbstractRuleSet;
 import fr.aboucorp.variantchess.entities.utils.SquareList;
 import fr.aboucorp.variantchess.libgdx.Board3dManager;
-import fr.aboucorp.variantchess.libgdx.utils.ChessModelList;
+import fr.aboucorp.variantchess.libgdx.utils.GraphicGameArray;
 
 public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycle {
     protected final Board board;
@@ -110,23 +110,25 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
         this.gameState = GameState.SelectPiece;
     }
 
-    public ChessModelList getPiecesModelsFromActualTurn() {
+    public GraphicGameArray get3DModelsForTurn() {
         if (this.actualTurn.getTurnColor() == ChessColor.BLACK) {
-            return this.getBlackPieceModels();
+            return this.board3dManager.getBlackPieceModels();
         } else {
-            return this.getWhitePieceModels();
+            return this.board3dManager.getWhitePieceModels();
         }
     }
 
-    protected abstract ChessModelList getBlackPieceModels();
+    public GraphicGameArray get2DModelsForTurn() {
+        // TODO
+        return null;
+    }
 
-    protected abstract ChessModelList getWhitePieceModels();
 
     public abstract Square getSquareFromLocation(Location location);
 
     public abstract ChessColor getWinner();
 
-    public abstract ChessModelList getPossibleSquareModels();
+    public abstract GraphicGameArray getPossibleSquareModels();
 
     public Camera getCamera() {
         return this.board3dManager.getCamera();
@@ -169,6 +171,8 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
     }
 
     public abstract String getFenFromBoard();
+
+
 
     public interface BoardLoadingListener {
         void OnBoardLoaded();
