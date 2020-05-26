@@ -18,7 +18,6 @@ import java.util.List;
 
 import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
-import fr.aboucorp.variantchess.app.views.activities.MainActivity;
 
 
 public class SignUpFragment extends VariantChessFragment implements Validator.ValidationListener {

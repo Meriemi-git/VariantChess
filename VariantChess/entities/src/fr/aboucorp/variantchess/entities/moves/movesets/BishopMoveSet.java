@@ -12,7 +12,7 @@ import fr.aboucorp.variantchess.entities.utils.SquareList;
 public class BishopMoveSet extends AbstractMoveSet {
 
     public BishopMoveSet(Piece thisPiece, ClassicBoard classicBoard, GameEventManager gameEventManager) {
-        super(thisPiece, classicBoard,gameEventManager);
+        super(thisPiece, classicBoard, gameEventManager);
     }
 
     @Override
@@ -21,50 +21,50 @@ public class BishopMoveSet extends AbstractMoveSet {
         SquareList validSquares = new SquareList();
         Location start = piece.getLocation();
         // top left direction
-        for(float x = start.getX()+1, z = start.getZ()+1 ; x < 8 && z < 8; x++,z++ ){
-            Square validSquare = (Square) allSquares.getItemByLocation(new Location(x,0,z));
-            if(validSquare != null && validSquare.getPiece() == null){
+        for (float x = start.getX() + 1, z = start.getZ() + 1; x < 8 && z < 8; x++, z++) {
+            Square validSquare = (Square) allSquares.getItemByLocation(new Location(x, 0, z));
+            if (validSquare != null && validSquare.getPiece() == null) {
                 validSquares.add(validSquare);
-            }else if(validSquare.getPiece().getChessColor() != turnColor){
+            } else if (validSquare.getPiece().getChessColor() != turnColor) {
                 validSquares.add(validSquare);
                 break;
-            }else{
+            } else {
                 break;
             }
         }
         // Top Right direction
-        for(float x = start.getX()-1, z = start.getZ()+1 ; x >= 0 && z < 8; x--,z++ ){
-            Square validSquare = (Square) allSquares.getItemByLocation(new Location(x,0,z));
-            if(validSquare != null && validSquare.getPiece() == null){
+        for (float x = start.getX() - 1, z = start.getZ() + 1; x >= 0 && z < 8; x--, z++) {
+            Square validSquare = (Square) allSquares.getItemByLocation(new Location(x, 0, z));
+            if (validSquare != null && validSquare.getPiece() == null) {
                 validSquares.add(validSquare);
-            }else if(validSquare.getPiece().getChessColor() != turnColor){
+            } else if (validSquare.getPiece().getChessColor() != turnColor) {
                 validSquares.add(validSquare);
                 break;
-            }else{
+            } else {
                 break;
             }
         }
         // Down Left direction
-        for(float x = start.getX()-1, z = start.getZ()-1 ; x >= 0 && z >= 0; x--,z-- ){
-            Square validSquare = (Square) allSquares.getItemByLocation(new Location(x,0,z));
-            if(validSquare != null && validSquare.getPiece() == null){
+        for (float x = start.getX() - 1, z = start.getZ() - 1; x >= 0 && z >= 0; x--, z--) {
+            Square validSquare = (Square) allSquares.getItemByLocation(new Location(x, 0, z));
+            if (validSquare != null && validSquare.getPiece() == null) {
                 validSquares.add(validSquare);
-            }else if(validSquare.getPiece().getChessColor() != turnColor){
+            } else if (validSquare.getPiece().getChessColor() != turnColor) {
                 validSquares.add(validSquare);
                 break;
-            }else{
+            } else {
                 break;
             }
         }
         // Down Right direction
-        for(float x = start.getX()+1, z = start.getZ()-1 ; x < 8 && z >= 0; x++,z-- ){
-            Square validSquare = (Square) allSquares.getItemByLocation(new Location(x,0,z));
-            if(validSquare != null && validSquare.getPiece() == null){
+        for (float x = start.getX() + 1, z = start.getZ() - 1; x < 8 && z >= 0; x++, z--) {
+            Square validSquare = (Square) allSquares.getItemByLocation(new Location(x, 0, z));
+            if (validSquare != null && validSquare.getPiece() == null) {
                 validSquares.add(validSquare);
-            }else if(validSquare.getPiece().getChessColor() != turnColor){
+            } else if (validSquare.getPiece().getChessColor() != turnColor) {
                 validSquares.add(validSquare);
                 break;
-            }else{
+            } else {
                 break;
             }
         }

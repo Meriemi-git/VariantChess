@@ -75,10 +75,10 @@ task copyAndroidNatives {
             def outputDir = null
             if (jar.name.endsWith("natives-arm64-v8a.jar")) outputDir = file("libs/arm64-v8a")
             if (jar.name.endsWith("natives-armeabi-v7a.jar")) outputDir = file("libs/armeabi-v7a")
-            if(jar.name.endsWith("natives-armeabi.jar")) outputDir = file("libs/armeabi")
-            if(jar.name.endsWith("natives-x86_64.jar")) outputDir = file("libs/x86_64")
-            if(jar.name.endsWith("natives-x86.jar")) outputDir = file("libs/x86")
-            if(outputDir != null) {
+            if (jar.name.endsWith("natives-armeabi.jar")) outputDir = file("libs/armeabi")
+            if (jar.name.endsWith("natives-x86_64.jar")) outputDir = file("libs/x86_64")
+            if (jar.name.endsWith("natives-x86.jar")) outputDir = file("libs/x86")
+            if (outputDir != null) {
                 copy {
                     from zipTree(jar)
                     into outputDir
@@ -144,19 +144,19 @@ dependencies {
     def nav_version = "2.3.0-alpha06"
 
     // Java language implementation
-   /* implementation "androidx.navigation:navigation-fragment:$nav_version"
-    implementation "androidx.navigation:navigation-ui:$nav_version"
+    /* implementation "androidx.navigation:navigation-fragment:$nav_version"
+     implementation "androidx.navigation:navigation-ui:$nav_version"
 
-    // Kotlin
-    implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
-    implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
+     // Kotlin
+     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
+     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
 
-    // Dynamic Feature Module Support
-    implementation "androidx.navigation:navigation-dynamic-features-fragment:$nav_version"
+     // Dynamic Feature Module Support
+     implementation "androidx.navigation:navigation-dynamic-features-fragment:$nav_version"
 
 
-    // Testing Navigation
-    androidTestImplementation "androidx.navigation:navigation-testing:$nav_version"*/
+     // Testing Navigation
+     androidTestImplementation "androidx.navigation:navigation-testing:$nav_version"*/
 
 
     // Google API
@@ -166,7 +166,8 @@ dependencies {
     def room_version = "2.2.5"
 
     implementation "androidx.room:room-runtime:$room_version"
-    annotationProcessor "androidx.room:room-compiler:$room_version" // For Kotlin use kapt instead of annotationProcessor
+    annotationProcessor "androidx.room:room-compiler:$room_version"
+    // For Kotlin use kapt instead of annotationProcessor
 
     // optional - Kotlin Extensions and Coroutines support for Room
     implementation "androidx.room:room-ktx:$room_version"

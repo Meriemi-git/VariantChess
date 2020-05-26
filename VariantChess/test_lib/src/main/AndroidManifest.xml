@@ -1,2 +1,1 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="fr.aboucorp.test_lib" />
+<manifest package="fr.aboucorp.test_lib" />

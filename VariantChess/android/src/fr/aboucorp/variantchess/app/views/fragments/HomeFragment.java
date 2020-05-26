@@ -10,7 +10,6 @@ import android.widget.Button;
 
 import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
-import fr.aboucorp.variantchess.app.views.activities.MainActivity;
 import fr.aboucorp.variantchess.app.views.activities.VariantChessActivity;
 
 public class HomeFragment extends VariantChessFragment {
@@ -18,6 +17,12 @@ public class HomeFragment extends VariantChessFragment {
     private SessionManager sessionManager;
 
     public HomeFragment() {
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.home_layout, container, false);
+        return view;
     }
 
     @Override
@@ -29,12 +34,6 @@ public class HomeFragment extends VariantChessFragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.home_layout, container, false);
-        return view;
-    }
-
-    @Override
     protected void bindViews() {
         this.home_btn_online_game = this.getView().findViewById(R.id.home_btn_online_game);
     }
@@ -42,7 +41,7 @@ public class HomeFragment extends VariantChessFragment {
     @Override
     protected void bindListeners() {
         this.home_btn_online_game.setOnClickListener(v -> {
-            ((VariantChessActivity) this.getActivity()).setFragment(GameFragment.class,"newGame",null);
+            ((VariantChessActivity) this.getActivity()).setFragment(GameFragment.class, "newGame", null);
         });
     }
 }

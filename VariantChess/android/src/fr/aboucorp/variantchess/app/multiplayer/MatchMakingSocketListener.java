@@ -18,6 +18,7 @@ class MatchMakingSocketListener extends AbstractSocketListener {
     public MatchMakingSocketListener(MatchListener listener) {
         this.listener = listener;
     }
+
     @Override
     public void onDisconnect(Throwable t) {
         super.onDisconnect(t);

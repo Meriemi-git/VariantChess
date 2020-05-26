@@ -6,19 +6,19 @@ import java.util.List;
 import fr.aboucorp.variantchess.entities.Square;
 
 public class SquareList extends GameElementList<Square> {
-    public Square getSquareByLabel(String label){
-        for(Square square : this){
-            if(square.getSquareLabel().toLowerCase().equals(label.toLowerCase())){
+    public Square getSquareByLabel(String label) {
+        for (Square square : this) {
+            if (square.getSquareLabel().toLowerCase().equals(label.toLowerCase())) {
                 return square;
             }
         }
         return null;
     }
 
-    public List<Square> getSquaresByLine(int lineNumber){
+    public List<Square> getSquaresByLine(int lineNumber) {
         List<Square> squares = new ArrayList<>();
-        for(Square square : this){
-            if(square.getLocation().getZ() == lineNumber){
+        for (Square square : this) {
+            if (square.getLocation().getZ() == lineNumber) {
                 squares.add(square);
             }
         }

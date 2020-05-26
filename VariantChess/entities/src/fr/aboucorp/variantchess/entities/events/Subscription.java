@@ -1,6 +1,6 @@
 package fr.aboucorp.variantchess.entities.events;
 
-class Subscription implements Comparable<Subscription>{
+class Subscription implements Comparable<Subscription> {
     public final fr.aboucorp.variantchess.entities.events.GameEventSubscriber subscriber;
     private final int priority;
 
@@ -12,6 +12,6 @@ class Subscription implements Comparable<Subscription>{
 
     @Override
     public int compareTo(Subscription sub) {
-        return Integer.compare(this.priority,sub.priority);
+        return Integer.compare(this.priority, sub.priority);
     }
 }

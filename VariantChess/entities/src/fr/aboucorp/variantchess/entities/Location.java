@@ -12,6 +12,18 @@ public class Location implements Cloneable {
         this.z = z;
     }
 
+    public static Location fromString(String string) throws NumberFormatException {
+        try {
+            String[] stringValues = string.substring(1, string.length() - 2).split(",");
+            float x = Float.parseFloat(stringValues[0]);
+            float y = Float.parseFloat(stringValues[0]);
+            float z = Float.parseFloat(stringValues[0]);
+            return new Location(x, y, z);
+        } catch (Exception ex) {
+            throw new NumberFormatException("Error during location string parsing");
+        }
+    }
+
     @Override
     public boolean equals(Object obj) {
         return obj instanceof Location && ((Location) obj).getX() == this.x && ((Location) obj).getY() == this.y && ((Location) obj).getZ() == this.z;
@@ -25,35 +37,22 @@ public class Location implements Cloneable {
         return this.y;
     }
 
-
     public float getZ() {
         return this.z;
     }
 
     @Override
-    public Location clone()  {
-        return new Location(this.x,this.y,this.z);
+    public Location clone() {
+        return new Location(this.x, this.y, this.z);
     }
 
     @Override
     public String toString() {
-        return "[" + (char) (65 + (7 - this.x)) + (this.z +1) + "]";
+        return "[" + (char) (65 + (7 - this.x)) + (this.z + 1) + "]";
     }
 
     public String getStringValue() {
-       return "(" + this.x +","+ this.y + "," + this.z + ")";
-    }
-
-    public static Location fromString(String string) throws NumberFormatException{
-        try {
-            String[] stringValues = string.substring(1, string.length() - 2).split(",");
-            float x = Float.parseFloat(stringValues[0]);
-            float y = Float.parseFloat(stringValues[0]);
-            float z = Float.parseFloat(stringValues[0]);
-            return new Location(x,y,z);
-        }catch(Exception ex){
-            throw new NumberFormatException("Error during location string parsing");
-        }
+        return "(" + this.x + "," + this.y + "," + this.z + ")";
     }
 
 }

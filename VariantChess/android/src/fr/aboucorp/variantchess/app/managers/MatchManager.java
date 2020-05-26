@@ -36,7 +36,7 @@ public class MatchManager implements GameEventSubscriber, MatchListener, BoardMa
     private Match match;
 
 
-    public MatchManager(BoardManager boardManager,GameEventManager gameEventManager) {
+    public MatchManager(BoardManager boardManager, GameEventManager gameEventManager) {
         this.eventManager = gameEventManager;
         this.boardManager = boardManager;
         this.boardManager.setBoardLoadingListener(this);
@@ -45,30 +45,30 @@ public class MatchManager implements GameEventSubscriber, MatchListener, BoardMa
 
     @Override
     public void OnBoardLoaded() {
-        this.eventManager.subscribe(GameEvent.class,this,1);
+        this.eventManager.subscribe(GameEvent.class, this, 1);
         this.turnManager.startParty(this.match);
     }
 
-    public void endTurn(MoveEvent event) {
-        this.turnManager.endTurn(event,this.boardManager.getFenFromBoard());
-        this.turnManager.startTurn();
-    }
-
-    public String getPartyInfos(){
+    public String getPartyInfos() {
         return this.turnManager.getTurnColor().name();
     }
 
     @Override
     public void receiveGameEvent(GameEvent event) {
         this.eventListener.OnMatchEvent(event);
-        if(event instanceof PartyEvent){
-            Log.i("fr.aboucorp.variantchess",event.message);
-        }else if(event instanceof BoardEvent && ((BoardEvent) event).type == BoardEventType.CHECKMATE){
+        if (event instanceof PartyEvent) {
+            Log.i("fr.aboucorp.variantchess", event.message);
+        } else if (event instanceof BoardEvent && ((BoardEvent) event).type == BoardEventType.CHECKMATE) {
             ChessColor winner = this.boardManager.getWinner();
-            this.eventManager.sendMessage(new PartyEvent(String.format("Game finished ! Winner : %s",winner != null ? winner.name() : "EQUALITY")));
-        }else if(event instanceof MoveEvent && ((BoardEvent) event).type == BoardEventType.MOVE){
-            this.endTurn(((MoveEvent)event));
+            this.eventManager.sendMessage(new PartyEvent(String.format("Game finished ! Winner : %s", winner != null ? winner.name() : "EQUALITY")));
+        } else if (event instanceof MoveEvent && ((BoardEvent) event).type == BoardEventType.MOVE) {
+            this.endTurn(((MoveEvent) event));
         }
+    }
+
+    public void endTurn(MoveEvent event) {
+        this.turnManager.endTurn(event, this.boardManager.getFenFromBoard());
+        this.turnManager.startTurn();
     }
 
     @Override

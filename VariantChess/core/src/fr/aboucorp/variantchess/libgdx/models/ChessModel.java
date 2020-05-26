@@ -18,7 +18,7 @@ public abstract class ChessModel extends ModelInstance {
     private Vector3 dimensions = new Vector3();
 
     ChessModel(Model model, Location location, Material originalMaterial) {
-        super(model,location.getX(),location.getY(),location.getZ());
+        super(model, location.getX(), location.getY(), location.getZ());
         this.originalMaterial = originalMaterial;
         this.location = location.clone();
         this.calculateBoundingBox(this.boundingBox);
@@ -28,14 +28,14 @@ public abstract class ChessModel extends ModelInstance {
 
     public void move(Location location) {
         this.location = location;
-        this.transform.setTranslation(new Vector3(location.getX(),location.getY(),location.getZ()));
+        this.transform.setTranslation(new Vector3(location.getX(), location.getY(), location.getZ()));
     }
 
     public boolean isVisible(final Camera cam) {
         Vector3 position = new Vector3();
         this.transform.getTranslation(position);
         position.add(this.center);
-        return cam.frustum.boundsInFrustum(position,this.dimensions);
+        return cam.frustum.boundsInFrustum(position, this.dimensions);
     }
 
 

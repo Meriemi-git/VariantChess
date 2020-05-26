@@ -12,8 +12,8 @@ import fr.aboucorp.variantchess.entities.moves.movesets.BishopMoveSet;
 public class Bishop extends Piece {
 
     public Bishop(Square square, ChessColor chessColor, PieceId pieceId, ClassicBoard classicBoard, GameEventManager gameEventManager) {
-        super(square, chessColor,pieceId);
-        this.moveSet = new BishopMoveSet(this, classicBoard,gameEventManager);
+        super(square, chessColor, pieceId);
+        this.moveSet = new BishopMoveSet(this, classicBoard, gameEventManager);
     }
 
     @Override

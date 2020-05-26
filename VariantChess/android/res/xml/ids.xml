@@ -1,3 +1,5 @@
 <resources>
-    <item type="app_id" name="737891246568" />
+    <item
+        name="737891246568"
+        type="app_id" />
 </resources>

@@ -13,8 +13,6 @@ import fr.aboucorp.variantchess.libgdx.models.GraphicsGameElement;
 class Material3dManager {
     private Material selectedPieceMaterial;
     private Material occupiedMaterial;
-    public boolean picturesLoading;
-
 
     public Material3dManager() {
         this.selectedPieceMaterial = new Material();
@@ -28,9 +26,9 @@ class Material3dManager {
 
 
     public void resetMaterial(GraphicsGameElement element, boolean isTactical) {
-        if(isTactical){
+        if (isTactical) {
             // TODO
-        }else{
+        } else {
             Material oldMat = element.getModel3d().materials.get(0);
             oldMat.clear();
             oldMat.set(element.getModel3d().getOriginalMaterial());
@@ -39,25 +37,25 @@ class Material3dManager {
     }
 
     public void setSelectedMaterial(GraphicsGameElement element, boolean isTactical) {
-        if(isTactical){
+        if (isTactical) {
             // TODO
-        }else {
-            this.set3DMaterial(element.getModel3d(),this.selectedPieceMaterial);
+        } else {
+            this.set3DMaterial(element.getModel3d(), this.selectedPieceMaterial);
         }
 
     }
 
-    private void set3DMaterial(ChessModel model, Material material){
+    private void set3DMaterial(ChessModel model, Material material) {
         Material actualMaterial = model.materials.get(0);
         actualMaterial.clear();
         actualMaterial.set(material);
     }
 
     public void setOccupiedMaterial(GraphicsGameElement element, boolean isTactical) {
-        if(isTactical){
+        if (isTactical) {
             // TODO
-        }else {
-            this.set3DMaterial(element.getModel3d(),this.occupiedMaterial);
+        } else {
+            this.set3DMaterial(element.getModel3d(), this.occupiedMaterial);
         }
     }
 

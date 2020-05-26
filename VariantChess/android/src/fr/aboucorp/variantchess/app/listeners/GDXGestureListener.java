@@ -15,6 +15,7 @@ public class GDXGestureListener implements GestureDetector.GestureListener {
 
     private BoardManager boardManager;
     private TouchedModelFinder touchedModelFinder;
+
     public GDXGestureListener(BoardManager boardManager) {
         this.boardManager = boardManager;
         this.touchedModelFinder = new TouchedModelFinder(boardManager);
@@ -22,10 +23,10 @@ public class GDXGestureListener implements GestureDetector.GestureListener {
 
     @Override
     public boolean touchDown(float screenX, float screenY, int pointer, int button) {
-        if(this.boardManager.IsTacticalViewOn()){
-            this.reactOn2DModelTouched(this.boardManager.getGameState(),screenX,screenY);
-        }else{
-            this.reactOn3DModelTouched(this.boardManager.getGameState(),screenX,screenY);
+        if (this.boardManager.IsTacticalViewOn()) {
+            this.reactOn2DModelTouched(this.boardManager.getGameState(), screenX, screenY);
+        } else {
+            this.reactOn3DModelTouched(this.boardManager.getGameState(), screenX, screenY);
         }
         return this.boardManager.IsTacticalViewOn();
     }
@@ -40,7 +41,7 @@ public class GDXGestureListener implements GestureDetector.GestureListener {
 
 
     private void reactOn3DModelTouched(GameState gameState, float screenX, float screenY) {
-        if(gameState == GameState.SelectPiece){
+        if (gameState == GameState.SelectPiece) {
             GraphicsGameElement piece = this.touchedModelFinder.getTouched3DModel(screenX, screenY, this.boardManager.get3DModelsForTurn());
             if (piece != null) {
                 Piece touchedPiece = this.boardManager.getPieceFromLocation(piece.getLocation());
@@ -50,7 +51,7 @@ public class GDXGestureListener implements GestureDetector.GestureListener {
                     this.boardManager.unHighlight();
                 }
             }
-        }else if(gameState == GameState.SelectCase){
+        } else if (gameState == GameState.SelectCase) {
             GraphicsGameElement otherPiece = this.touchedModelFinder.getTouched3DModel(screenX, screenY, this.boardManager.get3DModelsForTurn());
             if (otherPiece != null) {
                 Piece otherTouchedPiece = this.boardManager.getPieceFromLocation(otherPiece.getLocation());
@@ -60,12 +61,12 @@ public class GDXGestureListener implements GestureDetector.GestureListener {
                 }
             } else {
                 GraphicsGameElement square = this.touchedModelFinder.getTouched3DModel(screenX, screenY, this.boardManager.getPossibleSquareModels());
-                if(square != null) {
+                if (square != null) {
                     Square touchedSquare = this.boardManager.getSquareFromLocation(square.getLocation());
                     if (touchedSquare != null) {
                         this.boardManager.selectSquare(touchedSquare);
                     }
-                }else {
+                } else {
                     this.boardManager.unHighlight();
                 }
             }

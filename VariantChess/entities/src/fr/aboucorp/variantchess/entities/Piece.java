@@ -10,7 +10,7 @@ public abstract class Piece extends GameElement {
     private PieceId pieceId;
     private boolean isFirstMove = true;
 
-    public Piece(Square square, ChessColor chessColor, PieceId pieceId){
+    public Piece(Square square, ChessColor chessColor, PieceId pieceId) {
         super(square.getLocation(), chessColor);
         this.actualSquare = square;
         this.pieceId = pieceId;
@@ -25,7 +25,7 @@ public abstract class Piece extends GameElement {
         this.isFirstMove = false;
     }
 
-    public PieceId getPieceId(){
+    public PieceId getPieceId() {
         return this.pieceId;
     }
 
@@ -45,12 +45,11 @@ public abstract class Piece extends GameElement {
         return this.actualSquare;
     }
 
-    public void die(){
+    public void die() {
         this.actualSquare.setPiece(null);
         this.actualSquare = null;
         this.setLocation(null);
     }
-
 
 
     @Override

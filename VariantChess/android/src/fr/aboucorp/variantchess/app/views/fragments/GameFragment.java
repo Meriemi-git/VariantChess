@@ -20,7 +20,6 @@ import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
 import fr.aboucorp.variantchess.app.viewmodel.GameModeAdapter;
 import fr.aboucorp.variantchess.app.views.activities.BoardActivity;
-import fr.aboucorp.variantchess.app.views.activities.MainActivity;
 import fr.aboucorp.variantchess.entities.ChessColor;
 import fr.aboucorp.variantchess.entities.GameMode;
 import fr.aboucorp.variantchess.entities.Match;
@@ -37,6 +36,12 @@ public class GameFragment extends VariantChessFragment implements AdapterView.On
     private SessionManager sessionManager;
 
     @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.new_game_layout, container, false);
+        return view;
+    }
+
+    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         this.bindViews();
@@ -44,17 +49,12 @@ public class GameFragment extends VariantChessFragment implements AdapterView.On
         this.sessionManager = SessionManager.getInstance(this.getActivity());
         this.new_game_spinner.setOnItemSelectedListener(this);
         List<GameMode> modes = new ArrayList<>();
-        modes.add(new GameMode("Classic","Normal gamemode with classic rules and bla and bla and bla and many test."));
-        modes.add(new GameMode("Random","Normal gamemode with classic rules but pieces and randmly set at the start of the game"));
-        GameModeAdapter adpater = new GameModeAdapter(this.getActivity(),modes);
+        modes.add(new GameMode("Classic", "Normal gamemode with classic rules and bla and bla and bla and many test."));
+        modes.add(new GameMode("Random", "Normal gamemode with classic rules but pieces and randmly set at the start of the game"));
+        GameModeAdapter adpater = new GameModeAdapter(this.getActivity(), modes);
         this.new_game_spinner.setAdapter(adpater);
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.new_game_layout, container, false);
-        return view;
-    }
     @Override
     protected void bindViews() {
         this.new_game_spinner = this.getView().findViewById(R.id.new_game_spinner);
@@ -70,7 +70,7 @@ public class GameFragment extends VariantChessFragment implements AdapterView.On
     }
 
     private void launchGame() {
-        if(this.new_game_rdb_online.isChecked()){
+        if (this.new_game_rdb_online.isChecked()) {
 /*            try {
                 this.sessionManager.launchMatchMaking((GameMode)this.new_game_spinner.getSelectedItem(),this);
                 this.new_game_progress_bar.setVisibility(View.VISIBLE);
@@ -78,12 +78,12 @@ public class GameFragment extends VariantChessFragment implements AdapterView.On
                 Toast.makeText(getActivity(),getActivity().getString(R.string.matchmaking_failed), Toast.LENGTH_LONG).show();
                 e.printStackTrace();
             }*/
-        }else if(this.new_game_rdb_offline.isChecked()){
+        } else if (this.new_game_rdb_offline.isChecked()) {
             Match matchP = new Match();
             matchP.setBlackPlayer(new Player("BlackPlayer", ChessColor.BLACK));
             matchP.setWhitePlayer(new Player("WhitePlayer", ChessColor.WHITE));
             Bundle args = new Bundle();
-            args.putSerializable("match",matchP);
+            args.putSerializable("match", matchP);
             Intent intent = new Intent(this.getActivity(), BoardActivity.class);
             intent.putExtras(args);
             this.startActivity(intent);

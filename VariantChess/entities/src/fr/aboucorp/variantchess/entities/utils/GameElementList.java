@@ -9,19 +9,19 @@ import fr.aboucorp.variantchess.entities.Location;
 public abstract class GameElementList<T extends GameElement> extends ArrayList<T> {
 
     public fr.aboucorp.variantchess.entities.GameElement getItemByLocation(Location location) {
-      for(GameElement element : this){
-        if(element.getLocation().equals(location)){
-            return element;
+        for (GameElement element : this) {
+            if (element.getLocation().equals(location)) {
+                return element;
+            }
         }
-      }
-      return null;
+        return null;
     }
 
     public T removeByLocation(Location location) {
         T removed;
-        for (Iterator<T> iter = this.iterator(); iter.hasNext();){
+        for (Iterator<T> iter = this.iterator(); iter.hasNext(); ) {
             T element = iter.next();
-            if(element.getLocation().equals(location)){
+            if (element.getLocation().equals(location)) {
                 removed = element;
                 iter.remove();
                 return removed;

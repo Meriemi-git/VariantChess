@@ -8,6 +8,7 @@ import fr.aboucorp.variantchess.entities.enums.PieceId;
 
 public class ChessPieceM extends ChessModel {
     public final PieceId id;
+
     protected ChessPieceM(Model model, Location location, Material originalMaterial, PieceId id) {
         super(model, location, originalMaterial);
         this.materials.get(0).set(originalMaterial);

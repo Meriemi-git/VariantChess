@@ -10,8 +10,8 @@ import fr.aboucorp.variantchess.entities.moves.movesets.RookMoveSet;
 
 public class Rook extends Piece {
     public Rook(Square square, ChessColor chessColor, PieceId pieceId, ClassicBoard classicBoard, GameEventManager gameEventManager) {
-        super(square, chessColor,pieceId);
-        this.moveSet = new RookMoveSet(this, classicBoard,gameEventManager);
+        super(square, chessColor, pieceId);
+        this.moveSet = new RookMoveSet(this, classicBoard, gameEventManager);
     }
 
     @Override

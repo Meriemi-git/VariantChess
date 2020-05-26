@@ -13,7 +13,7 @@ public class Pawn extends Piece {
     private boolean isFirstMove = true;
 
     public Pawn(Square square, ChessColor chessColor, PieceId pieceId, ClassicBoard classicBoard, GameEventManager gameEventManager) {
-        super(square, chessColor,pieceId);
+        super(square, chessColor, pieceId);
         this.moveSet = new PawnMoveSet(this, classicBoard, gameEventManager);
     }
 
@@ -23,6 +23,7 @@ public class Pawn extends Piece {
         this.isFirstMove = false;
     }
 
+    @Override
     public boolean isFirstMove() {
         return this.isFirstMove;
     }

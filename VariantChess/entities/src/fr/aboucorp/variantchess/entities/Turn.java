@@ -24,7 +24,7 @@ public class Turn implements Comparable<Turn>, Serializable {
     public Turn() {
     }
 
-    public ChessColor getTurnColor(){
+    public ChessColor getTurnColor() {
         return this.player.getColor();
     }
 
@@ -86,6 +86,6 @@ public class Turn implements Comparable<Turn>, Serializable {
 
     @Override
     public int compareTo(Turn turn) {
-        return Integer.compare(this.turnNumber,turn.turnNumber);
+        return Integer.compare(this.turnNumber, turn.turnNumber);
     }
 }

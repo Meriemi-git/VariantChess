@@ -32,7 +32,7 @@ class TouchedModelFinder {
             Vector3 position = new Vector3();
             final GraphicsGameElement element = models.get(i);
             element.getModel3d().transform.getTranslation(position);
-            BoundingBox box =  element.getModel3d().calculateBoundingBox(new BoundingBox()).mul( element.getModel3d().transform.cpy());
+            BoundingBox box = element.getModel3d().calculateBoundingBox(new BoundingBox()).mul(element.getModel3d().transform.cpy());
             position.add(box.getCenter(new Vector3()));
             double dist2 = ray.origin.dst2(position);
             if (distance > 0f && dist2 > distance) continue;

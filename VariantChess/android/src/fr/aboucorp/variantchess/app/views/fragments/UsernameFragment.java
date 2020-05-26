@@ -18,10 +18,9 @@ import java.util.List;
 import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.exceptions.UsernameDuplicateException;
 import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
-import fr.aboucorp.variantchess.app.views.activities.MainActivity;
 import fr.aboucorp.variantchess.app.views.activities.VariantChessActivity;
 
-public class UsernameFragment extends VariantChessFragment  implements Validator.ValidationListener{
+public class UsernameFragment extends VariantChessFragment implements Validator.ValidationListener {
     private Button username_btn_validate;
     @NotEmpty
     private EditText username_txt_username;

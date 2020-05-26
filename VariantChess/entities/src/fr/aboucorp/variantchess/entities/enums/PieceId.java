@@ -3,8 +3,6 @@ package fr.aboucorp.variantchess.entities.enums;
 import java.util.Arrays;
 
 import fr.aboucorp.variantchess.entities.ChessColor;
-import fr.aboucorp.variantchess.entities.Piece;
-import fr.aboucorp.variantchess.entities.boards.Board;
 
 public enum PieceId {
     WP1(0),
@@ -42,28 +40,28 @@ public enum PieceId {
 
     private final double enumId;
 
-    PieceId(int enumId){
+    PieceId(int enumId) {
         this.enumId = enumId;
     }
 
-    public static PieceId get(int numericId){
+    public static PieceId get(int numericId) {
         return Arrays.stream(values()).filter(x -> x.enumId == numericId).findFirst().get();
     }
 
-    public static boolean isPawn(PieceId id){
+    public static boolean isPawn(PieceId id) {
         return isWhitePawn(id) || isBlackPawn(id);
     }
 
-    private static boolean isWhitePawn(PieceId id){
+    private static boolean isWhitePawn(PieceId id) {
         return id == WP1 || id == WP2 || id == WP3 || id == WP4 || id == WP5 || id == WP6 || id == WP7 || id == WP8;
     }
 
-    private static boolean isBlackPawn(PieceId id){
+    private static boolean isBlackPawn(PieceId id) {
         return id == BP1 || id == BP2 || id == BP3 || id == BP4 || id == BP5 || id == BP6 || id == BP7 || id == BP8;
     }
 
-    public static ChessColor getColor(PieceId pieceId){
-        if(isWhitePawn(pieceId)){
+    public static ChessColor getColor(PieceId pieceId) {
+        if (isWhitePawn(pieceId)) {
             return ChessColor.WHITE;
         }
         return ChessColor.BLACK;

@@ -28,6 +28,7 @@ public class AccountFragment extends VariantChessFragment {
         this.bindListeners();
 
     }
+
     @Override
     protected void bindViews() {
         this.btn_create = this.getView().findViewById(R.id.btn_create);
@@ -36,7 +37,7 @@ public class AccountFragment extends VariantChessFragment {
 
     @Override
     protected void bindListeners() {
-        this.btn_connect.setOnClickListener(v -> ((MainActivity) this.getActivity()).setFragment(SignUpFragment.class,"signup",null));
-        this.btn_create.setOnClickListener(v -> ((MainActivity) this.getActivity()).setFragment(SignInFragment.class,"signin",null));
+        this.btn_connect.setOnClickListener(v -> ((MainActivity) this.getActivity()).setFragment(SignUpFragment.class, "signup", null));
+        this.btn_create.setOnClickListener(v -> ((MainActivity) this.getActivity()).setFragment(SignInFragment.class, "signin", null));
     }
 }

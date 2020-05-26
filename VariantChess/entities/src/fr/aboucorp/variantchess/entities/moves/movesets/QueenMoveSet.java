@@ -13,20 +13,20 @@ public class QueenMoveSet extends AbstractMoveSet {
     private BishopMoveSet bishopMoveSet;
 
     public QueenMoveSet(Piece thisPiece, ClassicBoard classicBoard, GameEventManager gameEventManager) {
-        super(thisPiece, classicBoard,gameEventManager);
-        this.rookMoveSet = new RookMoveSet(thisPiece, classicBoard,gameEventManager);
-        this.bishopMoveSet = new BishopMoveSet(thisPiece, classicBoard,gameEventManager);
+        super(thisPiece, classicBoard, gameEventManager);
+        this.rookMoveSet = new RookMoveSet(thisPiece, classicBoard, gameEventManager);
+        this.bishopMoveSet = new BishopMoveSet(thisPiece, classicBoard, gameEventManager);
     }
 
     @Override
     protected SquareList getPossibleMoves(Piece piece, ChessColor turnColor) {
         SquareList squares = new SquareList();
-        SquareList rookMoves  = this.rookMoveSet.getPossibleMoves(piece,turnColor);
-        SquareList bishopMoves = this.bishopMoveSet.getPossibleMoves(piece,turnColor);
-        if(rookMoves != null){
+        SquareList rookMoves = this.rookMoveSet.getPossibleMoves(piece, turnColor);
+        SquareList bishopMoves = this.bishopMoveSet.getPossibleMoves(piece, turnColor);
+        if (rookMoves != null) {
             squares.addAll(rookMoves);
         }
-        if(bishopMoves != null){
+        if (bishopMoves != null) {
             squares.addAll(bishopMoves);
         }
         return squares;
@@ -34,6 +34,6 @@ public class QueenMoveSet extends AbstractMoveSet {
 
     @Override
     public SquareList getThreats(Piece piece, ChessColor turnColor) {
-        return this.getPossibleMoves(piece,turnColor);
+        return this.getPossibleMoves(piece, turnColor);
     }
 }

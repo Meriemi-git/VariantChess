@@ -12,8 +12,8 @@ import fr.aboucorp.variantchess.entities.moves.movesets.KnightMoveSet;
 public class Knight extends Piece {
 
     public Knight(Square square, ChessColor chessColor, PieceId id, ClassicBoard classicBoard, GameEventManager gameEventManager) {
-        super(square, chessColor,id);
-        this.moveSet = new KnightMoveSet(this, classicBoard,gameEventManager);
+        super(square, chessColor, id);
+        this.moveSet = new KnightMoveSet(this, classicBoard, gameEventManager);
     }
 
     @Override

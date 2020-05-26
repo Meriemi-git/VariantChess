@@ -1,17 +1,20 @@
 package fr.aboucorp.variantchess.libgdx.models;
 
-import com.badlogic.gdx.graphics.PerspectiveCamera;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 
 import fr.aboucorp.variantchess.entities.Location;
+import fr.aboucorp.variantchess.entities.enums.PieceId;
 
 public class GraphicsGameElement {
+    private final PieceId id;
     private ChessModel model3d;
     private Sprite model2d;
     private Location location;
 
-    public GraphicsGameElement(Location location){
+    public GraphicsGameElement(Location location, PieceId id) {
         this.location = location;
+        this.id = id;
     }
 
     public ChessModel getModel3d() {
@@ -30,7 +33,7 @@ public class GraphicsGameElement {
         this.model2d = model2d;
     }
 
-    public boolean isVisible(PerspectiveCamera camera) {
+    public boolean isVisible(Camera camera, boolean isTacticalView) {
         // TODO
         return true;
     }
@@ -40,13 +43,16 @@ public class GraphicsGameElement {
     }
 
     public void move2D(Location location) {
-        // TODO move sprite
         this.location = location;
     }
 
     public void move3D(Location location) {
         this.model3d.move(location);
         this.location = location;
+    }
+
+    public PieceId getId() {
+        return this.id;
     }
 }
 

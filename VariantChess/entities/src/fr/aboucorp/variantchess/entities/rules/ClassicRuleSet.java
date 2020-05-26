@@ -25,15 +25,15 @@ import fr.aboucorp.variantchess.entities.utils.PieceList;
 
 public class ClassicRuleSet extends AbstractRuleSet implements GameEventSubscriber {
 
-    private final Board board;
     private static int FIFTY_MOVE_RULE_NUMBER = 75;
+    private final Board board;
     public int fiftyMoveCounter = 0;
     public boolean whiteCanCastleKing;
     public boolean whiteCanCastleQueen;
     public boolean blackCanCastleKing;
     public boolean blackCanCastleQueen;
-    private boolean kingIsInCheck;
     public Square enPassant;
+    private boolean kingIsInCheck;
     private Turn previousTurn;
     private Turn actualTurn;
 
@@ -94,114 +94,6 @@ public class ClassicRuleSet extends AbstractRuleSet implements GameEventSubscrib
         }
     }
 
-    private void canCastle() {
-        if (this.whiteCanCastleKingNow()) {
-            this.whiteCanCastleKing = true;
-            this.gameEventManager.sendMessage(new PieceEvent("White can castle on king side", BoardEventType.CASTLE_KING, PieceId.WK));
-        } else {
-            this.whiteCanCastleKing = false;
-        }
-        if (this.whiteCanCastleQueenNow()) {
-            this.whiteCanCastleQueen = true;
-            this.gameEventManager.sendMessage(new PieceEvent("White can castle on queen side", BoardEventType.CASTLE_QUEEN, PieceId.WK));
-        } else {
-            this.whiteCanCastleQueen = false;
-        }
-        if (this.blackCanCastleKingNow()) {
-            this.blackCanCastleKing = true;
-            this.gameEventManager.sendMessage(new PieceEvent("Black can castle on king side", BoardEventType.CASTLE_KING,PieceId.BK));
-        } else {
-            this.blackCanCastleKing = false;
-        }
-        if (this.blackCanCastleQueenNow()) {
-            this.blackCanCastleQueen = true;
-            this.gameEventManager.sendMessage(new PieceEvent("Black can castle on queen side", BoardEventType.CASTLE_QUEEN, PieceId.BK));
-        } else {
-            this.blackCanCastleQueen = false;
-        }
-    }
-
-    private boolean blackCanCastleQueenNow() {
-        return this.blackCanCastleQueen()
-                && this.board.getSquares().getSquareByLabel("D8").getPiece() == null
-                && this.board.getSquares().getSquareByLabel("C8").getPiece() == null;
-    }
-
-    public boolean blackCanCastleQueen() {
-        return this.board.getBlackPieces().getPieceById(PieceId.BK).isFirstMove()
-                && this.board.getBlackPieces().getPieceById(PieceId.BLR).isFirstMove();
-    }
-
-    private boolean blackCanCastleKingNow() {
-        return this.blackCanCastleKing()
-                && this.board.getSquares().getSquareByLabel("F8").getPiece() == null
-                && this.board.getSquares().getSquareByLabel("G8").getPiece() == null;
-    }
-
-    public boolean blackCanCastleKing() {
-        return this.board.getBlackPieces().getPieceById(PieceId.BK).isFirstMove()
-                && this.board.getBlackPieces().getPieceById(PieceId.BLR).isFirstMove();
-    }
-
-    private boolean whiteCanCastleQueenNow() {
-        return this.whiteCanCastleQueen()
-                && this.board.getSquares().getSquareByLabel("D1").getPiece() == null
-                && this.board.getSquares().getSquareByLabel("C1").getPiece() == null
-                && this.board.getSquares().getSquareByLabel("CB1").getPiece() == null;
-    }
-
-    public boolean whiteCanCastleQueen() {
-        return this.board.getWhitePieces().getPieceById(PieceId.WK).isFirstMove()
-                && this.board.getWhitePieces().getPieceById(PieceId.WLR).isFirstMove();
-    }
-
-    private boolean whiteCanCastleKingNow() {
-        return this.whiteCanCastleKing()
-                && this.board.getSquares().getSquareByLabel("G1").getPiece() == null
-                && this.board.getSquares().getSquareByLabel("F1").getPiece() == null;
-    }
-
-    public boolean whiteCanCastleKing() {
-        return this.board.getWhitePieces().getPieceById(PieceId.WK).isFirstMove()
-                && this.board.getWhitePieces().getPieceById(PieceId.WRR).isFirstMove();
-
-    }
-
-    private void canClaimADraw() {
-        this.fiftyMoveRule();
-    }
-
-    private void fiftyMoveRule() {
-        if (this.previousTurn != null && this.previousTurn.getPlayed() != null) {
-            if (PieceId.isPawn(this.previousTurn.getPlayed()) || this.previousTurn.getDeadPiece() != null) {
-                this.fiftyMoveCounter = 0;
-            } else {
-                this.fiftyMoveCounter++;
-            }
-        }
-        if (this.fiftyMoveCounter >= FIFTY_MOVE_RULE_NUMBER * 2) {
-            this.gameEventManager.sendMessage(new PartyEvent("Player can claim a draw following the fifty move rule "));
-        }
-    }
-
-    private void isGameFinished() {
-        if (this.previousTurn != null) {
-            boolean cantMove = true;
-            for (Piece piece : this.board.getPiecesByColor(this.actualTurn.getTurnColor())) {
-                if (piece.getMoveSet().getNextMoves().size() > 0) {
-                    cantMove = false;
-                }
-            }
-            if (cantMove) {
-                if (this.kingIsInCheck) {
-                    this.gameEventManager.sendMessage(new BoardEvent("Game is finished", BoardEventType.MATE));
-                } else {
-                    this.gameEventManager.sendMessage(new BoardEvent("Game is finished", BoardEventType.DRAW));
-                }
-            }
-        }
-    }
-
     public ChessColor getWinner() {
         PieceList opposites;
         ChessColor oppositeColor = this.actualTurn.getTurnColor() == ChessColor.WHITE ? ChessColor.BLACK : ChessColor.WHITE;
@@ -243,6 +135,114 @@ public class ClassicRuleSet extends AbstractRuleSet implements GameEventSubscrib
         } else if (event instanceof TurnEndEvent) {
             this.enPassant = null;
         }
+    }
+
+    private void canClaimADraw() {
+        this.fiftyMoveRule();
+    }
+
+    private void canCastle() {
+        if (this.whiteCanCastleKingNow()) {
+            this.whiteCanCastleKing = true;
+            this.gameEventManager.sendMessage(new PieceEvent("White can castle on king side", BoardEventType.CASTLE_KING, PieceId.WK));
+        } else {
+            this.whiteCanCastleKing = false;
+        }
+        if (this.whiteCanCastleQueenNow()) {
+            this.whiteCanCastleQueen = true;
+            this.gameEventManager.sendMessage(new PieceEvent("White can castle on queen side", BoardEventType.CASTLE_QUEEN, PieceId.WK));
+        } else {
+            this.whiteCanCastleQueen = false;
+        }
+        if (this.blackCanCastleKingNow()) {
+            this.blackCanCastleKing = true;
+            this.gameEventManager.sendMessage(new PieceEvent("Black can castle on king side", BoardEventType.CASTLE_KING, PieceId.BK));
+        } else {
+            this.blackCanCastleKing = false;
+        }
+        if (this.blackCanCastleQueenNow()) {
+            this.blackCanCastleQueen = true;
+            this.gameEventManager.sendMessage(new PieceEvent("Black can castle on queen side", BoardEventType.CASTLE_QUEEN, PieceId.BK));
+        } else {
+            this.blackCanCastleQueen = false;
+        }
+    }
+
+    private void isGameFinished() {
+        if (this.previousTurn != null) {
+            boolean cantMove = true;
+            for (Piece piece : this.board.getPiecesByColor(this.actualTurn.getTurnColor())) {
+                if (piece.getMoveSet().getNextMoves().size() > 0) {
+                    cantMove = false;
+                }
+            }
+            if (cantMove) {
+                if (this.kingIsInCheck) {
+                    this.gameEventManager.sendMessage(new BoardEvent("Game is finished", BoardEventType.MATE));
+                } else {
+                    this.gameEventManager.sendMessage(new BoardEvent("Game is finished", BoardEventType.DRAW));
+                }
+            }
+        }
+    }
+
+    private void fiftyMoveRule() {
+        if (this.previousTurn != null && this.previousTurn.getPlayed() != null) {
+            if (PieceId.isPawn(this.previousTurn.getPlayed()) || this.previousTurn.getDeadPiece() != null) {
+                this.fiftyMoveCounter = 0;
+            } else {
+                this.fiftyMoveCounter++;
+            }
+        }
+        if (this.fiftyMoveCounter >= FIFTY_MOVE_RULE_NUMBER * 2) {
+            this.gameEventManager.sendMessage(new PartyEvent("Player can claim a draw following the fifty move rule "));
+        }
+    }
+
+    private boolean whiteCanCastleKingNow() {
+        return this.whiteCanCastleKing()
+                && this.board.getSquares().getSquareByLabel("G1").getPiece() == null
+                && this.board.getSquares().getSquareByLabel("F1").getPiece() == null;
+    }
+
+    private boolean whiteCanCastleQueenNow() {
+        return this.whiteCanCastleQueen()
+                && this.board.getSquares().getSquareByLabel("D1").getPiece() == null
+                && this.board.getSquares().getSquareByLabel("C1").getPiece() == null
+                && this.board.getSquares().getSquareByLabel("CB1").getPiece() == null;
+    }
+
+    private boolean blackCanCastleKingNow() {
+        return this.blackCanCastleKing()
+                && this.board.getSquares().getSquareByLabel("F8").getPiece() == null
+                && this.board.getSquares().getSquareByLabel("G8").getPiece() == null;
+    }
+
+    private boolean blackCanCastleQueenNow() {
+        return this.blackCanCastleQueen()
+                && this.board.getSquares().getSquareByLabel("D8").getPiece() == null
+                && this.board.getSquares().getSquareByLabel("C8").getPiece() == null;
+    }
+
+    public boolean whiteCanCastleKing() {
+        return this.board.getWhitePieces().getPieceById(PieceId.WK).isFirstMove()
+                && this.board.getWhitePieces().getPieceById(PieceId.WRR).isFirstMove();
+
+    }
+
+    public boolean whiteCanCastleQueen() {
+        return this.board.getWhitePieces().getPieceById(PieceId.WK).isFirstMove()
+                && this.board.getWhitePieces().getPieceById(PieceId.WLR).isFirstMove();
+    }
+
+    public boolean blackCanCastleKing() {
+        return this.board.getBlackPieces().getPieceById(PieceId.BK).isFirstMove()
+                && this.board.getBlackPieces().getPieceById(PieceId.BLR).isFirstMove();
+    }
+
+    public boolean blackCanCastleQueen() {
+        return this.board.getBlackPieces().getPieceById(PieceId.BK).isFirstMove()
+                && this.board.getBlackPieces().getPieceById(PieceId.BLR).isFirstMove();
     }
 
     @Override

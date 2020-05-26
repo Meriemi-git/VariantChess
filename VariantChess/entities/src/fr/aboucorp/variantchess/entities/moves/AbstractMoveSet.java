@@ -29,13 +29,13 @@ public abstract class AbstractMoveSet implements GameEventSubscriber {
     protected final Piece piece;
     protected final ClassicBoard classicBoard;
     protected boolean isChecking;
+    protected Turn actualTurn;
+    protected Turn previousTurn;
     private PieceId kingInCheck;
     private List<Piece> checkingPieces;
     private SquareList nextMoves;
-    protected Turn actualTurn;
-    protected Turn previousTurn;
 
-    protected AbstractMoveSet(Piece piece, ClassicBoard classicBoard,GameEventManager gameEventManager) {
+    protected AbstractMoveSet(Piece piece, ClassicBoard classicBoard, GameEventManager gameEventManager) {
         this.piece = piece;
         this.classicBoard = classicBoard;
         this.eventManager = gameEventManager;
@@ -50,7 +50,7 @@ public abstract class AbstractMoveSet implements GameEventSubscriber {
                 this.isChecking = true;
                 this.kingInCheck = ((CheckInEvent) event).played;
                 this.checkingPieces = ((CheckInEvent) event).checkingPieces;
-            } else if(event instanceof CheckOutEvent &&  PieceId.getColor(((CheckOutEvent) event).played) == this.piece.getChessColor()) {
+            } else if (event instanceof CheckOutEvent && PieceId.getColor(((CheckOutEvent) event).played) == this.piece.getChessColor()) {
                 this.isChecking = false;
                 this.kingInCheck = null;
                 this.checkingPieces = null;
@@ -88,7 +88,7 @@ public abstract class AbstractMoveSet implements GameEventSubscriber {
                 this.piece.move(checkedMove);
                 boolean isUnchecking = true;
                 for (Piece ckecking : this.checkingPieces) {
-                    if (  kingMoveSet.moveCausingSingleCheck(ckecking, oppositeColor) != null) {
+                    if (kingMoveSet.moveCausingSingleCheck(ckecking, oppositeColor) != null) {
                         isUnchecking = false;
                     }
                 }
@@ -102,16 +102,7 @@ public abstract class AbstractMoveSet implements GameEventSubscriber {
         return uncheckingMoves;
     }
 
-    public GameElementList<Piece> moveCauseCheck(ChessColor color) {
-        GameElementList<Piece> causingChecks = new PieceList();
-        for (Piece piece : this.classicBoard.getPiecesByColor(color)) {
-             Piece causingCheck = this.moveCausingSingleCheck(piece, color);
-             if(causingCheck != null) {
-                 causingChecks.add(causingCheck);
-             }
-        }
-        return causingChecks;
-    }
+    protected abstract SquareList getPossibleMoves(Piece piece, ChessColor turnColor);
 
     protected Piece moveCausingSingleCheck(Piece piece, ChessColor color) {
         for (Square possibleMove : piece.getMoveSet().getPossibleMoves(piece, color)) {
@@ -125,7 +116,16 @@ public abstract class AbstractMoveSet implements GameEventSubscriber {
         return null;
     }
 
-    protected abstract SquareList getPossibleMoves(Piece piece, ChessColor turnColor);
+    public GameElementList<Piece> moveCauseCheck(ChessColor color) {
+        GameElementList<Piece> causingChecks = new PieceList();
+        for (Piece piece : this.classicBoard.getPiecesByColor(color)) {
+            Piece causingCheck = this.moveCausingSingleCheck(piece, color);
+            if (causingCheck != null) {
+                causingChecks.add(causingCheck);
+            }
+        }
+        return causingChecks;
+    }
 
     public abstract SquareList getThreats(Piece piece, ChessColor turnColor);
 
@@ -133,7 +133,7 @@ public abstract class AbstractMoveSet implements GameEventSubscriber {
         return this.nextMoves;
     }
 
-    public void clear(){
+    public void clear() {
         this.isChecking = false;
         this.kingInCheck = null;
         this.checkingPieces = new ArrayList<>();

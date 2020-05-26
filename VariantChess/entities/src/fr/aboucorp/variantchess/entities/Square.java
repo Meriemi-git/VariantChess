@@ -9,13 +9,8 @@ public class Square extends GameElement {
 
     public Square(Location location, ChessColor chessColor) {
         super(location, chessColor);
-        this.columnLetter =  (char)( 65 + (7 - (int)this.getLocation().getX()));
-        this.squareLabel = this.columnLetter + "" + (int)(this.getLocation().getZ()+1);
-    }
-
-    @Override
-    public String toString() {
-        return '[' + this.squareLabel + ']';
+        this.columnLetter = (char) (65 + (7 - (int) this.getLocation().getX()));
+        this.squareLabel = this.columnLetter + "" + (int) (this.getLocation().getZ() + 1);
     }
 
     public Piece getPiece() {
@@ -30,12 +25,17 @@ public class Square extends GameElement {
         return this.squareLabel;
     }
 
-    public char getColumnLetter(){
+    public char getColumnLetter() {
         return this.columnLetter;
     }
 
     @Override
     public boolean equals(Object obj) {
         return obj instanceof Square && ((Square) obj).getLocation().equals(this.getLocation());
+    }
+
+    @Override
+    public String toString() {
+        return '[' + this.squareLabel + ']';
     }
 }

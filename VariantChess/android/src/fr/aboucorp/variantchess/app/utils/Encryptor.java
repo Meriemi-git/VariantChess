@@ -30,13 +30,13 @@ class Encryptor {
             byte[] iv = cipher.getIV();
             return Base64.encodeToString(iv, Base64.DEFAULT);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException e) {
-            Log.e("fr.aboucorp.variantchess",e.getMessage());
+            Log.e("fr.aboucorp.variantchess", e.getMessage());
             throw new HashException("Cannot hash text");
         } catch (BadPaddingException e) {
-            Log.e("fr.aboucorp.variantchess",e.getMessage());
+            Log.e("fr.aboucorp.variantchess", e.getMessage());
             throw new HashException("Cannot hash text");
         } catch (IllegalBlockSizeException e) {
-            Log.e("fr.aboucorp.variantchess",e.getMessage());
+            Log.e("fr.aboucorp.variantchess", e.getMessage());
             throw new HashException("Cannot hash text");
         }
     }

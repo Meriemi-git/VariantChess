@@ -15,13 +15,13 @@ import fr.aboucorp.variantchess.entities.utils.SquareList;
 public class PawnMoveSet extends AbstractMoveSet {
 
     public PawnMoveSet(Piece thisPiece, ClassicBoard classicBoard, GameEventManager gameEventManager) {
-        super(thisPiece, classicBoard,gameEventManager);
+        super(thisPiece, classicBoard, gameEventManager);
     }
 
     @Override
     protected SquareList getPossibleMoves(Piece piece, ChessColor turnColor) {
         SquareList validSquares = this.getClassicMoves(piece);
-        validSquares.addAll(this.getEatingMoves(piece,  turnColor, false));
+        validSquares.addAll(this.getEatingMoves(piece, turnColor, false));
         return validSquares;
     }
 
@@ -59,22 +59,22 @@ public class PawnMoveSet extends AbstractMoveSet {
                 && (isThreat
                 || (diagRight.getPiece() != null && diagRight.getPiece().getChessColor() != turnColor))) {
             validSquares.add(diagRight);
-        } else if (diagRight != null && diagRight.getPiece() == null && this.enPassantRightIsPossible(diagRight)){
+        } else if (diagRight != null && diagRight.getPiece() == null && this.enPassantRightIsPossible(diagRight)) {
             validSquares.add(diagRight);
         }
         if (diagLeft != null
                 && (isThreat
                 || (diagLeft.getPiece() != null && diagLeft.getPiece().getChessColor() != turnColor))) {
             validSquares.add(diagLeft);
-        }else if(diagLeft != null && diagLeft.getPiece() == null && this.enPassantLeftIsPossible(diagLeft)){
+        } else if (diagLeft != null && diagLeft.getPiece() == null && this.enPassantLeftIsPossible(diagLeft)) {
             validSquares.add(diagLeft);
         }
         return validSquares;
     }
 
     private boolean enPassantRightIsPossible(Square diagRight) {
-        if (this.enPassantIsPossible() && diagRight.getLocation().getX() == this.previousTurn.getTo().getX() ) {
-            this.eventManager.sendMessage(new EnPassantEvent("En passant", BoardEventType.EN_PASSANT,diagRight));
+        if (this.enPassantIsPossible() && diagRight.getLocation().getX() == this.previousTurn.getTo().getX()) {
+            this.eventManager.sendMessage(new EnPassantEvent("En passant", BoardEventType.EN_PASSANT, diagRight));
             return true;
         }
         return false;

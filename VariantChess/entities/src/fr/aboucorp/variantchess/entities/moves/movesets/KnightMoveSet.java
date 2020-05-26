@@ -12,7 +12,7 @@ import fr.aboucorp.variantchess.entities.utils.SquareList;
 public class KnightMoveSet extends AbstractMoveSet {
 
     public KnightMoveSet(Piece thisPiece, ClassicBoard classicBoard, GameEventManager gameEventManager) {
-        super(thisPiece, classicBoard,gameEventManager);
+        super(thisPiece, classicBoard, gameEventManager);
     }
 
     @Override
@@ -25,37 +25,37 @@ public class KnightMoveSet extends AbstractMoveSet {
             if (end.getX() == start.getX() + 2
                     && (end.getZ() == start.getZ() + 1
                     || end.getZ() == start.getZ() - 1)) {
-                if(square.getPiece() == null ||  square.getPiece().getChessColor() != turnColor) {
+                if (square.getPiece() == null || square.getPiece().getChessColor() != turnColor) {
                     validSquares.add(square);
                 }
             }
             if (end.getX() == start.getX() - 2
                     && (end.getZ() == start.getZ() + 1
                     || end.getZ() == start.getZ() - 1)) {
-                if(square.getPiece() == null || square.getPiece().getChessColor() != turnColor) {
+                if (square.getPiece() == null || square.getPiece().getChessColor() != turnColor) {
                     validSquares.add(square);
                 }
             }
             if (end.getZ() == start.getZ() + 2
                     && (end.getX() == start.getX() + 1
                     || end.getX() == start.getX() - 1)) {
-                if(square.getPiece() == null || square.getPiece().getChessColor() != turnColor) {
+                if (square.getPiece() == null || square.getPiece().getChessColor() != turnColor) {
                     validSquares.add(square);
                 }
             }
             if (end.getZ() == start.getZ() - 2
                     && (end.getX() == start.getX() + 1
                     || end.getX() == start.getX() - 1)) {
-                if(square.getPiece() == null || square.getPiece().getChessColor() != turnColor) {
+                if (square.getPiece() == null || square.getPiece().getChessColor() != turnColor) {
                     validSquares.add(square);
                 }
             }
         }
-        return  validSquares;
+        return validSquares;
     }
 
     @Override
     public SquareList getThreats(Piece piece, ChessColor turnColor) {
-        return this.getPossibleMoves(piece,turnColor);
+        return this.getPossibleMoves(piece, turnColor);
     }
 }

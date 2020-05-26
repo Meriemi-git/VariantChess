@@ -14,7 +14,7 @@ public abstract class GdxPostRunner {
                 try {
                     this.execute();
                 } catch (Exception ex) {
-                    Log.e("fr.aboucorp.variantchess",ex.getMessage());
+                    Log.e("fr.aboucorp.variantchess", ex.getMessage());
                 } finally {
                     synchronized (this.lock2) {
                         this.lock2.notify();
@@ -41,16 +41,16 @@ public abstract class GdxPostRunner {
         }
     }
 
-    public void startAsync(){
+    protected abstract void execute();
+
+    public void startAsync() {
         new Thread(() -> Gdx.app.postRunnable(() -> {
             try {
                 this.execute();
             } catch (Exception ex) {
-                Log.e("fr.aboucorp.variantchess",ex.getMessage());
+                Log.e("fr.aboucorp.variantchess", ex.getMessage());
                 ex.printStackTrace();
             }
         })).start();
     }
-
-    protected abstract void execute();
 }

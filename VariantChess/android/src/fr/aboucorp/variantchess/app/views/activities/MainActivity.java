@@ -27,7 +27,7 @@ import fr.aboucorp.variantchess.app.views.fragments.UsernameFragment;
 
 import static fr.aboucorp.variantchess.app.multiplayer.SessionManager.SHARED_PREFERENCE_NAME;
 
-public class MainActivity extends VariantChessActivity  {
+public class MainActivity extends VariantChessActivity {
     private Toolbar toolbar;
     private SessionManager sessionManager;
     private UserViewModel userViewModel;
@@ -59,16 +59,9 @@ public class MainActivity extends VariantChessActivity  {
         this.getSupportActionBar().setHomeButtonEnabled(true);
     }
 
-    private void updateConnectionUI(User user) {
-        if(user != null){
-            this.toolbar.setSubtitle(user.getDisplayName());
-        }else{
-            this.toolbar.setSubtitle("Disconnected");
-        }
-        MenuItem disconnect = this.toolbar.getMenu().findItem(R.id.menu_action_disconnect);
-        MenuItem profile = this.toolbar.getMenu().findItem(R.id.menu_action_profil);
-        disconnect.setVisible(user != null);
-        profile.setVisible(user != null);
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
     }
 
     @Override
@@ -90,6 +83,7 @@ public class MainActivity extends VariantChessActivity  {
         }
     }
 
+    @Override
     public void userIsConnected(User connected) {
         if (connected != null) {
             if (TextUtils.isEmpty(connected.getDisplayName())) {
@@ -120,6 +114,18 @@ public class MainActivity extends VariantChessActivity  {
         return true;
     }
 
+    private void updateConnectionUI(User user) {
+        if (user != null) {
+            this.toolbar.setSubtitle(user.getDisplayName());
+        } else {
+            this.toolbar.setSubtitle("Disconnected");
+        }
+        MenuItem disconnect = this.toolbar.getMenu().findItem(R.id.menu_action_disconnect);
+        MenuItem profile = this.toolbar.getMenu().findItem(R.id.menu_action_profil);
+        disconnect.setVisible(user != null);
+        profile.setVisible(user != null);
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -136,11 +142,6 @@ public class MainActivity extends VariantChessActivity  {
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
-
-    @Override
-    public void onBackPressed() {
-       super.onBackPressed();
     }
 
 }

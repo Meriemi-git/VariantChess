@@ -21,9 +21,8 @@ import java.util.concurrent.ExecutionException;
 
 import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
-import fr.aboucorp.variantchess.app.views.activities.MainActivity;
 
-public class SignInFragment extends VariantChessFragment  implements Validator.ValidationListener {
+public class SignInFragment extends VariantChessFragment implements Validator.ValidationListener {
 
     private Button btn_register;
 
@@ -77,11 +76,11 @@ public class SignInFragment extends VariantChessFragment  implements Validator.V
         try {
             this.sessionManager.signInWithEmail(this.txt_mail.getText().toString(), this.txt_pwd.getText().toString());
         } catch (ExecutionException e) {
-            Log.i("fr.aboucorp.variantchess","ExecutionException during mail signin message : " + e.getMessage());
+            Log.i("fr.aboucorp.variantchess", "ExecutionException during mail signin message : " + e.getMessage());
             Toast.makeText(this.getActivity(), R.string.error_during_signin, Toast.LENGTH_LONG).show();
             e.printStackTrace();
         } catch (InterruptedException e) {
-            Log.i("fr.aboucorp.variantchess","InterruptedException during mail signin message : " + e.getMessage());
+            Log.i("fr.aboucorp.variantchess", "InterruptedException during mail signin message : " + e.getMessage());
             Toast.makeText(this.getActivity(), R.string.error_during_signin, Toast.LENGTH_LONG).show();
             e.printStackTrace();
         }

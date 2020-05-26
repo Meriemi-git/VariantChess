@@ -8,11 +8,6 @@ public class Match implements Serializable {
     public Player whitePlayer;
     public Player blackPlayer;
 
-
-    public void setWhitePlayer(Player whitePlayer) {
-        this.whitePlayer = whitePlayer;
-    }
-
     public Player getBlackPlayer() {
         return this.blackPlayer;
     }
@@ -23,6 +18,10 @@ public class Match implements Serializable {
 
     public Player getWhitePlayer() {
         return this.whitePlayer;
+    }
+
+    public void setWhitePlayer(Player whitePlayer) {
+        this.whitePlayer = whitePlayer;
     }
 
     public LinkedList<Turn> getTurns() {

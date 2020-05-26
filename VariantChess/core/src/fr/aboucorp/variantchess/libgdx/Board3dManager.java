@@ -45,7 +45,6 @@ import fr.aboucorp.variantchess.entities.pieces.Pawn;
 import fr.aboucorp.variantchess.entities.pieces.Queen;
 import fr.aboucorp.variantchess.entities.pieces.Rook;
 import fr.aboucorp.variantchess.entities.utils.SquareList;
-import fr.aboucorp.variantchess.libgdx.models.ChessModel;
 import fr.aboucorp.variantchess.libgdx.models.ChessPieceM;
 import fr.aboucorp.variantchess.libgdx.models.ChessSquareM;
 import fr.aboucorp.variantchess.libgdx.models.GraphicsGameElement;
@@ -59,45 +58,36 @@ import fr.aboucorp.variantchess.libgdx.utils.GraphicGameArray;
 
 public class Board3dManager extends ApplicationAdapter {
 
-    /**
-     * Chargeur de modele 3D
-     */
-    private ModelBatch modelBatch;
-
-    private SpriteBatch spriteBatch;
-
-    /**
-     * Camera de la vue 3D
-     */
-    private PerspectiveCamera camera;
-
-    /**
-     * Controller de la camera permettant à l'utilisateur de la faire pivoter
-     */
-    private CameraInputController camController;
-
-    /**
-     * Environnement 3D pour l'affichage des modèles
-     */
-    private Environment environment;
-
-    /**
-     * Ecouteur d'évènement au clic sur la fenêtre
-     */
-    private InputAdapter androidInputAdapter;
-
-    private GestureDetector.GestureListener androidListener;
-
-    private boolean tacticalViewEnabled;
-
     private final GraphicGameArray chessSquareModels;
     private final GraphicGameArray whitePieceModels;
     private final GraphicGameArray blackPieceModels;
     private final GraphicGameArray whiteDeadPieceModels;
     private final GraphicGameArray blackDeadPieceModels;
     private final ArrayList<Piece> loadingPieces;
-    private static Map<Class, String> assetPaths = new HashMap<>();
-
+    private Map<Class, String> assetPaths;
+    /**
+     * Chargeur de modele 3D
+     */
+    private ModelBatch modelBatch;
+    private SpriteBatch spriteBatch;
+    /**
+     * Camera de la vue 3D
+     */
+    private PerspectiveCamera camera;
+    /**
+     * Controller de la camera permettant à l'utilisateur de la faire pivoter
+     */
+    private CameraInputController camController;
+    /**
+     * Environnement 3D pour l'affichage des modèles
+     */
+    private Environment environment;
+    /**
+     * Ecouteur d'évènement au clic sur la fenêtre
+     */
+    private InputAdapter androidInputAdapter;
+    private GestureDetector.GestureListener androidListener;
+    private boolean tacticalViewEnabled;
     private ModelBuilder modelBuilder;
     private AssetManager assets;
     private boolean boardIsLoading;
@@ -106,221 +96,177 @@ public class Board3dManager extends ApplicationAdapter {
     private TextureAtlas piecesAtlas;
 
     public Board3dManager() {
-        this.material3dManager =new Material3dManager();
+        this.material3dManager = new Material3dManager();
         this.whitePieceModels = new GraphicGameArray();
         this.whiteDeadPieceModels = new GraphicGameArray();
         this.blackPieceModels = new GraphicGameArray();
         this.blackDeadPieceModels = new GraphicGameArray();
         this.chessSquareModels = new GraphicGameArray();
         this.loadingPieces = new ArrayList<>();
+        this.assetPaths = new HashMap<>();
     }
 
     @Override
     public void create() {
-        this.assets = new AssetManager(new InternalFileHandleResolver());
-        this.modelBatch = new ModelBatch();
-        this.spriteBatch = new SpriteBatch();
-        this.modelBuilder = new ModelBuilder();
+        if (this.assets == null) {
+            this.assets = new AssetManager(new InternalFileHandleResolver());
+        }
+        if (this.modelBatch == null) {
+            this.modelBatch = new ModelBatch();
+        }
+        if (this.spriteBatch == null) {
+            this.spriteBatch = new SpriteBatch();
+        }
+        if (this.modelBuilder == null) {
+            this.modelBuilder = new ModelBuilder();
+        }
         this.initEnvironment();
-        this.initCamera(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
-        if(this.tacticalViewEnabled){
+        this.initCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        if (this.tacticalViewEnabled) {
             this.setTacticalCamera();
         }
-        this.setPaths();
-        this.loadModels();
+        if (this.assetPaths.size() == 0) {
+            this.setPaths();
+            this.loadModels();
+        }
+
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        this.initCamera(width, height);
     }
 
     @Override
     public void render() {
-        if ((this.boardIsLoading || this.material3dManager.picturesLoading) && this.assets.update()) {
+        if (this.boardIsLoading && this.assets.update()) {
             this.doneLoading();
         }
-        this.camController.update();
-        Gdx.gl.glClearColor(42 / 255f, 79 / 255f, 110 / 255f, 1);
-        Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-        this.modelBatch.begin(this.camera);
-        for (GraphicsGameElement piece : this.whitePieceModels) {
-            if (piece.isVisible(this.camera) && !this.tacticalViewEnabled) {
-                this.modelBatch.render(piece.getModel3d(), this.environment);
+        if (!this.boardIsLoading) {
+            this.camController.update();
+            Gdx.gl.glClearColor(42 / 255f, 79 / 255f, 110 / 255f, 1);
+            Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+            Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+
+            this.modelBatch.begin(this.camera);
+            for (GraphicsGameElement squareModel : this.chessSquareModels) {
+                if (squareModel.isVisible(this.camera, this.tacticalViewEnabled)) {
+                    this.modelBatch.render(squareModel.getModel3d(), this.environment);
+                }
             }
-        }
-
-        for (GraphicsGameElement piece : this.blackPieceModels) {
-            if (piece.isVisible(this.camera) && !this.tacticalViewEnabled) {
-                this.modelBatch.render(piece.getModel3d(), this.environment);
+            if (this.tacticalViewEnabled) {
+                this.modelBatch.end();
+                this.spriteBatch.begin();
             }
-        }
-        for (GraphicsGameElement deadPiece : this.whiteDeadPieceModels) {
-            if (deadPiece.isVisible(this.camera) && !this.tacticalViewEnabled) {
-                this.modelBatch.render(deadPiece.getModel3d(), this.environment);
+            for (GraphicsGameElement piece : this.whitePieceModels) {
+                if (piece.isVisible(this.camera, this.tacticalViewEnabled)) {
+                    if (this.tacticalViewEnabled) {
+                        this.spriteBatch.setProjectionMatrix(this.calculateProjectionMatrix(piece.getLocation()));
+                        this.spriteBatch.draw(piece.getModel2d(), 0, 0, 24, 24);
+                    } else {
+                        this.modelBatch.render(piece.getModel3d(), this.environment);
+                    }
+                }
             }
-        }
-        for (GraphicsGameElement deadPiece : this.blackDeadPieceModels) {
-            if (deadPiece.isVisible(this.camera) && !this.tacticalViewEnabled) {
-                this.modelBatch.render(deadPiece.getModel3d(), this.environment);
+            for (GraphicsGameElement piece : this.blackPieceModels) {
+                if (piece.isVisible(this.camera, this.tacticalViewEnabled)) {
+                    if (this.tacticalViewEnabled) {
+                        this.spriteBatch.setProjectionMatrix(this.calculateProjectionMatrix(piece.getLocation()));
+                        this.spriteBatch.draw(piece.getModel2d(), 0, 0, 24, 24);
+                    } else {
+                        this.modelBatch.render(piece.getModel3d(), this.environment);
+                    }
+                }
             }
-        }
-        for (GraphicsGameElement squareModel : this.chessSquareModels) {
-            if (squareModel.isVisible(this.camera)) {
-                this.modelBatch.render(squareModel.getModel3d(), this.environment);
+            for (GraphicsGameElement deadPiece : this.whiteDeadPieceModels) {
+                if (deadPiece.isVisible(this.camera, this.tacticalViewEnabled)) {
+                    if (this.tacticalViewEnabled) {
+                        //this.spriteBatch.setProjectionMatrix(deadPiece.getTransformation());
+                        //this.spriteBatch.draw(deadPiece.getModel2d(), 0, 0, 24, 24);
+                    } else {
+                        this.modelBatch.render(deadPiece.getModel3d(), this.environment);
+                    }
+                }
             }
-        }
+            for (GraphicsGameElement deadPiece : this.blackDeadPieceModels) {
+                if (deadPiece.isVisible(this.camera, this.tacticalViewEnabled)) {
+                    if (this.tacticalViewEnabled) {
+                        //this.spriteBatch.setProjectionMatrix(deadPiece.getTransformation());
+                        //this.spriteBatch.draw(deadPiece.getModel2d(), 0, 0, 24, 24);
+                    } else {
+                        this.modelBatch.render(deadPiece.getModel3d(), this.environment);
+                    }
+                }
+            }
 
-        this.modelBatch.end();
-        if (this.tacticalViewEnabled) {
-            this.displayPictures();
-        }
-    }
-
-    private void displayPictures() {
-        this.spriteBatch.begin();
-        this.whitePieceModels.forEach(piece -> {
-            Matrix4 tmpMat4 = new Matrix4();
-            Vector3 squareCenter = new Vector3(piece.getLocation().getX() + 0.475f, piece.getLocation().getY(), piece.getLocation().getZ() - 0.5f);
-            Matrix4 textTransform = new Matrix4();
-            textTransform.idt()
-                    .translate(squareCenter)
-                    .scl(0.04f)
-                    .rotate(1, 0, 0, 90)
-                    .rotate(0, 1, 0, 180);
-
-            this.spriteBatch.setProjectionMatrix(tmpMat4.set(this.camera.combined).mul(textTransform));
-            String id = this.material3dManager.getRegionNameFromPieceId(((ChessPieceM) piece.getModel3d()).id);
-            TextureAtlas.AtlasRegion region = this.piecesAtlas.findRegion(id);
-            Sprite pieceSprite = new Sprite(region);
-            this.spriteBatch.draw(pieceSprite, 0, 0, 24, 24);
-        });
-
-        this.blackPieceModels.forEach(piece -> {
-            Matrix4 tmpMat4 = new Matrix4();
-            Vector3 squareCenter = new Vector3(piece.getLocation().getX() + 0.475f, piece.getLocation().getY(), piece.getLocation().getZ() - 0.5f);
-            Matrix4 textTransform = new Matrix4();
-            textTransform.idt()
-                    .translate(squareCenter)
-                    .scl(0.04f)
-                    .rotate(1, 0, 0, 90)
-                    .rotate(0, 1, 0, 180);
-
-            this.spriteBatch.setProjectionMatrix(tmpMat4.set(this.camera.combined).mul(textTransform));
-            String id = this.material3dManager.getRegionNameFromPieceId(((ChessPieceM) piece.getModel3d()).id);
-            TextureAtlas.AtlasRegion region = this.piecesAtlas.findRegion(id);
-            Sprite pieceSprite = new Sprite(region);
-            this.spriteBatch.draw(pieceSprite, 0, 0, 24, 24);
-        });
-        this.whiteDeadPieceModels.forEach(piece -> {
-            Matrix4 tmpMat4 = new Matrix4();
-            Vector3 squareCenter = new Vector3(piece.getLocation().getX() + 0.475f, piece.getLocation().getY(), piece.getLocation().getZ() - 0.5f);
-            Matrix4 textTransform = new Matrix4();
-            textTransform.idt()
-                    .translate(squareCenter)
-                    .scl(0.04f)
-                    .rotate(1, 0, 0, 90)
-                    .rotate(0, 1, 0, 180);
-
-            this.spriteBatch.setProjectionMatrix(tmpMat4.set(this.camera.combined).mul(textTransform));
-            String id = this.material3dManager.getRegionNameFromPieceId(((ChessPieceM) piece.getModel3d()).id);
-            TextureAtlas.AtlasRegion region = this.piecesAtlas.findRegion(id);
-            Sprite pieceSprite = new Sprite(region);
-            this.spriteBatch.draw(pieceSprite, 0, 0, 24, 24);
-        });
-        this.blackDeadPieceModels.forEach(piece -> {
-            Matrix4 tmpMat4 = new Matrix4();
-            Vector3 squareCenter = new Vector3(piece.getLocation().getX() + 0.475f, piece.getLocation().getY(), piece.getLocation().getZ() - 0.5f);
-            Matrix4 textTransform = new Matrix4();
-            textTransform.idt()
-                    .translate(squareCenter)
-                    .scl(0.04f)
-                    .rotate(1, 0, 0, 90)
-                    .rotate(0, 1, 0, 180);
-
-            this.spriteBatch.setProjectionMatrix(tmpMat4.set(this.camera.combined).mul(textTransform));
-            String id = this.material3dManager.getRegionNameFromPieceId(((ChessPieceM) piece.getModel3d()).id);
-            TextureAtlas.AtlasRegion region = this.piecesAtlas.findRegion(id);
-            Sprite pieceSprite = new Sprite(region);
-            this.spriteBatch.draw(pieceSprite, 0, 0, 24, 24);
-        });
-        this.spriteBatch.end();
-    }
-
-
-private void setPaths() {
-        assetPaths.put(Knight.class, "data/knight.g3db");
-        assetPaths.put(King.class, "data/king.g3db");
-        assetPaths.put(Queen.class, "data/queen.g3db");
-        assetPaths.put(Pawn.class, "data/pawn.g3db");
-        assetPaths.put(Rook.class, "data/rook.g3db");
-        assetPaths.put(Bishop.class, "data/bishop.g3db");
-        assetPaths.put(Piece.class, "data/pictures/pieces.atlas");
-    }
-
-    public void createSquares(List<Square> squares) {
-        this.modelBuilder = new ModelBuilder();
-        Model compositeModel = this.createModelFromParts();
-
-        for (GameElement square : squares) {
-            Material material;
-            if (square.getChessColor() == ChessColor.BLACK) {
-                material = new Material(ColorAttribute.createDiffuse(Color.GRAY));
+            if (this.tacticalViewEnabled) {
+                this.spriteBatch.end();
             } else {
-                material = new Material(ColorAttribute.createDiffuse(Color.WHITE));
-            }
-            ChessSquareM squareModel = new ChessSquareM(compositeModel, square.getLocation(), material, ((Square) square).getSquareLabel());
-            GraphicsGameElement element = new GraphicsGameElement(square.getLocation());
-            element.setModel3d(squareModel);
-            this.chessSquareModels.add(element);
-        }
-
-    }
-
-    private Model createModelFromParts() {
-        int attr = VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal | VertexAttributes.Usage.TextureCoordinates;
-        this.modelBuilder.begin();
-        this.modelBuilder.node().id = "root";
-        MeshPartBuilder top = this.modelBuilder.part("top", GL20.GL_TRIANGLES, attr, new Material());
-        top.rect(-0.5f, 0f, -0.5f, -0.5f, 0f, 0.5f, 0.5f, 0f, 0.5f, 0.5f, 0f, -0.5f, 0, 1, 0);
-        MeshPartBuilder other = this.modelBuilder.part("others", GL20.GL_TRIANGLES, attr, new Material());
-        other.rect(-0.5f, 0f, -0.5f, 0.5f, 0f, -0.5f, 0.5f, -0.1f, -0.5f, -0.5f, -0.1f, -0.5f, 0, 0, -1);
-        other.rect(0.5f, 0f, -0.5f, 0.5f, 0f, 0.5f, 0.5f, -0.1f, 0.5f, 0.5f, -0.1f, -0.5f, 1, 0, 0);
-        other.rect(0.5f, 0f, 0.5f, -0.5f, 0f, 0.5f, -0.5f, -0.1f, 0.5f, 0.5f, -0.1f, 0.5f, 0, 0, 1);
-        other.rect(-0.5f, 0f, 0.5f, -0.5f, 0f, -0.5f, -0.5f, -0.1f, -0.5f, -0.5f, -0.1f, 0.5f, 1, 0, 0);
-        other.rect(-0.5f, -0.1f, -0.5f, 0.5f, -0.1f, -0.5f, 0.5f, -0.1f, 0.5f, -0.5f, -0.1f, 0.5f, 0, -1, 0);
-        return this.modelBuilder.end();
-    }
-
-    public void createPieces(List<Piece> pieces) {
-        this.loadingPieces.addAll(pieces);
-        this.boardIsLoading = true;
-    }
-
-    private void loadModels() {
-        for (Map.Entry<Class, String> entrySet : assetPaths.entrySet()) {
-            if (entrySet.getKey().equals(Piece.class)) {
-                this.assets.load(entrySet.getValue(), TextureAtlas.class);
-            } else {
-                this.assets.load(entrySet.getValue(), Model.class);
+                this.modelBatch.end();
             }
         }
+    }
 
-        this.boardIsLoading = true;
+    @Override
+    public void dispose() {
+        this.clearBoard();
+        this.modelBatch.dispose();
+        this.spriteBatch.dispose();
+        this.assets.dispose();
+        this.assetPaths.clear();
+        Gdx.app.log("fr.aboucorp.variantchess", "dispose Board3D");
+    }
+
+    public void clearBoard() {
+        this.selectedModel = null;
+        this.blackPieceModels.clear();
+        this.whitePieceModels.clear();
+        this.whiteDeadPieceModels.clear();
+        this.blackDeadPieceModels.clear();
+        this.chessSquareModels.clear();
     }
 
     private void doneLoading() {
-        if(this.tacticalViewEnabled){
-            this.load3dModels();
-        }else{
-            this.load2dModels();
+        if (this.tacticalViewEnabled) {
+            this.get2dModels();
+        } else {
+            this.get3dModels();
         }
-        this.boardIsLoading = false;
     }
 
-    private void load2dModels() {
-        this.piecesAtlas = this.assets.get(assetPaths.get(Piece.class), TextureAtlas.class);
+    private Matrix4 calculateProjectionMatrix(Location location) {
+        Matrix4 tmpMat4 = new Matrix4();
+        Vector3 squareCenter = new Vector3(location.getX() + 0.475f, location.getY(), location.getZ() - 0.5f);
+        Matrix4 textTransform = new Matrix4();
+        textTransform.idt()
+                .translate(squareCenter)
+                .scl(0.04f)
+                .rotate(1, 0, 0, 90)
+                .rotate(0, 1, 0, 180);
 
+        return tmpMat4.set(this.camera.combined).mul(textTransform);
     }
 
-    private void load3dModels() {
+    private void get2dModels() {
+        if (this.assets.isLoaded(this.assetPaths.get(Piece.class))) {
+            this.piecesAtlas = this.assets.get(this.assetPaths.get(Piece.class), TextureAtlas.class);
+            for (Iterator<Piece> iter = this.loadingPieces.iterator(); iter.hasNext(); ) {
+                Piece piece = iter.next();
+                GraphicsGameElement element = this.getOrAddPieceByIdAndColor(piece.getPieceId(), piece.getChessColor(), piece.getLocation());
+                element.move2D(piece.getLocation());
+                String id = this.material3dManager.getRegionNameFromPieceId(piece.getPieceId());
+                TextureAtlas.AtlasRegion region = this.piecesAtlas.findRegion(id);
+                Sprite pieceSprite = new Sprite(region);
+                element.setModel2d(pieceSprite);
+            }
+            this.boardIsLoading = false;
+        } else {
+            this.assets.load(this.assetPaths.get(Piece.class), TextureAtlas.class);
+        }
+    }
+
+    private void get3dModels() {
         Model knightModel = this.assets.get("data/knight.g3db", Model.class);
         Model bishopModel = this.assets.get("data/bishop.g3db", Model.class);
         Model pawnModel = this.assets.get("data/pawn.g3db", Model.class);
@@ -359,15 +305,139 @@ private void setPaths() {
             } else if (piece instanceof Queen) {
                 model = new QueenM(queenModel, piece.getLocation(), material, piece.getPieceId());
             }
-            GraphicsGameElement element = new GraphicsGameElement(model.getLocation());
+            GraphicsGameElement element = new GraphicsGameElement(model.getLocation(), piece.getPieceId());
             element.setModel3d(model);
             if (piece.getChessColor() == ChessColor.BLACK) {
                 this.blackPieceModels.add(element);
             } else {
                 this.whitePieceModels.add(element);
             }
-            iter.remove();
+            //iter.remove();
         }
+        this.boardIsLoading = false;
+    }
+
+    private GraphicsGameElement getOrAddPieceByIdAndColor(PieceId pieceId, ChessColor chessColor, Location location) {
+        GraphicsGameElement element;
+        if (chessColor == ChessColor.WHITE) {
+            element = this.whitePieceModels.getElementById(pieceId);
+            if (element == null) {
+                element = this.whiteDeadPieceModels.getElementById(pieceId);
+            }
+            if (element == null) {
+                element = new GraphicsGameElement(location, pieceId);
+            }
+            this.whitePieceModels.add(element);
+        } else {
+            element = this.blackPieceModels.getElementById(pieceId);
+            if (element == null) {
+                element = this.blackDeadPieceModels.getElementById(pieceId);
+            }
+            if (element == null) {
+                element = new GraphicsGameElement(location, pieceId);
+            }
+            this.blackPieceModels.add(element);
+        }
+        return element;
+    }
+
+    /**
+     * Initialisation de l'environnement 3D
+     */
+    private void initEnvironment() {
+        this.environment = new Environment();
+        this.environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 0.6f));
+        this.environment.set(new ColorAttribute(ColorAttribute.Specular, 0.4f, 0.4f, 0.4f, 1f));
+
+        this.environment.add(new DirectionalLight().set(0.6f, 0.6f, 0.6f, -1f, -0.8f, -0.2f));
+    }
+
+    /**
+     * Initialisation de la caméra pour la vue 3D
+     */
+    private void initCamera(int width, int height) {
+        this.camera = new PerspectiveCamera(30, width, height);
+        this.camera.position.set(3.5f, 15f, -5f);
+        this.camera.lookAt(3.475f, 0, 3.475f);
+        this.camera.near = 1f;
+        this.camera.far = 300f;
+        this.camera.update();
+        this.camController = new CameraInputController(this.camera);
+        this.camController.target.set(new Vector3(3.5f, 0, 3.5f));
+        InputMultiplexer multiplexer = new InputMultiplexer(new GestureDetector(this.androidListener), this.camController);
+        multiplexer.addProcessor(this.androidInputAdapter);
+        Gdx.input.setInputProcessor(multiplexer);
+    }
+
+    private void setTacticalCamera() {
+        this.camera.direction.set(0, 0, 0);
+        this.camera.lookAt(3.5f, 0, 3.5f);
+        this.camera.up.set(0, 1, 0);
+        this.camera.position.set(new Vector3(3.475f, 20, 3.475f));
+        this.camera.lookAt(3.5f, 0, 3.5f);
+        this.camera.rotate(Vector3.Y, -45);
+        this.camera.update();
+    }
+
+    private void setPaths() {
+        this.assetPaths.put(Knight.class, "data/knight.g3db");
+        this.assetPaths.put(King.class, "data/king.g3db");
+        this.assetPaths.put(Queen.class, "data/queen.g3db");
+        this.assetPaths.put(Pawn.class, "data/pawn.g3db");
+        this.assetPaths.put(Rook.class, "data/rook.g3db");
+        this.assetPaths.put(Bishop.class, "data/bishop.g3db");
+        this.assetPaths.put(Piece.class, "data/pictures/pieces.atlas");
+    }
+
+    private void loadModels() {
+        if (this.tacticalViewEnabled) {
+            this.assets.load(this.assetPaths.get(Piece.class), TextureAtlas.class);
+        } else {
+            for (Map.Entry<Class, String> entrySet : this.assetPaths.entrySet()) {
+                if (!entrySet.getKey().equals(Piece.class)) {
+                    this.assets.load(entrySet.getValue(), Model.class);
+                }
+            }
+        }
+        this.boardIsLoading = true;
+    }
+
+    public void createSquares(List<Square> squares) {
+        this.modelBuilder = new ModelBuilder();
+        Model compositeModel = this.createModelFromParts();
+        for (GameElement square : squares) {
+            Material material;
+            if (square.getChessColor() == ChessColor.BLACK) {
+                material = new Material(ColorAttribute.createDiffuse(Color.GRAY));
+            } else {
+                material = new Material(ColorAttribute.createDiffuse(Color.WHITE));
+            }
+            ChessSquareM squareModel = new ChessSquareM(compositeModel, square.getLocation(), material, ((Square) square).getSquareLabel());
+            GraphicsGameElement element = new GraphicsGameElement(square.getLocation(), null);
+            element.setModel3d(squareModel);
+            this.chessSquareModels.add(element);
+        }
+
+    }
+
+    private Model createModelFromParts() {
+        int attr = VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal | VertexAttributes.Usage.TextureCoordinates;
+        this.modelBuilder.begin();
+        this.modelBuilder.node().id = "root";
+        MeshPartBuilder top = this.modelBuilder.part("top", GL20.GL_TRIANGLES, attr, new Material());
+        top.rect(-0.5f, 0f, -0.5f, -0.5f, 0f, 0.5f, 0.5f, 0f, 0.5f, 0.5f, 0f, -0.5f, 0, 1, 0);
+        MeshPartBuilder other = this.modelBuilder.part("others", GL20.GL_TRIANGLES, attr, new Material());
+        other.rect(-0.5f, 0f, -0.5f, 0.5f, 0f, -0.5f, 0.5f, -0.1f, -0.5f, -0.5f, -0.1f, -0.5f, 0, 0, -1);
+        other.rect(0.5f, 0f, -0.5f, 0.5f, 0f, 0.5f, 0.5f, -0.1f, 0.5f, 0.5f, -0.1f, -0.5f, 1, 0, 0);
+        other.rect(0.5f, 0f, 0.5f, -0.5f, 0f, 0.5f, -0.5f, -0.1f, 0.5f, 0.5f, -0.1f, 0.5f, 0, 0, 1);
+        other.rect(-0.5f, 0f, 0.5f, -0.5f, 0f, -0.5f, -0.5f, -0.1f, -0.5f, -0.5f, -0.1f, 0.5f, 1, 0, 0);
+        other.rect(-0.5f, -0.1f, -0.5f, 0.5f, -0.1f, -0.5f, 0.5f, -0.1f, 0.5f, -0.5f, -0.1f, 0.5f, 0, -1, 0);
+        return this.modelBuilder.end();
+    }
+
+    public void createPieces(List<Piece> pieces) {
+        this.loadingPieces.addAll(pieces);
+        this.boardIsLoading = true;
     }
 
     public void selectPiece(Piece touched) {
@@ -396,48 +466,17 @@ private void setPaths() {
         }
     }
 
-    public GraphicGameArray getWhitePieceModels() {
-        return this.whitePieceModels;
-    }
-
-    public GraphicGameArray getBlackPieceModels() {
-        return this.blackPieceModels;
-    }
-
-    private GraphicGameArray getChessSquareModels() {
-        return this.chessSquareModels;
-    }
-
-    /**
-     * Initialisation de l'environnement 3D
-     */
-    private void initEnvironment() {
-        this.environment = new Environment();
-        this.environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 0.6f));
-        this.environment.set(new ColorAttribute(ColorAttribute.Specular, 0.4f, 0.4f, 0.4f, 1f));
-
-        this.environment.add(new DirectionalLight().set(0.6f, 0.6f, 0.6f, -1f, -0.8f, -0.2f));
-    }
-
-    /**
-     * Initialisation de la caméra pour la vue 3D
-     */
-    private void initCamera(int width , int height) {
-        this.camera = new PerspectiveCamera(30, width, height);
-        this.camera.position.set(3.5f, 15f, -5f);
-        this.camera.lookAt(3.475f, 0, 3.475f);
-        this.camera.near = 1f;
-        this.camera.far = 300f;
-        this.camera.update();
-        this.camController = new CameraInputController(this.camera);
-        this.camController.target.set(new Vector3(3.5f, 0, 3.5f));
-        InputMultiplexer multiplexer = new InputMultiplexer(new GestureDetector(this.androidListener), this.camController);
-        multiplexer.addProcessor(this.androidInputAdapter);
-        Gdx.input.setInputProcessor(multiplexer);
-    }
-
     public void moveSelectedPieceIntoSquare(Square square) {
-        this.move(this.selectedModel,square.getLocation());
+        this.move(this.selectedModel, square.getLocation());
+    }
+
+    private void move(GraphicsGameElement element, Location location) {
+        if (element.getModel2d() != null) {
+            element.move2D(location);
+        }
+        if (element.getModel3d() != null) {
+            element.move3D(location);
+        }
     }
 
     public void highlightEmptySquareFromLocation(Square square) {
@@ -453,6 +492,14 @@ private void setPaths() {
         }
     }
 
+    public GraphicGameArray getWhitePieceModels() {
+        return this.whitePieceModels;
+    }
+
+    public GraphicGameArray getBlackPieceModels() {
+        return this.blackPieceModels;
+    }
+
     public void moveToSquare(Piece piece, Square square) {
         GraphicsGameElement element;
         if (piece.getChessColor() == ChessColor.WHITE) {
@@ -460,7 +507,7 @@ private void setPaths() {
         } else {
             element = this.getBlackPieceModels().getByLocation(piece.getLocation());
         }
-        this.move(element,square.getLocation());
+        this.move(element, square.getLocation());
     }
 
     public GraphicGameArray getSquareModelsFromPossibleMoves(SquareList possiblesMoves) {
@@ -477,6 +524,10 @@ private void setPaths() {
         return possibleSquares;
     }
 
+    private GraphicGameArray getChessSquareModels() {
+        return this.chessSquareModels;
+    }
+
     public void unHighlightSquares(SquareList possiblesMoves) {
         for (Square square : possiblesMoves) {
             this.material3dManager.resetMaterial(this.getChessSquareModels().getByLocation(square.getLocation()), this.tacticalViewEnabled);
@@ -490,18 +541,10 @@ private void setPaths() {
         }
     }
 
-    private void move(GraphicsGameElement element, Location location){
-        if(this.tacticalViewEnabled){
-            element.move2D(location);
-        }else {
-            element.move3D(location);
-        }
-    }
-
     public void moveToEven(Piece piece) {
-        if(this.tacticalViewEnabled){
+        if (this.tacticalViewEnabled) {
             // TODO
-        }else {
+        } else {
             GraphicsGameElement eatenPiece;
             if (piece.getChessColor() == ChessColor.WHITE) {
                 eatenPiece = this.getWhitePieceModels().removeByLocation(piece.getLocation());
@@ -521,22 +564,16 @@ private void setPaths() {
         }
     }
 
-    public void clearBoard() {
-        this.selectedModel = null;
-        this.blackPieceModels.clear();
-        this.whitePieceModels.clear();
-        this.whiteDeadPieceModels.clear();
-        this.blackDeadPieceModels.clear();
-        this.chessSquareModels.clear();
-    }
-
     public void toogleTacticalView() {
-        this.tacticalViewEnabled = !this.tacticalViewEnabled;
-        if (this.tacticalViewEnabled) {
+        if (!this.tacticalViewEnabled) {
+            if (this.piecesAtlas == null) {
+                this.boardIsLoading = true;
+            }
             this.setTacticalCamera();
         } else {
             this.set3DCamera();
         }
+        this.tacticalViewEnabled = !this.tacticalViewEnabled;
     }
 
     private void set3DCamera() {
@@ -544,19 +581,6 @@ private void setPaths() {
         this.camera.up.set(0, 1, 0);
         this.camera.position.set(3.5f, 15f, -8f);
         this.camera.lookAt(3.5f, 0, 3.5f);
-        this.camera.update();
-    }
-
-    private void setTacticalCamera() {
-        this.camera.direction.set(0, 0, 0);
-        this.camera.lookAt(3.5f, 0, 3.5f);
-        this.camera.up.set(0, 1, 0);
-        this.camera.position.set(new Vector3(3.475f, 20, 3.475f));
-        this.camera.lookAt(3.5f, 0, 3.5f);
-        this.camera.rotate(Vector3.Y, -45);
-            /*if (turnColor == ChessColor.BLACK) {
-                this.camera.rotate(Vector3.Y, -180);
-            }*/
         this.camera.update();
     }
 
@@ -594,19 +618,6 @@ private void setPaths() {
         this.androidListener = androidListener;
     }
 
-    @Override
-    public void resize(int width, int height) {
-        this.initCamera(width, height);
-    }
-
-    @Override
-    public void dispose() {
-        this.modelBatch.dispose();
-        this.spriteBatch.dispose();
-        this.assets.dispose();
-        Gdx.app.log("fr.aboucorp.variantchess","dispose Board3D");
-    }
-
     public boolean isTacticalViewEnabled() {
         return this.tacticalViewEnabled;
     }
@@ -617,6 +628,5 @@ private void setPaths() {
 
     public void exit() {
         Gdx.app.exit();
-        Gdx.app.log("fr.aboucorp.variantchess","Exit VariantChess app");
     }
 }

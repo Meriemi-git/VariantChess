@@ -35,8 +35,8 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
     protected final Board board;
     protected final Board3dManager board3dManager;
     protected final AbstractRuleSet ruleSet;
-    protected Piece selectedPiece;
     protected final GameEventManager gameEventManager;
+    protected Piece selectedPiece;
     protected Turn previousTurn;
     protected Turn actualTurn;
     protected SquareList possiblesMoves;
@@ -97,7 +97,7 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
     public void selectSquare(Square to) {
         Square from = this.selectedPiece.getSquare();
         Piece deadPiece = this.moveToSquare(to);
-        String message = String.format("Move %s from %s to %s", this.selectedPiece,from, to);
+        String message = String.format("Move %s from %s to %s", this.selectedPiece, from, to);
         this.gameEventManager.sendMessage(new MoveEvent(
                 message
                 , from.getLocation()
@@ -105,6 +105,8 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
                 , this.selectedPiece.getPieceId()
                 , deadPiece != null ? deadPiece.getPieceId() : null));
     }
+
+    protected abstract Piece moveToSquare(Square to);
 
     public void unHighlight() {
         this.gameState = GameState.SelectPiece;
@@ -122,7 +124,6 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
         // TODO
         return null;
     }
-
 
     public abstract Square getSquareFromLocation(Location location);
 
@@ -148,10 +149,6 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
         return pieces.stream().filter(p -> p.getLocation().equals(location)).findFirst().get();
     }
 
-
-
-    protected abstract Piece moveToSquare(Square to);
-
     public void toogleTacticalView() {
         GdxPostRunner runner = new GdxPostRunner() {
             @Override
@@ -171,7 +168,6 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
     }
 
     public abstract String getFenFromBoard();
-
 
 
     public interface BoardLoadingListener {

@@ -1,16 +1,16 @@
 package fr.aboucorp.variantchess.app.views.activities;
 
 import android.app.AlertDialog;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toolbar;
 
+import androidx.preference.PreferenceManager;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
@@ -21,6 +21,7 @@ import fr.aboucorp.variantchess.app.listeners.MatchEventListener;
 import fr.aboucorp.variantchess.app.managers.MatchManager;
 import fr.aboucorp.variantchess.app.managers.boards.ClassicBoardManager;
 import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
+import fr.aboucorp.variantchess.app.views.fragments.SettingsFragment;
 import fr.aboucorp.variantchess.entities.Match;
 import fr.aboucorp.variantchess.entities.boards.Board;
 import fr.aboucorp.variantchess.entities.boards.ClassicBoard;
@@ -33,12 +34,12 @@ import fr.aboucorp.variantchess.entities.rules.ClassicRuleSet;
 import fr.aboucorp.variantchess.libgdx.Board3dManager;
 
 public class BoardActivity extends AndroidApplication implements GameEventSubscriber, MatchEventListener {
+
+    public FrameLayout board_panel;
     private Button btn_end_turn;
     private Switch switch_tactical;
     private TextView lbl_turn;
     private TextView party_logs;
-    public FrameLayout board_panel;
-
     private Board3dManager board3dManager;
     private ClassicBoardManager boardManager;
     private MatchManager matchManager;
@@ -46,67 +47,7 @@ public class BoardActivity extends AndroidApplication implements GameEventSubscr
     private Toolbar toolbar;
     private User user;
     private Match match;
-
-    @Override
-    protected void onCreate (Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        this.setContentView(R.layout.board_layout);
-        if(savedInstanceState != null){
-            this.match = (Match) savedInstanceState.getSerializable("match");
-        }else{
-            this.match = (Match) this.getIntent().getExtras().getSerializable("match");
-        }
-        this.bindViews();
-        this.bindListeners();
-        this.setToolbar();
-        this.sessionManager = SessionManager.getInstance(this);
-        this.user = this.sessionManager.getUser();
-        this.initializeBoard();
-        this.matchManager.setEventListener(this);
-        this.matchManager.startParty(this.match);
-    }
-
-
-
-    private void setToolbar() {
-        this.toolbar = this.findViewById(R.id.main_toolbar);
-        this.toolbar.setTitle(this.getString(R.string.app_name));
-        this.toolbar.setSubtitle(this.user != null ? this.user.getDisplayName() : "Disconnected");
-        this.setActionBar(this.toolbar);
-        this.toolbar.setNavigationOnClickListener(v -> this.onBackPressed());
-        this.getActionBar().setDisplayHomeAsUpEnabled(true);
-        this.getActionBar().setHomeButtonEnabled(false);
-        this.getActionBar().setHomeAsUpIndicator(R.drawable.ic_arrow_back);
-    }
-
-    private void bindListeners() {
-        this.btn_end_turn.setOnClickListener(v -> {
-            BoardActivity.this.matchManager.endTurn(null);
-            this.runOnUiThread(() ->
-                    BoardActivity.this.lbl_turn.setText("Turn of " + BoardActivity.this.matchManager.getPartyInfos()));
-        });
-        this.switch_tactical.setOnClickListener(v -> BoardActivity.this.boardManager.toogleTacticalView());
-    }
-
-    private void bindViews() {
-        this.board_panel = this.findViewById(R.id.board);
-        this.btn_end_turn = this.findViewById(R.id.btn_end_turn);
-        this.lbl_turn = this.findViewById(R.id.lbl_turn);
-        this.party_logs = this.findViewById(R.id.party_logs);
-        this.switch_tactical = this.findViewById(R.id.switch_tactical);
-    }
-
-    private void initializeBoard(){
-        GameEventManager gameEventManager = new GameEventManager();
-        gameEventManager.subscribe(GameEvent.class,this,1);
-        this.board3dManager = new Board3dManager();
-        Board classicBoard = new ClassicBoard(gameEventManager);
-        ClassicRuleSet classicRules = new ClassicRuleSet(classicBoard,gameEventManager);
-        this.boardManager = new ClassicBoardManager(this.board3dManager, classicBoard, classicRules,gameEventManager);
-        this.matchManager = new MatchManager(this.boardManager,gameEventManager);
-        AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
-        this.board_panel.addView(this.initializeForView(this.board3dManager, config));
-    }
+    private GameEventManager gameEventManager;
 
     @Override
     public void receiveGameEvent(GameEvent event) {
@@ -120,15 +61,72 @@ public class BoardActivity extends AndroidApplication implements GameEventSubscr
 
     @Override
     public void OnMatchEvent(GameEvent event) {
-        if(!(event instanceof TurnEvent)) {
+        if (!(event instanceof TurnEvent)) {
             this.runOnUiThread(() ->
                     this.party_logs.append("\n" + event.message));
         }
     }
 
     @Override
-    public void onConfigurationChanged(Configuration config) {
-        super.onConfigurationChanged(config);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        this.setContentView(R.layout.board_layout);
+        if (savedInstanceState != null) {
+            this.match = (Match) savedInstanceState.getSerializable("match");
+        } else {
+            this.match = (Match) this.getIntent().getExtras().getSerializable("match");
+        }
+        this.bindViews();
+        this.bindListeners();
+        this.setToolbar();
+        //this.sessionManager = SessionManager.getInstance(this);
+        // this.user = this.sessionManager.getUser();
+        this.initializeBoard();
+        this.matchManager.setEventListener(this);
+        this.matchManager.startParty(this.match);
+    }
+
+    private void bindViews() {
+        this.board_panel = this.findViewById(R.id.board);
+        this.btn_end_turn = this.findViewById(R.id.btn_end_turn);
+        this.lbl_turn = this.findViewById(R.id.lbl_turn);
+        this.party_logs = this.findViewById(R.id.party_logs);
+        this.switch_tactical = this.findViewById(R.id.switch_tactical);
+    }
+
+    private void bindListeners() {
+        this.btn_end_turn.setOnClickListener(v -> {
+            BoardActivity.this.matchManager.endTurn(null);
+            this.runOnUiThread(() ->
+                    BoardActivity.this.lbl_turn.setText("Turn of " + BoardActivity.this.matchManager.getPartyInfos()));
+        });
+        this.switch_tactical.setOnClickListener(v -> BoardActivity.this.boardManager.toogleTacticalView());
+    }
+
+    private void setToolbar() {
+        this.toolbar = this.findViewById(R.id.main_toolbar);
+        this.toolbar.setTitle(this.getString(R.string.app_name));
+        this.toolbar.setSubtitle(this.user != null ? this.user.getDisplayName() : "Disconnected");
+        this.setActionBar(this.toolbar);
+        this.toolbar.setNavigationOnClickListener(v -> this.onBackPressed());
+        this.getActionBar().setDisplayHomeAsUpEnabled(true);
+        this.getActionBar().setHomeButtonEnabled(false);
+        this.getActionBar().setHomeAsUpIndicator(R.drawable.ic_arrow_back);
+    }
+
+    private void initializeBoard() {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean isTactical = sharedPref.getBoolean(SettingsFragment.IS_TACTICAL_MODE_ON, false);
+        this.gameEventManager = new GameEventManager();
+        this.gameEventManager.subscribe(GameEvent.class, this, 1);
+        this.board3dManager = new Board3dManager();
+        this.board3dManager.setTacticalViewEnabled(isTactical);
+        Board classicBoard = new ClassicBoard(this.gameEventManager);
+        ClassicRuleSet classicRules = new ClassicRuleSet(classicBoard, this.gameEventManager);
+        this.boardManager = new ClassicBoardManager(this.board3dManager, classicBoard, classicRules, this.gameEventManager);
+        this.matchManager = new MatchManager(this.boardManager, this.gameEventManager);
+        AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
+        this.board_panel.addView(this.initializeForView(this.board3dManager, config));
     }
 
     @Override
@@ -148,37 +146,59 @@ public class BoardActivity extends AndroidApplication implements GameEventSubscr
     }
 
     @Override
+    public void recreate() {
+        super.recreate();
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+    }
+
+    @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
         savedInstanceState.putSerializable("match", this.match);
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        this.getMenuInflater().inflate(R.menu.main_menu, menu);
-        return true;
+    protected void onStop() {
+        super.onStop();
     }
 
     @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        MenuItem disconnect = this.toolbar.getMenu().findItem(R.id.menu_action_disconnect);
-        MenuItem profile = this.toolbar.getMenu().findItem(R.id.menu_action_profil);
-        MenuItem settings = this.toolbar.getMenu().findItem(R.id.menu_action_settings);
-        disconnect.setVisible(false);
-        profile.setVisible(true);
-        settings.setVisible(false);
-        return true;
+    protected void onPause() {
+        super.onPause();
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_action_profil:
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
+    protected void onResume() {
+        super.onResume();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration config) {
+        super.onConfigurationChanged(config);
+        this.setContentView(R.layout.board_layout);
+        this.bindViews();
+        this.bindListeners();
+        this.setToolbar();
+        AndroidApplicationConfiguration libgdxConfig = new AndroidApplicationConfiguration();
+        this.board_panel.addView(this.initializeForView(this.board3dManager, libgdxConfig));
+    }
+
+    @Override
+    public void exit() {
+        super.exit();
+    }
 }
