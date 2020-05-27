@@ -11,53 +11,9 @@ import fr.aboucorp.variantchess.libgdx.models.ChessModel;
 import fr.aboucorp.variantchess.libgdx.models.GraphicsGameElement;
 
 class Material3dManager {
+
     private Material selectedPieceMaterial;
     private Material occupiedMaterial;
-
-    public Material3dManager() {
-        this.selectedPieceMaterial = new Material();
-        this.selectedPieceMaterial.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, 0.8f));
-        this.selectedPieceMaterial.set(ColorAttribute.createDiffuse(Color.ROYAL));
-
-        this.occupiedMaterial = new Material();
-        this.occupiedMaterial.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, 0.8f));
-        this.occupiedMaterial.set(ColorAttribute.createDiffuse(Color.RED));
-    }
-
-
-    public void resetMaterial(GraphicsGameElement element, boolean isTactical) {
-        if (isTactical) {
-            // TODO
-        } else {
-            Material oldMat = element.getModel3d().materials.get(0);
-            oldMat.clear();
-            oldMat.set(element.getModel3d().getOriginalMaterial());
-        }
-
-    }
-
-    public void setSelectedMaterial(GraphicsGameElement element, boolean isTactical) {
-        if (isTactical) {
-            // TODO
-        } else {
-            this.set3DMaterial(element.getModel3d(), this.selectedPieceMaterial);
-        }
-
-    }
-
-    private void set3DMaterial(ChessModel model, Material material) {
-        Material actualMaterial = model.materials.get(0);
-        actualMaterial.clear();
-        actualMaterial.set(material);
-    }
-
-    public void setOccupiedMaterial(GraphicsGameElement element, boolean isTactical) {
-        if (isTactical) {
-            // TODO
-        } else {
-            this.set3DMaterial(element.getModel3d(), this.occupiedMaterial);
-        }
-    }
 
     public String getRegionNameFromPieceId(PieceId id) {
         switch (id) {
@@ -110,6 +66,52 @@ class Material3dManager {
             default:
                 return "wp";
         }
+    }
+
+    public void resetMaterial(GraphicsGameElement element, boolean isTactical) {
+        if (element.getModel2d() != null) {
+            element.setUseShader(false);
+        }
+        if (element.getModel3d() != null) {
+            Material oldMat = element.getModel3d().materials.get(0);
+            oldMat.clear();
+            oldMat.set(element.getModel3d().getOriginalMaterial());
+        }
+
+    }
+
+    private void set3DMaterial(ChessModel model, Material material) {
+        Material actualMaterial = model.materials.get(0);
+        actualMaterial.clear();
+        actualMaterial.set(material);
+    }
+
+    public void setOccupiedMaterial(GraphicsGameElement element, boolean isTactical) {
+        if (isTactical) {
+            element.setUseShader(true);
+        } else {
+            this.set3DMaterial(element.getModel3d(), this.occupiedMaterial);
+        }
+    }
+
+    public void setSelectedMaterial(GraphicsGameElement element, boolean isTactical) {
+        if (element.getModel2d() != null) {
+            element.setUseShader(true);
+        }
+        if (element.getModel3d() != null) {
+            this.set3DMaterial(element.getModel3d(), this.selectedPieceMaterial);
+        }
+
+    }
+
+    public Material3dManager() {
+        this.selectedPieceMaterial = new Material();
+        this.selectedPieceMaterial.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, 0.8f));
+        this.selectedPieceMaterial.set(ColorAttribute.createDiffuse(Color.ROYAL));
+
+        this.occupiedMaterial = new Material();
+        this.occupiedMaterial.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, 0.8f));
+        this.occupiedMaterial.set(ColorAttribute.createDiffuse(Color.RED));
     }
 
 }

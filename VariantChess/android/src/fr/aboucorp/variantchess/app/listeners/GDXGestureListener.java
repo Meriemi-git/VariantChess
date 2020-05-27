@@ -1,6 +1,7 @@
 package fr.aboucorp.variantchess.app.listeners;
 
-import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
 
@@ -15,7 +16,6 @@ public class GDXGestureListener implements GestureDetector.GestureListener {
 
     private BoardManager boardManager;
     private TouchedModelFinder touchedModelFinder;
-    private float currentZoom;
 
     public GDXGestureListener(BoardManager boardManager) {
         this.boardManager = boardManager;
@@ -27,9 +27,9 @@ public class GDXGestureListener implements GestureDetector.GestureListener {
         if (this.boardManager.getGameState() == GameState.SelectPiece) {
             GraphicsGameElement piece;
             if (this.boardManager.IsTacticalViewOn()) {
-                piece = this.touchedModelFinder.getTouched2DModel(screenX, screenY, this.boardManager.get3DModelsForTurn());
+                piece = this.touchedModelFinder.getTouched2DModel(screenX, screenY, this.boardManager.getModelsForTurn());
             } else {
-                piece = this.touchedModelFinder.getTouched3DModel(screenX, screenY, this.boardManager.get3DModelsForTurn());
+                piece = this.touchedModelFinder.getTouched3DModel(screenX, screenY, this.boardManager.getModelsForTurn());
             }
             if (piece != null) {
                 Piece touchedPiece = this.boardManager.getPieceFromLocation(piece.getLocation());
@@ -42,9 +42,9 @@ public class GDXGestureListener implements GestureDetector.GestureListener {
         } else if (this.boardManager.getGameState() == GameState.SelectCase) {
             GraphicsGameElement otherPiece;
             if (this.boardManager.IsTacticalViewOn()) {
-                otherPiece = this.touchedModelFinder.getTouched2DModel(screenX, screenY, this.boardManager.get3DModelsForTurn());
+                otherPiece = this.touchedModelFinder.getTouched2DModel(screenX, screenY, this.boardManager.getModelsForTurn());
             } else {
-                otherPiece = this.touchedModelFinder.getTouched3DModel(screenX, screenY, this.boardManager.get3DModelsForTurn());
+                otherPiece = this.touchedModelFinder.getTouched3DModel(screenX, screenY, this.boardManager.getModelsForTurn());
             }
             if (otherPiece != null) {
                 Piece otherTouchedPiece = this.boardManager.getPieceFromLocation(otherPiece.getLocation());
@@ -97,8 +97,11 @@ public class GDXGestureListener implements GestureDetector.GestureListener {
     @Override
     public boolean pan(float x, float y, float deltaX, float deltaY) {
         if (this.boardManager.IsTacticalViewOn()) {
- /*           this.boardManager.getCamera().translate(-deltaX * 0.5f * this.currentZoom, deltaY * 0.5f * this.currentZoom);
-            this.boardManager.getCamera().update();*/
+            Gdx.app.log("fr.aboucorp.variantchess", "x :" + x + " y :" + y + " deltaX : " + deltaX + " deltaY :" + deltaY);
+            float newX = (deltaX / this.boardManager.getCamera().fieldOfView);
+            float newZ = (deltaY / this.boardManager.getCamera().fieldOfView);
+            this.boardManager.getCamera().translate(newX, 0, newZ);
+            this.boardManager.getCamera().update();
             return false;
         } else {
             return false;
@@ -108,8 +111,7 @@ public class GDXGestureListener implements GestureDetector.GestureListener {
     @Override
     public boolean panStop(float x, float y, int pointer, int button) {
         if (this.boardManager.IsTacticalViewOn()) {
-            this.currentZoom = this.boardManager.getCamera().zoom;
-            return true;
+            return false;
         } else {
             return false;
         }
@@ -118,8 +120,14 @@ public class GDXGestureListener implements GestureDetector.GestureListener {
     @Override
     public boolean zoom(float initialDistance, float distance) {
         if (this.boardManager.IsTacticalViewOn()) {
-            OrthographicCamera camera = this.boardManager.getCamera();
-            camera.zoom = (initialDistance / distance) * this.currentZoom;
+            PerspectiveCamera camera = this.boardManager.getCamera();
+            float rap = (initialDistance / distance);
+            rap = rap < 1f ? 0.95f : rap > 1f ? 1.05f : rap;
+            Gdx.app.log("fr.aboucorp.variantchess", initialDistance + " " + distance + " " + rap + " " + camera.fieldOfView);
+            float newFieldOfView = rap * camera.fieldOfView;
+            newFieldOfView = newFieldOfView <= 8 ? 8 : newFieldOfView >= 40 ? 40 : newFieldOfView;
+            camera.fieldOfView = newFieldOfView;
+            Gdx.app.log("fr.aboucorp.variantchess", "fov:" + newFieldOfView);
             camera.update();
             return true;
         } else {

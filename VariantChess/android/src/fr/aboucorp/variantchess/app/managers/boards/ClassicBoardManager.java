@@ -48,27 +48,6 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
     }
 
     @Override
-    protected void manageTurnStart(TurnStartEvent event) {
-        if (this.actualTurn != null) {
-            this.previousTurn = this.actualTurn;
-        }
-        this.actualTurn = event.turn;
-        GdxPostRunner runner = new GdxPostRunner() {
-            @Override
-            public void execute() {
-                //ClassicBoardManager.this.board3dManager.moveCameraOnNewTurn(ClassicBoardManager.this.actualTurn.getTurnColor());
-            }
-        };
-        runner.startAsync();
-    }
-
-    @Override
-    protected void manageTurnEnd() {
-        this.selectedPiece = null;
-        this.possiblesMoves = null;
-    }
-
-    @Override
     public void startParty(Match match) {
         this.match = match;
         super.startParty(match);
@@ -143,7 +122,7 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
     public Piece moveToSquare(Square square) {
         Piece eated = this.eat(square);
         this.selectedPiece.move(square);
-        this.board3dManager.moveSelectedPieceIntoSquare(square);
+        this.board3dManager.moveSelected(square);
         ((ClassicRuleSet) this.ruleSet).isKingInCheck(this.selectedPiece);
         ((ClassicRuleSet) this.ruleSet).checkIfCastling(square);
         this.resetHighlited();
@@ -231,6 +210,27 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
         return fenString.toString();
     }
 
+    @Override
+    protected void manageTurnStart(TurnStartEvent event) {
+        if (this.actualTurn != null) {
+            this.previousTurn = this.actualTurn;
+        }
+        this.actualTurn = event.turn;
+        GdxPostRunner runner = new GdxPostRunner() {
+            @Override
+            public void execute() {
+                //ClassicBoardManager.this.board3dManager.moveCameraOnNewTurn(ClassicBoardManager.this.actualTurn.getTurnColor());
+            }
+        };
+        runner.startAsync();
+    }
+
+    @Override
+    protected void manageTurnEnd() {
+        this.selectedPiece = null;
+        this.possiblesMoves = null;
+    }
+
     private Piece eat(Square square) {
         Piece toBeEaten = square.getPiece();
         if (((ClassicRuleSet) this.ruleSet).isEnPassantMove(this.selectedPiece, square)) {
@@ -260,9 +260,9 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
         if (possibleMoves != null) {
             for (Square square : possibleMoves) {
                 if (square.getPiece() == null) {
-                    this.board3dManager.highlightEmptySquareFromLocation(square);
+                    this.board3dManager.highlightEmpty(square);
                 } else {
-                    this.board3dManager.highlightOccupiedSquareFromLocation(square);
+                    this.board3dManager.highlightOccupied(square);
                 }
             }
         }

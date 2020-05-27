@@ -1,8 +1,9 @@
 package fr.aboucorp.variantchess.app.managers.boards;
 
-import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.PerspectiveCamera;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 import fr.aboucorp.variantchess.app.listeners.GDXGestureListener;
 import fr.aboucorp.variantchess.app.listeners.GDXInputAdapter;
@@ -44,18 +45,52 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
 
     private GameState gameState;
 
-    BoardManager(Board board, Board3dManager board3dManager, AbstractRuleSet ruleSet, GameEventManager gameEventManager) {
-        this.board = board;
-        this.board3dManager = board3dManager;
-        this.ruleSet = ruleSet;
-        GDXInputAdapter inputAdapter = new GDXInputAdapter(board3dManager);
-        board3dManager.setAndroidInputAdapter(inputAdapter);
-        GDXGestureListener gestureListener = new GDXGestureListener(this);
-        board3dManager.setAndroidListener(gestureListener);
-        this.gameState = GameState.SelectPiece;
-        this.gameEventManager = gameEventManager;
+    public boolean IsTacticalViewOn() {
+        return this.board3dManager.isTacticalViewEnabled();
     }
 
+    public PerspectiveCamera getCamera() {
+        return this.board3dManager.getCamera();
+    }
+
+    public abstract String getFenFromBoard();
+
+    public GameState getGameState() {
+        return this.gameState;
+    }
+
+    public GraphicGameArray getModelsForTurn() {
+        if (this.actualTurn.getTurnColor() == ChessColor.BLACK) {
+            return this.board3dManager.getBlackPieceModels();
+        } else {
+            return this.board3dManager.getWhitePieceModels();
+        }
+    }
+
+    public Piece getPieceFromLocation(Location location) {
+        ArrayList<Piece> pieces;
+        if (this.actualTurn.getTurnColor() == ChessColor.WHITE) {
+            pieces = this.board.getWhitePieces();
+        } else {
+            pieces = this.board.getBlackPieces();
+        }
+        Optional<Piece> piece = pieces.stream().filter(p -> p.getLocation().equals(location)).findFirst();
+        return piece.isPresent() ? piece.get() : null;
+    }
+
+    public abstract GraphicGameArray getPossibleSquareModels();
+
+    public abstract Square getSquareFromLocation(Location location);
+
+    public abstract ChessColor getWinner();
+
+    public abstract ChessColor loadBoard(String fenString) throws FenStringBadFormatException;
+
+    protected abstract void manageTurnEnd();
+
+    protected abstract void manageTurnStart(TurnStartEvent event);
+
+    protected abstract Piece moveToSquare(Square to);
 
     @Override
     public void receiveGameEvent(GameEvent event) {
@@ -65,29 +100,6 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
             this.manageTurnEnd();
         }
     }
-
-    protected abstract void manageTurnStart(TurnStartEvent event);
-
-    protected abstract void manageTurnEnd();
-
-    @Override
-    public void startParty(Match match) {
-        this.gameEventManager.subscribe(PartyEvent.class, this, 1);
-        this.gameEventManager.subscribe(TurnEvent.class, this, 1);
-        this.gameEventManager.subscribe(PieceEvent.class, this, 1);
-    }
-
-    @Override
-    public void stopParty() {
-        this.gameState = GameState.SelectPiece;
-        this.selectedPiece = null;
-        this.previousTurn = null;
-        this.actualTurn = null;
-        this.board.clearBoard();
-        this.ruleSet.moveNumber = 0;
-    }
-
-    public abstract ChessColor loadBoard(String fenString) throws FenStringBadFormatException;
 
     public void selectPiece(Piece touched) {
         this.selectedPiece = touched;
@@ -106,47 +118,25 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
                 , deadPiece != null ? deadPiece.getPieceId() : null));
     }
 
-    protected abstract Piece moveToSquare(Square to);
+    public void setBoardLoadingListener(BoardLoadingListener boardLoadingListener) {
+        this.boardLoadingListener = boardLoadingListener;
+    }
 
-    public void unHighlight() {
+    @Override
+    public void startParty(Match match) {
+        this.gameEventManager.subscribe(PartyEvent.class, this, 1);
+        this.gameEventManager.subscribe(TurnEvent.class, this, 1);
+        this.gameEventManager.subscribe(PieceEvent.class, this, 1);
+    }
+
+    @Override
+    public void stopParty() {
         this.gameState = GameState.SelectPiece;
-    }
-
-    public GraphicGameArray get3DModelsForTurn() {
-        if (this.actualTurn.getTurnColor() == ChessColor.BLACK) {
-            return this.board3dManager.getBlackPieceModels();
-        } else {
-            return this.board3dManager.getWhitePieceModels();
-        }
-    }
-
-    public GraphicGameArray get2DModelsForTurn() {
-        // TODO
-        return null;
-    }
-
-    public abstract Square getSquareFromLocation(Location location);
-
-    public abstract ChessColor getWinner();
-
-    public abstract GraphicGameArray getPossibleSquareModels();
-
-    public OrthographicCamera getCamera() {
-        return this.board3dManager.getCamera();
-    }
-
-    public GameState getGameState() {
-        return this.gameState;
-    }
-
-    public Piece getPieceFromLocation(Location location) {
-        ArrayList<Piece> pieces;
-        if (this.actualTurn.getTurnColor() == ChessColor.WHITE) {
-            pieces = this.board.getWhitePieces();
-        } else {
-            pieces = this.board.getBlackPieces();
-        }
-        return pieces.stream().filter(p -> p.getLocation().equals(location)).findFirst().get();
+        this.selectedPiece = null;
+        this.previousTurn = null;
+        this.actualTurn = null;
+        this.board.clearBoard();
+        this.ruleSet.moveNumber = 0;
     }
 
     public void toogleTacticalView() {
@@ -159,16 +149,21 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
         runner.startAsync();
     }
 
-    public boolean IsTacticalViewOn() {
-        return this.board3dManager.isTacticalViewEnabled();
+    public void unHighlight() {
+        this.gameState = GameState.SelectPiece;
     }
 
-    public void setBoardLoadingListener(BoardLoadingListener boardLoadingListener) {
-        this.boardLoadingListener = boardLoadingListener;
+    BoardManager(Board board, Board3dManager board3dManager, AbstractRuleSet ruleSet, GameEventManager gameEventManager) {
+        this.board = board;
+        this.board3dManager = board3dManager;
+        this.ruleSet = ruleSet;
+        GDXInputAdapter inputAdapter = new GDXInputAdapter(board3dManager);
+        board3dManager.setAndroidInputAdapter(inputAdapter);
+        GDXGestureListener gestureListener = new GDXGestureListener(this);
+        board3dManager.setAndroidListener(gestureListener);
+        this.gameState = GameState.SelectPiece;
+        this.gameEventManager = gameEventManager;
     }
-
-    public abstract String getFenFromBoard();
-
 
     public interface BoardLoadingListener {
         void OnBoardLoaded();

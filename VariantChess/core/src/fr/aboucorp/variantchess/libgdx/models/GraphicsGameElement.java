@@ -11,18 +11,24 @@ public class GraphicsGameElement {
     private ChessModel model3d;
     private Sprite model2d;
     private Location location;
+    private String vertexShader;
+    private String fragmentShader;
+    private boolean useShader;
 
-    public GraphicsGameElement(Location location, PieceId id) {
-        this.location = location;
-        this.id = id;
+    public String getFragmentShader() {
+        return this.fragmentShader;
     }
 
-    public ChessModel getModel3d() {
-        return this.model3d;
+    public void setFragmentShader(String fragmentShader) {
+        this.fragmentShader = fragmentShader;
     }
 
-    public void setModel3d(ChessModel model3d) {
-        this.model3d = model3d;
+    public PieceId getId() {
+        return this.id;
+    }
+
+    public Location getLocation() {
+        return this.location;
     }
 
     public Sprite getModel2d() {
@@ -33,13 +39,33 @@ public class GraphicsGameElement {
         this.model2d = model2d;
     }
 
+    public ChessModel getModel3d() {
+        return this.model3d;
+    }
+
+    public void setModel3d(ChessModel model3d) {
+        this.model3d = model3d;
+    }
+
+    public String getVertexShader() {
+        return this.vertexShader;
+    }
+
+    public void setVertexShader(String vertexShader) {
+        this.vertexShader = vertexShader;
+    }
+
+    public boolean isUseShader() {
+        return this.useShader;
+    }
+
+    public void setUseShader(boolean useShader) {
+        this.useShader = useShader;
+    }
+
     public boolean isVisible(Camera camera, boolean isTacticalView) {
         // TODO
         return true;
-    }
-
-    public Location getLocation() {
-        return this.location;
     }
 
     public void move2D(Location location) {
@@ -51,8 +77,9 @@ public class GraphicsGameElement {
         this.location = location;
     }
 
-    public PieceId getId() {
-        return this.id;
+    public GraphicsGameElement(Location location, PieceId id) {
+        this.location = location;
+        this.id = id;
     }
 }
 
