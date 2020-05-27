@@ -1,6 +1,6 @@
 package fr.aboucorp.variantchess.app.managers.boards;
 
-import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 
 import java.util.ArrayList;
 
@@ -131,7 +131,7 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
 
     public abstract GraphicGameArray getPossibleSquareModels();
 
-    public Camera getCamera() {
+    public OrthographicCamera getCamera() {
         return this.board3dManager.getCamera();
     }
 

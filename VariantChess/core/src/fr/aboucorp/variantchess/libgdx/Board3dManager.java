@@ -8,7 +8,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.PerspectiveCamera;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -73,7 +73,7 @@ public class Board3dManager extends ApplicationAdapter {
     /**
      * Camera de la vue 3D
      */
-    private PerspectiveCamera camera;
+    private OrthographicCamera camera;
     /**
      * Controller de la camera permettant à l'utilisateur de la faire pivoter
      */
@@ -356,7 +356,9 @@ public class Board3dManager extends ApplicationAdapter {
      * Initialisation de la caméra pour la vue 3D
      */
     private void initCamera(int width, int height) {
-        this.camera = new PerspectiveCamera(30, width, height);
+        //this.camera = new PerspectiveCamera(30, width, height);
+        float aspectRatio = (float) Gdx.graphics.getHeight() / (float) Gdx.graphics.getWidth();
+        this.camera = new OrthographicCamera(10 * aspectRatio, 10);
         this.camera.position.set(3.5f, 15f, -5f);
         this.camera.lookAt(3.475f, 0, 3.475f);
         this.camera.near = 1f;
@@ -606,7 +608,7 @@ public class Board3dManager extends ApplicationAdapter {
         this.camera.update();
     }
 
-    public PerspectiveCamera getCamera() {
+    public OrthographicCamera getCamera() {
         return this.camera;
     }
 
