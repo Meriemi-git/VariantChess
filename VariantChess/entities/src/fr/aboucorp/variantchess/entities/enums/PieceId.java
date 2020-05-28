@@ -66,4 +66,24 @@ public enum PieceId {
         }
         return ChessColor.BLACK;
     }
+
+    public static boolean isRook(PieceId id) {
+        return id == BRR || id == BLR || id == WRR || id == WLR;
+    }
+
+    public static boolean isKnight(PieceId id) {
+        return id == BRN || id == BLN || id == WRN || id == WLN;
+    }
+
+    public static boolean isBishop(PieceId id) {
+        return id == BRB || id == BLB || id == WRB || id == WLB;
+    }
+
+    public static boolean isKing(PieceId id) {
+        return id == BK || id == WK;
+    }
+
+    public static boolean isQueen(PieceId id) {
+        return id == BQ || id == WQ;
+    }
 }

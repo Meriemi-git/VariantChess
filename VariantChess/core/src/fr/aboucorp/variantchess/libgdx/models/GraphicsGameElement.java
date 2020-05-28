@@ -3,24 +3,26 @@ package fr.aboucorp.variantchess.libgdx.models;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 
+import fr.aboucorp.variantchess.entities.ChessColor;
 import fr.aboucorp.variantchess.entities.Location;
 import fr.aboucorp.variantchess.entities.enums.PieceId;
 
 public class GraphicsGameElement {
     private final PieceId id;
+    private final ChessColor color;
     private ChessModel model3d;
     private Sprite model2d;
     private Location location;
-    private String vertexShader;
-    private String fragmentShader;
     private boolean useShader;
 
-    public String getFragmentShader() {
-        return this.fragmentShader;
+    public GraphicsGameElement(Location location, PieceId id, ChessColor color) {
+        this.location = location;
+        this.id = id;
+        this.color = color;
     }
 
-    public void setFragmentShader(String fragmentShader) {
-        this.fragmentShader = fragmentShader;
+    public ChessColor getColor() {
+        return this.color;
     }
 
     public PieceId getId() {
@@ -47,14 +49,6 @@ public class GraphicsGameElement {
         this.model3d = model3d;
     }
 
-    public String getVertexShader() {
-        return this.vertexShader;
-    }
-
-    public void setVertexShader(String vertexShader) {
-        this.vertexShader = vertexShader;
-    }
-
     public boolean isUseShader() {
         return this.useShader;
     }
@@ -68,18 +62,11 @@ public class GraphicsGameElement {
         return true;
     }
 
-    public void move2D(Location location) {
+    public void move(Location location) {
         this.location = location;
-    }
-
-    public void move3D(Location location) {
-        this.model3d.move(location);
-        this.location = location;
-    }
-
-    public GraphicsGameElement(Location location, PieceId id) {
-        this.location = location;
-        this.id = id;
+        if (this.model3d != null) {
+            this.model3d.move(location);
+        }
     }
 }
 
