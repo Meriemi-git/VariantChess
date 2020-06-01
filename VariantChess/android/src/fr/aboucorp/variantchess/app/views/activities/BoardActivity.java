@@ -50,16 +50,6 @@ public class BoardActivity extends AndroidApplication implements GameEventSubscr
     private GameEventManager gameEventManager;
 
     @Override
-    public void receiveGameEvent(GameEvent event) {
-        this.runOnUiThread(() -> {
-            if (event instanceof BoardEvent || event instanceof TurnEvent) {
-                BoardActivity.this.party_logs.setText(BoardActivity.this.party_logs.getText() + "\n" + event.message);
-            }
-            BoardActivity.this.lbl_turn.setText("Turn of " + BoardActivity.this.matchManager.getPartyInfos());
-        });
-    }
-
-    @Override
     public void OnMatchEvent(GameEvent event) {
         if (!(event instanceof TurnEvent)) {
             this.runOnUiThread(() ->
@@ -84,6 +74,84 @@ public class BoardActivity extends AndroidApplication implements GameEventSubscr
         this.initializeBoard();
         this.matchManager.setEventListener(this);
         this.matchManager.startParty(this.match);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putSerializable("match", this.match);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
+    @Override
+    public void onBackPressed() {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setMessage("If you exit the game you will loose the match");
+        alertDialogBuilder.setPositiveButton("yes",
+                (dialog, arg1) -> this.stopParty());
+        alertDialogBuilder.setNegativeButton("No", (dialog, which) -> dialog.dismiss());
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+    }
+
+    @Override
+    public void recreate() {
+        super.recreate();
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration config) {
+        super.onConfigurationChanged(config);
+        this.setContentView(R.layout.board_layout);
+        this.bindViews();
+        this.bindListeners();
+        this.setToolbar();
+        AndroidApplicationConfiguration libgdxConfig = new AndroidApplicationConfiguration();
+        this.board_panel.addView(this.initializeForView(this.board3dManager, libgdxConfig));
+    }
+
+    @Override
+    public void exit() {
+        super.exit();
+    }
+
+    @Override
+    public void receiveGameEvent(GameEvent event) {
+        this.runOnUiThread(() -> {
+            if (event instanceof BoardEvent || event instanceof TurnEvent) {
+                BoardActivity.this.party_logs.setText(BoardActivity.this.party_logs.getText() + "\n" + event.message);
+            }
+            BoardActivity.this.lbl_turn.setText("Turn of " + BoardActivity.this.matchManager.getPartyInfos());
+        });
     }
 
     private void bindViews() {
@@ -129,76 +197,8 @@ public class BoardActivity extends AndroidApplication implements GameEventSubscr
         this.board_panel.addView(this.initializeForView(this.board3dManager, config));
     }
 
-    @Override
-    public void onBackPressed() {
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-        alertDialogBuilder.setMessage("If you exit the game you will loose the match");
-        alertDialogBuilder.setPositiveButton("yes",
-                (dialog, arg1) -> this.stopParty());
-        alertDialogBuilder.setNegativeButton("No", (dialog, which) -> dialog.dismiss());
-        AlertDialog alertDialog = alertDialogBuilder.create();
-        alertDialog.show();
-    }
-
     private void stopParty() {
         this.matchManager.stopParty();
         this.board3dManager.exit();
-    }
-
-    @Override
-    public void recreate() {
-        super.recreate();
-    }
-
-    @Override
-    public void finish() {
-        super.finish();
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-        super.onSaveInstanceState(savedInstanceState);
-        savedInstanceState.putSerializable("match", this.match);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration config) {
-        super.onConfigurationChanged(config);
-        this.setContentView(R.layout.board_layout);
-        this.bindViews();
-        this.bindListeners();
-        this.setToolbar();
-        AndroidApplicationConfiguration libgdxConfig = new AndroidApplicationConfiguration();
-        this.board_panel.addView(this.initializeForView(this.board3dManager, libgdxConfig));
-    }
-
-    @Override
-    public void exit() {
-        super.exit();
     }
 }

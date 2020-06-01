@@ -55,6 +55,7 @@ import fr.aboucorp.variantchess.libgdx.models.pieces.KnightM;
 import fr.aboucorp.variantchess.libgdx.models.pieces.PawnM;
 import fr.aboucorp.variantchess.libgdx.models.pieces.QueenM;
 import fr.aboucorp.variantchess.libgdx.models.pieces.RookM;
+import fr.aboucorp.variantchess.libgdx.shaders.CustomShaderProvider;
 import fr.aboucorp.variantchess.libgdx.utils.GraphicGameArray;
 
 public class Board3dManager extends ApplicationAdapter {
@@ -65,32 +66,7 @@ public class Board3dManager extends ApplicationAdapter {
     private final GraphicGameArray whiteDeadPieceModels;
     private final GraphicGameArray blackDeadPieceModels;
     private final ArrayList<Piece> loadingPieces;
-    private final String vertexShader = "attribute vec4 " + ShaderProgram.POSITION_ATTRIBUTE + ";\n" //
-            + "attribute vec4 " + ShaderProgram.COLOR_ATTRIBUTE + ";\n" //
-            + "attribute vec2 " + ShaderProgram.TEXCOORD_ATTRIBUTE + "0;\n" //
-            + "uniform mat4 u_projTrans;\n" //
-            + "varying vec4 v_color;\n" //
-            + "varying vec2 v_texCoords;\n" //
-            + "\n" //
-            + "void main()\n" //
-            + "{\n" //
-            + "   v_color = " + ShaderProgram.COLOR_ATTRIBUTE + ";\n" //
-            + "   v_texCoords = " + ShaderProgram.TEXCOORD_ATTRIBUTE + "0;\n" //
-            + "   gl_Position =  u_projTrans * " + ShaderProgram.POSITION_ATTRIBUTE + ";\n" //
-            + "}\n";
-    private final String fragmentShader = "#ifdef GL_ES\n" //
-            + "#define LOWP lowp\n" //
-            + "precision mediump float;\n" //
-            + "#else\n" //
-            + "#define LOWP \n" //
-            + "#endif\n" //
-            + "varying LOWP vec4 v_color;\n" //
-            + "varying vec2 v_texCoords;\n" //
-            + "uniform sampler2D u_texture;\n" //
-            + "void main()\n"//
-            + "{\n" //
-            + "  gl_FragColor = v_color * texture2D(u_texture, v_texCoords).a;\n" //
-            + "}";
+
     private Map<Class, String> assetPaths;
     /**
      * Chargeur de modele 3D
@@ -120,8 +96,8 @@ public class Board3dManager extends ApplicationAdapter {
     private boolean boardIsLoading;
     private GraphicsGameElement selectedModel;
     private Material3dManager material3dManager;
-    private TextureAtlas piecesAtlas;
     private ShaderProgram shaderProgram;
+
 
     public Board3dManager() {
         this.material3dManager = new Material3dManager();
@@ -136,11 +112,15 @@ public class Board3dManager extends ApplicationAdapter {
 
     @Override
     public void create() {
+        Gdx.app.log("fr.aboucorp.variantchess", Gdx.app.getGraphics().getGLVersion().getMajorVersion() + "." + Gdx.app.getGraphics().getGLVersion().getMinorVersion());
+        if (this.shaderProgram == null) {
+            ShaderProgram.pedantic = false;
+        }
         if (this.assets == null) {
             this.assets = new AssetManager(new InternalFileHandleResolver());
         }
         if (this.modelBatch == null) {
-            this.modelBatch = new ModelBatch();
+            this.modelBatch = new ModelBatch(new CustomShaderProvider());
         }
         if (this.spriteBatch == null) {
             this.spriteBatch = new SpriteBatch();
@@ -148,9 +128,7 @@ public class Board3dManager extends ApplicationAdapter {
         if (this.modelBuilder == null) {
             this.modelBuilder = new ModelBuilder();
         }
-        if (this.shaderProgram == null) {
-            this.shaderProgram = new ShaderProgram(this.vertexShader, this.fragmentShader);
-        }
+
         this.initEnvironment();
         this.initCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         if (this.tacticalViewEnabled) {
@@ -160,7 +138,6 @@ public class Board3dManager extends ApplicationAdapter {
             this.setPaths();
             this.loadModels();
         }
-
     }
 
     @Override
@@ -173,6 +150,7 @@ public class Board3dManager extends ApplicationAdapter {
         if (this.boardIsLoading && this.assets.update()) {
             this.doneLoading();
         }
+
         if (!this.boardIsLoading) {
             this.camController.update();
             Gdx.gl.glClearColor(42 / 255f, 79 / 255f, 110 / 255f, 1);
@@ -194,11 +172,7 @@ public class Board3dManager extends ApplicationAdapter {
                 if (piece.isVisible(this.camera, this.tacticalViewEnabled)) {
                     if (this.tacticalViewEnabled) {
                         this.spriteBatch.setProjectionMatrix(this.calculateProjectionMatrix(piece.getLocation()));
-                        if (piece.isUseShader()) {
-                            this.spriteBatch.setShader(this.shaderProgram);
-                        }
                         this.spriteBatch.draw(piece.getModel2d(), 0, 0, 24, 24);
-                        this.spriteBatch.setShader(null);
                     } else {
                         this.modelBatch.render(piece.getModel3d(), this.environment);
                     }
@@ -208,10 +182,6 @@ public class Board3dManager extends ApplicationAdapter {
                 if (piece.isVisible(this.camera, this.tacticalViewEnabled)) {
                     if (this.tacticalViewEnabled) {
                         this.spriteBatch.setProjectionMatrix(this.calculateProjectionMatrix(piece.getLocation()));
-                        if (piece.isUseShader()) {
-                            this.spriteBatch.setShader(this.shaderProgram);
-                            this.spriteBatch.setShader(null);
-                        }
                         this.spriteBatch.draw(piece.getModel2d(), 0, 0, 24, 24);
                     } else {
                         this.modelBatch.render(piece.getModel3d(), this.environment);
@@ -222,10 +192,6 @@ public class Board3dManager extends ApplicationAdapter {
                 if (deadPiece.isVisible(this.camera, this.tacticalViewEnabled)) {
                     if (this.tacticalViewEnabled) {
                         this.spriteBatch.setProjectionMatrix(this.calculateProjectionMatrix(deadPiece.getLocation()));
-                        if (deadPiece.isUseShader()) {
-                            this.spriteBatch.setShader(this.shaderProgram);
-                            this.spriteBatch.setShader(null);
-                        }
                         this.spriteBatch.draw(deadPiece.getModel2d(), 0, 0, 24, 24);
                     } else {
                         this.modelBatch.render(deadPiece.getModel3d(), this.environment);
@@ -236,10 +202,6 @@ public class Board3dManager extends ApplicationAdapter {
                 if (deadPiece.isVisible(this.camera, this.tacticalViewEnabled)) {
                     if (this.tacticalViewEnabled) {
                         this.spriteBatch.setProjectionMatrix(this.calculateProjectionMatrix(deadPiece.getLocation()));
-                        if (deadPiece.isUseShader()) {
-                            this.spriteBatch.setShader(this.shaderProgram);
-                            this.spriteBatch.setShader(null);
-                        }
                         this.spriteBatch.draw(deadPiece.getModel2d(), 0, 0, 24, 24);
                     } else {
                         this.modelBatch.render(deadPiece.getModel3d(), this.environment);
@@ -356,7 +318,7 @@ public class Board3dManager extends ApplicationAdapter {
 
     private void set2dModels() {
         if (this.assets.isLoaded(this.assetPaths.get(Piece.class))) {
-            this.piecesAtlas = this.assets.get(this.assetPaths.get(Piece.class), TextureAtlas.class);
+            this.material3dManager.setPiecesAtlas(this.assets.get(this.assetPaths.get(Piece.class), TextureAtlas.class));
             if (this.loadingPieces.size() > 0) {
                 this.set2dModelForNewPieces(this.loadingPieces.iterator());
             } else {
@@ -431,6 +393,7 @@ public class Board3dManager extends ApplicationAdapter {
                 model = new QueenM(models.get("queenModel"), element.getLocation(), material, element.getId());
             }
             element.setModel3d(model);
+            element.getModel3d().userData = element.getColor();
             if (element.getColor() == ChessColor.BLACK) {
                 this.blackPieceModels.add(element);
             } else {
@@ -475,6 +438,7 @@ public class Board3dManager extends ApplicationAdapter {
             }
             GraphicsGameElement element = new GraphicsGameElement(model.getLocation(), piece.getPieceId(), piece.getChessColor());
             element.setModel3d(model);
+            element.getModel3d().userData = piece.getChessColor();
             if (piece.getChessColor() == ChessColor.BLACK) {
                 this.blackPieceModels.add(element);
             } else {
@@ -494,8 +458,7 @@ public class Board3dManager extends ApplicationAdapter {
                 this.blackDeadPieceModels.add(element);
             }
             element.move(piece.getLocation());
-            String id = this.material3dManager.getRegionNameFromPieceId(piece.getPieceId());
-            TextureAtlas.AtlasRegion region = this.piecesAtlas.findRegion(id);
+            TextureAtlas.AtlasRegion region = this.material3dManager.getRegionById(piece.getPieceId());
             Sprite pieceSprite = new Sprite(region);
             element.setModel2d(pieceSprite);
             iter.remove();
@@ -506,8 +469,7 @@ public class Board3dManager extends ApplicationAdapter {
         for (Iterator<GraphicsGameElement> iter = elements; iter.hasNext(); ) {
             GraphicsGameElement element = iter.next();
             element.move(element.getLocation());
-            String id = this.material3dManager.getRegionNameFromPieceId(element.getId());
-            TextureAtlas.AtlasRegion region = this.piecesAtlas.findRegion(id);
+            TextureAtlas.AtlasRegion region = this.material3dManager.getRegionById(element.getId());
             Sprite pieceSprite = new Sprite(region);
             element.setModel2d(pieceSprite);
         }
@@ -708,7 +670,7 @@ public class Board3dManager extends ApplicationAdapter {
 
     public void toogleTacticalView() {
         if (!this.tacticalViewEnabled) {
-            if (this.piecesAtlas == null) {
+            if (this.material3dManager.getPiecesAtlas() == null) {
                 this.boardIsLoading = true;
             }
             this.setTacticalCamera();

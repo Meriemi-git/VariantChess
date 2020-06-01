@@ -2,6 +2,7 @@ package fr.aboucorp.variantchess.libgdx;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
@@ -14,6 +15,18 @@ class Material3dManager {
 
     private Material selectedPieceMaterial;
     private Material occupiedMaterial;
+    private TextureAtlas piecesAtlas;
+
+
+    public Material3dManager() {
+        this.selectedPieceMaterial = new Material();
+        this.selectedPieceMaterial.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, 0.8f));
+        this.selectedPieceMaterial.set(ColorAttribute.createDiffuse(Color.ROYAL));
+
+        this.occupiedMaterial = new Material();
+        this.occupiedMaterial.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, 0.8f));
+        this.occupiedMaterial.set(ColorAttribute.createDiffuse(Color.RED));
+    }
 
     public String getRegionNameFromPieceId(PieceId id) {
         switch (id) {
@@ -31,15 +44,6 @@ class Material3dManager {
             case WRB:
             case WLB:
                 return "wb";
-            case WP1:
-            case WP2:
-            case WP3:
-            case WP4:
-            case WP5:
-            case WP6:
-            case WP7:
-            case WP8:
-                return "wp";
             case BK:
                 return "bk";
             case BQ:
@@ -101,17 +105,17 @@ class Material3dManager {
         if (element.getModel3d() != null) {
             this.set3DMaterial(element.getModel3d(), this.selectedPieceMaterial);
         }
-
     }
 
-    public Material3dManager() {
-        this.selectedPieceMaterial = new Material();
-        this.selectedPieceMaterial.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, 0.8f));
-        this.selectedPieceMaterial.set(ColorAttribute.createDiffuse(Color.ROYAL));
-
-        this.occupiedMaterial = new Material();
-        this.occupiedMaterial.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, 0.8f));
-        this.occupiedMaterial.set(ColorAttribute.createDiffuse(Color.RED));
+    public TextureAtlas getPiecesAtlas() {
+        return this.piecesAtlas;
     }
 
+    public void setPiecesAtlas(TextureAtlas piecesAtlas) {
+        this.piecesAtlas = piecesAtlas;
+    }
+
+    public TextureAtlas.AtlasRegion getRegionById(PieceId pieceId) {
+        return this.piecesAtlas.findRegion(this.getRegionNameFromPieceId(pieceId));
+    }
 }
