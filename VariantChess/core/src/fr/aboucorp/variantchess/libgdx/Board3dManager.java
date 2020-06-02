@@ -10,7 +10,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.VertexAttributes;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g3d.Environment;
@@ -18,11 +17,10 @@ import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
-import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
+import com.badlogic.gdx.graphics.g3d.environment.PointLight;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
@@ -55,7 +53,6 @@ import fr.aboucorp.variantchess.libgdx.models.pieces.KnightM;
 import fr.aboucorp.variantchess.libgdx.models.pieces.PawnM;
 import fr.aboucorp.variantchess.libgdx.models.pieces.QueenM;
 import fr.aboucorp.variantchess.libgdx.models.pieces.RookM;
-import fr.aboucorp.variantchess.libgdx.shaders.CustomShaderProvider;
 import fr.aboucorp.variantchess.libgdx.utils.GraphicGameArray;
 
 public class Board3dManager extends ApplicationAdapter {
@@ -96,8 +93,6 @@ public class Board3dManager extends ApplicationAdapter {
     private boolean boardIsLoading;
     private GraphicsGameElement selectedModel;
     private Material3dManager material3dManager;
-    private ShaderProgram shaderProgram;
-
 
     public Board3dManager() {
         this.material3dManager = new Material3dManager();
@@ -113,14 +108,11 @@ public class Board3dManager extends ApplicationAdapter {
     @Override
     public void create() {
         Gdx.app.log("fr.aboucorp.variantchess", Gdx.app.getGraphics().getGLVersion().getMajorVersion() + "." + Gdx.app.getGraphics().getGLVersion().getMinorVersion());
-        if (this.shaderProgram == null) {
-            ShaderProgram.pedantic = false;
-        }
         if (this.assets == null) {
             this.assets = new AssetManager(new InternalFileHandleResolver());
         }
         if (this.modelBatch == null) {
-            this.modelBatch = new ModelBatch(new CustomShaderProvider());
+            this.modelBatch = new ModelBatch();
         }
         if (this.spriteBatch == null) {
             this.spriteBatch = new SpriteBatch();
@@ -229,9 +221,11 @@ public class Board3dManager extends ApplicationAdapter {
 
     private void initEnvironment() {
         this.environment = new Environment();
-        this.environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 0.6f));
-        this.environment.set(new ColorAttribute(ColorAttribute.Specular, 0.4f, 0.4f, 0.4f, 1f));
-        this.environment.add(new DirectionalLight().set(0.6f, 0.6f, 0.6f, -1f, -0.8f, -0.2f));
+        this.environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 0.1f));
+        this.environment.set(new ColorAttribute(ColorAttribute.Reflection, 0.4f, 0.4f, 0.4f, 1f));
+        this.environment.add(new PointLight().set(Color.LIGHT_GRAY, new Vector3(-2f, 10f, 3.5f), 50));
+        this.environment.add(new PointLight().set(Color.LIGHT_GRAY, new Vector3(10f, 10f, 3.5f), 50));
+
     }
 
     /**
@@ -369,28 +363,28 @@ public class Board3dManager extends ApplicationAdapter {
                 material = new Material(ColorAttribute.createDiffuse(Color.GRAY));
             }
             ChessPieceM model = null;
-            if (PieceId.isRook(element.getId())) {
-                model = new RookM(models.get("rookModel"), element.getLocation(), material, element.getId());
-            } else if (PieceId.isPawn(element.getId())) {
-                model = new PawnM(models.get("pawnModel"), element.getLocation(), material, element.getId());
-            } else if (PieceId.isKnight(element.getId())) {
-                model = new KnightM(models.get("knightModel"), element.getLocation(), material, element.getId());
+            if (PieceId.isRook(element.getPieceId())) {
+                model = new RookM(models.get("rookModel"), element.getLocation(), material, element.getPieceId());
+            } else if (PieceId.isPawn(element.getPieceId())) {
+                model = new PawnM(models.get("pawnModel"), element.getLocation(), material, element.getPieceId());
+            } else if (PieceId.isKnight(element.getPieceId())) {
+                model = new KnightM(models.get("knightModel"), element.getLocation(), material, element.getPieceId());
                 if (element.getColor() == ChessColor.WHITE) {
                     model.transform.rotate(Vector3.Y, -90);
                 } else {
                     model.transform.rotate(Vector3.Y, 90);
                 }
-            } else if (PieceId.isBishop(element.getId())) {
-                model = new BishopM(models.get("bishopModel"), element.getLocation(), material, element.getId());
+            } else if (PieceId.isBishop(element.getPieceId())) {
+                model = new BishopM(models.get("bishopModel"), element.getLocation(), material, element.getPieceId());
                 if (element.getColor() == ChessColor.WHITE) {
                     model.transform.rotate(Vector3.Y, -90);
                 } else {
                     model.transform.rotate(Vector3.Y, 90);
                 }
-            } else if (PieceId.isKing(element.getId())) {
-                model = new KingM(models.get("kingModel"), element.getLocation(), material, element.getId());
-            } else if (PieceId.isQueen(element.getId())) {
-                model = new QueenM(models.get("queenModel"), element.getLocation(), material, element.getId());
+            } else if (PieceId.isKing(element.getPieceId())) {
+                model = new KingM(models.get("kingModel"), element.getLocation(), material, element.getPieceId());
+            } else if (PieceId.isQueen(element.getPieceId())) {
+                model = new QueenM(models.get("queenModel"), element.getLocation(), material, element.getPieceId());
             }
             element.setModel3d(model);
             element.getModel3d().userData = element.getColor();
@@ -458,9 +452,7 @@ public class Board3dManager extends ApplicationAdapter {
                 this.blackDeadPieceModels.add(element);
             }
             element.move(piece.getLocation());
-            TextureAtlas.AtlasRegion region = this.material3dManager.getRegionById(piece.getPieceId());
-            Sprite pieceSprite = new Sprite(region);
-            element.setModel2d(pieceSprite);
+            element.setModel2d(this.material3dManager.getSpriteById(piece.getPieceId(), false));
             iter.remove();
         }
     }
@@ -469,9 +461,7 @@ public class Board3dManager extends ApplicationAdapter {
         for (Iterator<GraphicsGameElement> iter = elements; iter.hasNext(); ) {
             GraphicsGameElement element = iter.next();
             element.move(element.getLocation());
-            TextureAtlas.AtlasRegion region = this.material3dManager.getRegionById(element.getId());
-            Sprite pieceSprite = new Sprite(region);
-            element.setModel2d(pieceSprite);
+            element.setModel2d(this.material3dManager.getSpriteById(element.getPieceId(), false));
         }
     }
 
@@ -556,15 +546,15 @@ public class Board3dManager extends ApplicationAdapter {
     }
 
     public void highlightEmpty(Square square) {
-        this.material3dManager.setSelectedMaterial(this.chessSquareModels.getByLocation(square.getLocation()), this.tacticalViewEnabled);
+        this.material3dManager.setSelectedMaterial(this.chessSquareModels.getByLocation(square.getLocation()));
     }
 
     public void highlightOccupied(Square square) {
-        this.material3dManager.setOccupiedMaterial(this.chessSquareModels.getByLocation(square.getLocation()), this.tacticalViewEnabled);
+        this.material3dManager.setOccupiedMaterial(this.chessSquareModels.getByLocation(square.getLocation()));
         if (square.getPiece().getChessColor() == ChessColor.WHITE) {
-            this.material3dManager.setOccupiedMaterial(this.getWhitePieceModels().getByLocation(square.getPiece().getLocation()), this.tacticalViewEnabled);
+            this.material3dManager.setOccupiedMaterial(this.getWhitePieceModels().getByLocation(square.getPiece().getLocation()));
         } else {
-            this.material3dManager.setOccupiedMaterial(this.getBlackPieceModels().getByLocation(square.getPiece().getLocation()), this.tacticalViewEnabled);
+            this.material3dManager.setOccupiedMaterial(this.getBlackPieceModels().getByLocation(square.getPiece().getLocation()));
         }
     }
 
@@ -627,7 +617,7 @@ public class Board3dManager extends ApplicationAdapter {
             this.move(eatenPiece, new Location(xpos, 0, zpos));
             this.blackDeadPieceModels.add(eatenPiece);
         }
-        this.material3dManager.resetMaterial(eatenPiece, this.tacticalViewEnabled);
+        this.material3dManager.resetMaterial(eatenPiece);
         eatenPiece.getModel3d().transform.rotate(Vector3.Y, 180);
 
     }
@@ -644,18 +634,18 @@ public class Board3dManager extends ApplicationAdapter {
 
     public void resetSelection() {
         if (this.selectedModel != null) {
-            this.material3dManager.resetMaterial(this.selectedModel, this.tacticalViewEnabled);
+            this.material3dManager.resetMaterial(this.selectedModel);
         }
         this.selectedModel = null;
         for (Iterator<GraphicsGameElement> iter = this.chessSquareModels.iterator(); iter.hasNext(); ) {
             GraphicsGameElement square = iter.next();
-            this.material3dManager.resetMaterial(square, this.tacticalViewEnabled);
+            this.material3dManager.resetMaterial(square);
         }
     }
 
     public void selectPiece(Piece touched) {
         if (this.selectedModel != null) {
-            this.material3dManager.resetMaterial(this.selectedModel, this.tacticalViewEnabled);
+            this.material3dManager.resetMaterial(this.selectedModel);
         }
         GraphicsGameElement element;
         if (touched.getChessColor() == ChessColor.BLACK) {
@@ -664,7 +654,7 @@ public class Board3dManager extends ApplicationAdapter {
         } else {
             element = this.whitePieceModels.getByLocation(touched.getLocation());
         }
-        this.material3dManager.setSelectedMaterial(element, this.tacticalViewEnabled);
+        this.material3dManager.setSelectedMaterial(element);
         this.selectedModel = element;
     }
 
@@ -690,12 +680,12 @@ public class Board3dManager extends ApplicationAdapter {
 
     public void unHighlightSquares(SquareList possiblesMoves) {
         for (Square square : possiblesMoves) {
-            this.material3dManager.resetMaterial(this.getChessSquareModels().getByLocation(square.getLocation()), this.tacticalViewEnabled);
+            this.material3dManager.resetMaterial(this.getChessSquareModels().getByLocation(square.getLocation()));
             if (square.getPiece() != null) {
                 if (square.getPiece().getChessColor() == ChessColor.WHITE) {
-                    this.material3dManager.resetMaterial(this.getWhitePieceModels().getByLocation(square.getPiece().getLocation()), this.tacticalViewEnabled);
+                    this.material3dManager.resetMaterial(this.getWhitePieceModels().getByLocation(square.getPiece().getLocation()));
                 } else {
-                    this.material3dManager.resetMaterial(this.getBlackPieceModels().getByLocation(square.getPiece().getLocation()), this.tacticalViewEnabled);
+                    this.material3dManager.resetMaterial(this.getBlackPieceModels().getByLocation(square.getPiece().getLocation()));
                 }
             }
         }

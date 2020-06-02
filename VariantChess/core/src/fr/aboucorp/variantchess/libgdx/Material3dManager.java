@@ -2,6 +2,7 @@ package fr.aboucorp.variantchess.libgdx;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
@@ -28,36 +29,49 @@ class Material3dManager {
         this.occupiedMaterial.set(ColorAttribute.createDiffuse(Color.RED));
     }
 
-    public String getRegionNameFromPieceId(PieceId id) {
+    public String getRegionNameFromPieceId(PieceId id, boolean selection) {
+        String regionName;
         switch (id) {
             case WK:
-                return "wk";
+                regionName = "wk";
+                break;
             case WQ:
-                return "wq";
+                regionName = "wq";
+                break;
             case WLN:
-                return "wrn";
+                regionName = "wrn";
+                break;
             case WRN:
-                return "wln";
+                regionName = "wln";
+                break;
             case WRR:
             case WLR:
-                return "wr";
+                regionName = "wr";
+                break;
             case WRB:
             case WLB:
-                return "wb";
+                regionName = "wb";
+                break;
             case BK:
-                return "bk";
+                regionName = "bk";
+                break;
             case BQ:
-                return "bq";
+                regionName = "bq";
+                break;
             case BLN:
-                return "brn";
+                regionName = "brn";
+                break;
             case BRN:
-                return "bln";
+                regionName = "bln";
+                break;
             case BRR:
             case BLR:
-                return "br";
+                regionName = "br";
+                break;
             case BRB:
             case BLB:
-                return "bb";
+                regionName = "bb";
+                break;
             case BP1:
             case BP2:
             case BP3:
@@ -66,15 +80,20 @@ class Material3dManager {
             case BP6:
             case BP7:
             case BP8:
-                return "bp";
+                regionName = "bp";
+                break;
             default:
-                return "wp";
+                regionName = "wp";
         }
+        if (selection) {
+            regionName += "_selected";
+        }
+        return regionName;
     }
 
-    public void resetMaterial(GraphicsGameElement element, boolean isTactical) {
+    public void resetMaterial(GraphicsGameElement element) {
         if (element.getModel2d() != null) {
-            element.setUseShader(false);
+            element.setModel2d(this.getSpriteById(element.getPieceId(), false));
         }
         if (element.getModel3d() != null) {
             Material oldMat = element.getModel3d().materials.get(0);
@@ -90,17 +109,15 @@ class Material3dManager {
         actualMaterial.set(material);
     }
 
-    public void setOccupiedMaterial(GraphicsGameElement element, boolean isTactical) {
-        if (isTactical) {
-            element.setUseShader(true);
-        } else {
+    public void setOccupiedMaterial(GraphicsGameElement element) {
+        if (element.getModel3d() != null) {
             this.set3DMaterial(element.getModel3d(), this.occupiedMaterial);
         }
     }
 
-    public void setSelectedMaterial(GraphicsGameElement element, boolean isTactical) {
+    public void setSelectedMaterial(GraphicsGameElement element) {
         if (element.getModel2d() != null) {
-            element.setUseShader(true);
+            element.setModel2d(this.getSpriteById(element.getPieceId(), true));
         }
         if (element.getModel3d() != null) {
             this.set3DMaterial(element.getModel3d(), this.selectedPieceMaterial);
@@ -115,7 +132,9 @@ class Material3dManager {
         this.piecesAtlas = piecesAtlas;
     }
 
-    public TextureAtlas.AtlasRegion getRegionById(PieceId pieceId) {
-        return this.piecesAtlas.findRegion(this.getRegionNameFromPieceId(pieceId));
+
+    public Sprite getSpriteById(PieceId id, boolean selection) {
+        TextureAtlas.AtlasRegion region = this.piecesAtlas.findRegion(this.getRegionNameFromPieceId(id, selection));
+        return new Sprite(region);
     }
 }

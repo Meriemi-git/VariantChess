@@ -25,7 +25,7 @@ public class GraphicsGameElement {
         return this.color;
     }
 
-    public PieceId getId() {
+    public PieceId getPieceId() {
         return this.id;
     }
 

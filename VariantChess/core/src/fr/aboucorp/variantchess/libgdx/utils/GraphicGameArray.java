@@ -38,7 +38,7 @@ public class GraphicGameArray extends Array<GraphicsGameElement> {
     public GraphicsGameElement getElementById(PieceId pieceId) {
         for (Iterator<GraphicsGameElement> iter = this.iterator(); iter.hasNext(); ) {
             GraphicsGameElement model = iter.next();
-            if (model.getId() != null && model.getId().equals(pieceId)) {
+            if (model.getPieceId() != null && model.getPieceId().equals(pieceId)) {
                 return model;
             }
         }
