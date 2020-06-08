@@ -8,7 +8,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.heroiclabs.nakama.api.User;
 import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.NotEmpty;
@@ -16,9 +15,10 @@ import com.mobsandgeeks.saripaar.annotation.NotEmpty;
 import java.util.List;
 
 import fr.aboucorp.variantchess.R;
+import fr.aboucorp.variantchess.app.db.entities.ChessUser;
 import fr.aboucorp.variantchess.app.exceptions.UsernameDuplicateException;
 import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
-import fr.aboucorp.variantchess.app.views.activities.VariantChessActivity;
+import fr.aboucorp.variantchess.app.views.activities.MainActivity;
 
 public class UsernameFragment extends VariantChessFragment implements Validator.ValidationListener {
     private Button username_btn_validate;
@@ -27,6 +27,16 @@ public class UsernameFragment extends VariantChessFragment implements Validator.
     private Validator validator;
     private SessionManager sessionManager;
 
+    @Override
+    protected void bindViews() {
+        this.username_btn_validate = this.getView().findViewById(R.id.username_btn_validate);
+        this.username_txt_username = this.getView().findViewById(R.id.username_txt_username);
+    }
+
+    @Override
+    protected void bindListeners() {
+        this.username_btn_validate.setOnClickListener(v -> this.validator.validate());
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -45,22 +55,10 @@ public class UsernameFragment extends VariantChessFragment implements Validator.
     }
 
     @Override
-    protected void bindViews() {
-        this.username_btn_validate = this.getView().findViewById(R.id.username_btn_validate);
-        this.username_txt_username = this.getView().findViewById(R.id.username_txt_username);
-    }
-
-    @Override
-    protected void bindListeners() {
-        this.username_btn_validate.setOnClickListener(v -> this.validator.validate());
-    }
-
-
-    @Override
     public void onValidationSucceeded() {
         try {
-            User user = this.sessionManager.updateDisplayName(this.username_txt_username.getText().toString());
-            ((VariantChessActivity) this.getActivity()).userIsConnected(user);
+            ChessUser user = this.sessionManager.updateDisplayName(this.username_txt_username.getText().toString());
+            ((MainActivity) this.getActivity()).userIsConnected(user);
         } catch (UsernameDuplicateException e) {
             Toast.makeText(this.getActivity(), R.string.username_already_exists, Toast.LENGTH_LONG).show();
         }

@@ -19,8 +19,11 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
 import fr.aboucorp.variantchess.R;
+import fr.aboucorp.variantchess.app.db.entities.ChessUser;
+import fr.aboucorp.variantchess.app.db.entities.ChessUserRepository;
 import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
 import fr.aboucorp.variantchess.app.utils.ExceptionCauseCode;
+import fr.aboucorp.variantchess.app.views.activities.MainActivity;
 
 
 public class SignUpFragment extends VariantChessFragment implements Validator.ValidationListener {
@@ -35,8 +38,9 @@ public class SignUpFragment extends VariantChessFragment implements Validator.Va
 
     private Validator validator;
 
-
     private SessionManager sessionManager;
+
+    private ChessUserRepository chessUserRepository;
 
     public SignUpFragment() {
     }
@@ -67,13 +71,14 @@ public class SignUpFragment extends VariantChessFragment implements Validator.Va
         this.bindListeners();
         this.validator = new Validator(this);
         this.validator.setValidationListener(this);
-
+        this.chessUserRepository = new ChessUserRepository(this.getActivity().getApplication());
     }
 
     @Override
     public void onValidationSucceeded() {
         try {
-            this.sessionManager.signUpWithEmail(this.txt_mail.getText().toString(), this.txt_pwd.getText().toString());
+            ChessUser connected = this.sessionManager.signUpWithEmail(this.txt_mail.getText().toString(), this.txt_pwd.getText().toString());
+            ((MainActivity) this.getActivity()).userIsConnected(connected);
         } catch (ExecutionException e) {
             if (ExceptionCauseCode.getCodeValueFromCause(e.getCause()) == ExceptionCauseCode.ALREADY_EXISTS) {
                 Toast.makeText(this.getActivity(), R.string.username_already_exists, Toast.LENGTH_LONG).show();
@@ -88,7 +93,6 @@ public class SignUpFragment extends VariantChessFragment implements Validator.Va
         for (ValidationError error : errors) {
             View view = error.getView();
             String message = error.getCollatedErrorMessage(this.getActivity());
-
             // Display error messages ;)
             if (view instanceof EditText) {
                 ((EditText) view).setError(message);

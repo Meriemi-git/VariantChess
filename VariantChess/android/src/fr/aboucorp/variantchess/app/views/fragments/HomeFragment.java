@@ -13,10 +13,10 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.lifecycle.ViewModelProvider;
 
 import fr.aboucorp.variantchess.R;
+import fr.aboucorp.variantchess.app.db.entities.UserViewModel;
 import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
 import fr.aboucorp.variantchess.app.utils.FragmentTag;
-import fr.aboucorp.variantchess.app.viewmodel.UserViewModel;
-import fr.aboucorp.variantchess.app.views.activities.VariantChessActivity;
+import fr.aboucorp.variantchess.app.views.activities.MainActivity;
 
 public class HomeFragment extends VariantChessFragment {
     private Button home_btn_online_game;
@@ -39,19 +39,19 @@ public class HomeFragment extends VariantChessFragment {
         this.home_btn_offline_game.setOnClickListener(v -> {
             Bundle args = new Bundle();
             args.putBoolean(ONLINE_ARGS_KEY, false);
-            ((VariantChessActivity) this.getActivity()).setFragment(GameModeFragment.class, FragmentTag.GAME, args);
+            ((MainActivity) this.getActivity()).setFragment(GameModeFragment.class, FragmentTag.GAME, args);
         });
         this.home_btn_online_game.setOnClickListener(v -> {
             if (this.userViewModel.getConnected().getValue() != null) {
                 Bundle args = new Bundle();
                 args.putBoolean(ONLINE_ARGS_KEY, true);
-                ((VariantChessActivity) this.getActivity()).setFragment(GameModeFragment.class, FragmentTag.GAME, args);
+                ((MainActivity) this.getActivity()).setFragment(GameModeFragment.class, FragmentTag.GAME, args);
             } else {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
                 builder.setTitle(R.string.home_connection_required_title);
                 builder.setMessage(R.string.home_connection_required_title_message);
                 builder.setPositiveButton(R.string.general_lbl_confirm, (dialog, id) -> {
-                    ((VariantChessActivity) this.getActivity()).setFragment(AccountFragment.class, FragmentTag.ACCOUNT, null);
+                    ((MainActivity) this.getActivity()).setFragment(AccountFragment.class, FragmentTag.ACCOUNT, null);
                 });
                 builder.setNegativeButton(R.string.general_close, (dialog, id) -> dialog.dismiss());
                 AlertDialog dialog = builder.create();

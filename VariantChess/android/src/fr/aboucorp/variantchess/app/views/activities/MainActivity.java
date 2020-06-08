@@ -6,21 +6,21 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.heroiclabs.nakama.api.User;
-
 import fr.aboucorp.variantchess.R;
+import fr.aboucorp.variantchess.app.db.entities.ChessUser;
+import fr.aboucorp.variantchess.app.db.entities.UserViewModel;
 import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
 import fr.aboucorp.variantchess.app.utils.FragmentTag;
-import fr.aboucorp.variantchess.app.viewmodel.UserViewModel;
 import fr.aboucorp.variantchess.app.views.fragments.HomeFragment;
 import fr.aboucorp.variantchess.app.views.fragments.SettingsFragment;
 
-public class MainActivity extends VariantChessActivity {
+public class MainActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private SessionManager sessionManager;
     private UserViewModel userViewModel;
@@ -38,8 +38,8 @@ public class MainActivity extends VariantChessActivity {
         this.sessionManager = SessionManager.getInstance(this);
         this.userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
         try {
-            this.sessionManager.restoreSessionIfPossible();
-            this.userIsConnected(this.sessionManager.getUser());
+            this.sessionManager.tryReconnectUser();
+            this.userIsConnected(this.sessionManager.getChessUser());
         } catch (Exception e) {
             Log.e("fr.aboucorp.variantchess", e.getMessage());
             e.printStackTrace();
@@ -80,7 +80,6 @@ public class MainActivity extends VariantChessActivity {
         }
     }
 
-    @Override
     public void setFragment(Class<? extends Fragment> fragmentClass, String fragmentTag, Bundle args) {
         FragmentTransaction fragmentTransaction = this.getSupportFragmentManager().beginTransaction();
         Fragment existing = this.getSupportFragmentManager().findFragmentByTag(fragmentTag);
@@ -92,32 +91,18 @@ public class MainActivity extends VariantChessActivity {
                 existing.setArguments(args);
             }
             fragmentTransaction.replace(R.id.fragment_container, existing, fragmentTag);
-            //fragmentTransaction.addToBackStack(fragmentTag);
             fragmentTransaction.commit();
         } catch (IllegalAccessException | InstantiationException e) {
             e.printStackTrace();
         }
     }
 
-    @Override
-    public void userIsConnected(User connected) {
+    public void userIsConnected(ChessUser connected) {
         if (connected != null) {
             Toast.makeText(this, R.string.connected, Toast.LENGTH_LONG).show();
         }
-        this.userViewModel.setConnected(connected);
         this.setFragment(HomeFragment.class, "home", null);
-         /*if (TextUtils.isEmpty(connected.getDisplayName())) {
-                this.setFragment(UsernameFragment.class, "username", null);
-            } else {
-            this.userViewModel.setConnected(connected);
-            this.setFragment(HomeFragment.class, "home", null);
-            Toast.makeText(this, R.string.connected, Toast.LENGTH_LONG).show();
-        }
-         } else {
-             this.setFragment(AccountFragment.class, "account", null);
-        }*/
-
-
+        this.userViewModel.setConnected(connected);
     }
 
     private void setToolbar() {
@@ -130,9 +115,10 @@ public class MainActivity extends VariantChessActivity {
         this.getSupportActionBar().setHomeButtonEnabled(true);
     }
 
-    private void updateConnectionUI(User user) {
+    private void updateConnectionUI(ChessUser user) {
         if (user != null) {
-            this.toolbar.setSubtitle(user.getDisplayName());
+            this.toolbar.setSubtitle(user.displayName);
+
         } else {
             this.toolbar.setSubtitle("Disconnected");
         }

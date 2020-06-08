@@ -1,4 +1,4 @@
-package fr.aboucorp.variantchess.app.viewmodel;
+package fr.aboucorp.variantchess.app.db.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;

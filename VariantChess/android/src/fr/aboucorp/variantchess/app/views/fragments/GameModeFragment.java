@@ -25,11 +25,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.aboucorp.variantchess.R;
+import fr.aboucorp.variantchess.app.db.adapters.GameModeAdapter;
+import fr.aboucorp.variantchess.app.db.entities.UserViewModel;
 import fr.aboucorp.variantchess.app.multiplayer.MatchListener;
 import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
 import fr.aboucorp.variantchess.app.utils.AsyncHandler;
-import fr.aboucorp.variantchess.app.viewmodel.GameModeAdapter;
-import fr.aboucorp.variantchess.app.viewmodel.UserViewModel;
 import fr.aboucorp.variantchess.app.views.activities.BoardActivity;
 import fr.aboucorp.variantchess.entities.ChessColor;
 import fr.aboucorp.variantchess.entities.ChessMatch;

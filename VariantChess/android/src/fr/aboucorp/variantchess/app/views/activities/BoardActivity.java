@@ -10,22 +10,17 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toolbar;
 
-import androidx.annotation.NonNull;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelStore;
-import androidx.lifecycle.ViewModelStoreOwner;
 import androidx.preference.PreferenceManager;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
-import com.heroiclabs.nakama.api.User;
 
 import fr.aboucorp.variantchess.R;
+import fr.aboucorp.variantchess.app.db.entities.ChessUser;
 import fr.aboucorp.variantchess.app.listeners.MatchEventListener;
 import fr.aboucorp.variantchess.app.managers.MatchManager;
 import fr.aboucorp.variantchess.app.managers.boards.ClassicBoardManager;
 import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
-import fr.aboucorp.variantchess.app.viewmodel.UserViewModel;
 import fr.aboucorp.variantchess.app.views.fragments.SettingsFragment;
 import fr.aboucorp.variantchess.entities.ChessMatch;
 import fr.aboucorp.variantchess.entities.boards.Board;
@@ -38,7 +33,7 @@ import fr.aboucorp.variantchess.entities.events.models.TurnEvent;
 import fr.aboucorp.variantchess.entities.rules.ClassicRuleSet;
 import fr.aboucorp.variantchess.libgdx.Board3dManager;
 
-public class BoardActivity extends AndroidApplication implements GameEventSubscriber, MatchEventListener, ViewModelStoreOwner {
+public class BoardActivity extends AndroidApplication implements GameEventSubscriber, MatchEventListener {
 
     public FrameLayout board_panel;
     private Button btn_end_turn;
@@ -50,7 +45,7 @@ public class BoardActivity extends AndroidApplication implements GameEventSubscr
     private MatchManager matchManager;
     private SessionManager sessionManager;
     private Toolbar toolbar;
-    private User user;
+    private ChessUser chessUser;
     private ChessMatch chessMatch;
     private GameEventManager gameEventManager;
 
@@ -60,12 +55,6 @@ public class BoardActivity extends AndroidApplication implements GameEventSubscr
             this.runOnUiThread(() ->
                     this.party_logs.append("\n" + event.message));
         }
-    }
-
-    @NonNull
-    @Override
-    public ViewModelStore getViewModelStore() {
-        return null;
     }
 
     @Override
@@ -86,13 +75,14 @@ public class BoardActivity extends AndroidApplication implements GameEventSubscr
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        UserViewModel userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.board_layout);
         if (savedInstanceState != null) {
             this.chessMatch = (ChessMatch) savedInstanceState.getSerializable("chessMatch");
+            this.chessUser = (ChessUser) savedInstanceState.getSerializable("chessUser");
         } else {
             this.chessMatch = (ChessMatch) this.getIntent().getExtras().getSerializable("chessMatch");
+            this.chessUser = (ChessUser) this.getIntent().getExtras().getSerializable("chessUser");
         }
         this.bindViews();
         this.bindListeners();
@@ -149,7 +139,7 @@ public class BoardActivity extends AndroidApplication implements GameEventSubscr
     private void setToolbar() {
         this.toolbar = this.findViewById(R.id.main_toolbar);
         this.toolbar.setTitle(this.getString(R.string.app_name));
-        this.toolbar.setSubtitle(this.user != null ? this.user.getDisplayName() : "Disconnected");
+        this.toolbar.setSubtitle(this.chessUser != null ? this.chessUser.displayName : "Disconnected");
         this.setActionBar(this.toolbar);
         this.toolbar.setNavigationOnClickListener(v -> this.onBackPressed());
         this.getActionBar().setDisplayHomeAsUpEnabled(true);

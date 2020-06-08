@@ -26,6 +26,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
+import fr.aboucorp.variantchess.app.db.dto.ChessUserDto;
+import fr.aboucorp.variantchess.app.db.entities.ChessUser;
 import fr.aboucorp.variantchess.app.exceptions.UsernameDuplicateException;
 import fr.aboucorp.variantchess.app.utils.ExceptionCauseCode;
 import fr.aboucorp.variantchess.app.utils.ResultType;
@@ -61,10 +63,10 @@ public class SessionManager {
         return Boolean.parseBoolean(userExistsRpc.getPayload());
     }
 
-    public User signInWithEmail(String mail, String password) throws ExecutionException, InterruptedException, TimeoutException {
+    public ChessUser signInWithEmail(String mail, String password) throws ExecutionException, InterruptedException, TimeoutException {
         this.authentWithEmail(mail, password, ResultType.SIGNIN);
         User connected = this.client.getAccount(this.session).get(5000, TimeUnit.MILLISECONDS).getUser();
-        return connected;
+        return ChessUserDto.fromUserToChessUser(connected);
     }
 
     private void authentWithEmail(String mail, String password, int signType) throws ExecutionException, InterruptedException, TimeoutException {
@@ -72,7 +74,7 @@ public class SessionManager {
 
         if (signType == ResultType.SIGNUP) {
             metadata.put("signType", "SIGNUP");
-            this.restoreSessionIfPossible();
+            this.tryReconnectUser();
             if (this.user == null) {
                 this.session = this.client.authenticateEmail(mail, password, false).get(5000, TimeUnit.MILLISECONDS);
                 this.user = this.client.getAccount(this.session).get(5000, TimeUnit.MILLISECONDS).getUser();
@@ -85,7 +87,7 @@ public class SessionManager {
         this.pref.edit().putString("nk.session", this.session.getAuthToken()).apply();
     }
 
-    public void restoreSessionIfPossible() throws InterruptedException {
+    public void tryReconnectUser() throws InterruptedException {
         // Lets check if we can restore a cached session.
         String sessionString = this.pref.getString("nk.session", null);
         if (sessionString != null && !sessionString.isEmpty()) {
@@ -102,9 +104,9 @@ public class SessionManager {
         }
     }
 
-    public User signUpWithEmail(String mail, String password) throws InterruptedException, ExecutionException, TimeoutException {
+    public ChessUser signUpWithEmail(String mail, String password) throws InterruptedException, ExecutionException, TimeoutException {
         this.authentWithEmail(mail, password, ResultType.SIGNUP);
-        return this.user;
+        return ChessUserDto.fromUserToChessUser(this.user);
     }
 
     public void destroySession() {
@@ -112,7 +114,7 @@ public class SessionManager {
         this.pref.edit().putString("nk.session", null).apply();
     }
 
-    public User updateDisplayName(String displayName) throws UsernameDuplicateException {
+    public ChessUser updateDisplayName(String displayName) throws UsernameDuplicateException {
         Metadata data = new Metadata();
         String timeZone = TimeZone.getDefault().getDisplayName();
         String langTag = Locale.getDefault().getDisplayLanguage();
@@ -122,7 +124,7 @@ public class SessionManager {
         String rpcid = "update_user_infos";
         try {
             Rpc call = this.client.rpc(this.session, rpcid, data.getJsonFromMetadata()).get();
-            return this.client.getAccount(this.session).get().getUser();
+            return ChessUserDto.fromUserToChessUser(this.client.getAccount(this.session).get().getUser());
         } catch (ExecutionException e) {
             if (ExceptionCauseCode.getCodeValueFromCause(e.getCause()) == ExceptionCauseCode.ALREADY_EXISTS) {
                 throw new UsernameDuplicateException("Thius username is already taken");
@@ -173,9 +175,12 @@ public class SessionManager {
         }
     }
 
-
-    public User getUser() {
-        return this.user;
+    public ChessUser getChessUser() {
+        if (this.user == null) {
+            return null;
+        } else {
+            return ChessUserDto.fromUserToChessUser(this.user);
+        }
     }
 
     public Match joinMatchByToken(String token) throws ExecutionException, InterruptedException {
