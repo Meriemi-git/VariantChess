@@ -5,7 +5,7 @@ import fr.aboucorp.variantchess.entities.Location;
 import fr.aboucorp.variantchess.entities.Piece;
 import fr.aboucorp.variantchess.entities.Square;
 import fr.aboucorp.variantchess.entities.boards.ClassicBoard;
-import fr.aboucorp.variantchess.entities.enums.BoardEventType;
+import fr.aboucorp.variantchess.entities.enums.EventType;
 import fr.aboucorp.variantchess.entities.enums.PieceId;
 import fr.aboucorp.variantchess.entities.events.GameEventManager;
 import fr.aboucorp.variantchess.entities.events.GameEventSubscriber;
@@ -29,8 +29,8 @@ public class KingMoveSet extends AbstractMoveSet implements GameEventSubscriber 
     public void receiveGameEvent(GameEvent event) {
         super.receiveGameEvent(event);
         if (event instanceof PieceEvent && this.piece.getChessColor() == PieceId.getColor(((PieceEvent) event).played)) {
-            this.canCastleQueenSide = ((PieceEvent) event).type == BoardEventType.CASTLE_QUEEN;
-            this.canCastleKingSide = ((PieceEvent) event).type == BoardEventType.CASTLE_KING;
+            this.canCastleQueenSide = ((PieceEvent) event).boardEventType == EventType.CASTLE_QUEEN;
+            this.canCastleKingSide = ((PieceEvent) event).boardEventType == EventType.CASTLE_KING;
         }
     }
 

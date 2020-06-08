@@ -84,7 +84,7 @@ public class SignUpFragment extends VariantChessFragment implements Validator.Va
                 Toast.makeText(this.getActivity(), R.string.username_already_exists, Toast.LENGTH_LONG).show();
             }
         } catch (InterruptedException | TimeoutException e) {
-            e.printStackTrace();
+            Toast.makeText(this.getActivity(), R.string.failed_login, Toast.LENGTH_LONG).show();
         }
     }
 
@@ -93,7 +93,6 @@ public class SignUpFragment extends VariantChessFragment implements Validator.Va
         for (ValidationError error : errors) {
             View view = error.getView();
             String message = error.getCollatedErrorMessage(this.getActivity());
-            // Display error messages ;)
             if (view instanceof EditText) {
                 ((EditText) view).setError(message);
             } else {

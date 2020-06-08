@@ -42,4 +42,12 @@ public class ChessUserRepository {
             this.chessUserDao.insertAll(chessUser);
         });
     }
+
+    public void disconnect() {
+        VariantChessDatabase.databaseWriteExecutor.execute(() -> {
+            ChessUser user = this.chessUserDao.getConnected().getValue();
+            user.isConnected = false;
+            this.chessUserDao.update(user);
+        });
+    }
 }

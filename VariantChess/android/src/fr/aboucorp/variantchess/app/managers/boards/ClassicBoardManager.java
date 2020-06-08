@@ -10,7 +10,7 @@ import fr.aboucorp.variantchess.entities.Piece;
 import fr.aboucorp.variantchess.entities.Square;
 import fr.aboucorp.variantchess.entities.Turn;
 import fr.aboucorp.variantchess.entities.boards.Board;
-import fr.aboucorp.variantchess.entities.enums.BoardEventType;
+import fr.aboucorp.variantchess.entities.enums.EventType;
 import fr.aboucorp.variantchess.entities.events.GameEventManager;
 import fr.aboucorp.variantchess.entities.events.GameEventSubscriber;
 import fr.aboucorp.variantchess.entities.events.models.CastlingEvent;
@@ -244,7 +244,7 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
             }
             this.board3dManager.moveToEven(toBeEaten);
             String eventMessage = String.format("Piece %s die on %s", toBeEaten.getPieceId().name(), toBeEaten.getLocation());
-            this.gameEventManager.sendMessage(new PieceEvent(eventMessage, BoardEventType.DEATH, toBeEaten.getPieceId()));
+            this.gameEventManager.sendMessage(new PieceEvent(eventMessage, EventType.DEATH, toBeEaten.getPieceId()));
             toBeEaten.die();
         }
         return toBeEaten;

@@ -8,7 +8,7 @@ import fr.aboucorp.variantchess.entities.Piece;
 import fr.aboucorp.variantchess.entities.Square;
 import fr.aboucorp.variantchess.entities.Turn;
 import fr.aboucorp.variantchess.entities.boards.ClassicBoard;
-import fr.aboucorp.variantchess.entities.enums.BoardEventType;
+import fr.aboucorp.variantchess.entities.enums.EventType;
 import fr.aboucorp.variantchess.entities.enums.PieceId;
 import fr.aboucorp.variantchess.entities.events.GameEventManager;
 import fr.aboucorp.variantchess.entities.events.GameEventSubscriber;
@@ -54,7 +54,7 @@ public abstract class AbstractMoveSet implements GameEventSubscriber {
                 this.isChecking = false;
                 this.kingInCheck = null;
                 this.checkingPieces = null;
-            } else if (((PieceEvent) event).type == BoardEventType.DEATH && ((PieceEvent) event).played == this.piece.getPieceId()) {
+            } else if (((PieceEvent) event).boardEventType == EventType.DEATH && ((PieceEvent) event).played == this.piece.getPieceId()) {
                 this.eventManager.unSubscribe(GameEvent.class, this);
             }
         } else if (event instanceof TurnStartEvent) {

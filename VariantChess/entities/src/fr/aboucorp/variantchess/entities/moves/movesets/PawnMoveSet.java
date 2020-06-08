@@ -5,7 +5,7 @@ import fr.aboucorp.variantchess.entities.Location;
 import fr.aboucorp.variantchess.entities.Piece;
 import fr.aboucorp.variantchess.entities.Square;
 import fr.aboucorp.variantchess.entities.boards.ClassicBoard;
-import fr.aboucorp.variantchess.entities.enums.BoardEventType;
+import fr.aboucorp.variantchess.entities.enums.EventType;
 import fr.aboucorp.variantchess.entities.enums.PieceId;
 import fr.aboucorp.variantchess.entities.events.GameEventManager;
 import fr.aboucorp.variantchess.entities.events.models.EnPassantEvent;
@@ -23,6 +23,11 @@ public class PawnMoveSet extends AbstractMoveSet {
         SquareList validSquares = this.getClassicMoves(piece);
         validSquares.addAll(this.getEatingMoves(piece, turnColor, false));
         return validSquares;
+    }
+
+    @Override
+    public SquareList getThreats(Piece piece, ChessColor turnColor) {
+        return this.getEatingMoves(piece, turnColor, true);
     }
 
     private SquareList getClassicMoves(Piece piece) {
@@ -44,7 +49,6 @@ public class PawnMoveSet extends AbstractMoveSet {
         }
         return classicMoves;
     }
-
 
     private SquareList getEatingMoves(Piece piece, ChessColor turnColor, boolean isThreat) {
         Location start = piece.getLocation();
@@ -74,7 +78,7 @@ public class PawnMoveSet extends AbstractMoveSet {
 
     private boolean enPassantRightIsPossible(Square diagRight) {
         if (this.enPassantIsPossible() && diagRight.getLocation().getX() == this.previousTurn.getTo().getX()) {
-            this.eventManager.sendMessage(new EnPassantEvent("En passant", BoardEventType.EN_PASSANT, diagRight));
+            this.eventManager.sendMessage(new EnPassantEvent("En passant", EventType.EN_PASSANT, diagRight));
             return true;
         }
         return false;
@@ -82,7 +86,7 @@ public class PawnMoveSet extends AbstractMoveSet {
 
     private boolean enPassantLeftIsPossible(Square diagLeft) {
         if (this.enPassantIsPossible() && diagLeft.getLocation().getX() == this.previousTurn.getTo().getX()) {
-            this.eventManager.sendMessage(new EnPassantEvent("En passant", BoardEventType.EN_PASSANT, diagLeft));
+            this.eventManager.sendMessage(new EnPassantEvent("En passant", EventType.EN_PASSANT, diagLeft));
             return true;
         }
         return false;
@@ -95,11 +99,6 @@ public class PawnMoveSet extends AbstractMoveSet {
                 && PieceId.isPawn(this.previousTurn.getPlayed())
                 && Math.abs(this.previousTurn.getTo().getZ() - this.previousTurn.getFrom().getZ()) == 2
                 && Math.abs(this.previousTurn.getTo().getX() - this.piece.getLocation().getX()) == 1;
-    }
-
-    @Override
-    public SquareList getThreats(Piece piece, ChessColor turnColor) {
-        return this.getEatingMoves(piece, turnColor, true);
     }
 
 }

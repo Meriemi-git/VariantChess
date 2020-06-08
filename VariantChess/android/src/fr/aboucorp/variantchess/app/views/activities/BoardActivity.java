@@ -14,12 +14,18 @@ import androidx.preference.PreferenceManager;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
+import com.heroiclabs.nakama.MatchData;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 
 import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.db.entities.ChessUser;
 import fr.aboucorp.variantchess.app.listeners.MatchEventListener;
 import fr.aboucorp.variantchess.app.managers.MatchManager;
 import fr.aboucorp.variantchess.app.managers.boards.ClassicBoardManager;
+import fr.aboucorp.variantchess.app.multiplayer.AbstractMatchListener;
 import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
 import fr.aboucorp.variantchess.app.views.fragments.SettingsFragment;
 import fr.aboucorp.variantchess.entities.ChessMatch;
@@ -29,6 +35,7 @@ import fr.aboucorp.variantchess.entities.events.GameEventManager;
 import fr.aboucorp.variantchess.entities.events.GameEventSubscriber;
 import fr.aboucorp.variantchess.entities.events.models.BoardEvent;
 import fr.aboucorp.variantchess.entities.events.models.GameEvent;
+import fr.aboucorp.variantchess.entities.events.models.TurnEndEvent;
 import fr.aboucorp.variantchess.entities.events.models.TurnEvent;
 import fr.aboucorp.variantchess.entities.rules.ClassicRuleSet;
 import fr.aboucorp.variantchess.libgdx.Board3dManager;
@@ -54,6 +61,9 @@ public class BoardActivity extends AndroidApplication implements GameEventSubscr
         if (!(event instanceof TurnEvent)) {
             this.runOnUiThread(() ->
                     this.party_logs.append("\n" + event.message));
+        }
+        if (this.chessMatch.getMatchId() != null) {
+            this.sessionManager.sendEvent(event, this.chessMatch.getMatchId());
         }
     }
 
@@ -117,6 +127,7 @@ public class BoardActivity extends AndroidApplication implements GameEventSubscr
             }
             BoardActivity.this.lbl_turn.setText("Turn of " + BoardActivity.this.matchManager.getPartyInfos());
         });
+
     }
 
     private void bindViews() {
@@ -147,7 +158,8 @@ public class BoardActivity extends AndroidApplication implements GameEventSubscr
         this.getActionBar().setHomeAsUpIndicator(R.drawable.ic_arrow_back);
     }
 
-    private void initializeBoard() {
+    private void
+    initializeBoard() {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         boolean isTactical = sharedPref.getBoolean(SettingsFragment.IS_TACTICAL_MODE_ON, false);
         this.gameEventManager = new GameEventManager();
@@ -158,6 +170,7 @@ public class BoardActivity extends AndroidApplication implements GameEventSubscr
         ClassicRuleSet classicRules = new ClassicRuleSet(classicBoard, this.gameEventManager);
         this.boardManager = new ClassicBoardManager(this.board3dManager, classicBoard, classicRules, this.gameEventManager);
         this.sessionManager = SessionManager.getInstance(this);
+        this.sessionManager.setMatchListener(new ConcreteMatchListener(this));
         this.matchManager = new MatchManager(this.boardManager, this.gameEventManager, this.sessionManager);
         AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
         this.board_panel.addView(this.initializeForView(this.board3dManager, config));
@@ -166,5 +179,29 @@ public class BoardActivity extends AndroidApplication implements GameEventSubscr
     private void stopParty() {
         this.matchManager.stopParty();
         this.board3dManager.exit();
+    }
+
+    private class ConcreteMatchListener extends AbstractMatchListener {
+        private BoardActivity boardActivity;
+
+        public ConcreteMatchListener(BoardActivity boardActivity) {
+            this.boardActivity = boardActivity;
+        }
+
+        @Override
+        public void onMatchData(MatchData matchData) {
+            super.onMatchData(matchData);
+            ObjectInputStream ois = null;
+            try {
+                ois = new ObjectInputStream(new ByteArrayInputStream(matchData.getData()));
+                GameEvent gameEvent = (GameEvent) ois.readObject();
+                if (gameEvent instanceof TurnEndEvent) {
+                    TurnEndEvent event = (TurnEndEvent) gameEvent;
+                    BoardActivity.this.matchManager.playTheMove(event);
+                }
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

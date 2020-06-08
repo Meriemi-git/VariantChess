@@ -68,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
             case R.id.menu_action_profil:
                 return true;
             case R.id.menu_action_disconnect:
+                this.userViewModel.disconnectUser();
                 this.sessionManager.destroySession();
                 this.userViewModel.setConnected(null);
                 this.setFragment(HomeFragment.class, FragmentTag.HOME, null);

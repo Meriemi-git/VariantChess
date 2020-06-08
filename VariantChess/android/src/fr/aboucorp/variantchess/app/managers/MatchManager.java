@@ -6,13 +6,14 @@ import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
 import fr.aboucorp.variantchess.entities.ChessColor;
 import fr.aboucorp.variantchess.entities.ChessMatch;
 import fr.aboucorp.variantchess.entities.PartyLifeCycle;
-import fr.aboucorp.variantchess.entities.enums.BoardEventType;
+import fr.aboucorp.variantchess.entities.enums.EventType;
 import fr.aboucorp.variantchess.entities.events.GameEventManager;
 import fr.aboucorp.variantchess.entities.events.GameEventSubscriber;
 import fr.aboucorp.variantchess.entities.events.models.BoardEvent;
 import fr.aboucorp.variantchess.entities.events.models.GameEvent;
 import fr.aboucorp.variantchess.entities.events.models.MoveEvent;
 import fr.aboucorp.variantchess.entities.events.models.PartyEvent;
+import fr.aboucorp.variantchess.entities.events.models.TurnEndEvent;
 
 public class MatchManager implements GameEventSubscriber, BoardManager.BoardLoadingListener, PartyLifeCycle {
     private final BoardManager boardManager;
@@ -40,10 +41,10 @@ public class MatchManager implements GameEventSubscriber, BoardManager.BoardLoad
     @Override
     public void receiveGameEvent(GameEvent event) {
         this.eventListener.OnMatchEvent(event);
-        if (event instanceof BoardEvent && ((BoardEvent) event).type == BoardEventType.CHECKMATE) {
+        if (event instanceof BoardEvent && ((BoardEvent) event).boardEventType == EventType.CHECKMATE) {
             ChessColor winner = this.boardManager.getWinner();
-            this.eventManager.sendMessage(new PartyEvent(String.format("Game finished ! Winner : %s", winner != null ? winner.name() : "EQUALITY")));
-        } else if (event instanceof MoveEvent && ((BoardEvent) event).type == BoardEventType.MOVE) {
+            this.eventManager.sendMessage(new PartyEvent(String.format("Game finished ! Winner : %s", winner != null ? winner.name() : "EQUALITY"), EventType.END_GAME));
+        } else if (event instanceof MoveEvent && ((BoardEvent) event).boardEventType == EventType.MOVE) {
             this.endTurn(((MoveEvent) event));
 
         }
@@ -72,5 +73,9 @@ public class MatchManager implements GameEventSubscriber, BoardManager.BoardLoad
 
     public void setEventListener(MatchEventListener eventListener) {
         this.eventListener = eventListener;
+    }
+
+    public void playTheMove(TurnEndEvent event) {
+        this.boardManager.playTheMove(event);
     }
 }

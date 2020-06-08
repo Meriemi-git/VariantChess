@@ -1,13 +1,14 @@
 package fr.aboucorp.variantchess.entities.events.models;
 
-import fr.aboucorp.variantchess.entities.enums.BoardEventType;
+import java.io.Serializable;
+
 import fr.aboucorp.variantchess.entities.enums.PieceId;
 
-public class PieceEvent extends BoardEvent {
+public class PieceEvent extends BoardEvent implements Serializable {
     public PieceId played;
 
-    public PieceEvent(String eventMessage, BoardEventType type, PieceId played) {
-        super(eventMessage, type);
+    public PieceEvent(String eventMessage, int boardEventType, PieceId played) {
+        super(eventMessage, boardEventType);
         this.played = played;
     }
 }

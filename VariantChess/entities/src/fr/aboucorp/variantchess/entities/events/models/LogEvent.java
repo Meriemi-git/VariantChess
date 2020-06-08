@@ -1,7 +1,11 @@
 package fr.aboucorp.variantchess.entities.events.models;
 
-public class LogEvent extends GameEvent {
+import java.io.Serializable;
+
+import fr.aboucorp.variantchess.entities.enums.EventType;
+
+public class LogEvent extends GameEvent implements Serializable {
     public LogEvent(String eventMessage) {
-        super(eventMessage);
+        super(eventMessage, EventType.LOG);
     }
 }

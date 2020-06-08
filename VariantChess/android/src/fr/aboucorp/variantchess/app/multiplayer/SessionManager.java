@@ -17,6 +17,9 @@ import com.heroiclabs.nakama.SocketClient;
 import com.heroiclabs.nakama.api.Rpc;
 import com.heroiclabs.nakama.api.User;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -32,6 +35,7 @@ import fr.aboucorp.variantchess.app.exceptions.UsernameDuplicateException;
 import fr.aboucorp.variantchess.app.utils.ExceptionCauseCode;
 import fr.aboucorp.variantchess.app.utils.ResultType;
 import fr.aboucorp.variantchess.entities.GameMode;
+import fr.aboucorp.variantchess.entities.events.models.GameEvent;
 
 public class SessionManager {
     public static final String SHARED_PREFERENCE_NAME = "nakama";
@@ -41,6 +45,7 @@ public class SessionManager {
     private User user;
     private SocketClient matchmakingSocket;
     private SharedPreferences pref;
+    private MatchMakingSocketListener socketListener;
 
     private SessionManager(Activity activity) {
         this.pref = activity.getSharedPreferences(SHARED_PREFERENCE_NAME, Context.MODE_PRIVATE);
@@ -136,11 +141,10 @@ public class SessionManager {
         return null;
     }
 
-
     public String launchMatchMaking(GameMode gamemode, MatchListener matchListener) throws ExecutionException, InterruptedException {
         this.matchmakingSocket = this.client.createSocket();
-        MatchMakingSocketListener socketListener = new MatchMakingSocketListener(matchListener);
-        this.matchmakingSocket.connect(this.session, socketListener).get();
+        this.socketListener = new MatchMakingSocketListener(matchListener);
+        this.matchmakingSocket.connect(this.session, this.socketListener).get();
         String ticketString = this.pref.getString("nk.ticket", null);
         if (!TextUtils.isEmpty(ticketString)) {
             try {
@@ -163,7 +167,6 @@ public class SessionManager {
         this.pref.edit().putString("nk.ticket", matchmakerTicket.getTicket()).apply();
         return matchmakerTicket.getTicket();
     }
-
 
     public void cancelMatchMaking(String ticket) {
         try {
@@ -190,6 +193,25 @@ public class SessionManager {
     public List<User> getUsersFromMatched(MatchmakerMatched matched) throws ExecutionException, InterruptedException {
         return this.client.getUsers(this.session, matched.getUsers().stream().map(u -> u.getPresence().getUserId())
                 .collect(Collectors.toList())).get().getUsersList();
+    }
+
+    public void setMatchListener(MatchListener listener) {
+        this.socketListener.setListener(listener);
+    }
+
+    public void sendEvent(GameEvent event, String matchId) {
+
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = null;
+        try {
+            oos = new ObjectOutputStream(bos);
+            oos.writeObject(event);
+            oos.flush();
+            byte[] data = bos.toByteArray();
+            this.matchmakingSocket.sendMatchData(matchId, event.boardEventType, data);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
 

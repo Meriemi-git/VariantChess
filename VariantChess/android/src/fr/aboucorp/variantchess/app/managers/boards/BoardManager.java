@@ -168,4 +168,10 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
     public interface BoardLoadingListener {
         void OnBoardLoaded();
     }
+
+    public void playTheMove(TurnEndEvent event) {
+        this.selectPiece(this.board.getPieceById(event.turn.getPlayed()));
+        Square destination = (Square) this.board.getSquares().getItemByLocation(event.turn.getTo());
+        this.selectSquare(destination);
+    }
 }

@@ -1,9 +1,13 @@
 package fr.aboucorp.variantchess.entities.events.models;
 
-public abstract class GameEvent {
-    public String message;
+import java.io.Serializable;
 
-    public GameEvent(String message) {
+public abstract class GameEvent implements Serializable {
+    public final String message;
+    public final int boardEventType;
+
+    public GameEvent(String message, int boardEventType) {
         this.message = message;
+        this.boardEventType = boardEventType;
     }
 }

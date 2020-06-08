@@ -1,14 +1,15 @@
 package fr.aboucorp.variantchess.entities.events.models;
 
-import fr.aboucorp.variantchess.entities.Square;
-import fr.aboucorp.variantchess.entities.enums.BoardEventType;
+import java.io.Serializable;
 
-public class EnPassantEvent extends BoardEvent {
+import fr.aboucorp.variantchess.entities.Square;
+
+public class EnPassantEvent extends BoardEvent implements Serializable {
 
     public final Square destination;
 
-    public EnPassantEvent(String eventMessage, BoardEventType type, Square destination) {
-        super(eventMessage, type);
+    public EnPassantEvent(String eventMessage, int boardEventType, Square destination) {
+        super(eventMessage, boardEventType);
         this.destination = destination;
     }
 }

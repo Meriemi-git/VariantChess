@@ -27,4 +27,8 @@ public class UserViewModel extends AndroidViewModel {
     public void insert(ChessUser chessUser) {
         this.chessUserRepository.insert(chessUser);
     }
+
+    public void disconnectUser() {
+        this.chessUserRepository.disconnect();
+    }
 }

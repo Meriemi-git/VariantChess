@@ -1,12 +1,10 @@
 package fr.aboucorp.variantchess.entities.events.models;
 
-import fr.aboucorp.variantchess.entities.enums.BoardEventType;
+import java.io.Serializable;
 
-public class BoardEvent extends GameEvent {
-    public final BoardEventType type;
+public class BoardEvent extends GameEvent implements Serializable {
 
-    public BoardEvent(String eventMessage, BoardEventType type) {
-        super(eventMessage);
-        this.type = type;
+    public BoardEvent(String eventMessage, int boardEventType) {
+        super(eventMessage, boardEventType);
     }
 }

@@ -1,6 +1,8 @@
 package fr.aboucorp.variantchess.entities;
 
-public class Location implements Cloneable {
+import java.io.Serializable;
+
+public class Location implements Cloneable, Serializable {
 
     private final float x;
     private final float y;
@@ -10,6 +12,21 @@ public class Location implements Cloneable {
         this.x = x;
         this.y = y;
         this.z = z;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof Location && ((Location) obj).getX() == this.x && ((Location) obj).getY() == this.y && ((Location) obj).getZ() == this.z;
+    }
+
+    @Override
+    public Location clone() {
+        return new Location(this.x, this.y, this.z);
+    }
+
+    @Override
+    public String toString() {
+        return "[" + (char) (65 + (7 - this.x)) + (this.z + 1) + "]";
     }
 
     public static Location fromString(String string) throws NumberFormatException {
@@ -24,11 +41,6 @@ public class Location implements Cloneable {
         }
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        return obj instanceof Location && ((Location) obj).getX() == this.x && ((Location) obj).getY() == this.y && ((Location) obj).getZ() == this.z;
-    }
-
     public float getX() {
         return this.x;
     }
@@ -39,16 +51,6 @@ public class Location implements Cloneable {
 
     public float getZ() {
         return this.z;
-    }
-
-    @Override
-    public Location clone() {
-        return new Location(this.x, this.y, this.z);
-    }
-
-    @Override
-    public String toString() {
-        return "[" + (char) (65 + (7 - this.x)) + (this.z + 1) + "]";
     }
 
     public String getStringValue() {
