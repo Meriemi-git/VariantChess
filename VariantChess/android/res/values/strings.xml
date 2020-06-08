@@ -53,10 +53,15 @@
     <string name="online_lbl_gamemode">Select a game mode</string>
     <string name="home_lbl_new_game">New game</string>
     <string name="new_game_lbl_launch">Launch</string>
-    <string name="new_game_online">Online</string>
-    <string name="new_game_offline">Offline</string>
+    <string name="new_game_online">Online game</string>
+    <string name="new_game_offline">Offline game</string>
     <string name="matchmaking_failed">Matchmaking error, please relaunch it.</string>
     <string name="matchmaking_success">Match found</string>
     <string name="settings_tactical_view_lbl">Enable Tactical view</string>
+    <string name="general_or">OR</string>
+    <string name="home_connection_required_title">Connection required</string>
+    <string name="home_connection_required_title_message">You must connect to existing account to launch an online game.</string>
+    <string name="matchmaking_cancelled">Matchmaking canceled</string>
+    <string name="matchmaking_cannot_join_match">Cannot join match</string>
 
 </resources>

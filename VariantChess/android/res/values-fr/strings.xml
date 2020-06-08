@@ -46,4 +46,7 @@
     <string name="signin_lbl_mail">Saisissez votre mail</string>
     <string name="signin_lbl_password">Saisissez votre mot de passe</string>
     <string name="signin_lbl_confirm_password">Confirmez votre mot de passe</string>
+    <string name="new_game_offline">Partie hors-ligne</string>
+    <string name="new_game_online">Partie en ligne</string>
+    <string name="general_or">OU</string>
 </resources>

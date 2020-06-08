@@ -10,6 +10,10 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toolbar;
 
+import androidx.annotation.NonNull;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelStore;
+import androidx.lifecycle.ViewModelStoreOwner;
 import androidx.preference.PreferenceManager;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
@@ -21,8 +25,9 @@ import fr.aboucorp.variantchess.app.listeners.MatchEventListener;
 import fr.aboucorp.variantchess.app.managers.MatchManager;
 import fr.aboucorp.variantchess.app.managers.boards.ClassicBoardManager;
 import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
+import fr.aboucorp.variantchess.app.viewmodel.UserViewModel;
 import fr.aboucorp.variantchess.app.views.fragments.SettingsFragment;
-import fr.aboucorp.variantchess.entities.Match;
+import fr.aboucorp.variantchess.entities.ChessMatch;
 import fr.aboucorp.variantchess.entities.boards.Board;
 import fr.aboucorp.variantchess.entities.boards.ClassicBoard;
 import fr.aboucorp.variantchess.entities.events.GameEventManager;
@@ -33,7 +38,7 @@ import fr.aboucorp.variantchess.entities.events.models.TurnEvent;
 import fr.aboucorp.variantchess.entities.rules.ClassicRuleSet;
 import fr.aboucorp.variantchess.libgdx.Board3dManager;
 
-public class BoardActivity extends AndroidApplication implements GameEventSubscriber, MatchEventListener {
+public class BoardActivity extends AndroidApplication implements GameEventSubscriber, MatchEventListener, ViewModelStoreOwner {
 
     public FrameLayout board_panel;
     private Button btn_end_turn;
@@ -46,7 +51,7 @@ public class BoardActivity extends AndroidApplication implements GameEventSubscr
     private SessionManager sessionManager;
     private Toolbar toolbar;
     private User user;
-    private Match match;
+    private ChessMatch chessMatch;
     private GameEventManager gameEventManager;
 
     @Override
@@ -57,75 +62,10 @@ public class BoardActivity extends AndroidApplication implements GameEventSubscr
         }
     }
 
+    @NonNull
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        this.setContentView(R.layout.board_layout);
-        if (savedInstanceState != null) {
-            this.match = (Match) savedInstanceState.getSerializable("match");
-        } else {
-            this.match = (Match) this.getIntent().getExtras().getSerializable("match");
-        }
-        this.bindViews();
-        this.bindListeners();
-        this.setToolbar();
-        //this.sessionManager = SessionManager.getInstance(this);
-        // this.user = this.sessionManager.getUser();
-        this.initializeBoard();
-        this.matchManager.setEventListener(this);
-        this.matchManager.startParty(this.match);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-        super.onSaveInstanceState(savedInstanceState);
-        savedInstanceState.putSerializable("match", this.match);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-    }
-
-    @Override
-    public void onBackPressed() {
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-        alertDialogBuilder.setMessage("If you exit the game you will loose the match");
-        alertDialogBuilder.setPositiveButton("yes",
-                (dialog, arg1) -> this.stopParty());
-        alertDialogBuilder.setNegativeButton("No", (dialog, which) -> dialog.dismiss());
-        AlertDialog alertDialog = alertDialogBuilder.create();
-        alertDialog.show();
-    }
-
-    @Override
-    public void recreate() {
-        super.recreate();
-    }
-
-    @Override
-    public void finish() {
-        super.finish();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    public ViewModelStore getViewModelStore() {
+        return null;
     }
 
     @Override
@@ -142,6 +82,41 @@ public class BoardActivity extends AndroidApplication implements GameEventSubscr
     @Override
     public void exit() {
         super.exit();
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        UserViewModel userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
+        super.onCreate(savedInstanceState);
+        this.setContentView(R.layout.board_layout);
+        if (savedInstanceState != null) {
+            this.chessMatch = (ChessMatch) savedInstanceState.getSerializable("chessMatch");
+        } else {
+            this.chessMatch = (ChessMatch) this.getIntent().getExtras().getSerializable("chessMatch");
+        }
+        this.bindViews();
+        this.bindListeners();
+        this.setToolbar();
+        this.initializeBoard();
+        this.matchManager.setEventListener(this);
+        this.matchManager.startParty(this.chessMatch);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putSerializable("chessMatch", this.chessMatch);
+    }
+
+    @Override
+    public void onBackPressed() {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setMessage("If you exit the game you will loose the chessMatch");
+        alertDialogBuilder.setPositiveButton("yes",
+                (dialog, arg1) -> this.stopParty());
+        alertDialogBuilder.setNegativeButton("No", (dialog, which) -> dialog.dismiss());
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
     }
 
     @Override
@@ -192,7 +167,8 @@ public class BoardActivity extends AndroidApplication implements GameEventSubscr
         Board classicBoard = new ClassicBoard(this.gameEventManager);
         ClassicRuleSet classicRules = new ClassicRuleSet(classicBoard, this.gameEventManager);
         this.boardManager = new ClassicBoardManager(this.board3dManager, classicBoard, classicRules, this.gameEventManager);
-        this.matchManager = new MatchManager(this.boardManager, this.gameEventManager);
+        this.sessionManager = SessionManager.getInstance(this);
+        this.matchManager = new MatchManager(this.boardManager, this.gameEventManager, this.sessionManager);
         AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
         this.board_panel.addView(this.initializeForView(this.board3dManager, config));
     }

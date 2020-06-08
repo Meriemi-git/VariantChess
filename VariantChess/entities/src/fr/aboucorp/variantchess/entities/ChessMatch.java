@@ -3,10 +3,11 @@ package fr.aboucorp.variantchess.entities;
 import java.io.Serializable;
 import java.util.LinkedList;
 
-public class Match implements Serializable {
+public class ChessMatch implements Serializable {
     public LinkedList turns = new LinkedList<>();
     public Player whitePlayer;
     public Player blackPlayer;
+    private String matchId;
 
     public Player getBlackPlayer() {
         return this.blackPlayer;
@@ -30,5 +31,13 @@ public class Match implements Serializable {
 
     public void setTurns(LinkedList<Turn> turns) {
         this.turns = turns;
+    }
+
+    public String getMatchId() {
+        return this.matchId;
+    }
+
+    public void setMatchId(String matchId) {
+        this.matchId = matchId;
     }
 }

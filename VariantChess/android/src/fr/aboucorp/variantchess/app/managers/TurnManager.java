@@ -2,7 +2,7 @@ package fr.aboucorp.variantchess.app.managers;
 
 
 import fr.aboucorp.variantchess.entities.ChessColor;
-import fr.aboucorp.variantchess.entities.Match;
+import fr.aboucorp.variantchess.entities.ChessMatch;
 import fr.aboucorp.variantchess.entities.PartyLifeCycle;
 import fr.aboucorp.variantchess.entities.Player;
 import fr.aboucorp.variantchess.entities.Turn;
@@ -16,13 +16,25 @@ public class TurnManager implements PartyLifeCycle {
     private GameEventManager gameEventManager;
     private Player whitePlayer;
     private Player blackPlayer;
-    private Match match;
+    private ChessMatch chessMatch;
     private Turn current;
 
     public TurnManager(GameEventManager gameEventManager) {
         this.gameEventManager = gameEventManager;
     }
 
+    @Override
+    public void startParty(ChessMatch chessMatch) {
+        this.chessMatch = chessMatch;
+        this.whitePlayer = chessMatch.getWhitePlayer();
+        this.blackPlayer = chessMatch.getBlackPlayer();
+        this.startTurn();
+    }
+
+    @Override
+    public void stopParty() {
+        this.chessMatch = null;
+    }
 
     public void endTurn(MoveEvent event, String fenFromBoard) {
         this.current.setFen(fenFromBoard);
@@ -32,40 +44,26 @@ public class TurnManager implements PartyLifeCycle {
             this.current.setFrom(event.from);
             this.current.setDeadPiece(event.deadPiece);
         }
-        this.match.getTurns().add(this.current);
-        this.gameEventManager.sendMessage(new TurnEndEvent("Ending turn", this.match.getTurns().getLast()));
+        this.chessMatch.getTurns().add(this.current);
+        this.gameEventManager.sendMessage(new TurnEndEvent("Ending turn", this.chessMatch.getTurns().getLast()));
     }
-
 
     public ChessColor getTurnColor() {
         return this.current.getTurnColor();
     }
 
-    @Override
-    public void startParty(Match match) {
-        this.match = match;
-        this.whitePlayer = match.getWhitePlayer();
-        this.blackPlayer = match.getBlackPlayer();
-        this.startTurn();
-    }
-
     public void startTurn() {
         Turn nextTurn;
         Player player = null;
-        if (this.match.getTurns().size() > 0 && this.match.getTurns().getLast().getTurnColor() == ChessColor.WHITE) {
+        if (this.chessMatch.getTurns().size() > 0 && this.chessMatch.getTurns().getLast().getTurnColor() == ChessColor.WHITE) {
             player = this.blackPlayer;
         } else {
             player = this.whitePlayer;
         }
-        nextTurn = new Turn(this.match.getTurns().size() + 1, player);
+        nextTurn = new Turn(this.chessMatch.getTurns().size() + 1, player);
         this.current = nextTurn;
         String eventMessage = String.format("Turn %s, color : %s", nextTurn.getTurnNumber(), nextTurn.getTurnColor());
         this.gameEventManager.sendMessage(new TurnStartEvent(eventMessage, nextTurn));
-    }
-
-    @Override
-    public void stopParty() {
-        this.match = null;
     }
 
 }

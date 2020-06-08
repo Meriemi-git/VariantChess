@@ -4,23 +4,27 @@ package fr.aboucorp.variantchess.entities;
 import java.io.Serializable;
 
 public class Player implements Serializable {
-    protected String name;
-    protected ChessColor color;
+    private final String displayName;
+    private final ChessColor color;
+    private final String userID;
 
-    public Player(String name, ChessColor color) {
-        this.name = name;
+    public Player(String displayName, ChessColor color, String userID) {
+        this.displayName = displayName;
         this.color = color;
+        this.userID = userID;
     }
 
-    public Player() {
-    }
 
     public ChessColor getColor() {
         return this.color;
     }
 
-    public String getName() {
-        return this.name;
+    public String getDisplayName() {
+        return this.displayName;
+    }
+
+    public String getUserID() {
+        return this.userID;
     }
 
 }

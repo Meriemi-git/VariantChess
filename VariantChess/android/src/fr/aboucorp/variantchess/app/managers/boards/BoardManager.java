@@ -9,8 +9,8 @@ import fr.aboucorp.variantchess.app.listeners.GDXGestureListener;
 import fr.aboucorp.variantchess.app.listeners.GDXInputAdapter;
 import fr.aboucorp.variantchess.app.utils.GdxPostRunner;
 import fr.aboucorp.variantchess.entities.ChessColor;
+import fr.aboucorp.variantchess.entities.ChessMatch;
 import fr.aboucorp.variantchess.entities.Location;
-import fr.aboucorp.variantchess.entities.Match;
 import fr.aboucorp.variantchess.entities.PartyLifeCycle;
 import fr.aboucorp.variantchess.entities.Piece;
 import fr.aboucorp.variantchess.entities.Square;
@@ -44,6 +44,44 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
     protected BoardLoadingListener boardLoadingListener;
 
     private GameState gameState;
+
+    BoardManager(Board board, Board3dManager board3dManager, AbstractRuleSet ruleSet, GameEventManager gameEventManager) {
+        this.board = board;
+        this.board3dManager = board3dManager;
+        this.ruleSet = ruleSet;
+        GDXInputAdapter inputAdapter = new GDXInputAdapter(board3dManager);
+        board3dManager.setAndroidInputAdapter(inputAdapter);
+        GDXGestureListener gestureListener = new GDXGestureListener(this);
+        board3dManager.setAndroidListener(gestureListener);
+        this.gameState = GameState.SelectPiece;
+        this.gameEventManager = gameEventManager;
+    }
+
+    @Override
+    public void receiveGameEvent(GameEvent event) {
+        if (event instanceof TurnStartEvent) {
+            this.manageTurnStart((TurnStartEvent) event);
+        } else if (event instanceof TurnEndEvent) {
+            this.manageTurnEnd();
+        }
+    }
+
+    @Override
+    public void startParty(ChessMatch chessMatch) {
+        this.gameEventManager.subscribe(PartyEvent.class, this, 1);
+        this.gameEventManager.subscribe(TurnEvent.class, this, 1);
+        this.gameEventManager.subscribe(PieceEvent.class, this, 1);
+    }
+
+    @Override
+    public void stopParty() {
+        this.gameState = GameState.SelectPiece;
+        this.selectedPiece = null;
+        this.previousTurn = null;
+        this.actualTurn = null;
+        this.board.clearBoard();
+        this.ruleSet.moveNumber = 0;
+    }
 
     public boolean IsTacticalViewOn() {
         return this.board3dManager.isTacticalViewEnabled();
@@ -92,15 +130,6 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
 
     protected abstract Piece moveToSquare(Square to);
 
-    @Override
-    public void receiveGameEvent(GameEvent event) {
-        if (event instanceof TurnStartEvent) {
-            this.manageTurnStart((TurnStartEvent) event);
-        } else if (event instanceof TurnEndEvent) {
-            this.manageTurnEnd();
-        }
-    }
-
     public void selectPiece(Piece touched) {
         this.selectedPiece = touched;
         this.gameState = GameState.SelectCase;
@@ -122,23 +151,6 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
         this.boardLoadingListener = boardLoadingListener;
     }
 
-    @Override
-    public void startParty(Match match) {
-        this.gameEventManager.subscribe(PartyEvent.class, this, 1);
-        this.gameEventManager.subscribe(TurnEvent.class, this, 1);
-        this.gameEventManager.subscribe(PieceEvent.class, this, 1);
-    }
-
-    @Override
-    public void stopParty() {
-        this.gameState = GameState.SelectPiece;
-        this.selectedPiece = null;
-        this.previousTurn = null;
-        this.actualTurn = null;
-        this.board.clearBoard();
-        this.ruleSet.moveNumber = 0;
-    }
-
     public void toogleTacticalView() {
         GdxPostRunner runner = new GdxPostRunner() {
             @Override
@@ -151,18 +163,6 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
 
     public void unHighlight() {
         this.gameState = GameState.SelectPiece;
-    }
-
-    BoardManager(Board board, Board3dManager board3dManager, AbstractRuleSet ruleSet, GameEventManager gameEventManager) {
-        this.board = board;
-        this.board3dManager = board3dManager;
-        this.ruleSet = ruleSet;
-        GDXInputAdapter inputAdapter = new GDXInputAdapter(board3dManager);
-        board3dManager.setAndroidInputAdapter(inputAdapter);
-        GDXGestureListener gestureListener = new GDXGestureListener(this);
-        board3dManager.setAndroidListener(gestureListener);
-        this.gameState = GameState.SelectPiece;
-        this.gameEventManager = gameEventManager;
     }
 
     public interface BoardLoadingListener {

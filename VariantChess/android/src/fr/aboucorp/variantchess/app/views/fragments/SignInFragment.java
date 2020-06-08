@@ -18,6 +18,7 @@ import com.mobsandgeeks.saripaar.annotation.Password;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
@@ -43,6 +44,19 @@ public class SignInFragment extends VariantChessFragment implements Validator.Va
     private SessionManager sessionManager;
 
     @Override
+    protected void bindViews() {
+        this.txt_mail = this.getView().findViewById(R.id.sign_in_mail);
+        this.txt_pwd = this.getView().findViewById(R.id.sign_in_pwd);
+        this.txt_condifm_pwd = this.getView().findViewById(R.id.sign_in_btn_confirm_pwd);
+        this.btn_register = this.getView().findViewById(R.id.register_btn_create_account);
+    }
+
+    @Override
+    protected void bindListeners() {
+        this.btn_register.setOnClickListener(v -> this.validator.validate());
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.sign_in_layout, container, false);
         return view;
@@ -59,19 +73,6 @@ public class SignInFragment extends VariantChessFragment implements Validator.Va
     }
 
     @Override
-    protected void bindViews() {
-        this.txt_mail = this.getView().findViewById(R.id.sign_in_mail);
-        this.txt_pwd = this.getView().findViewById(R.id.sign_in_pwd);
-        this.txt_condifm_pwd = this.getView().findViewById(R.id.sign_in_btn_confirm_pwd);
-        this.btn_register = this.getView().findViewById(R.id.register_btn_create_account);
-    }
-
-    @Override
-    protected void bindListeners() {
-        this.btn_register.setOnClickListener(v -> this.validator.validate());
-    }
-
-    @Override
     public void onValidationSucceeded() {
         try {
             this.sessionManager.signInWithEmail(this.txt_mail.getText().toString(), this.txt_pwd.getText().toString());
@@ -79,7 +80,7 @@ public class SignInFragment extends VariantChessFragment implements Validator.Va
             Log.i("fr.aboucorp.variantchess", "ExecutionException during mail signin message : " + e.getMessage());
             Toast.makeText(this.getActivity(), R.string.error_during_signin, Toast.LENGTH_LONG).show();
             e.printStackTrace();
-        } catch (InterruptedException e) {
+        } catch (InterruptedException | TimeoutException e) {
             Log.i("fr.aboucorp.variantchess", "InterruptedException during mail signin message : " + e.getMessage());
             Toast.makeText(this.getActivity(), R.string.error_during_signin, Toast.LENGTH_LONG).show();
             e.printStackTrace();

@@ -15,9 +15,12 @@ import com.mobsandgeeks.saripaar.annotation.NotEmpty;
 import com.mobsandgeeks.saripaar.annotation.Password;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
+import fr.aboucorp.variantchess.app.utils.ExceptionCauseCode;
 
 
 public class SignUpFragment extends VariantChessFragment implements Validator.ValidationListener {
@@ -39,6 +42,18 @@ public class SignUpFragment extends VariantChessFragment implements Validator.Va
     }
 
     @Override
+    protected void bindViews() {
+        this.txt_mail = this.getView().findViewById(R.id.signup_txt_mail);
+        this.txt_pwd = this.getView().findViewById(R.id.signup_txt_pwd);
+        this.btn_mail_connect = this.getView().findViewById(R.id.signup_btn_mail_connect);
+    }
+
+    @Override
+    protected void bindListeners() {
+        this.btn_mail_connect.setOnClickListener(v -> this.validator.validate());
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.sign_up_layout, container, false);
         return view;
@@ -56,20 +71,16 @@ public class SignUpFragment extends VariantChessFragment implements Validator.Va
     }
 
     @Override
-    protected void bindViews() {
-        this.txt_mail = this.getView().findViewById(R.id.signup_txt_mail);
-        this.txt_pwd = this.getView().findViewById(R.id.signup_txt_pwd);
-        this.btn_mail_connect = this.getView().findViewById(R.id.signup_btn_mail_connect);
-    }
-
-    @Override
-    protected void bindListeners() {
-        this.btn_mail_connect.setOnClickListener(v -> this.validator.validate());
-    }
-
-    @Override
     public void onValidationSucceeded() {
-        this.sessionManager.signUpWithEmail(this.txt_mail.getText().toString(), this.txt_pwd.getText().toString());
+        try {
+            this.sessionManager.signUpWithEmail(this.txt_mail.getText().toString(), this.txt_pwd.getText().toString());
+        } catch (ExecutionException e) {
+            if (ExceptionCauseCode.getCodeValueFromCause(e.getCause()) == ExceptionCauseCode.ALREADY_EXISTS) {
+                Toast.makeText(this.getActivity(), R.string.username_already_exists, Toast.LENGTH_LONG).show();
+            }
+        } catch (InterruptedException | TimeoutException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
