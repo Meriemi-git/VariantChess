@@ -89,6 +89,7 @@ public class MainActivity extends AppCompatActivity {
                 existing = fragmentClass.newInstance();
             }
             if (args != null) {
+                args.putSerializable("chessUser", this.userViewModel.getConnected().getValue());
                 existing.setArguments(args);
             }
             fragmentTransaction.replace(R.id.fragment_container, existing, fragmentTag);
@@ -102,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
         if (connected != null) {
             Toast.makeText(this, R.string.connected, Toast.LENGTH_LONG).show();
         }
-        this.setFragment(HomeFragment.class, "home", null);
+        this.setFragment(HomeFragment.class, FragmentTag.HOME, null);
         this.userViewModel.setConnected(connected);
     }
 

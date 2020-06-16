@@ -13,6 +13,7 @@ import fr.aboucorp.variantchess.app.db.entities.ChessUser;
 
 @Dao
 public interface ChessUserDao {
+
     @Query("SELECT * FROM chessuser")
     List<ChessUser> getAll();
 
@@ -24,6 +25,9 @@ public interface ChessUserDao {
 
     @Query("SELECT * FROM chessuser WHERE is_connected = 1 LIMIT 1")
     LiveData<ChessUser> getConnected();
+
+    @Query("UPDATE chessuser SET is_connected = 0 WHERE username != :username")
+    void disconnectAllOthers(String username);
 
     @Insert
     void insertAll(ChessUser... users);

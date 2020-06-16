@@ -8,6 +8,7 @@ public class ChessMatch implements Serializable {
     public Player whitePlayer;
     public Player blackPlayer;
     private String matchId;
+    private Player currentPlayer;
 
     public Player getBlackPlayer() {
         return this.blackPlayer;
@@ -39,5 +40,13 @@ public class ChessMatch implements Serializable {
 
     public void setMatchId(String matchId) {
         this.matchId = matchId;
+    }
+
+    public Player getCurrentPlayer() {
+        return this.currentPlayer;
+    }
+
+    public void setCurrentPlayer(Player currentPlayer) {
+        this.currentPlayer = currentPlayer;
     }
 }

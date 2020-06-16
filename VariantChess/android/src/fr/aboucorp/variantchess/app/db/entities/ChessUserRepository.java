@@ -2,23 +2,28 @@ package fr.aboucorp.variantchess.app.db.entities;
 
 import android.app.Application;
 
+import androidx.annotation.NonNull;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import fr.aboucorp.variantchess.app.db.VariantChessDatabase;
 import fr.aboucorp.variantchess.app.db.dao.ChessUserDao;
 
 public class ChessUserRepository {
+
     private ChessUserDao chessUserDao;
-    private MutableLiveData<ChessUser> connected;
+
+    @NonNull
+    private MutableLiveData<ChessUser> chessUser = new MutableLiveData<>();
 
     public ChessUserRepository(Application application) {
         VariantChessDatabase db = VariantChessDatabase.getDatabase(application);
         this.chessUserDao = db.chessUserDao();
-        this.connected = new MutableLiveData<ChessUser>(this.chessUserDao.getConnected().getValue());
     }
 
-    MutableLiveData<ChessUser> getConnected() {
-        return this.connected;
+    @NonNull
+    LiveData<ChessUser> getConnected() {
+        return this.chessUser;
     }
 
     public void setConnected(ChessUser connecting) {
@@ -29,12 +34,14 @@ public class ChessUserRepository {
                 if (user != null) {
                     user.isConnected = true;
                     this.chessUserDao.update(user);
+
                 } else {
                     this.chessUserDao.insertAll(connecting);
                 }
+                this.chessUserDao.disconnectAllOthers(connecting.username);
             });
+            this.chessUser.postValue(connecting);
         }
-        this.connected.setValue(connecting);
     }
 
     void insert(ChessUser chessUser) {
@@ -46,8 +53,11 @@ public class ChessUserRepository {
     public void disconnect() {
         VariantChessDatabase.databaseWriteExecutor.execute(() -> {
             ChessUser user = this.chessUserDao.getConnected().getValue();
-            user.isConnected = false;
-            this.chessUserDao.update(user);
+            if (user != null) {
+                user.isConnected = false;
+                this.chessUserDao.update(user);
+            }
         });
+        this.chessUser.postValue(null);
     }
 }

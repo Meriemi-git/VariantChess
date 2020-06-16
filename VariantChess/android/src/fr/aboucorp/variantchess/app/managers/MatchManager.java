@@ -1,8 +1,6 @@
 package fr.aboucorp.variantchess.app.managers;
 
-import fr.aboucorp.variantchess.app.listeners.MatchEventListener;
 import fr.aboucorp.variantchess.app.managers.boards.BoardManager;
-import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
 import fr.aboucorp.variantchess.entities.ChessColor;
 import fr.aboucorp.variantchess.entities.ChessMatch;
 import fr.aboucorp.variantchess.entities.PartyLifeCycle;
@@ -13,23 +11,19 @@ import fr.aboucorp.variantchess.entities.events.models.BoardEvent;
 import fr.aboucorp.variantchess.entities.events.models.GameEvent;
 import fr.aboucorp.variantchess.entities.events.models.MoveEvent;
 import fr.aboucorp.variantchess.entities.events.models.PartyEvent;
-import fr.aboucorp.variantchess.entities.events.models.TurnEndEvent;
 
 public class MatchManager implements GameEventSubscriber, BoardManager.BoardLoadingListener, PartyLifeCycle {
-    private final BoardManager boardManager;
-    private final TurnManager turnManager;
-    private final SessionManager sessionManager;
-    private GameEventManager eventManager;
-    private MatchEventListener eventListener;
-    private ChessMatch chessMatch;
+    protected final BoardManager boardManager;
+    protected final TurnManager turnManager;
+    protected GameEventManager eventManager;
+    protected ChessMatch chessMatch;
 
 
-    public MatchManager(BoardManager boardManager, GameEventManager gameEventManager, SessionManager sessionManager) {
+    public MatchManager(BoardManager boardManager, GameEventManager gameEventManager) {
         this.eventManager = gameEventManager;
         this.boardManager = boardManager;
         this.boardManager.setBoardLoadingListener(this);
         this.turnManager = new TurnManager(gameEventManager);
-        this.sessionManager = sessionManager;
     }
 
     @Override
@@ -40,13 +34,11 @@ public class MatchManager implements GameEventSubscriber, BoardManager.BoardLoad
 
     @Override
     public void receiveGameEvent(GameEvent event) {
-        this.eventListener.OnMatchEvent(event);
         if (event instanceof BoardEvent && ((BoardEvent) event).boardEventType == EventType.CHECKMATE) {
             ChessColor winner = this.boardManager.getWinner();
             this.eventManager.sendMessage(new PartyEvent(String.format("Game finished ! Winner : %s", winner != null ? winner.name() : "EQUALITY"), EventType.END_GAME));
         } else if (event instanceof MoveEvent && ((BoardEvent) event).boardEventType == EventType.MOVE) {
             this.endTurn(((MoveEvent) event));
-
         }
     }
 
@@ -71,11 +63,4 @@ public class MatchManager implements GameEventSubscriber, BoardManager.BoardLoad
         this.turnManager.startTurn();
     }
 
-    public void setEventListener(MatchEventListener eventListener) {
-        this.eventListener = eventListener;
-    }
-
-    public void playTheMove(TurnEndEvent event) {
-        this.boardManager.playTheMove(event);
-    }
 }

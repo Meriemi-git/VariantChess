@@ -9,15 +9,17 @@ import androidx.lifecycle.LiveData;
 public class UserViewModel extends AndroidViewModel {
 
     private ChessUserRepository chessUserRepository;
+    private LiveData<ChessUser> connected;
 
     public UserViewModel(@NonNull Application application) {
         super(application);
         this.chessUserRepository = new ChessUserRepository(application);
+        this.connected = this.chessUserRepository.getConnected();
     }
 
 
     public LiveData<ChessUser> getConnected() {
-        return this.chessUserRepository.getConnected();
+        return this.connected;
     }
 
     public void setConnected(ChessUser connected) {

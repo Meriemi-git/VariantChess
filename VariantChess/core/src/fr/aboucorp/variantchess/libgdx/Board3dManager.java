@@ -151,52 +151,53 @@ public class Board3dManager extends ApplicationAdapter {
             Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
             this.modelBatch.begin(this.camera);
-            for (GraphicsGameElement squareModel : this.chessSquareModels) {
-                if (squareModel.isVisible(this.camera, this.tacticalViewEnabled)) {
-                    this.modelBatch.render(squareModel.getModel3d(), this.environment);
+            for (int i = 0; i < this.chessSquareModels.size; i++) {
+                if (this.chessSquareModels.get(i).isVisible(this.camera, this.tacticalViewEnabled)) {
+                    this.modelBatch.render(this.chessSquareModels.get(i).getModel3d(), this.environment);
                 }
             }
+
             if (this.tacticalViewEnabled) {
                 this.modelBatch.end();
                 this.spriteBatch.begin();
             }
-            for (GraphicsGameElement piece : this.whitePieceModels) {
-                if (piece.isVisible(this.camera, this.tacticalViewEnabled)) {
+            for (int i = 0; i < this.whitePieceModels.size; i++) {
+                if (this.whitePieceModels.get(i).isVisible(this.camera, this.tacticalViewEnabled)) {
                     if (this.tacticalViewEnabled) {
-                        this.spriteBatch.setProjectionMatrix(this.calculateProjectionMatrix(piece.getLocation()));
-                        this.spriteBatch.draw(piece.getModel2d(), 0, 0, 24, 24);
+                        this.spriteBatch.setProjectionMatrix(this.calculateProjectionMatrix(this.whitePieceModels.get(i).getLocation()));
+                        this.spriteBatch.draw(this.whitePieceModels.get(i).getModel2d(), 0, 0, 24, 24);
                     } else {
-                        this.modelBatch.render(piece.getModel3d(), this.environment);
+                        this.modelBatch.render(this.whitePieceModels.get(i).getModel3d(), this.environment);
                     }
                 }
             }
-            for (GraphicsGameElement piece : this.blackPieceModels) {
-                if (piece.isVisible(this.camera, this.tacticalViewEnabled)) {
+            for (int i = 0; i < this.blackPieceModels.size; i++) {
+                if (this.blackPieceModels.get(i).isVisible(this.camera, this.tacticalViewEnabled)) {
                     if (this.tacticalViewEnabled) {
-                        this.spriteBatch.setProjectionMatrix(this.calculateProjectionMatrix(piece.getLocation()));
-                        this.spriteBatch.draw(piece.getModel2d(), 0, 0, 24, 24);
+                        this.spriteBatch.setProjectionMatrix(this.calculateProjectionMatrix(this.blackPieceModels.get(i).getLocation()));
+                        this.spriteBatch.draw(this.blackPieceModels.get(i).getModel2d(), 0, 0, 24, 24);
                     } else {
-                        this.modelBatch.render(piece.getModel3d(), this.environment);
+                        this.modelBatch.render(this.blackPieceModels.get(i).getModel3d(), this.environment);
                     }
                 }
             }
-            for (GraphicsGameElement deadPiece : this.whiteDeadPieceModels) {
-                if (deadPiece.isVisible(this.camera, this.tacticalViewEnabled)) {
+            for (int i = 0; i < this.whiteDeadPieceModels.size; i++) {
+                if (this.whiteDeadPieceModels.get(i).isVisible(this.camera, this.tacticalViewEnabled)) {
                     if (this.tacticalViewEnabled) {
-                        this.spriteBatch.setProjectionMatrix(this.calculateProjectionMatrix(deadPiece.getLocation()));
-                        this.spriteBatch.draw(deadPiece.getModel2d(), 0, 0, 24, 24);
+                        this.spriteBatch.setProjectionMatrix(this.calculateProjectionMatrix(this.whiteDeadPieceModels.get(i).getLocation()));
+                        this.spriteBatch.draw(this.whiteDeadPieceModels.get(i).getModel2d(), 0, 0, 24, 24);
                     } else {
-                        this.modelBatch.render(deadPiece.getModel3d(), this.environment);
+                        this.modelBatch.render(this.whiteDeadPieceModels.get(i).getModel3d(), this.environment);
                     }
                 }
             }
-            for (GraphicsGameElement deadPiece : this.blackDeadPieceModels) {
-                if (deadPiece.isVisible(this.camera, this.tacticalViewEnabled)) {
+            for (int i = 0; i < this.blackDeadPieceModels.size; i++) {
+                if (this.blackDeadPieceModels.get(i).isVisible(this.camera, this.tacticalViewEnabled)) {
                     if (this.tacticalViewEnabled) {
-                        this.spriteBatch.setProjectionMatrix(this.calculateProjectionMatrix(deadPiece.getLocation()));
-                        this.spriteBatch.draw(deadPiece.getModel2d(), 0, 0, 24, 24);
+                        this.spriteBatch.setProjectionMatrix(this.calculateProjectionMatrix(this.blackDeadPieceModels.get(i).getLocation()));
+                        this.spriteBatch.draw(this.blackDeadPieceModels.get(i).getModel2d(), 0, 0, 24, 24);
                     } else {
-                        this.modelBatch.render(deadPiece.getModel3d(), this.environment);
+                        this.modelBatch.render(this.blackDeadPieceModels.get(i).getModel3d(), this.environment);
                     }
                 }
             }
@@ -637,10 +638,7 @@ public class Board3dManager extends ApplicationAdapter {
             this.material3dManager.resetMaterial(this.selectedModel);
         }
         this.selectedModel = null;
-        for (Iterator<GraphicsGameElement> iter = this.chessSquareModels.iterator(); iter.hasNext(); ) {
-            GraphicsGameElement square = iter.next();
-            this.material3dManager.resetMaterial(square);
-        }
+        this.chessSquareModels.forEach(m -> this.material3dManager.resetMaterial(m));
     }
 
     public void selectPiece(Piece touched) {

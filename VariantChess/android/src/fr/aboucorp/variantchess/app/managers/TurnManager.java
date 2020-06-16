@@ -66,4 +66,8 @@ public class TurnManager implements PartyLifeCycle {
         this.gameEventManager.sendMessage(new TurnStartEvent(eventMessage, nextTurn));
     }
 
+    public void appendTurn(Turn opposite) {
+        this.chessMatch.turns.add(opposite);
+    }
+
 }

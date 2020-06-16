@@ -13,8 +13,6 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import androidx.lifecycle.ViewModelProvider;
-
 import com.heroiclabs.nakama.Error;
 import com.heroiclabs.nakama.Match;
 import com.heroiclabs.nakama.MatchmakerMatched;
@@ -25,7 +23,7 @@ import java.util.List;
 
 import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.db.adapters.GameModeAdapter;
-import fr.aboucorp.variantchess.app.db.entities.UserViewModel;
+import fr.aboucorp.variantchess.app.db.entities.ChessUser;
 import fr.aboucorp.variantchess.app.multiplayer.AbstractMatchListener;
 import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
 import fr.aboucorp.variantchess.app.utils.AsyncHandler;
@@ -34,6 +32,8 @@ import fr.aboucorp.variantchess.entities.ChessColor;
 import fr.aboucorp.variantchess.entities.ChessMatch;
 import fr.aboucorp.variantchess.entities.GameMode;
 import fr.aboucorp.variantchess.entities.Player;
+
+import static fr.aboucorp.variantchess.app.utils.ArgsKey.IS_ONLINE;
 
 public class GameModeFragment extends VariantChessFragment {
     private Spinner new_game_spinner;
@@ -44,6 +44,7 @@ public class GameModeFragment extends VariantChessFragment {
     private boolean isOnline;
     private String matchmakingTicket;
     private ChessMatch chessMatch;
+    private ChessUser chessUser;
 
     @Override
     protected void bindViews() {
@@ -61,7 +62,8 @@ public class GameModeFragment extends VariantChessFragment {
     @Override
     public void setArguments(@androidx.annotation.Nullable Bundle args) {
         super.setArguments(args);
-        this.isOnline = args != null && args.getBoolean(ONLINE_ARGS_KEY);
+        this.chessUser = (ChessUser) args.getSerializable("chessUser");
+        this.isOnline = args != null && args.getBoolean(IS_ONLINE);
     }
 
     @Override
@@ -76,7 +78,6 @@ public class GameModeFragment extends VariantChessFragment {
         this.bindViews();
         this.bindListeners();
         this.sessionManager = SessionManager.getInstance(this.getActivity());
-        UserViewModel userViewModel = new ViewModelProvider(this.getActivity()).get(UserViewModel.class);
         List<GameMode> modes = new ArrayList<>();
         modes.add(new GameMode("Classic", "Normal gamemode with classic rules and bla and bla and bla and many test."));
         modes.add(new GameMode("Random", "Normal gamemode with classic rules but pieces and randmly set at the start of the game"));
@@ -172,6 +173,7 @@ public class GameModeFragment extends VariantChessFragment {
                 protected void callbackOnUI() {
                     Bundle args = new Bundle();
                     args.putSerializable("chessMatch", GameModeFragment.this.chessMatch);
+                    args.putSerializable("chessUser", GameModeFragment.this.chessUser);
                     Intent intent = new Intent(GameModeFragment.this.getActivity(), BoardActivity.class);
                     intent.putExtras(args);
                     GameModeFragment.this.startActivity(intent);
