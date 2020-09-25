@@ -1,6 +1,7 @@
 package fr.aboucorp.variantchess.entities.enums;
 
 public enum GameState {
-    SelectPiece,
-    SelectCase,
+    PIECE_SELECTION,
+    SQUARE_SELECTION,
+    WAIT_FOR_NEXT_TURN
 }

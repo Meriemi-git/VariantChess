@@ -43,7 +43,7 @@
     <string name="lbl_link_title">Link your account</string>
     <string name="link_google_message">"We found a google account for @. Login with it to link your account an signup autmatically with your Google account. "</string>
     <string name="username_lbl_choose_username">Choose your username</string>
-    <string name="username_already_exists">This username is already taken</string>
+    <string name="err_username_already_exists">This username is already taken</string>
     <string name="username_hint_username">Username</string>
     <string name="signin_lbl_mail">Enter your mail</string>
     <string name="signin_lbl_password">Enter your password</string>
@@ -61,4 +61,11 @@
     <string name="home_connection_required_title_message">You must connect to existing account to launch an online game.</string>
     <string name="matchmaking_cancelled">Matchmaking canceled</string>
     <string name="matchmaking_cannot_join_match">Cannot join match</string>
+    <string name="sign_in_lbl_username">Enter your username</string>
+    <string name="sign_in_hint_username">Your username</string>
+    <string name="err_email_invalid">Invalid email address</string>
+    <string name="err_mail_already_exists">Email address already registered</string>
+    <string name="error_password_match">Password doesn\'t match</string>
+    <string name="err_nakama_general">Unknown error.</string>
+    <string name="warn_account_exists_with_different_username">Log into existing account</string>
 </resources>

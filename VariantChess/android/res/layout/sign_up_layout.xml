@@ -6,37 +6,94 @@
     android:orientation="vertical">
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingBottom="20dp"
-        android:text="@string/lbl_mail_connect"
-        android:textSize="24sp" />
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:autoSizeMaxTextSize="30sp"
+        android:autoSizeMinTextSize="12sp"
+        android:autoSizeStepGranularity="1sp"
+        android:autoSizeTextType="uniform"
+        android:gravity="center_horizontal"
+        android:text="@string/sign_in_lbl_account_creation" />
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:autoSizeMaxTextSize="20sp"
+        android:autoSizeMinTextSize="14sp"
+        android:autoSizeStepGranularity="1sp"
+        android:autoSizeTextType="uniform"
+        android:gravity="center_horizontal"
+        android:text="@string/sign_in_lbl_username" />
 
     <EditText
-        android:id="@+id/signup_txt_mail"
+        android:id="@+id/signup_username"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:autofillHints=""
         android:ems="10"
-        android:gravity="center"
+        android:gravity="center_horizontal"
+        android:inputType="textPersonName" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:autoSizeMaxTextSize="20sp"
+        android:autoSizeMinTextSize="14sp"
+        android:autoSizeStepGranularity="1sp"
+        android:autoSizeTextType="uniform"
+        android:gravity="center_horizontal"
+        android:text="@string/signin_lbl_mail" />
+
+    <EditText
+        android:id="@+id/signup_mail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:gravity="center_horizontal"
         android:hint="@string/lbl_hint_email"
         android:inputType="textEmailAddress" />
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:autoSizeMaxTextSize="20sp"
+        android:autoSizeMinTextSize="14sp"
+        android:autoSizeStepGranularity="1sp"
+        android:autoSizeTextType="uniform"
+        android:gravity="center_horizontal"
+        android:text="@string/signin_lbl_password" />
+
     <EditText
-        android:id="@+id/signup_txt_pwd"
+        android:id="@+id/signup_pwd"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:autofillHints=""
         android:ems="10"
-        android:gravity="center"
+        android:gravity="center_horizontal"
+        android:hint="@string/lbl_hint_password"
+        android:inputType="textPassword" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:autoSizeMaxTextSize="20sp"
+        android:autoSizeMinTextSize="14sp"
+        android:autoSizeStepGranularity="1sp"
+        android:autoSizeTextType="uniform"
+        android:gravity="center_horizontal"
+        android:text="@string/signin_lbl_confirm_password" />
+
+    <EditText
+        android:id="@+id/signup_confirm_pwd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:gravity="center_horizontal"
         android:hint="@string/lbl_hint_password"
         android:inputType="textPassword" />
 
     <Button
-        android:id="@+id/signup_btn_mail_connect"
+        android:id="@+id/register_btn_create_account"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/lbl_connect"
-        android:textSize="18sp" />
-
+        android:text="@string/lbl_create_account" />
 </LinearLayout>

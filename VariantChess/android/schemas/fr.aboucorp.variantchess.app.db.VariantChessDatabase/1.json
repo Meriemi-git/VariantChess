@@ -2,23 +2,17 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "65cebd058a34641242abac995ce1719d",
+    "identityHash": "72a6a5abf589391abcde20aaff55dac0",
     "entities": [
       {
         "tableName": "chessuser",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `displayName` TEXT, `username` TEXT, `user_id` TEXT, `is_connected` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `username` TEXT, `user_id` TEXT, `is_connected` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
             "columnName": "id",
             "affinity": "INTEGER",
             "notNull": true
-          },
-          {
-            "fieldPath": "displayName",
-            "columnName": "displayName",
-            "affinity": "TEXT",
-            "notNull": false
           },
           {
             "fieldPath": "username",
@@ -62,7 +56,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '65cebd058a34641242abac995ce1719d')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '72a6a5abf589391abcde20aaff55dac0')"
     ]
   }
 }

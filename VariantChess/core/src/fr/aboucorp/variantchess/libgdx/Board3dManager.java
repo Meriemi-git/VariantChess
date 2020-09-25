@@ -677,13 +677,15 @@ public class Board3dManager extends ApplicationAdapter {
     }
 
     public void unHighlightSquares(SquareList possiblesMoves) {
-        for (Square square : possiblesMoves) {
-            this.material3dManager.resetMaterial(this.getChessSquareModels().getByLocation(square.getLocation()));
-            if (square.getPiece() != null) {
-                if (square.getPiece().getChessColor() == ChessColor.WHITE) {
-                    this.material3dManager.resetMaterial(this.getWhitePieceModels().getByLocation(square.getPiece().getLocation()));
-                } else {
-                    this.material3dManager.resetMaterial(this.getBlackPieceModels().getByLocation(square.getPiece().getLocation()));
+        if (possiblesMoves != null) {
+            for (Square square : possiblesMoves) {
+                this.material3dManager.resetMaterial(this.getChessSquareModels().getByLocation(square.getLocation()));
+                if (square.getPiece() != null) {
+                    if (square.getPiece().getChessColor() == ChessColor.WHITE) {
+                        this.material3dManager.resetMaterial(this.getWhitePieceModels().getByLocation(square.getPiece().getLocation()));
+                    } else {
+                        this.material3dManager.resetMaterial(this.getBlackPieceModels().getByLocation(square.getPiece().getLocation()));
+                    }
                 }
             }
         }
