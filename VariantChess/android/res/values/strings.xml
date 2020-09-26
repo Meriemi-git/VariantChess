@@ -70,5 +70,6 @@
     <string name="error_password_match">Password doesn\'t match</string>
     <string name="err_nakama_general">Unknown error.</string>
     <string name="warn_account_exists_with_different_username">Log into existing account</string>
+    <string name="general_continu">Continue</string>
 
 </resources>

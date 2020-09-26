@@ -17,7 +17,7 @@ import fr.aboucorp.variantchess.app.db.entities.ChessUser;
 import fr.aboucorp.variantchess.app.db.entities.UserViewModel;
 import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
 import fr.aboucorp.variantchess.app.utils.FragmentTag;
-import fr.aboucorp.variantchess.app.views.fragments.HomeFragment;
+import fr.aboucorp.variantchess.app.views.fragments.AuthentFragment;
 import fr.aboucorp.variantchess.app.views.fragments.SettingsFragment;
 
 import static fr.aboucorp.variantchess.app.utils.ArgsKey.CHESS_USER;
@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
                 this.userViewModel.disconnectUser();
                 this.sessionManager.destroySession();
                 this.userViewModel.setConnected(null);
-                this.setFragment(HomeFragment.class, FragmentTag.HOME, null);
+                this.setFragment(AuthentFragment.class, FragmentTag.HOME, null);
                 return true;
             case R.id.menu_action_settings:
                 this.setFragment(SettingsFragment.class, FragmentTag.SETTINGS, null);
@@ -105,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
         if (connected != null) {
             Toast.makeText(this, R.string.connected, Toast.LENGTH_LONG).show();
         }
-        this.setFragment(HomeFragment.class, FragmentTag.HOME, null);
+        this.setFragment(AuthentFragment.class, FragmentTag.HOME, null);
         this.userViewModel.setConnected(connected);
     }
 

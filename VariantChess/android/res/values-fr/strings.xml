@@ -49,20 +49,5 @@
     <string name="new_game_offline">Partie hors-ligne</string>
     <string name="new_game_online">Partie en ligne</string>
     <string name="general_or">OU</string>
-    <string name="online_lbl_gamemode">Selection du mode de jeu</string>
-    <string name="home_lbl_new_game">Nouvelle partie</string>
-    <string name="new_game_lbl_launch">Lancer</string>
-    <string name="matchmaking_failed">Erreur de matchmaking, veuillez réessayer</string>
-    <string name="matchmaking_success">Match trouvé</string>
-    <string name="settings_tactical_view_lbl">Activer la vue tactique</string>
-    <string name="home_connection_required_title">Connexion requise</string>
-    <string name="home_connection_required_title_message">Vous devez vous connecter à votre compte pour lancer une partie en ligne</string>
-    <string name="matchmaking_cancelled">Matchmaking annulé</string>
-    <string name="matchmaking_cannot_join_match">Impossible de joindre une partie</string>
-    <string name="sign_in_lbl_username">Saisissez votre pseudo</string>
-    <string name="sign_in_hint_username">Votre pseudo</string>
-    <string name="err_email_invalid">Adresse mail invalide</string>
-    <string name="err_mail_already_exists">Adresse mail déjà utlisé</string>
-    <string name="error_password_match">Le mot de passe ne correspond pas</string>
-    <string name="err_nakama_general">Erreur inconnue</string>
+    <string name="general_continu">Continuer</string>
 </resources>
