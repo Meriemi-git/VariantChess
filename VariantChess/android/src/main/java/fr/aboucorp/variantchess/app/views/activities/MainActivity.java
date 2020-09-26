@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             this.sessionManager.tryReconnectUser();
             this.userIsConnected(this.sessionManager.getChessUser());
+            this.setFragment(AuthentFragment.class, FragmentTag.AUTHENT, null);
         } catch (Exception e) {
             Log.e("fr.aboucorp.variantchess", e.getMessage());
             e.printStackTrace();
@@ -73,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
                 this.userViewModel.disconnectUser();
                 this.sessionManager.destroySession();
                 this.userViewModel.setConnected(null);
-                this.setFragment(AuthentFragment.class, FragmentTag.HOME, null);
+                this.setFragment(AuthentFragment.class, FragmentTag.AUTHENT, null);
                 return true;
             case R.id.menu_action_settings:
                 this.setFragment(SettingsFragment.class, FragmentTag.SETTINGS, null);
