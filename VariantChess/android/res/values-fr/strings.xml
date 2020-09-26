@@ -49,4 +49,5 @@
     <string name="new_game_offline">Partie hors-ligne</string>
     <string name="new_game_online">Partie en ligne</string>
     <string name="general_or">OU</string>
+    <string name="general_continu">Continuer</string>
 </resources>
