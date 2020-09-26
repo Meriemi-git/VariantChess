@@ -81,8 +81,7 @@ public class SignUpFragment extends VariantChessFragment {
         this.validator = new AwesomeValidation(COLORATION);
         this.validator.addValidation(getActivity(), R.id.signup_mail, android.util.Patterns.EMAIL_ADDRESS, R.string.err_email_invalid);
         String regexPassword = "(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])";
-        String regexShit="[a-z]{8}[a-z]*";
-        this.validator.addValidation(getActivity(), R.id.signup_pwd,regexShit , R.string.error_wrong_password);
+        this.validator.addValidation(getActivity(), R.id.signup_pwd,regexPassword , R.string.error_wrong_password);
         this.validator.addValidation(getActivity(), R.id.signup_confirm_pwd, input -> txt_pwd.getText().toString().equals(txt_confirm_pwd.getText().toString()),R.string.error_password_match);
     }
 }
