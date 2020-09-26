@@ -29,19 +29,15 @@
     <string name="sign_in_error_duplicate_displayname">Username already taken</string>
     <string name="sign_in_error_duplicate_mail">This email is already taken</string>
     <string name="general_unconnected">Disconnected</string>
-    <string name="error_during_signin">Error during signin operation</string>
+    <string name="signin_credential_error">Invalid credentials</string>
     <string name="connected">Connected !</string>
     <string name="general_error_title">Error</string>
-    <string name="general_lbl_error_connexion">Cannot connect with there credentials</string>
     <string name="general_lbl_dismiss">Dismiss</string>
     <string name="general_info_title">Information</string>
-    <string name="link_mail_message">We found an account for @. Enter your password to logon with your google account next time.</string>
     <string name="general_lbl_cancel">Cancel</string>
     <string name="general_lbl_confirm">Confirm</string>
     <string name="error_wrong_password">Wrong password</string>
     <string name="general_password">Password</string>
-    <string name="lbl_link_title">Link your account</string>
-    <string name="link_google_message">"We found a google account for @. Login with it to link your account an signup autmatically with your Google account. "</string>
     <string name="username_lbl_choose_username">Choose your username</string>
     <string name="err_username_already_exists">This username is already taken</string>
     <string name="username_hint_username">Username</string>
@@ -66,7 +62,7 @@
     <string name="err_email_invalid">Invalid email address</string>
     <string name="err_mail_already_exists">Email address already registered</string>
     <string name="error_password_match">Password doesn\'t match</string>
-    <string name="err_nakama_general">Unknown error.</string>
+    <string name="err_general">Unknown error</string>
     <string name="warn_account_exists_with_different_username">Log into existing account</string>
     <string name="general_continu">Continue</string>
 </resources>

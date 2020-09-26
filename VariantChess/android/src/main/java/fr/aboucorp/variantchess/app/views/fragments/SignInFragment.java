@@ -6,10 +6,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import fr.aboucorp.variantchess.R;
+import fr.aboucorp.variantchess.app.db.entities.ChessUser;
 import fr.aboucorp.variantchess.app.db.entities.ChessUserRepository;
+import fr.aboucorp.variantchess.app.exceptions.AuthentificationException;
+import fr.aboucorp.variantchess.app.exceptions.IncorrectCredentials;
 import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
+import fr.aboucorp.variantchess.app.views.activities.MainActivity;
 
 
 public class SignInFragment extends VariantChessFragment  {
@@ -25,6 +30,7 @@ public class SignInFragment extends VariantChessFragment  {
     private ChessUserRepository chessUserRepository;
 
     public SignInFragment() {
+        this.sessionManager = SessionManager.getInstance(getActivity());
     }
 
     @Override
@@ -36,6 +42,17 @@ public class SignInFragment extends VariantChessFragment  {
 
     @Override
     protected void bindListeners() {
+        btn_mail_connect.setOnClickListener(view -> {
+            try {
+                ChessUser user = this.sessionManager.signInWithEmail(this.txt_mail.getText().toString(), this.txt_pwd.getText().toString());
+                ((MainActivity) this.getActivity()).userIsConnected(user);
+                // TODO Redirect on gamemode fragment
+            } catch (IncorrectCredentials e) {
+                Toast.makeText(getContext(), R.string.signin_credential_error, Toast.LENGTH_LONG).show();
+            } catch (AuthentificationException e) {
+                Toast.makeText(getContext(), R.string.err_general, Toast.LENGTH_LONG).show();
+            }
+        });
 
     }
 

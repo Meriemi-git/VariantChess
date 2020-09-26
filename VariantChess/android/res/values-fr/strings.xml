@@ -29,13 +29,11 @@
     <string name="sign_in_error_duplicate_displayname">Ce nom d\'utilisateur est déjà pris</string>
     <string name="sign_in_error_duplicate_mail">Cette adresse mail est déjà prise</string>
     <string name="general_unconnected">Déconnecté</string>
-    <string name="error_during_signin">Erreur lors de la création du compte</string>
+    <string name="signin_credential_error">Invalid credentials</string>
     <string name="connected">Connecté !</string>
-    <string name="general_lbl_error_connexion">Impossible de se connecter avec ces informations</string>
     <string name="general_lbl_dismiss">Sortir</string>
     <string name="general_error_title">Erreur</string>
     <string name="general_info_title">Information</string>
-    <string name="link_mail_message">Nous avons trouvé un compte pour @. Saisissez votre mot de passe pour vous connecter avec Google la prochaine fois.</string>
     <string name="general_lbl_cancel">Annuler</string>
     <string name="general_lbl_confirm">Confimer</string>
     <string name="error_wrong_password">Mot de passe incorrect</string>
@@ -50,4 +48,21 @@
     <string name="new_game_online">Partie en ligne</string>
     <string name="general_or">OU</string>
     <string name="general_continu">Continuer</string>
+    <string name="err_mail_already_exists">Adresse mail déjà enregistrée</string>
+    <string name="error_password_match">Les mots de passe ne correspondent pas</string>
+    <string name="warn_account_exists_with_different_username">Connection à un compte existant</string>
+    <string name="home_connection_required_title">Connection requise</string>
+    <string name="err_general">Erreur inconnue</string>
+    <string name="err_email_invalid">Adresse mail invalide</string>
+    <string name="home_connection_required_title_message">Vous deveza vous connecter votre compte pour jouer en ligne</string>
+    <string name="home_lbl_new_game">Nouvelle partie</string>
+    <string name="online_lbl_gamemode">Choisissez un mode de jeu</string>
+    <string name="new_game_lbl_launch">Démarrer</string>
+    <string name="matchmaking_failed">Erreur de matchmaking, veuillez le relancer.</string>
+    <string name="matchmaking_success">PArtie trouvée</string>
+    <string name="settings_tactical_view_lbl">Activer la vue tactique</string>
+    <string name="matchmaking_cancelled">Matchmaking annulé</string>
+    <string name="matchmaking_cannot_join_match">Impossible de rejoindre une partie</string>
+    <string name="sign_in_lbl_username">Saisissez votre pseudo</string>
+    <string name="sign_in_hint_username">Votre pseudo</string>
 </resources>

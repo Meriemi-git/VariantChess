@@ -71,24 +71,25 @@ public class SessionManager {
         return Boolean.parseBoolean(userExistsRpc.getPayload());
     }
 
-    public User signInWithEmail(String mail, String password) throws AuthentificationException {
-        return this.authentWithEmail(mail, password, null, ResultType.SIGNIN);
+    public ChessUser signInWithEmail(String mail, String password) throws AuthentificationException {
+        return ChessUserDto.fromUserToChessUser(this.authentWithEmail(mail, password, null, ResultType.SIGNIN));
     }
 
     public ChessUser signUpWithEmail(String mail, String password, String displayName) throws AuthentificationException {
         return ChessUserDto.fromUserToChessUser(this.authentWithEmail(mail, password, displayName, ResultType.SIGNUP));
     }
 
-    private User authentWithEmail(String mail, String password,String username, int signType) throws AuthentificationException {
+    private User authentWithEmail(String mail, String password, String username, int signType) throws AuthentificationException {
         if (signType == ResultType.SIGNUP) {
             try {
-                this.session = this.client.authenticateEmail(mail, password, true,username).get(2000, TimeUnit.MILLISECONDS);
+                this.session = this.client.authenticateEmail(mail, password, true, username).get(2000, TimeUnit.MILLISECONDS);
             } catch (ExecutionException e) {
                 if (ExceptionCauseCode.getCodeValueFromCause(e.getCause()) == ExceptionCauseCode.UNAUTHENTICATED) {
                     throw new MailAlreadyRegistered("Email already registered");
-                }else if(ExceptionCauseCode.getCodeValueFromCause(e.getCause()) == ExceptionCauseCode.ALREADY_EXISTS){
+                } else if (ExceptionCauseCode.getCodeValueFromCause(e.getCause()) == ExceptionCauseCode.ALREADY_EXISTS) {
                     throw new UsernameAlreadyRegistered("Username already registered");
                 }
+                throw new AuthentificationException("Authentification error");
             } catch (InterruptedException | TimeoutException e) {
                 throw new AuthentificationException("Communication problem during authenticateEmail with nakama server : " + e.getMessage());
             }

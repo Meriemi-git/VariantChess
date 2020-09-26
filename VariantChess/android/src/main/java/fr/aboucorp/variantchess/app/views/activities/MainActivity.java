@@ -105,7 +105,6 @@ public class MainActivity extends AppCompatActivity {
         if (connected != null) {
             Toast.makeText(this, R.string.connected, Toast.LENGTH_LONG).show();
         }
-        this.setFragment(AuthentFragment.class, FragmentTag.HOME, null);
         this.userViewModel.setConnected(connected);
     }
 

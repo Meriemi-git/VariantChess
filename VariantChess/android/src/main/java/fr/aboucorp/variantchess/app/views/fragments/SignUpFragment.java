@@ -55,12 +55,13 @@ public class SignUpFragment extends VariantChessFragment {
                         Toast.makeText(getContext(), R.string.warn_account_exists_with_different_username, Toast.LENGTH_LONG).show();
                     }
                     ((MainActivity)this.getActivity()).userIsConnected(user);
+                    // TODO redirect on gamemode fragment
                 } catch (MailAlreadyRegistered e) {
                     Toast.makeText(getContext(), R.string.err_mail_already_exists, Toast.LENGTH_LONG).show();
                 } catch (UsernameAlreadyRegistered e) {
                     Toast.makeText(getContext(), R.string.err_username_already_exists, Toast.LENGTH_LONG).show();
                 } catch(AuthentificationException e1){
-                    Toast.makeText(getContext(), R.string.err_nakama_general, Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(), R.string.err_general, Toast.LENGTH_LONG).show();
                 }
             }
         });
