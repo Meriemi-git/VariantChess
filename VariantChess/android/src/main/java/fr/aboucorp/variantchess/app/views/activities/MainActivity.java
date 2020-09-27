@@ -9,7 +9,6 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 
 import fr.aboucorp.variantchess.R;
@@ -19,8 +18,6 @@ import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
 import fr.aboucorp.variantchess.app.utils.FragmentTag;
 import fr.aboucorp.variantchess.app.views.fragments.AuthentFragment;
 import fr.aboucorp.variantchess.app.views.fragments.SettingsFragment;
-
-import static fr.aboucorp.variantchess.app.utils.ArgsKey.CHESS_USER;
 
 public class MainActivity extends AppCompatActivity {
     private Toolbar toolbar;
@@ -85,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void setFragment(Class<? extends Fragment> fragmentClass, String fragmentTag, Bundle args) {
-        FragmentTransaction fragmentTransaction = this.getSupportFragmentManager().beginTransaction();
+       /* FragmentTransaction fragmentTransaction = this.getSupportFragmentManager().beginTransaction();
         Fragment existing = this.getSupportFragmentManager().findFragmentByTag(fragmentTag);
         try {
             if (existing == null) {
@@ -99,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
             fragmentTransaction.commit();
         } catch (IllegalAccessException | InstantiationException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 
     public void userIsConnected(ChessUser connected) {

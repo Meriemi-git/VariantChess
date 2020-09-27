@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/authentFragment">
+    <fragment
+        android:id="@+id/authentFragment"
+        android:name="fr.aboucorp.variantchess.app.views.fragments.AuthentFragment"
+        android:label="AuthentFragment">
+        <action
+            android:id="@+id/action_authentFragment_to_signUpFragment"
+            app:destination="@id/signUpFragment" />
+        <action
+            android:id="@+id/action_authentFragment_to_signInFragment"
+            app:destination="@id/signInFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/signInFragment"
+        android:name="fr.aboucorp.variantchess.app.views.fragments.SignInFragment"
+        android:label="SignInFragment" />
+    <fragment
+        android:id="@+id/signUpFragment"
+        android:name="fr.aboucorp.variantchess.app.views.fragments.SignUpFragment"
+        android:label="SignUpFragment" />
+</navigation>

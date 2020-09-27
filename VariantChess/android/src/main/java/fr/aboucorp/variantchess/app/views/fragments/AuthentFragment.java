@@ -8,9 +8,10 @@ import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.navigation.NavDirections;
+import androidx.navigation.Navigation;
+
 import fr.aboucorp.variantchess.R;
-import fr.aboucorp.variantchess.app.utils.FragmentTag;
-import fr.aboucorp.variantchess.app.views.activities.MainActivity;
 
 public class AuthentFragment extends VariantChessFragment {
     private Button btn_connect;
@@ -40,10 +41,12 @@ public class AuthentFragment extends VariantChessFragment {
     @Override
     protected void bindListeners() {
         this.btn_connect.setOnClickListener(v -> {
-            ((MainActivity) this.getActivity()).setFragment(SignInFragment.class, FragmentTag.SIGNIN,null);
+            NavDirections action = AuthentFragmentDirections.actionAuthentFragmentToSignInFragment();
+            Navigation.findNavController(getView()).navigate(action);
         });
         this.btn_create_account.setOnClickListener(v -> {
-            ((MainActivity) this.getActivity()).setFragment(SignUpFragment.class, FragmentTag.SIGNUP, null);
+            NavDirections action = AuthentFragmentDirections.actionAuthentFragmentToSignUpFragment();
+            Navigation.findNavController(getView()).navigate(action);
         });
         this.btn_continue.setOnClickListener(v -> {
            //TODO Set gameMode fragment

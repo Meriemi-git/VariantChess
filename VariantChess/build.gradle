@@ -8,13 +8,13 @@ buildscript {
         google()
     }
     dependencies {
+        def nav_version = "2.3.0"
         classpath 'com.android.tools.build:gradle:4.0.1'
+        classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$nav_version"
     }
 }
 
 allprojects {
-    apply plugin: "eclipse"
-
     version = '1.0'
     ext {
         appName = "variantchess"
@@ -37,6 +37,7 @@ allprojects {
 
 project(":android") {
     apply plugin: "android"
+    apply plugin: "androidx.navigation.safeargs"
     configurations { natives }
 
     dependencies {
