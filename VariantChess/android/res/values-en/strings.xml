@@ -65,4 +65,11 @@
     <string name="err_general">Unknown error</string>
     <string name="warn_account_exists_with_different_username">Log into existing account</string>
     <string name="general_continu">Continue</string>
+    <string name="game_rule_title">Choose game rules</string>
+    <string name="general_selection">Selection</string>
+    <string name="general_description">Description</string>
+    <string name="general_difficulty">Difficulty</string>
+    <string name="general_balance">Balance</string>
+    <string name="difficulty_level">Difficulty level</string>
+    <string name="balance_level">Balance level</string>
 </resources>

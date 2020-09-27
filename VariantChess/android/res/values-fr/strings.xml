@@ -65,4 +65,11 @@
     <string name="matchmaking_cannot_join_match">Impossible de rejoindre une partie</string>
     <string name="sign_in_lbl_username">Saisissez votre pseudo</string>
     <string name="sign_in_hint_username">Votre pseudo</string>
+    <string name="game_rule_title">Choisissez les rêgles du jeu</string>
+    <string name="general_selection">Sélection</string>
+    <string name="general_description">Description</string>
+    <string name="general_difficulty">Difficulté</string>
+    <string name="general_balance">Équilibre</string>
+    <string name="difficulty_level">Niveau de difficulté</string>
+    <string name="balance_level">Niveau d\'équilibrage</string>
 </resources>
