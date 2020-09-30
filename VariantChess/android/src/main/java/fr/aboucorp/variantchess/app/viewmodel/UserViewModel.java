@@ -1,10 +1,13 @@
-package fr.aboucorp.variantchess.app.db.entities;
+package fr.aboucorp.variantchess.app.viewmodel;
 
 import android.app.Application;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
+
+import fr.aboucorp.variantchess.app.db.entities.ChessUser;
+import fr.aboucorp.variantchess.app.db.entities.ChessUserRepository;
 
 public class UserViewModel extends AndroidViewModel {
 
@@ -16,7 +19,6 @@ public class UserViewModel extends AndroidViewModel {
         this.chessUserRepository = new ChessUserRepository(application);
         this.connected = this.chessUserRepository.getConnected();
     }
-
 
     public LiveData<ChessUser> getConnected() {
         return this.connected;

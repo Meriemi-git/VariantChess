@@ -4,30 +4,28 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavDirections;
+import androidx.navigation.Navigation;
 
 import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.db.entities.ChessUser;
-import fr.aboucorp.variantchess.app.db.entities.UserViewModel;
 import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
-import fr.aboucorp.variantchess.app.utils.FragmentTag;
-import fr.aboucorp.variantchess.app.views.fragments.AuthentFragment;
-import fr.aboucorp.variantchess.app.views.fragments.SettingsFragment;
+import fr.aboucorp.variantchess.app.viewmodel.UserViewModel;
+import fr.aboucorp.variantchess.app.views.fragments.AuthentFragmentDirections;
+import fr.aboucorp.variantchess.app.views.fragments.SettingsFragmentDirections;
 
 public class MainActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private SessionManager sessionManager;
     private UserViewModel userViewModel;
+    private View view;
 
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,13 +35,18 @@ public class MainActivity extends AppCompatActivity {
         this.sessionManager = SessionManager.getInstance(this);
         this.userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
         try {
-            this.sessionManager.tryReconnectUser();
-            this.userIsConnected(this.sessionManager.getChessUser());
-            this.setFragment(AuthentFragment.class, FragmentTag.AUTHENT, null);
+            ChessUser user = this.sessionManager.tryReconnectUser();
+            this.userIsConnected(user);
         } catch (Exception e) {
             Log.e("fr.aboucorp.variantchess", e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void setContentView(View view) {
+        super.setContentView(view);
+        this.view = view;
     }
 
     @Override
@@ -64,39 +67,23 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        NavDirections action;
         switch (item.getItemId()) {
             case R.id.menu_action_profil:
                 return true;
             case R.id.menu_action_disconnect:
-                this.userViewModel.disconnectUser();
                 this.sessionManager.destroySession();
-                this.userViewModel.setConnected(null);
-                this.setFragment(AuthentFragment.class, FragmentTag.AUTHENT, null);
+                this.userViewModel.disconnectUser();
+                action = AuthentFragmentDirections.actionGlobalAuthentFragment();
+                Navigation.findNavController(this, R.id.nav_host_fragment).navigate(action);
                 return true;
             case R.id.menu_action_settings:
-                this.setFragment(SettingsFragment.class, FragmentTag.SETTINGS, null);
+                action = SettingsFragmentDirections.actionGlobalSettingsFragment();
+                Navigation.findNavController(this, R.id.nav_host_fragment).navigate(action);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
-
-    public void setFragment(Class<? extends Fragment> fragmentClass, String fragmentTag, Bundle args) {
-       /* FragmentTransaction fragmentTransaction = this.getSupportFragmentManager().beginTransaction();
-        Fragment existing = this.getSupportFragmentManager().findFragmentByTag(fragmentTag);
-        try {
-            if (existing == null) {
-                existing = fragmentClass.newInstance();
-            }
-            if (args != null) {
-                args.putSerializable(CHESS_USER, this.userViewModel.getConnected().getValue());
-                existing.setArguments(args);
-            }
-            fragmentTransaction.replace(R.id.fragment_container, existing, fragmentTag);
-            fragmentTransaction.commit();
-        } catch (IllegalAccessException | InstantiationException e) {
-            e.printStackTrace();
-        }*/
     }
 
     public void userIsConnected(ChessUser connected) {

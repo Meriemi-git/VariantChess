@@ -47,4 +47,6 @@ public class GameRulesFragment extends VariantChessFragment {
         this.bindViews();
         this.bindListeners();
     }
+
+
 }

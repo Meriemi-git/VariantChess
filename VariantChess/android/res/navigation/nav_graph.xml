@@ -42,4 +42,14 @@
         android:id="@+id/boardActivity"
         android:name="fr.aboucorp.variantchess.app.views.activities.BoardActivity"
         android:label="BoardActivity" />
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="fr.aboucorp.variantchess.app.views.fragments.SettingsFragment"
+        android:label="SettingsFragment" />
+    <action
+        android:id="@+id/action_global_authentFragment"
+        app:destination="@id/authentFragment" />
+    <action
+        android:id="@+id/action_global_settingsFragment"
+        app:destination="@id/settingsFragment" />
 </navigation>

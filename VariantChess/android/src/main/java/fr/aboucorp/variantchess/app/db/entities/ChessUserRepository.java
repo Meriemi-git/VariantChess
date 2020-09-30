@@ -22,7 +22,7 @@ public class ChessUserRepository {
     }
 
     @NonNull
-    LiveData<ChessUser> getConnected() {
+    public LiveData<ChessUser> getConnected() {
         return this.chessUser;
     }
 
@@ -44,7 +44,7 @@ public class ChessUserRepository {
         }
     }
 
-    void insert(ChessUser chessUser) {
+    public void insert(ChessUser chessUser) {
         VariantChessDatabase.databaseWriteExecutor.execute(() -> {
             this.chessUserDao.insertAll(chessUser);
         });

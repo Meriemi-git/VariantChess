@@ -112,7 +112,7 @@ public class SessionManager {
         return this.user;
     }
 
-    public void tryReconnectUser(){
+    public ChessUser tryReconnectUser() {
         // Lets check if we can restore a cached session.
         String sessionString = this.pref.getString("nk.session", null);
         if (sessionString != null && !sessionString.isEmpty()) {
@@ -122,11 +122,13 @@ public class SessionManager {
                 this.session = restoredSession;
                 try {
                     this.user = this.client.getAccount(this.session).get(5000, TimeUnit.MILLISECONDS).getUser();
+                    return ChessUserDto.fromUserToChessUser(this.user);
                 } catch (ExecutionException | TimeoutException | InterruptedException e) {
                     Log.i("fr.aboucorp.variantchess", e.getMessage());
                 }
             }
         }
+        return null;
     }
 
 
