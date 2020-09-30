@@ -52,7 +52,7 @@ public class ChessUserRepository {
 
     public void disconnect() {
         VariantChessDatabase.databaseWriteExecutor.execute(() -> {
-            ChessUser user = this.chessUserDao.getConnected().getValue();
+            ChessUser user = this.chessUserDao.getConnected();
             if (user != null) {
                 user.isConnected = false;
                 this.chessUserDao.update(user);

@@ -1,6 +1,5 @@
 package fr.aboucorp.variantchess.app.db.dao;
 
-import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -23,8 +22,9 @@ public interface ChessUserDao {
     @Query("SELECT * FROM chessuser WHERE username LIKE :username LIMIT 1")
     ChessUser findByName(String username);
 
-    @Query("SELECT * FROM chessuser WHERE is_connected = 1 LIMIT 1")
-    LiveData<ChessUser> getConnected();
+
+    @Query("SELECT * FROM chessuser WHERE is_connected = 1")
+    ChessUser getConnected();
 
     @Query("UPDATE chessuser SET is_connected = 0 WHERE username != :username")
     void disconnectAllOthers(String username);

@@ -16,6 +16,8 @@ public class ChessUser implements Serializable {
     public String username;
     @ColumnInfo(name = "user_id")
     public String userId;
+    @ColumnInfo(name = "metadata")
+    public String metadata;
     @ColumnInfo(name = "is_connected")
     public boolean isConnected;
 }

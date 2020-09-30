@@ -9,6 +9,7 @@ public class ChessUserDto {
         ChessUser chessUser = new ChessUser();
         chessUser.userId = user.getId();
         chessUser.username = user.getUsername();
+        chessUser.metadata = user.getMetadata();
         return chessUser;
     }
 }

@@ -2,7 +2,6 @@ package fr.aboucorp.variantchess.app.views.fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -76,23 +75,4 @@ public class SignInFragment extends VariantChessFragment  {
 
         this.chessUserRepository = new ChessUserRepository(this.getActivity().getApplication());
     }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_action_profil:
-                return true;
-            case R.id.menu_action_disconnect:
-
-                this.sessionManager.destroySession();
-
-                return true;
-            case R.id.menu_action_settings:
-                // TODO implement settings fragment navigation
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
 }

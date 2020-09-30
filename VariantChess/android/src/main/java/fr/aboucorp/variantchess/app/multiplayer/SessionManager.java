@@ -94,7 +94,6 @@ public class SessionManager {
                 throw new AuthentificationException("Communication problem during authenticateEmail with nakama server : " + e.getMessage());
             }
         } else {
-            this.tryReconnectUser();
             if (this.user == null) {
                 try {
                     this.session = this.client.authenticateEmail(mail, password, false).get(2000, TimeUnit.MILLISECONDS);
@@ -106,6 +105,8 @@ public class SessionManager {
                     }
                 } catch (InterruptedException | TimeoutException e) {
                     throw new AuthentificationException("Communication problem with getAccount nakama server  :" + e.getMessage());
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         }
@@ -131,11 +132,9 @@ public class SessionManager {
         return null;
     }
 
-
-
     public void destroySession() {
-        this.client.disconnect();
         this.pref.edit().putString("nk.session", null).apply();
+        this.session = null;
         this.user = null;
     }
 
