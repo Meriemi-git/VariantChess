@@ -8,6 +8,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.navigation.NavDirections;
+import androidx.navigation.Navigation;
+
 import com.basgeekball.awesomevalidation.AwesomeValidation;
 
 import fr.aboucorp.variantchess.R;
@@ -50,12 +53,13 @@ public class SignUpFragment extends VariantChessFragment {
         this.btn_register.setOnClickListener(v ->{
             if(this.validator.validate()) {
                 try {
-                    ChessUser user = this.sessionManager.signUpWithEmail(this.txt_mail.getText().toString(), this.txt_pwd.getText().toString(),this.txt_username.getText().toString());
-                    if(user.username != this.txt_username.getText().toString()){
+                    ChessUser user = this.sessionManager.signUpWithEmail(this.txt_mail.getText().toString(), this.txt_pwd.getText().toString(), this.txt_username.getText().toString());
+                    if (user.username != this.txt_username.getText().toString()) {
                         Toast.makeText(getContext(), R.string.warn_account_exists_with_different_username, Toast.LENGTH_LONG).show();
                     }
-                    ((MainActivity)this.getActivity()).userIsConnected(user);
-                    // TODO redirect on gamemode fragment
+                    ((MainActivity) this.getActivity()).userIsConnected(user);
+                    NavDirections action = SignUpFragmentDirections.actionSignUpFragmentToGameRulesFragment();
+                    Navigation.findNavController(getView()).navigate(action);
                 } catch (MailAlreadyRegistered e) {
                     Toast.makeText(getContext(), R.string.err_mail_already_exists, Toast.LENGTH_LONG).show();
                 } catch (UsernameAlreadyRegistered e) {

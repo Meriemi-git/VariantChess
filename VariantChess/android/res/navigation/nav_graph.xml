@@ -17,9 +17,29 @@
     <fragment
         android:id="@+id/signInFragment"
         android:name="fr.aboucorp.variantchess.app.views.fragments.SignInFragment"
-        android:label="SignInFragment" />
+        android:label="SignInFragment">
+        <action
+            android:id="@+id/action_signInFragment_to_gameRulesFragment"
+            app:destination="@id/gameRulesFragment" />
+    </fragment>
     <fragment
         android:id="@+id/signUpFragment"
         android:name="fr.aboucorp.variantchess.app.views.fragments.SignUpFragment"
-        android:label="SignUpFragment" />
+        android:label="SignUpFragment">
+        <action
+            android:id="@+id/action_signUpFragment_to_gameRulesFragment"
+            app:destination="@id/gameRulesFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/gameRulesFragment"
+        android:name="fr.aboucorp.variantchess.app.views.fragments.GameRulesFragment"
+        android:label="GameRulesFragment">
+        <action
+            android:id="@+id/action_gameRulesFragment_to_boardActivity"
+            app:destination="@id/boardActivity" />
+    </fragment>
+    <activity
+        android:id="@+id/boardActivity"
+        android:name="fr.aboucorp.variantchess.app.views.activities.BoardActivity"
+        android:label="BoardActivity" />
 </navigation>

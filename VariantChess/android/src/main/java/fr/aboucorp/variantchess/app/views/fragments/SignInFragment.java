@@ -8,6 +8,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.navigation.NavDirections;
+import androidx.navigation.Navigation;
+
 import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.db.entities.ChessUser;
 import fr.aboucorp.variantchess.app.db.entities.ChessUserRepository;
@@ -46,7 +49,8 @@ public class SignInFragment extends VariantChessFragment  {
             try {
                 ChessUser user = this.sessionManager.signInWithEmail(this.txt_mail.getText().toString(), this.txt_pwd.getText().toString());
                 ((MainActivity) this.getActivity()).userIsConnected(user);
-                // TODO Redirect on gamemode fragment
+                NavDirections action = SignInFragmentDirections.actionSignInFragmentToGameRulesFragment();
+                Navigation.findNavController(getView()).navigate(action);
             } catch (IncorrectCredentials e) {
                 Toast.makeText(getContext(), R.string.signin_credential_error, Toast.LENGTH_LONG).show();
             } catch (AuthentificationException e) {

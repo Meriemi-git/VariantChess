@@ -98,6 +98,8 @@ public class SessionManager {
             if (this.user == null) {
                 try {
                     this.session = this.client.authenticateEmail(mail, password, false).get(2000, TimeUnit.MILLISECONDS);
+                    this.user = this.client.getAccount(this.session).get(5000, TimeUnit.MILLISECONDS).getUser();
+                    this.pref.edit().putString("nk.session", this.session.getAuthToken()).apply();
                 } catch (ExecutionException e) {
                     if (ExceptionCauseCode.getCodeValueFromCause(e.getCause()) == ExceptionCauseCode.UNAUTHENTICATED) {
                         throw new IncorrectCredentials("Incorrect credentials during singin");
@@ -107,12 +109,6 @@ public class SessionManager {
                 }
             }
         }
-        try {
-            this.user = this.client.getAccount(this.session).get(5000, TimeUnit.MILLISECONDS).getUser();
-        } catch (ExecutionException | InterruptedException | TimeoutException e) {
-            throw new AuthentificationException("Communication problem with getAccount nakama server  :" + e.getMessage());
-        }
-        this.pref.edit().putString("nk.session", this.session.getAuthToken()).apply();
         return this.user;
     }
 
