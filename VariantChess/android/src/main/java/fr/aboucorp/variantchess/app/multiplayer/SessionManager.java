@@ -6,7 +6,9 @@ import android.content.SharedPreferences;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.heroiclabs.nakama.AbstractSocketListener;
+import androidx.navigation.NavDirections;
+import androidx.navigation.Navigation;
+
 import com.heroiclabs.nakama.Client;
 import com.heroiclabs.nakama.DefaultClient;
 import com.heroiclabs.nakama.DefaultSession;
@@ -16,11 +18,10 @@ import com.heroiclabs.nakama.MatchmakerTicket;
 import com.heroiclabs.nakama.Session;
 import com.heroiclabs.nakama.SocketClient;
 import com.heroiclabs.nakama.SocketListener;
-import com.heroiclabs.nakama.StreamData;
-import com.heroiclabs.nakama.api.Notification;
-import com.heroiclabs.nakama.api.NotificationList;
 import com.heroiclabs.nakama.api.Rpc;
 import com.heroiclabs.nakama.api.User;
+
+import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -34,6 +35,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
+import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.db.dto.ChessUserDto;
 import fr.aboucorp.variantchess.app.db.entities.ChessUser;
 import fr.aboucorp.variantchess.app.exceptions.AuthentificationException;
@@ -41,6 +43,9 @@ import fr.aboucorp.variantchess.app.exceptions.IncorrectCredentials;
 import fr.aboucorp.variantchess.app.exceptions.MailAlreadyRegistered;
 import fr.aboucorp.variantchess.app.exceptions.UsernameAlreadyRegistered;
 import fr.aboucorp.variantchess.app.utils.ExceptionCauseCode;
+import fr.aboucorp.variantchess.app.utils.JsonExtractor;
+import fr.aboucorp.variantchess.app.views.activities.MainActivity;
+import fr.aboucorp.variantchess.app.views.fragments.AuthentFragmentDirections;
 import fr.aboucorp.variantchess.entities.GameMode;
 import fr.aboucorp.variantchess.entities.events.models.GameEvent;
 
@@ -50,11 +55,13 @@ public class SessionManager {
     private final Client client = new DefaultClient("defaultkey", "192.168.1.37", 7349, false);
     private Session session;
     private User user;
-    private SocketClient matchmakingSocket;
+    private SocketClient socket;
     private SharedPreferences pref;
-    private MatchMakingSocketListener socketListener;
+    private boolean socketIsClosed;
+    private Activity activity;
 
     private SessionManager(Activity activity) {
+        this.activity = activity;
         this.pref = activity.getSharedPreferences(SHARED_PREFERENCE_NAME, Context.MODE_PRIVATE);
     }
 
@@ -68,24 +75,8 @@ public class SessionManager {
     public ChessUser signInWithEmail(String mail, String password) throws AuthentificationException {
         try {
             this.session = this.client.authenticateEmail(mail, password, false).get(2000, TimeUnit.MILLISECONDS);
-            String response = this.checkIfSessionExists();
             this.user = this.client.getAccount(this.session).get(5000, TimeUnit.MILLISECONDS).getUser();
-            SocketListener listener = new AbstractSocketListener() {
-                @Override
-                public void onNotifications(final NotificationList notifications) {
-                    System.out.println("Received notifications");
-                    for (Notification notification : notifications.getNotificationsList()) {
-                        System.out.format("Notification content: %s", notification.getContent());
-                    }
-                }
-
-                @Override
-                public void onStreamData(StreamData data) {
-                    super.onStreamData(data);
-                }
-            };
-            SocketClient socket = this.client.createSocket();
-            socket.connect(this.session, listener);
+            connectSocket();
             this.pref.edit().putString("nk.session", this.session.getAuthToken()).apply();
             return ChessUserDto.fromUserToChessUser(this.user);
         } catch (ExecutionException e) {
@@ -128,6 +119,7 @@ public class SessionManager {
                 this.session = restoredSession;
                 try {
                     this.user = this.client.getAccount(this.session).get(5000, TimeUnit.MILLISECONDS).getUser();
+                    connectSocket();
                     return ChessUserDto.fromUserToChessUser(this.user);
                 } catch (ExecutionException | TimeoutException | InterruptedException e) {
                     Log.i("fr.aboucorp.variantchess", e.getMessage());
@@ -137,21 +129,14 @@ public class SessionManager {
         return null;
     }
 
-    public void destroySession() {
-        this.pref.edit().putString("nk.session", null).apply();
-        this.session = null;
-        this.user = null;
-    }
-
-
-    public String launchMatchMaking(GameMode gamemode, MatchListener matchListener) throws ExecutionException, InterruptedException {
-        this.matchmakingSocket = this.client.createSocket();
-        this.socketListener = new MatchMakingSocketListener(matchListener);
-        this.matchmakingSocket.connect(this.session, this.socketListener).get();
+    public String launchMatchMaking(GameMode gamemode) throws ExecutionException, InterruptedException {
+        if (this.socket == null) {
+            connectSocket();
+        }
         String ticketString = this.pref.getString("nk.ticket", null);
         if (!TextUtils.isEmpty(ticketString)) {
             try {
-                this.matchmakingSocket.removeMatchmaker(ticketString).get();
+                this.socket.removeMatchmaker(ticketString).get();
             } catch (ExecutionException | InterruptedException e) {
                 Log.i("fr.aboucorp.variantchess", "Cannot remove matchmaking");
             }
@@ -165,34 +150,47 @@ public class SessionManager {
         String query = "*";
         int minCount = 2;
         int maxCount = 2;
-        MatchmakerTicket matchmakerTicket = this.matchmakingSocket.addMatchmaker(
+        MatchmakerTicket matchmakerTicket = this.socket.addMatchmaker(
                 minCount, maxCount, query, stringProps, numProps).get();
         this.pref.edit().putString("nk.ticket", matchmakerTicket.getTicket()).apply();
         return matchmakerTicket.getTicket();
     }
 
+    private void connectSocket() {
+        if (this.socket == null || this.socketIsClosed) {
+            SocketListener listener = new MultiplayerSocketListener(this);
+            this.socket = this.client.createSocket();
+            try {
+                socket.connect(this.session, listener).get();
+                this.checkIfSessionExists(this.socket);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            } catch (TimeoutException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
     public void cancelMatchMaking(String ticket) {
         try {
-            this.matchmakingSocket.removeMatchmaker(ticket).get();
+            this.socket.removeMatchmaker(ticket).get();
         } catch (ExecutionException | InterruptedException e) {
             Log.i("fr.aboucorp.variantchess", "Cannot remove matchmaking");
         } finally {
-            this.matchmakingSocket.disconnect();
+            this.socket.disconnect();
         }
     }
 
-
     public Match joinMatchByToken(String token) throws ExecutionException, InterruptedException {
-        return this.matchmakingSocket.joinMatchToken(token).get();
+        return this.socket.joinMatchToken(token).get();
     }
 
     public List<User> getUsersFromMatched(MatchmakerMatched matched) throws ExecutionException, InterruptedException {
         return this.client.getUsers(this.session, matched.getUsers().stream().map(u -> u.getPresence().getUserId())
                 .collect(Collectors.toList())).get().getUsersList();
-    }
-
-    public void setMatchListener(MatchListener listener) {
-        this.socketListener.setListener(listener);
     }
 
     public void sendEvent(GameEvent event, String matchId) {
@@ -203,7 +201,7 @@ public class SessionManager {
             oos.writeObject(event);
             oos.flush();
             byte[] data = bos.toByteArray();
-            this.matchmakingSocket.sendMatchData(matchId, event.boardEventType, data);
+            this.socket.sendMatchData(matchId, event.boardEventType, data);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -253,17 +251,53 @@ public class SessionManager {
                 throw new UsernameAlreadyRegistered("This username is already taken");
             }
         } catch (InterruptedException e) {
-            Log.e("fr.aboucorp.variantchess", "Erro during updating account");
+            Log.e("fr.aboucorp.variantchess", "Error during updating account");
             return null;
         }
         return null;
     }
 
-    private String checkIfSessionExists() throws InterruptedException, ExecutionException, TimeoutException {
+    private boolean checkIfSessionExists(SocketClient socket) throws InterruptedException, ExecutionException, TimeoutException {
         String rpcid = "check_user_session_exists";
+        Metadata data = new Metadata();
+        data.put("authToken", this.session.getAuthToken());
         Rpc userExistsRpc = null;
-        userExistsRpc = this.client.rpc(this.session, rpcid).get(5000, TimeUnit.MILLISECONDS);
-        return userExistsRpc.getPayload();
+        userExistsRpc = socket.rpc(rpcid, data.getJsonFromMetadata()).get(5000, TimeUnit.MILLISECONDS);
+        JSONObject mainObject = null;
+        boolean exists = JsonExtractor.ectractAttributeByName(userExistsRpc.getPayload(), "already_connected");
+        Log.i("fr.aboucorp.variantchess", "Existing session : " + exists);
+        return exists;
+    }
+
+    public boolean isSocketIsClosed() {
+        return this.socketIsClosed;
+    }
+
+    public void setSocketIsClosed(boolean socketIsClosed) {
+        this.socketIsClosed = socketIsClosed;
+    }
+
+    public void disconnect() {
+        if (this.socket != null) {
+            this.socket.disconnect();
+        }
+        this.socket = null;
+        this.pref.edit().putString("nk.session", null).apply();
+        this.session = null;
+        this.user = null;
+        if (this.activity instanceof MainActivity) {
+            ((MainActivity) this.activity).userIsConnected(null);
+        }
+        NavDirections action = AuthentFragmentDirections.actionGlobalAuthentFragment();
+        Navigation.findNavController(this.activity, R.id.nav_host_fragment).navigate(action);
+    }
+
+    public Session getSession() {
+        return this.session;
+    }
+
+    public SocketClient getSocket() {
+        return this.socket;
     }
 }
 
