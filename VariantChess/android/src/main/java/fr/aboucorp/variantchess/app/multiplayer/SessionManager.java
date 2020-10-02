@@ -21,8 +21,6 @@ import com.heroiclabs.nakama.SocketListener;
 import com.heroiclabs.nakama.api.Rpc;
 import com.heroiclabs.nakama.api.User;
 
-import org.json.JSONObject;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -30,6 +28,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -44,6 +43,7 @@ import fr.aboucorp.variantchess.app.exceptions.MailAlreadyRegistered;
 import fr.aboucorp.variantchess.app.exceptions.UsernameAlreadyRegistered;
 import fr.aboucorp.variantchess.app.utils.ExceptionCauseCode;
 import fr.aboucorp.variantchess.app.utils.JsonExtractor;
+import fr.aboucorp.variantchess.app.utils.VariantVars;
 import fr.aboucorp.variantchess.app.views.activities.MainActivity;
 import fr.aboucorp.variantchess.app.views.fragments.AuthentFragmentDirections;
 import fr.aboucorp.variantchess.entities.GameMode;
@@ -59,10 +59,12 @@ public class SessionManager {
     private SharedPreferences pref;
     private boolean socketIsClosed;
     private Activity activity;
+    private final String variantChessToken;
 
     private SessionManager(Activity activity) {
         this.activity = activity;
         this.pref = activity.getSharedPreferences(SHARED_PREFERENCE_NAME, Context.MODE_PRIVATE);
+        this.variantChessToken = UUID.randomUUID().toString();
     }
 
     public static SessionManager getInstance(Activity activity) {
@@ -129,32 +131,6 @@ public class SessionManager {
         return null;
     }
 
-    public String launchMatchMaking(GameMode gamemode) throws ExecutionException, InterruptedException {
-        if (this.socket == null) {
-            connectSocket();
-        }
-        String ticketString = this.pref.getString("nk.ticket", null);
-        if (!TextUtils.isEmpty(ticketString)) {
-            try {
-                this.socket.removeMatchmaker(ticketString).get();
-            } catch (ExecutionException | InterruptedException e) {
-                Log.i("fr.aboucorp.variantchess", "Cannot remove matchmaking");
-            }
-        }
-        Metadata<String> stringProps = new Metadata<>();
-        Metadata<Double> numProps = new Metadata<>();
-        Locale current = Locale.getDefault();
-        stringProps.put("locale", current.getCountry());
-        stringProps.put("gamemode", gamemode.getName());
-        numProps.put("rank", 1.0);
-        String query = "*";
-        int minCount = 2;
-        int maxCount = 2;
-        MatchmakerTicket matchmakerTicket = this.socket.addMatchmaker(
-                minCount, maxCount, query, stringProps, numProps).get();
-        this.pref.edit().putString("nk.ticket", matchmakerTicket.getTicket()).apply();
-        return matchmakerTicket.getTicket();
-    }
 
     private void connectSocket() {
         if (this.socket == null || this.socketIsClosed) {
@@ -174,23 +150,15 @@ public class SessionManager {
 
     }
 
-    public void cancelMatchMaking(String ticket) {
-        try {
-            this.socket.removeMatchmaker(ticket).get();
-        } catch (ExecutionException | InterruptedException e) {
-            Log.i("fr.aboucorp.variantchess", "Cannot remove matchmaking");
-        } finally {
-            this.socket.disconnect();
-        }
-    }
-
-    public Match joinMatchByToken(String token) throws ExecutionException, InterruptedException {
-        return this.socket.joinMatchToken(token).get();
-    }
-
-    public List<User> getUsersFromMatched(MatchmakerMatched matched) throws ExecutionException, InterruptedException {
-        return this.client.getUsers(this.session, matched.getUsers().stream().map(u -> u.getPresence().getUserId())
-                .collect(Collectors.toList())).get().getUsersList();
+    private boolean checkIfSessionExists(SocketClient socket) throws InterruptedException, ExecutionException, TimeoutException {
+        String rpcid = "check_user_session_exists";
+        Metadata data = new Metadata();
+        data.put(VariantVars.VARIANT_CHESS_TOKEN, this.variantChessToken);
+        Rpc userExistsRpc = null;
+        userExistsRpc = socket.rpc(rpcid, data.getJsonFromMetadata()).get(5000, TimeUnit.MILLISECONDS);
+        boolean exists = JsonExtractor.ectractAttributeByName(userExistsRpc.getPayload(), "already_connected");
+        Log.i("fr.aboucorp.variantchess", "Existing session : " + exists);
+        return exists;
     }
 
     public void sendEvent(GameEvent event, String matchId) {
@@ -257,16 +225,50 @@ public class SessionManager {
         return null;
     }
 
-    private boolean checkIfSessionExists(SocketClient socket) throws InterruptedException, ExecutionException, TimeoutException {
-        String rpcid = "check_user_session_exists";
-        Metadata data = new Metadata();
-        data.put("authToken", this.session.getAuthToken());
-        Rpc userExistsRpc = null;
-        userExistsRpc = socket.rpc(rpcid, data.getJsonFromMetadata()).get(5000, TimeUnit.MILLISECONDS);
-        JSONObject mainObject = null;
-        boolean exists = JsonExtractor.ectractAttributeByName(userExistsRpc.getPayload(), "already_connected");
-        Log.i("fr.aboucorp.variantchess", "Existing session : " + exists);
-        return exists;
+    public void cancelMatchMaking(String ticket) {
+        try {
+            this.socket.removeMatchmaker(ticket).get();
+        } catch (ExecutionException | InterruptedException e) {
+            Log.i("fr.aboucorp.variantchess", "Cannot remove matchmaking");
+        } finally {
+            this.socket.disconnect();
+        }
+    }
+
+    public Match joinMatchByToken(String token) throws ExecutionException, InterruptedException {
+        return this.socket.joinMatchToken(token).get();
+    }
+
+    public List<User> getUsersFromMatched(MatchmakerMatched matched) throws ExecutionException, InterruptedException {
+        return this.client.getUsers(this.session, matched.getUsers().stream().map(u -> u.getPresence().getUserId())
+                .collect(Collectors.toList())).get().getUsersList();
+    }
+
+    public String launchMatchMaking(GameMode gamemode) throws ExecutionException, InterruptedException {
+        if (this.socket == null) {
+            connectSocket();
+        }
+        String ticketString = this.pref.getString("nk.ticket", null);
+        if (!TextUtils.isEmpty(ticketString)) {
+            try {
+                this.socket.removeMatchmaker(ticketString).get();
+            } catch (ExecutionException | InterruptedException e) {
+                Log.i("fr.aboucorp.variantchess", "Cannot remove matchmaking");
+            }
+        }
+        Metadata<String> stringProps = new Metadata<>();
+        Metadata<Double> numProps = new Metadata<>();
+        Locale current = Locale.getDefault();
+        stringProps.put("locale", current.getCountry());
+        stringProps.put("gamemode", gamemode.getName());
+        numProps.put("rank", 1.0);
+        String query = "*";
+        int minCount = 2;
+        int maxCount = 2;
+        MatchmakerTicket matchmakerTicket = this.socket.addMatchmaker(
+                minCount, maxCount, query, stringProps, numProps).get();
+        this.pref.edit().putString("nk.ticket", matchmakerTicket.getTicket()).apply();
+        return matchmakerTicket.getTicket();
     }
 
     public boolean isSocketIsClosed() {

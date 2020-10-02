@@ -16,6 +16,7 @@ import com.heroiclabs.nakama.api.Notification;
 import com.heroiclabs.nakama.api.NotificationList;
 
 import fr.aboucorp.variantchess.app.utils.JsonExtractor;
+import fr.aboucorp.variantchess.app.utils.VariantVars;
 
 public class MultiplayerSocketListener extends AbstractSocketListener {
     private final SessionManager sessionManager;
@@ -77,7 +78,7 @@ public class MultiplayerSocketListener extends AbstractSocketListener {
         for (Notification notification : notifications.getNotificationsList()
         ) {
             if (notification.getCode() == 666) {
-                String authToken = JsonExtractor.ectractAttributeByName(notification.getContent(), "authToken");
+                String authToken = JsonExtractor.ectractAttributeByName(notification.getContent(), VariantVars.VARIANT_CHESS_TOKEN);
                 if (!authToken.equals(this.sessionManager.getSession().getAuthToken())) {
                     Log.i("fr.aboucorp.variantchess", "Disconnection of user with sessionID : " + authToken);
                     sessionManager.disconnect();
