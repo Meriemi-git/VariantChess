@@ -1,14 +1,7 @@
 package fr.aboucorp.variantchess.app.managers;
 
-import com.heroiclabs.nakama.MatchData;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-
 import fr.aboucorp.variantchess.app.db.entities.ChessUser;
 import fr.aboucorp.variantchess.app.managers.boards.BoardManager;
-import fr.aboucorp.variantchess.app.multiplayer.AbstractMatchListener;
 import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
 import fr.aboucorp.variantchess.entities.ChessMatch;
 import fr.aboucorp.variantchess.entities.events.GameEventManager;
@@ -24,7 +17,7 @@ public class OnlineMatchManager extends MatchManager {
         super(boardManager, gameEventManager);
         this.sessionManager = sessionManager;
         this.currentPlayer = currentPlayer;
-        this.sessionManager.setMatchListener(new ConcreteMatchListener());
+       // this.sessionManager.setMatchListener(new ConcreteMatchListener());
     }
 
     @Override
@@ -56,7 +49,7 @@ public class OnlineMatchManager extends MatchManager {
         this.turnManager.startTurn();
     }
 
-    private class ConcreteMatchListener extends AbstractMatchListener {
+/*    private class ConcreteMatchListener extends AbstractMatchListener {
 
         @Override
         public void onMatchData(MatchData matchData) {
@@ -75,5 +68,5 @@ public class OnlineMatchManager extends MatchManager {
                 e.printStackTrace();
             }
         }
-    }
+    }*/
 }

@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
             case R.id.menu_action_profil:
                 return true;
             case R.id.menu_action_disconnect:
-                this.sessionManager.destroySession();
+                this.sessionManager.disconnect();
                 this.userViewModel.disconnectUser();
                 action = AuthentFragmentDirections.actionGlobalAuthentFragment();
                 Navigation.findNavController(this, R.id.nav_host_fragment).navigate(action);
