@@ -18,17 +18,18 @@ import com.heroiclabs.nakama.api.NotificationList;
 import fr.aboucorp.variantchess.app.utils.JsonExtractor;
 import fr.aboucorp.variantchess.app.utils.VariantVars;
 
-public class MultiplayerSocketListener extends AbstractSocketListener {
+public class NakamaSocketListener extends AbstractSocketListener {
     private final SessionManager sessionManager;
+    private MultiplayerListener multiplayerListener;
 
-    public MultiplayerSocketListener(SessionManager sessionManager) {
+    public NakamaSocketListener(SessionManager sessionManager) {
         this.sessionManager = sessionManager;
     }
 
     @Override
     public void onDisconnect(Throwable t) {
         super.onDisconnect(t);
-        this.sessionManager.setSocketIsClosed(true);
+        this.sessionManager.setSocketClosed(true);
         Log.i("fr.aboucorp.variantchess", "onDisconnect ");
     }
 
@@ -43,6 +44,9 @@ public class MultiplayerSocketListener extends AbstractSocketListener {
     public void onChannelMessage(ChannelMessage message) {
         super.onChannelMessage(message);
         Log.i("fr.aboucorp.variantchess", "onChannelMessage " + message.getContent());
+        if (multiplayerListener != null) {
+            multiplayerListener.onChannelMessage(message);
+        }
 
     }
 
@@ -50,25 +54,36 @@ public class MultiplayerSocketListener extends AbstractSocketListener {
     public void onChannelPresence(ChannelPresenceEvent presence) {
         super.onChannelPresence(presence);
         Log.i("fr.aboucorp.variantchess", "onChannelPresence " + presence.getRoomName());
-
+        if (multiplayerListener != null) {
+            multiplayerListener.onChannelPresence(presence);
+        }
     }
 
     @Override
     public void onMatchmakerMatched(MatchmakerMatched matched) {
         super.onMatchmakerMatched(matched);
         Log.i("fr.aboucorp.variantchess", "onMatchmakerMatched " + matched.getMatchId());
+        if (multiplayerListener != null) {
+            multiplayerListener.onMatchmakerMatched(matched);
+        }
     }
 
     @Override
     public void onMatchData(MatchData matchData) {
         super.onMatchData(matchData);
         Log.i("fr.aboucorp.variantchess", "onMatchData " + matchData.getOpCode());
+        if (multiplayerListener != null) {
+            multiplayerListener.onMatchData(matchData);
+        }
     }
 
     @Override
     public void onMatchPresence(MatchPresenceEvent matchPresence) {
         super.onMatchPresence(matchPresence);
         Log.i("fr.aboucorp.variantchess", "onMatchPresence " + matchPresence.getMatchId());
+        if (multiplayerListener != null) {
+            multiplayerListener.onMatchPresence(matchPresence);
+        }
     }
 
     @Override
@@ -105,5 +120,9 @@ public class MultiplayerSocketListener extends AbstractSocketListener {
     public void onStreamData(StreamData data) {
         super.onStreamData(data);
         Log.i("fr.aboucorp.variantchess", "onStreamData " + data.getData());
+    }
+
+    public void setMultiplayerListener(MultiplayerListener multiplayerListener) {
+        this.multiplayerListener = multiplayerListener;
     }
 }

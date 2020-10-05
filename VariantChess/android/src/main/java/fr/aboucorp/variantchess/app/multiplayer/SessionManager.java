@@ -17,7 +17,6 @@ import com.heroiclabs.nakama.MatchmakerMatched;
 import com.heroiclabs.nakama.MatchmakerTicket;
 import com.heroiclabs.nakama.Session;
 import com.heroiclabs.nakama.SocketClient;
-import com.heroiclabs.nakama.SocketListener;
 import com.heroiclabs.nakama.api.Rpc;
 import com.heroiclabs.nakama.api.User;
 
@@ -57,9 +56,10 @@ public class SessionManager {
     private User user;
     private SocketClient socket;
     private SharedPreferences pref;
-    private boolean socketIsClosed;
+    private boolean socketClosed;
     private Activity activity;
     private final String variantChessToken;
+    private NakamaSocketListener nakamaSocketListener;
 
     private SessionManager(Activity activity) {
         this.activity = activity;
@@ -110,7 +110,6 @@ public class SessionManager {
         return ChessUserDto.fromUserToChessUser(this.user);
     }
 
-
     public ChessUser tryReconnectUser() {
         // Lets check if we can restore a cached session.
         String sessionString = this.pref.getString("nk.session", null);
@@ -133,11 +132,11 @@ public class SessionManager {
 
 
     private void connectSocket() {
-        if (this.socket == null || this.socketIsClosed) {
-            SocketListener listener = new MultiplayerSocketListener(this);
+        if (this.socket == null || this.socketClosed) {
+            this.nakamaSocketListener = new NakamaSocketListener(this);
             this.socket = this.client.createSocket();
             try {
-                socket.connect(this.session, listener).get();
+                socket.connect(this.session, this.nakamaSocketListener).get();
                 this.checkIfSessionExists(this.socket);
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -147,7 +146,6 @@ public class SessionManager {
                 e.printStackTrace();
             }
         }
-
     }
 
     private boolean checkIfSessionExists(SocketClient socket) throws InterruptedException, ExecutionException, TimeoutException {
@@ -191,6 +189,21 @@ public class SessionManager {
             e.printStackTrace();
         }
         return true;
+    }
+
+    public void disconnect() {
+        if (this.socket != null) {
+            this.socket.disconnect();
+        }
+        this.socket = null;
+        this.pref.edit().putString("nk.session", null).apply();
+        this.session = null;
+        this.user = null;
+        if (this.activity instanceof MainActivity) {
+            ((MainActivity) this.activity).userIsConnected(null);
+        }
+        NavDirections action = AuthentFragmentDirections.actionGlobalAuthentFragment();
+        Navigation.findNavController(this.activity, R.id.nav_host_fragment).navigate(action);
     }
 
     private boolean userExist(String email, boolean searchGoogleAccount) throws InterruptedException, ExecutionException, TimeoutException {
@@ -271,27 +284,8 @@ public class SessionManager {
         return matchmakerTicket.getTicket();
     }
 
-    public boolean isSocketIsClosed() {
-        return this.socketIsClosed;
-    }
-
-    public void setSocketIsClosed(boolean socketIsClosed) {
-        this.socketIsClosed = socketIsClosed;
-    }
-
-    public void disconnect() {
-        if (this.socket != null) {
-            this.socket.disconnect();
-        }
-        this.socket = null;
-        this.pref.edit().putString("nk.session", null).apply();
-        this.session = null;
-        this.user = null;
-        if (this.activity instanceof MainActivity) {
-            ((MainActivity) this.activity).userIsConnected(null);
-        }
-        NavDirections action = AuthentFragmentDirections.actionGlobalAuthentFragment();
-        Navigation.findNavController(this.activity, R.id.nav_host_fragment).navigate(action);
+    public void setSocketClosed(boolean socketClosed) {
+        this.socketClosed = socketClosed;
     }
 
     public Session getSession() {
@@ -300,6 +294,10 @@ public class SessionManager {
 
     public SocketClient getSocket() {
         return this.socket;
+    }
+
+    public void setMultiplayerListener(MultiplayerListener listener) {
+        this.nakamaSocketListener.setMultiplayerListener(listener);
     }
 }
 
