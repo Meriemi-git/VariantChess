@@ -74,5 +74,9 @@
     <string name="general_balance">Balance</string>
     <string name="difficulty_level">Difficulty level</string>
     <string name="balance_level">Balance level</string>
+    <string name="gamerules_name_classic">Classic</string>
+    <string name="gamerules_description_classic">Classic rule set for a regular chess game.</string>
+    <string name="gamerules_name_random">Random</string>
+    <string name="gamerules_description_random">Le placement des pièces au début de la partie est aléatoire au sein des deux premières lignes. Le \"roc\" et le \"en passant\" sont impossible. Les autres rêgles sont inchangées.</string>
 
 </resources>

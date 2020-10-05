@@ -13,7 +13,7 @@ import androidx.navigation.Navigation;
 
 import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.db.entities.ChessUser;
-import fr.aboucorp.variantchess.app.db.entities.ChessUserRepository;
+import fr.aboucorp.variantchess.app.db.repositories.ChessUserRepository;
 import fr.aboucorp.variantchess.app.exceptions.AuthentificationException;
 import fr.aboucorp.variantchess.app.exceptions.IncorrectCredentials;
 import fr.aboucorp.variantchess.app.multiplayer.SessionManager;

@@ -9,6 +9,9 @@ public class GameRules {
     @PrimaryKey(autoGenerate = true)
     public int id;
 
+    @ColumnInfo(name = "icon")
+    public String icon;
+
     @ColumnInfo(name = "name")
     public String name;
 

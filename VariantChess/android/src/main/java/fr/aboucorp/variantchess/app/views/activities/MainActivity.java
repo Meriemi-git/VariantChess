@@ -18,8 +18,8 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.db.entities.ChessUser;
+import fr.aboucorp.variantchess.app.db.viewmodel.UserViewModel;
 import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
-import fr.aboucorp.variantchess.app.viewmodel.UserViewModel;
 import fr.aboucorp.variantchess.app.views.fragments.AuthentFragmentDirections;
 import fr.aboucorp.variantchess.app.views.fragments.SettingsFragmentDirections;
 

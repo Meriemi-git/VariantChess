@@ -1,4 +1,4 @@
-package fr.aboucorp.variantchess.app.viewmodel;
+package fr.aboucorp.variantchess.app.db.viewmodel;
 
 import android.app.Application;
 
@@ -7,7 +7,7 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
 import fr.aboucorp.variantchess.app.db.entities.ChessUser;
-import fr.aboucorp.variantchess.app.db.entities.ChessUserRepository;
+import fr.aboucorp.variantchess.app.db.repositories.ChessUserRepository;
 
 public class UserViewModel extends AndroidViewModel {
 

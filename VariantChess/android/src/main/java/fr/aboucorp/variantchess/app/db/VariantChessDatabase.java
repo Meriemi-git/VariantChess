@@ -12,9 +12,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import fr.aboucorp.variantchess.app.db.dao.ChessUserDao;
+import fr.aboucorp.variantchess.app.db.dao.GameRulesDao;
 import fr.aboucorp.variantchess.app.db.entities.ChessUser;
+import fr.aboucorp.variantchess.app.db.entities.GameRules;
 
-@Database(entities = {ChessUser.class}, version = 2)
+@Database(entities = {ChessUser.class, GameRules.class}, version = 3)
 public abstract class VariantChessDatabase extends RoomDatabase {
     private static final int NUMBER_OF_THREADS = 4;
     public static final ExecutorService databaseWriteExecutor =
@@ -25,16 +27,29 @@ public abstract class VariantChessDatabase extends RoomDatabase {
         @Override
         public void onOpen(@NonNull SupportSQLiteDatabase db) {
             super.onOpen(db);
-
-            // If you want to keep data through app restarts,
-            // comment out the following block
             databaseWriteExecutor.execute(() -> {
-                // TODO populate database
+                INSTANCE.gameRulesDao().deleteAll();
+                GameRules classicGameRules = new GameRules();
+                classicGameRules.name = "gamerules_name_classic";
+                classicGameRules.icon = "ic_chess_qlt45";
+                classicGameRules.description = "gamerules_description_classic";
+                classicGameRules.balance = 5;
+                classicGameRules.difficulty = 3;
+                GameRules randomGameRules = new GameRules();
+                randomGameRules.name = "gamerules_name_random";
+                randomGameRules.icon = "ic_chess_qdt45";
+                randomGameRules.description = "gamerules_description_random";
+                randomGameRules.balance = 1;
+                randomGameRules.difficulty = 5;
+                INSTANCE.gameRulesDao().insertAll(classicGameRules, randomGameRules);
             });
         }
     };
 
     public abstract ChessUserDao chessUserDao();
+
+    public abstract GameRulesDao gameRulesDao();
+
 
     public static VariantChessDatabase getDatabase(final Context context) {
         if (INSTANCE == null) {

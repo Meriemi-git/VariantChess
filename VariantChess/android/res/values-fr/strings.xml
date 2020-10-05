@@ -72,4 +72,8 @@
     <string name="general_balance">Équilibre</string>
     <string name="difficulty_level">Niveau de difficulté</string>
     <string name="balance_level">Niveau d\'équilibrage</string>
+    <string name="gamerules_name_classic">Classique</string>
+    <string name="gamerules_description_classic">Jeu de rêgles classque pour une partie d\'échec traditionelle</string>
+    <string name="gamerules_name_random">Aléatoire</string>
+    <string name="gamerules_description_random">Le placement des pièces au début de la partie est aléatoire au sein des deux premières lignes. Le \"roc\" et le \"en passant\" sont impossible. Les autres rêgles sont identiques.</string>
 </resources>

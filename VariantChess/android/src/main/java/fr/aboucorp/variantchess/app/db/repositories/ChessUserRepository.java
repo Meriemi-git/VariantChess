@@ -1,4 +1,4 @@
-package fr.aboucorp.variantchess.app.db.entities;
+package fr.aboucorp.variantchess.app.db.repositories;
 
 import android.app.Application;
 
@@ -8,6 +8,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import fr.aboucorp.variantchess.app.db.VariantChessDatabase;
 import fr.aboucorp.variantchess.app.db.dao.ChessUserDao;
+import fr.aboucorp.variantchess.app.db.entities.ChessUser;
 
 public class ChessUserRepository {
 
