@@ -14,6 +14,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+import androidx.navigation.NavDirections;
+import androidx.navigation.Navigation;
 
 import java.util.List;
 
@@ -48,22 +50,19 @@ public class GameRulesFragment extends VariantChessFragment implements AdapterVi
         this.spinner_rules.setAdapter(gameRulesAdapter);
         this.spinner_rules.setOnItemSelectedListener(this);
         this.gameRulesViewModel.getAllGameRules().observe(getViewLifecycleOwner(), allGameRules -> {
-            // Update the cached copy of the words in the adapter.
-            GameRulesFragment.this.allGameRules = allGameRules;
-            gameRulesAdapter.setWords(allGameRules);
+            this.allGameRules = allGameRules;
+            gameRulesAdapter.setGameRules(allGameRules);
         });
         this.btn_online.setOnClickListener(v -> {
-            // TODO implement proper initialisation for BoardActicity
-            /*NavDirections action = GameRulesFragmentDirections.actionGameRulesFragmentToBoardActivity();
-            Navigation.findNavController(getView()).navigate(action);*/
+            GameRules selected = (GameRules) spinner_rules.getSelectedItem();
+            NavDirections action = GameRulesFragmentDirections.actionGameRulesFragmentToMatchmakingFragment(selected);
+            Navigation.findNavController(getView()).navigate(action);
         });
         this.btn_offline.setOnClickListener(v -> {
-            // TODO implement proper initialisation for BoardActicity
-            /*NavDirections action = GameRulesFragmentDirections.actionGameRulesFragmentToBoardActivity();
-            Navigation.findNavController(getView()).navigate(action);*/
+            GameRules selected = (GameRules) spinner_rules.getSelectedItem();
+            NavDirections action = GameRulesFragmentDirections.actionGameRulesFragmentToBoardActivity(selected);
+            Navigation.findNavController(getView()).navigate(action);
         });
-
-
     }
 
     @Override

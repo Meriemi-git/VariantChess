@@ -79,5 +79,6 @@
     <string name="gamerules_name_random">Random</string>
     <string name="gamerules_description_random">Le placement des pièces au début de la partie est aléatoire au sein des deux premières lignes. Le \"roc\" et le \"en passant\" sont impossible. Les autres rêgles sont inchangées.</string>
     <string name="content_desc_icon_gamerules">Gamerule icon</string>
+    <string name="matchmaking_in_progress">Matchmaking in progress</string>
 
 </resources>

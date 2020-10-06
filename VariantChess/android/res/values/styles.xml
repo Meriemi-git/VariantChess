@@ -1,6 +1,18 @@
 <resources>
+
     <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowActionBar">false</item>
+    </style>
+
+    <style name="VariantChess.Title" parent="TextAppearance.AppCompat">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">32dp</item>
+        <item name="android:text">@string/game_rule_title</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textSize">24sp</item>
     </style>
 </resources>

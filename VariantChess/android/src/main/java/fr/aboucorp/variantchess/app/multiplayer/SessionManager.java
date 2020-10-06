@@ -45,7 +45,6 @@ import fr.aboucorp.variantchess.app.utils.JsonExtractor;
 import fr.aboucorp.variantchess.app.utils.VariantVars;
 import fr.aboucorp.variantchess.app.views.activities.MainActivity;
 import fr.aboucorp.variantchess.app.views.fragments.AuthentFragmentDirections;
-import fr.aboucorp.variantchess.entities.GameMode;
 import fr.aboucorp.variantchess.entities.events.models.GameEvent;
 
 public class SessionManager {
@@ -257,7 +256,7 @@ public class SessionManager {
                 .collect(Collectors.toList())).get().getUsersList();
     }
 
-    public String launchMatchMaking(GameMode gamemode) throws ExecutionException, InterruptedException {
+    public String launchMatchMaking(String rulesName) throws ExecutionException, InterruptedException {
         if (this.socket == null) {
             connectSocket();
         }
@@ -273,7 +272,7 @@ public class SessionManager {
         Metadata<Double> numProps = new Metadata<>();
         Locale current = Locale.getDefault();
         stringProps.put("locale", current.getCountry());
-        stringProps.put("gamemode", gamemode.getName());
+        stringProps.put("gamemode", rulesName);
         numProps.put("rank", 1.0);
         String query = "*";
         int minCount = 2;
@@ -296,8 +295,8 @@ public class SessionManager {
         return this.socket;
     }
 
-    public void setMultiplayerListener(MultiplayerListener listener) {
-        this.nakamaSocketListener.setMultiplayerListener(listener);
+    public void setMatchmakingListener(MatchmakingListener listener) {
+        this.nakamaSocketListener.setMatchmakingListener(listener);
     }
 }
 

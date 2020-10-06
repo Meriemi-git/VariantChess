@@ -1,14 +1,8 @@
 package fr.aboucorp.variantchess.app.managers;
 
-import com.heroiclabs.nakama.ChannelPresenceEvent;
-import com.heroiclabs.nakama.MatchData;
-import com.heroiclabs.nakama.MatchPresenceEvent;
-import com.heroiclabs.nakama.MatchmakerMatched;
-import com.heroiclabs.nakama.api.ChannelMessage;
 
 import fr.aboucorp.variantchess.app.db.entities.ChessUser;
 import fr.aboucorp.variantchess.app.managers.boards.BoardManager;
-import fr.aboucorp.variantchess.app.multiplayer.MultiplayerListener;
 import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
 import fr.aboucorp.variantchess.entities.ChessMatch;
 import fr.aboucorp.variantchess.entities.events.GameEventManager;
@@ -16,7 +10,7 @@ import fr.aboucorp.variantchess.entities.events.models.GameEvent;
 import fr.aboucorp.variantchess.entities.events.models.MoveEvent;
 import fr.aboucorp.variantchess.entities.events.models.TurnEndEvent;
 
-public class OnlineMatchManager extends MatchManager implements MultiplayerListener {
+public class OnlineMatchManager extends MatchManager {
     private SessionManager sessionManager;
     private ChessUser currentPlayer;
 
@@ -24,7 +18,6 @@ public class OnlineMatchManager extends MatchManager implements MultiplayerListe
         super(boardManager, gameEventManager);
         this.sessionManager = sessionManager;
         this.currentPlayer = currentPlayer;
-        this.sessionManager.setMultiplayerListener(this);
     }
 
     @Override
@@ -54,31 +47,6 @@ public class OnlineMatchManager extends MatchManager implements MultiplayerListe
         this.turnManager.appendTurn(event.turn);
         this.boardManager.stopWaitForNextTurn();
         this.turnManager.startTurn();
-    }
-
-    @Override
-    public void onChannelMessage(ChannelMessage message) {
-
-    }
-
-    @Override
-    public void onChannelPresence(ChannelPresenceEvent presence) {
-
-    }
-
-    @Override
-    public void onMatchmakerMatched(MatchmakerMatched matched) {
-
-    }
-
-    @Override
-    public void onMatchData(MatchData matchData) {
-
-    }
-
-    @Override
-    public void onMatchPresence(MatchPresenceEvent matchPresence) {
-
     }
 
 /*    private class ConcreteMatchListener extends AbstractMatchListener {
