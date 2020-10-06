@@ -35,7 +35,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/lbl_selection"
-        app:layout_constraintWidth_max="200dip" />
+        app:layout_constraintWidth_max="250dip" />
 
     <TextView
         android:id="@+id/lbl_description"

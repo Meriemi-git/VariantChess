@@ -76,4 +76,5 @@
     <string name="gamerules_description_classic">Jeu de rêgles classque pour une partie d\'échec traditionelle</string>
     <string name="gamerules_name_random">Aléatoire</string>
     <string name="gamerules_description_random">Le placement des pièces au début de la partie est aléatoire au sein des deux premières lignes. Le \"roc\" et le \"en passant\" sont impossible. Les autres rêgles sont identiques.</string>
+    <string name="content_desc_icon_gamerules">Icone du set de rêgles</string>
 </resources>

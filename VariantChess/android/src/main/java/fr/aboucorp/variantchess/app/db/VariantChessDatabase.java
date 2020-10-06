@@ -37,7 +37,7 @@ public abstract class VariantChessDatabase extends RoomDatabase {
                 classicGameRules.difficulty = 3;
                 GameRules randomGameRules = new GameRules();
                 randomGameRules.name = "gamerules_name_random";
-                randomGameRules.icon = "ic_chess_qdt45";
+                randomGameRules.icon = "ic_chess_qlt45";
                 randomGameRules.description = "gamerules_description_random";
                 randomGameRules.balance = 1;
                 randomGameRules.difficulty = 5;

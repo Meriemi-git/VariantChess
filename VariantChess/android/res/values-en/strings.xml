@@ -76,4 +76,5 @@
     <string name="gamerules_description_classic">Classic rule set for a regular chess game.</string>
     <string name="gamerules_name_random">Random</string>
     <string name="gamerules_description_random">The placement of pieces at the start of the game is random within the first two lines. The \"rock\" and the \"in passing\" are impossible. The other rules are unchanged.</string>
+    <string name="content_desc_icon_gamerules">Gamerule icon</string>
 </resources>
