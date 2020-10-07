@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
 import java.util.List;
@@ -23,6 +24,12 @@ public class GameRulesAdapter extends ArrayAdapter<GameRules> {
     public GameRulesAdapter(@NonNull Context context, int resource) {
         super(context, resource);
         this.context = context;
+    }
+
+    @Nullable
+    @Override
+    public GameRules getItem(int position) {
+        return this.allGameRules.get(position);
     }
 
     @Override
@@ -60,7 +67,7 @@ public class GameRulesAdapter extends ArrayAdapter<GameRules> {
         return convertView;
     }
 
-    public void setWords(List<GameRules> allGameRules) {
+    public void setGameRules(List<GameRules> allGameRules) {
         this.allGameRules = allGameRules;
         notifyDataSetChanged();
     }

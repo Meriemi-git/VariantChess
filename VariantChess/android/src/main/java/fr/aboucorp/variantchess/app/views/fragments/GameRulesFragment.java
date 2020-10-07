@@ -8,12 +8,15 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+import androidx.navigation.NavDirections;
+import androidx.navigation.Navigation;
 
 import java.util.List;
 
@@ -27,6 +30,7 @@ public class GameRulesFragment extends VariantChessFragment implements AdapterVi
     private Button btn_offline;
     private TextView txt_rule_description;
     private Spinner spinner_rules;
+    private ProgressBar progress_bar;
     private LinearLayout balance_layout;
     private LinearLayout difficulty_layout;
     private GameRulesViewModel gameRulesViewModel;
@@ -40,6 +44,21 @@ public class GameRulesFragment extends VariantChessFragment implements AdapterVi
         this.spinner_rules = this.getView().findViewById(R.id.spinner_rules);
         this.balance_layout = this.getView().findViewById(R.id.balance_layout);
         this.difficulty_layout = this.getView().findViewById(R.id.difficulty_layout);
+        this.progress_bar = this.getView().findViewById(R.id.progress_bar);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.game_rules_layout, container, false);
+        return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        this.gameRulesViewModel = new GameRulesViewModel(getActivity().getApplication());
+        this.bindViews();
+        this.bindListeners();
     }
 
     @Override
@@ -48,29 +67,21 @@ public class GameRulesFragment extends VariantChessFragment implements AdapterVi
         this.spinner_rules.setAdapter(gameRulesAdapter);
         this.spinner_rules.setOnItemSelectedListener(this);
         this.gameRulesViewModel.getAllGameRules().observe(getViewLifecycleOwner(), allGameRules -> {
-            // Update the cached copy of the words in the adapter.
-            GameRulesFragment.this.allGameRules = allGameRules;
-            gameRulesAdapter.setWords(allGameRules);
+            this.allGameRules = allGameRules;
+            gameRulesAdapter.setGameRules(allGameRules);
         });
         this.btn_online.setOnClickListener(v -> {
-            // TODO implement proper initialisation for BoardActicity
-            /*NavDirections action = GameRulesFragmentDirections.actionGameRulesFragmentToBoardActivity();
-            Navigation.findNavController(getView()).navigate(action);*/
+            GameRules selected = (GameRules) spinner_rules.getSelectedItem();
+            NavDirections action = GameRulesFragmentDirections.actionGameRulesFragmentToMatchmakingFragment(selected);
+            Navigation.findNavController(getView()).navigate(action);
         });
         this.btn_offline.setOnClickListener(v -> {
-            // TODO implement proper initialisation for BoardActicity
-            /*NavDirections action = GameRulesFragmentDirections.actionGameRulesFragmentToBoardActivity();
-            Navigation.findNavController(getView()).navigate(action);*/
+            GameRules selected = (GameRules) spinner_rules.getSelectedItem();
+            NavDirections action = GameRulesFragmentDirections.actionGameRulesFragmentToBoardActivity(selected);
+            Navigation.findNavController(getView()).navigate(action);
         });
-
-
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.game_rules_layout, container, false);
-        return view;
-    }
 
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
@@ -101,12 +112,5 @@ public class GameRulesFragment extends VariantChessFragment implements AdapterVi
     public void onNothingSelected(AdapterView<?> adapterView) {
 
     }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        this.gameRulesViewModel = new GameRulesViewModel(getActivity().getApplication());
-        this.bindViews();
-        this.bindListeners();
-    }
 }
+

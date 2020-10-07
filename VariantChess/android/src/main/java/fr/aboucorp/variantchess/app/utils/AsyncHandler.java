@@ -29,7 +29,6 @@ public abstract class AsyncHandler {
     protected abstract void executeAsync() throws Exception;
 
     protected void callbackOnUI() {
-
     }
 
     protected void error(Exception ex) {

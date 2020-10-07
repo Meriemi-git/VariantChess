@@ -20,7 +20,8 @@ import fr.aboucorp.variantchess.app.utils.VariantVars;
 
 public class NakamaSocketListener extends AbstractSocketListener {
     private final SessionManager sessionManager;
-    private MultiplayerListener multiplayerListener;
+    private MatchmakingListener matchmakingListener;
+    private ChatListener chatListener;
 
     public NakamaSocketListener(SessionManager sessionManager) {
         this.sessionManager = sessionManager;
@@ -44,8 +45,8 @@ public class NakamaSocketListener extends AbstractSocketListener {
     public void onChannelMessage(ChannelMessage message) {
         super.onChannelMessage(message);
         Log.i("fr.aboucorp.variantchess", "onChannelMessage " + message.getContent());
-        if (multiplayerListener != null) {
-            multiplayerListener.onChannelMessage(message);
+        if (chatListener != null) {
+            chatListener.onChannelMessage(message);
         }
 
     }
@@ -54,8 +55,8 @@ public class NakamaSocketListener extends AbstractSocketListener {
     public void onChannelPresence(ChannelPresenceEvent presence) {
         super.onChannelPresence(presence);
         Log.i("fr.aboucorp.variantchess", "onChannelPresence " + presence.getRoomName());
-        if (multiplayerListener != null) {
-            multiplayerListener.onChannelPresence(presence);
+        if (chatListener != null) {
+            chatListener.onChannelPresence(presence);
         }
     }
 
@@ -63,8 +64,8 @@ public class NakamaSocketListener extends AbstractSocketListener {
     public void onMatchmakerMatched(MatchmakerMatched matched) {
         super.onMatchmakerMatched(matched);
         Log.i("fr.aboucorp.variantchess", "onMatchmakerMatched " + matched.getMatchId());
-        if (multiplayerListener != null) {
-            multiplayerListener.onMatchmakerMatched(matched);
+        if (matchmakingListener != null) {
+            matchmakingListener.onMatchmakerMatched(matched);
         }
     }
 
@@ -72,8 +73,8 @@ public class NakamaSocketListener extends AbstractSocketListener {
     public void onMatchData(MatchData matchData) {
         super.onMatchData(matchData);
         Log.i("fr.aboucorp.variantchess", "onMatchData " + matchData.getOpCode());
-        if (multiplayerListener != null) {
-            multiplayerListener.onMatchData(matchData);
+        if (matchmakingListener != null) {
+            matchmakingListener.onMatchData(matchData);
         }
     }
 
@@ -81,8 +82,8 @@ public class NakamaSocketListener extends AbstractSocketListener {
     public void onMatchPresence(MatchPresenceEvent matchPresence) {
         super.onMatchPresence(matchPresence);
         Log.i("fr.aboucorp.variantchess", "onMatchPresence " + matchPresence.getMatchId());
-        if (multiplayerListener != null) {
-            multiplayerListener.onMatchPresence(matchPresence);
+        if (matchmakingListener != null) {
+            matchmakingListener.onMatchPresence(matchPresence);
         }
     }
 
@@ -122,7 +123,11 @@ public class NakamaSocketListener extends AbstractSocketListener {
         Log.i("fr.aboucorp.variantchess", "onStreamData " + data.getData());
     }
 
-    public void setMultiplayerListener(MultiplayerListener multiplayerListener) {
-        this.multiplayerListener = multiplayerListener;
+    public void setMatchmakingListener(MatchmakingListener matchmakingListener) {
+        this.matchmakingListener = matchmakingListener;
+    }
+
+    public void setChatListener(ChatListener chatListener) {
+        this.chatListener = chatListener;
     }
 }

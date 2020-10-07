@@ -5,13 +5,9 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/tbl_titile"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:id="@+id/tbl_title"
+        style="@style/VariantChess.Title"
         android:text="@string/game_rule_title"
-        android:textAllCaps="true"
-        android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -25,7 +21,7 @@
         android:textAllCaps="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tbl_titile" />
+        app:layout_constraintTop_toBottomOf="@+id/tbl_title" />
 
     <Spinner
         android:id="@+id/spinner_rules"
