@@ -8,6 +8,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -29,6 +30,7 @@ public class GameRulesFragment extends VariantChessFragment implements AdapterVi
     private Button btn_offline;
     private TextView txt_rule_description;
     private Spinner spinner_rules;
+    private ProgressBar progress_bar;
     private LinearLayout balance_layout;
     private LinearLayout difficulty_layout;
     private GameRulesViewModel gameRulesViewModel;
@@ -42,6 +44,21 @@ public class GameRulesFragment extends VariantChessFragment implements AdapterVi
         this.spinner_rules = this.getView().findViewById(R.id.spinner_rules);
         this.balance_layout = this.getView().findViewById(R.id.balance_layout);
         this.difficulty_layout = this.getView().findViewById(R.id.difficulty_layout);
+        this.progress_bar = this.getView().findViewById(R.id.progress_bar);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.game_rules_layout, container, false);
+        return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        this.gameRulesViewModel = new GameRulesViewModel(getActivity().getApplication());
+        this.bindViews();
+        this.bindListeners();
     }
 
     @Override
@@ -65,11 +82,6 @@ public class GameRulesFragment extends VariantChessFragment implements AdapterVi
         });
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.game_rules_layout, container, false);
-        return view;
-    }
 
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
@@ -100,12 +112,5 @@ public class GameRulesFragment extends VariantChessFragment implements AdapterVi
     public void onNothingSelected(AdapterView<?> adapterView) {
 
     }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        this.gameRulesViewModel = new GameRulesViewModel(getActivity().getApplication());
-        this.bindViews();
-        this.bindListeners();
-    }
 }
+

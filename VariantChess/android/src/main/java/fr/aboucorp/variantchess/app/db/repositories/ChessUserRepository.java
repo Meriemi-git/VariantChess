@@ -24,7 +24,7 @@ public class ChessUserRepository {
 
     @NonNull
     public LiveData<ChessUser> getConnected() {
-        return this.chessUser;
+        return this.chessUserDao.getConnected();
     }
 
     public void setConnected(ChessUser connecting) {
@@ -51,14 +51,8 @@ public class ChessUserRepository {
         });
     }
 
-    public void disconnect() {
-        VariantChessDatabase.databaseWriteExecutor.execute(() -> {
-            ChessUser user = this.chessUserDao.getConnected();
-            if (user != null) {
-                user.isConnected = false;
-                this.chessUserDao.update(user);
-            }
-        });
-        this.chessUser.postValue(null);
+    public void update(ChessUser chessUser) {
+        this.chessUserDao.update(chessUser);
     }
+
 }

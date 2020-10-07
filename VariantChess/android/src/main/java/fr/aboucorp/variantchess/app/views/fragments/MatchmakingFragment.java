@@ -7,12 +7,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Chronometer;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavDirections;
+import androidx.navigation.Navigation;
 
 import com.heroiclabs.nakama.Match;
 import com.heroiclabs.nakama.MatchData;
@@ -41,6 +44,8 @@ public class MatchmakingFragment extends VariantChessFragment implements Matchma
     private ProgressBar progress_bar;
     private Chronometer matchmaking_chrono;
     private Button btn_cancel;
+    private Button btn_retry;
+    private ImageView img_warning;
     /**
      * Nakama multiplayer session manager
      */
@@ -60,63 +65,14 @@ public class MatchmakingFragment extends VariantChessFragment implements Matchma
         this.progress_bar = this.getView().findViewById(R.id.progress_bar);
         this.matchmaking_chrono = this.getView().findViewById(R.id.matchmaking_chrono);
         this.btn_cancel = this.getView().findViewById(R.id.btn_cancel);
+        this.btn_retry = this.getView().findViewById(R.id.btn_retry);
+        this.img_warning = this.getView().findViewById(R.id.img_warning);
     }
 
     @Override
     protected void bindListeners() {
         this.btn_cancel.setOnClickListener(v -> cancelMatchMaking(matchmakingTicket));
-    }
-
-    @Override
-    public void onMatchmakerMatched(MatchmakerMatched matched) {
-        Log.i("fr.aboucorp.variantchess", "onMatchmakerMatched " + matched);
-        AsyncHandler handler = new AsyncHandler() {
-            @Override
-            protected void executeAsync() throws Exception {
-                // TODO need entire refocto
-                Match match = sessionManager.joinMatchByToken(matched.getToken());
-                List<User> users = sessionManager.getUsersFromMatched(matched);
-                Player white = new Player(users.get(0).getUsername(), ChessColor.WHITE, users.get(0).getId());
-                Player black = new Player(users.get(1).getUsername(), ChessColor.BLACK, users.get(1).getId());
-                chessMatch = new ChessMatch();
-                chessMatch.setWhitePlayer(white);
-                chessMatch.setBlackPlayer(black);
-                chessMatch.setMatchId(match.getMatchId());
-            }
-
-            @Override
-            protected void callbackOnUI() {
-                matchmaking_chrono.stop();
-                Bundle args = new Bundle();
-                args.putSerializable("chessMatch", chessMatch);
-                args.putSerializable("chessUser", chessUser);
-            }
-
-            @Override
-            protected void error(Exception ex) {
-                super.error(ex);
-                Toast.makeText(getContext(), R.string.matchmaking_cannot_join_match, Toast.LENGTH_LONG).show();
-                cancelMatchMaking(matchmakingTicket);
-                matchmaking_chrono.stop();
-            }
-        };
-        handler.start();
-    }
-
-    @Override
-    public void onMatchData(MatchData matchData) {
-        Log.i("fr.aboucorp.variantchess", "onMatchData opcode" + matchData.getOpCode());
-    }
-
-    @Override
-    public void onMatchPresence(MatchPresenceEvent matchPresence) {
-
-    }
-
-    @Override
-    public void setArguments(@Nullable Bundle args) {
-        super.setArguments(args);
-        this.gameRules = (GameRules) args.getSerializable("gamerules");
+        this.btn_retry.setOnClickListener(v -> launchMatchmaking());
     }
 
     @Override
@@ -139,14 +95,72 @@ public class MatchmakingFragment extends VariantChessFragment implements Matchma
         this.bindViews();
         this.bindListeners();
         this.userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
-        this.userViewModel.getConnected().observe(getViewLifecycleOwner(), connected -> {
+        this.userViewModel.getConnected().observe(this.getViewLifecycleOwner(), connected -> {
             chessUser = connected;
             this.launchMatchmaking();
         });
     }
 
+
+
+    @Override
+    public void setArguments(@Nullable Bundle args) {
+        super.setArguments(args);
+        this.gameRules = (GameRules) args.getSerializable("gamerules");
+    }
+
+    @Override
+    public void onMatchmakerMatched(MatchmakerMatched matched) {
+        Log.i("fr.aboucorp.variantchess", "onMatchmakerMatched " + matched);
+        AsyncHandler handler = new AsyncHandler() {
+            @Override
+            protected void executeAsync() throws Exception {
+                // TODO need entire refocto
+                Match match = sessionManager.joinMatchByToken(matched.getToken());
+                List<User> users = sessionManager.getUsersFromMatched(matched);
+                Player white = new Player(users.get(0).getUsername(), ChessColor.WHITE, users.get(0).getId());
+                Player black = new Player(users.get(1).getUsername(), ChessColor.BLACK, users.get(1).getId());
+                chessMatch = new ChessMatch();
+                chessMatch.setWhitePlayer(white);
+                chessMatch.setBlackPlayer(black);
+                chessMatch.setMatchId(match.getMatchId());
+            }
+
+            @Override
+            protected void callbackOnUI() {
+                matchmaking_chrono.stop();
+                NavDirections action = MatchmakingFragmentDirections.actionMatchmakingFragmentToBoardActivity(chessMatch, chessUser);
+                Navigation.findNavController(getView()).navigate(action);
+            }
+
+            @Override
+            protected void error(Exception ex) {
+                super.error(ex);
+                Toast.makeText(getContext(), R.string.matchmaking_cannot_join_match, Toast.LENGTH_LONG).show();
+                cancelMatchMaking(matchmakingTicket);
+                matchmaking_chrono.stop();
+                img_warning.setVisibility(View.VISIBLE);
+            }
+        };
+        handler.start();
+    }
+
+    @Override
+    public void onMatchData(MatchData matchData) {
+        Log.i("fr.aboucorp.variantchess", "onMatchData opcode" + matchData.getOpCode());
+    }
+
+    @Override
+    public void onMatchPresence(MatchPresenceEvent matchPresence) {
+
+    }
+
     private void launchMatchmaking() {
         this.matchmaking_chrono.start();
+        this.btn_cancel.setVisibility(View.VISIBLE);
+        this.btn_retry.setVisibility(View.GONE);
+        this.img_warning.setVisibility(View.GONE);
+        this.progress_bar.setVisibility(View.VISIBLE);
         try {
             this.sessionManager.launchMatchMaking(gameRules.name);
         } catch (ExecutionException e) {
@@ -170,8 +184,10 @@ public class MatchmakingFragment extends VariantChessFragment implements Matchma
             protected void callbackOnUI() {
                 Toast.makeText(getContext(), R.string.matchmaking_cancelled, Toast.LENGTH_LONG).show();
                 matchmakingTicket = null;
-                btn_cancel.setEnabled(false);
                 matchmaking_chrono.stop();
+                btn_cancel.setVisibility(View.GONE);
+                progress_bar.setVisibility(View.GONE);
+                btn_retry.setVisibility(View.VISIBLE);
             }
 
             @Override
@@ -179,8 +195,10 @@ public class MatchmakingFragment extends VariantChessFragment implements Matchma
                 super.error(ex);
                 Toast.makeText(getContext(), R.string.matchmaking_cancelled, Toast.LENGTH_LONG).show();
                 matchmakingTicket = null;
-                btn_cancel.setEnabled(false);
                 matchmaking_chrono.stop();
+                btn_cancel.setVisibility(View.GONE);
+                progress_bar.setVisibility(View.GONE);
+                btn_retry.setVisibility(View.VISIBLE);
             }
         };
         handler.start();

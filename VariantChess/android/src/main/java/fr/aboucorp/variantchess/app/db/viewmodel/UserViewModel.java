@@ -5,6 +5,7 @@ import android.app.Application;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 
 import fr.aboucorp.variantchess.app.db.entities.ChessUser;
 import fr.aboucorp.variantchess.app.db.repositories.ChessUserRepository;
@@ -12,16 +13,24 @@ import fr.aboucorp.variantchess.app.db.repositories.ChessUserRepository;
 public class UserViewModel extends AndroidViewModel {
 
     private ChessUserRepository chessUserRepository;
-    private LiveData<ChessUser> connected;
+
+    private Observer onGetConnected;
 
     public UserViewModel(@NonNull Application application) {
         super(application);
         this.chessUserRepository = new ChessUserRepository(application);
-        this.connected = this.chessUserRepository.getConnected();
+        this.onGetConnected = (Observer<ChessUser>) user -> {
+            if (user != null) {
+                user.isConnected = false;
+                this.chessUserRepository.update(user);
+            }
+        };
     }
 
-    public LiveData<ChessUser> getConnected() {
-        return this.connected;
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        this.chessUserRepository.getConnected().removeObserver(this.onGetConnected);
     }
 
     public void setConnected(ChessUser connected) {
@@ -32,7 +41,11 @@ public class UserViewModel extends AndroidViewModel {
         this.chessUserRepository.insert(chessUser);
     }
 
+    public LiveData<ChessUser> getConnected() {
+        return this.chessUserRepository.getConnected();
+    }
+
     public void disconnectUser() {
-        this.chessUserRepository.disconnect();
+        this.chessUserRepository.getConnected().observeForever(this.onGetConnected);
     }
 }
