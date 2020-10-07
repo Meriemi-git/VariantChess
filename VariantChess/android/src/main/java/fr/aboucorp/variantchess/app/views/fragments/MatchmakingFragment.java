@@ -18,7 +18,6 @@ import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
 import com.heroiclabs.nakama.Match;
-import com.heroiclabs.nakama.MatchData;
 import com.heroiclabs.nakama.MatchPresenceEvent;
 import com.heroiclabs.nakama.MatchmakerMatched;
 import com.heroiclabs.nakama.api.User;
@@ -129,7 +128,7 @@ public class MatchmakingFragment extends VariantChessFragment implements Matchma
             @Override
             protected void callbackOnUI() {
                 matchmaking_chrono.stop();
-                NavDirections action = MatchmakingFragmentDirections.actionMatchmakingFragmentToBoardActivity(chessMatch, chessUser);
+                NavDirections action = MatchmakingFragmentDirections.actionMatchmakingFragmentToBoardActivity(true, chessMatch, chessUser, gameRules);
                 Navigation.findNavController(getView()).navigate(action);
             }
 
@@ -143,11 +142,6 @@ public class MatchmakingFragment extends VariantChessFragment implements Matchma
             }
         };
         handler.start();
-    }
-
-    @Override
-    public void onMatchData(MatchData matchData) {
-        Log.i("fr.aboucorp.variantchess", "onMatchData opcode" + matchData.getOpCode());
     }
 
     @Override

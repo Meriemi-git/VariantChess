@@ -298,6 +298,10 @@ public class SessionManager {
     public void setMatchmakingListener(MatchmakingListener listener) {
         this.nakamaSocketListener.setMatchmakingListener(listener);
     }
+
+    public void setMatchListener(MatchListener matchListener) {
+        this.nakamaSocketListener.setMatchListener(matchListener);
+    }
 }
 
 

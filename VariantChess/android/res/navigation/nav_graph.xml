@@ -72,11 +72,17 @@
             android:id="@+id/action_matchmakingFragment_to_boardActivity"
             app:destination="@id/boardActivity">
             <argument
-                android:name="chessMatch"
+                android:name="is_online"
+                app:argType="boolean" />
+            <argument
+                android:name="chess_match"
                 app:argType="fr.aboucorp.variantchess.entities.ChessMatch" />
             <argument
-                android:name="chessUser"
+                android:name="chess_user"
                 app:argType="fr.aboucorp.variantchess.app.db.entities.ChessUser" />
+            <argument
+                android:name="gamerules"
+                app:argType="fr.aboucorp.variantchess.app.db.entities.GameRules" />
         </action>
     </fragment>
 </navigation>

@@ -1,8 +1,15 @@
 package fr.aboucorp.variantchess.app.managers;
 
 
+import com.heroiclabs.nakama.MatchData;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+
 import fr.aboucorp.variantchess.app.db.entities.ChessUser;
 import fr.aboucorp.variantchess.app.managers.boards.BoardManager;
+import fr.aboucorp.variantchess.app.multiplayer.MatchListener;
 import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
 import fr.aboucorp.variantchess.entities.ChessMatch;
 import fr.aboucorp.variantchess.entities.events.GameEventManager;
@@ -10,7 +17,7 @@ import fr.aboucorp.variantchess.entities.events.models.GameEvent;
 import fr.aboucorp.variantchess.entities.events.models.MoveEvent;
 import fr.aboucorp.variantchess.entities.events.models.TurnEndEvent;
 
-public class OnlineMatchManager extends MatchManager {
+public class OnlineMatchManager extends MatchManager implements MatchListener {
     private SessionManager sessionManager;
     private ChessUser currentPlayer;
 
@@ -49,24 +56,20 @@ public class OnlineMatchManager extends MatchManager {
         this.turnManager.startTurn();
     }
 
-/*    private class ConcreteMatchListener extends AbstractMatchListener {
-
-        @Override
-        public void onMatchData(MatchData matchData) {
-            super.onMatchData(matchData);
-            ObjectInputStream ois = null;
-            try {
-                ois = new ObjectInputStream(new ByteArrayInputStream(matchData.getData()));
-                GameEvent gameEvent = (GameEvent) ois.readObject();
-                if (gameEvent instanceof TurnEndEvent) {
-                    TurnEndEvent event = (TurnEndEvent) gameEvent;
-                    if (!event.turn.getPlayer().getUserID().equals(OnlineMatchManager.this.currentPlayer.userId)) {
-                        OnlineMatchManager.this.playOppositeMove(event);
-                    }
+    @Override
+    public void onMatchData(MatchData matchData) {
+        ObjectInputStream ois = null;
+        try {
+            ois = new ObjectInputStream(new ByteArrayInputStream(matchData.getData()));
+            GameEvent gameEvent = (GameEvent) ois.readObject();
+            if (gameEvent instanceof TurnEndEvent) {
+                TurnEndEvent event = (TurnEndEvent) gameEvent;
+                if (!event.turn.getPlayer().getUserID().equals(OnlineMatchManager.this.currentPlayer.userId)) {
+                    OnlineMatchManager.this.playOppositeMove(event);
                 }
-            } catch (IOException | ClassNotFoundException e) {
-                e.printStackTrace();
             }
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
         }
-    }*/
+    }
 }
