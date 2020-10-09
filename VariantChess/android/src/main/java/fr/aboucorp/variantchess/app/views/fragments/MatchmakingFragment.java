@@ -20,6 +20,7 @@ import androidx.navigation.Navigation;
 import com.heroiclabs.nakama.Match;
 import com.heroiclabs.nakama.MatchPresenceEvent;
 import com.heroiclabs.nakama.MatchmakerMatched;
+import com.heroiclabs.nakama.UserPresence;
 import com.heroiclabs.nakama.api.User;
 
 import java.util.List;
@@ -146,6 +147,11 @@ public class MatchmakingFragment extends VariantChessFragment implements Matchma
 
     @Override
     public void onMatchPresence(MatchPresenceEvent matchPresence) {
+        for (UserPresence userPresence : matchPresence.getJoins()
+        ) {
+            Log.i("fr.aboucorp.variantchess", String.format("User with username : %s, status : %s", userPresence.getUsername(), userPresence.getStatus()));
+        }
+
 
     }
 

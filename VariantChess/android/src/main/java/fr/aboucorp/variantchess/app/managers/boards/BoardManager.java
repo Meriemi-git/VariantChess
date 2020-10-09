@@ -8,6 +8,7 @@ import java.util.Optional;
 import fr.aboucorp.variantchess.app.listeners.GDXGestureListener;
 import fr.aboucorp.variantchess.app.listeners.GDXInputAdapter;
 import fr.aboucorp.variantchess.app.utils.GdxPostRunner;
+import fr.aboucorp.variantchess.app.utils.fen.BoardStateBuilder;
 import fr.aboucorp.variantchess.entities.ChessColor;
 import fr.aboucorp.variantchess.entities.ChessMatch;
 import fr.aboucorp.variantchess.entities.Location;
@@ -17,6 +18,7 @@ import fr.aboucorp.variantchess.entities.Square;
 import fr.aboucorp.variantchess.entities.Turn;
 import fr.aboucorp.variantchess.entities.boards.Board;
 import fr.aboucorp.variantchess.entities.enums.GameState;
+import fr.aboucorp.variantchess.entities.enums.PieceId;
 import fr.aboucorp.variantchess.entities.events.GameEventManager;
 import fr.aboucorp.variantchess.entities.events.GameEventSubscriber;
 import fr.aboucorp.variantchess.entities.events.models.GameEvent;
@@ -43,8 +45,9 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
     protected SquareList possiblesMoves;
     protected BoardLoadingListener boardLoadingListener;
     protected GameState gameState;
+    protected BoardStateBuilder boardStateBuilder;
 
-    BoardManager(Board board, Board3dManager board3dManager, AbstractRuleSet ruleSet, GameEventManager gameEventManager) {
+    BoardManager(Board board, Board3dManager board3dManager, AbstractRuleSet ruleSet, GameEventManager gameEventManager, BoardStateBuilder boardStateBuilder) {
         this.board = board;
         this.board3dManager = board3dManager;
         this.ruleSet = ruleSet;
@@ -54,6 +57,7 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
         board3dManager.setAndroidListener(gestureListener);
         this.gameState = GameState.PIECE_SELECTION;
         this.gameEventManager = gameEventManager;
+        this.boardStateBuilder = boardStateBuilder;
     }
 
     @Override
@@ -82,19 +86,7 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
         this.ruleSet.moveNumber = 0;
     }
 
-    public boolean IsTacticalViewOn() {
-        return this.board3dManager.isTacticalViewEnabled();
-    }
 
-    public PerspectiveCamera getCamera() {
-        return this.board3dManager.getCamera();
-    }
-
-    public abstract String getFenFromBoard();
-
-    public GameState getGameState() {
-        return this.gameState;
-    }
 
     public GraphicGameArray getModelsForTurn() {
         if (this.actualTurn.getTurnColor() == ChessColor.BLACK) {
@@ -134,7 +126,7 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
         this.gameState = this.gameState == GameState.WAIT_FOR_NEXT_TURN ? GameState.WAIT_FOR_NEXT_TURN : GameState.SQUARE_SELECTION;
     }
 
-    public void selectSquare(Square to) {
+    public Piece selectSquare(Square to) {
         Square from = this.selectedPiece.getSquare();
         Piece deadPiece = this.moveToSquare(to);
         String message = String.format("Move %s from %s to %s", this.selectedPiece, from, to);
@@ -146,6 +138,7 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
                     , this.selectedPiece.getPieceId()
                     , deadPiece != null ? deadPiece.getPieceId() : null));
         }
+        return deadPiece;
     }
 
     public void setBoardLoadingListener(BoardLoadingListener boardLoadingListener) {
@@ -170,11 +163,31 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
         void OnBoardLoaded();
     }
 
-    public void playTheMove(TurnEndEvent event) {
-        this.selectPiece(this.board.getPieceById(event.turn.getPlayed()));
-        Square destination = (Square) this.board.getSquares().getItemByLocation(event.turn.getTo());
-        this.selectSquare(destination);
+    public Turn playTheOpposantMove(String fenState) {
+        PieceId played = this.boardStateBuilder.getPiecePlayedFromState(fenState);
+        Location from = this.boardStateBuilder.getFrom(fenState);
+        Location to = this.boardStateBuilder.getTo(fenState);
+        this.selectPiece(this.board.getPieceById(played));
+        Square selectedSquare = (Square) this.board.getSquares().getItemByLocation(to);
+        Piece deadPiece = this.selectSquare(selectedSquare);
+/*        this.gameEventManager.sendMessage(new MoveEvent(
+                getFenFromBoard()
+                , from
+                , to
+                , this.selectedPiece.getPieceId()
+                , deadPiece != null ? deadPiece.getPieceId() : null));*/
+        Turn opposantTurn = new Turn();
+        opposantTurn.setFrom(from);
+        opposantTurn.setTo(to);
+        opposantTurn.setPlayed(played);
+        opposantTurn.setDuration(null);
+        if (deadPiece != null) {
+            opposantTurn.setDeadPiece(deadPiece.getPieceId());
+        }
+        // TODO missing player
+        return opposantTurn;
     }
+
 
     public void waitForNextTurn() {
         this.gameState = GameState.WAIT_FOR_NEXT_TURN;
@@ -184,5 +197,23 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
         this.gameState = GameState.PIECE_SELECTION;
     }
 
+    public boolean IsTacticalViewOn() {
+        return this.board3dManager.isTacticalViewEnabled();
+    }
 
+    public PerspectiveCamera getCamera() {
+        return this.board3dManager.getCamera();
+    }
+
+    public GameState getGameState() {
+        return this.gameState;
+    }
+
+    public String getBoardState() {
+        return this.boardStateBuilder.getStateFromBoard(this.actualTurn);
+    }
+
+    public String getFenFromBoard() {
+        return this.boardStateBuilder.getFenFromBoard(this.actualTurn);
+    }
 }

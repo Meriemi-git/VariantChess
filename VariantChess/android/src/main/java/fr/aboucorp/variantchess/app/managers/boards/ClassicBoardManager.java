@@ -1,8 +1,7 @@
 package fr.aboucorp.variantchess.app.managers.boards;
 
-import java.util.List;
-
 import fr.aboucorp.variantchess.app.utils.GdxPostRunner;
+import fr.aboucorp.variantchess.app.utils.fen.ClassicBoardStateBuilder;
 import fr.aboucorp.variantchess.entities.ChessColor;
 import fr.aboucorp.variantchess.entities.ChessMatch;
 import fr.aboucorp.variantchess.entities.Location;
@@ -29,8 +28,8 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
 
     private ChessMatch chessMatch;
 
-    public ClassicBoardManager(Board3dManager board3dManager, Board board, ClassicRuleSet ruleSet, GameEventManager gameEventManager) {
-        super(board, board3dManager, ruleSet, gameEventManager);
+    public ClassicBoardManager(Board3dManager board3dManager, Board board, ClassicRuleSet ruleSet, GameEventManager gameEventManager, ClassicBoardStateBuilder classicFenBuilder) {
+        super(board, board3dManager, ruleSet, gameEventManager, classicFenBuilder);
         this.gameEventManager.subscribe(EnPassantEvent.class, this, 1);
     }
 
@@ -70,58 +69,6 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
             }
         };
         postRunner.startAsync();
-    }
-
-    @Override
-    public String getFenFromBoard() {
-        StringBuilder fenString = new StringBuilder();
-        for (int z = 7; z >= 0; z--) {
-            List<Square> lines = this.board.getSquares().getSquaresByLine(z);
-            int emptySquare = 0;
-            for (int x = 7; x >= 0; x--) {
-                Square square = lines.get(x);
-                Piece piece = square.getPiece();
-                if (piece != null) {
-                    if (emptySquare > 0) {
-                        fenString.append(emptySquare);
-                        emptySquare = 0;
-                    }
-                    fenString.append(piece.fen());
-                } else {
-                    emptySquare++;
-                }
-            }
-            if (emptySquare > 0) {
-                fenString.append(emptySquare);
-            }
-            fenString.append('/');
-        }
-        fenString.append(' ');
-        fenString.append(this.actualTurn.getTurnColor() == ChessColor.WHITE ? 'w' : 'b');
-        fenString.append(' ');
-        if (((ClassicRuleSet) this.ruleSet).whiteCanCastleKing()) {
-            fenString.append('K');
-        }
-        if (((ClassicRuleSet) this.ruleSet).whiteCanCastleQueen()) {
-            fenString.append('Q');
-        }
-        if (((ClassicRuleSet) this.ruleSet).blackCanCastleKing()) {
-            fenString.append('k');
-        }
-        if (((ClassicRuleSet) this.ruleSet).blackCanCastleQueen()) {
-            fenString.append('q');
-        }
-        fenString.append(' ');
-        if (((ClassicRuleSet) this.ruleSet).enPassant != null) {
-            fenString.append(((ClassicRuleSet) this.ruleSet).enPassant.getSquareLabel());
-        } else {
-            fenString.append('-');
-        }
-        fenString.append(' ');
-        fenString.append(((ClassicRuleSet) this.ruleSet).fiftyMoveCounter);
-        fenString.append(' ');
-        fenString.append(this.ruleSet.moveNumber);
-        return fenString.toString();
     }
 
     @Override

@@ -594,7 +594,7 @@ public class Board3dManager extends ApplicationAdapter {
     }
 
     private void move(GraphicsGameElement element, Location location) {
-        Gdx.app.log("fr.aboucorp.variantchess", "Move piece ! to : " + location);
+        Gdx.app.log("fr.aboucorp.variantchess", String.format("Move piece %s to %s ", element.getPieceId(), location));
         element.move(location);
     }
 
