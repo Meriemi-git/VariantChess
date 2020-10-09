@@ -45,7 +45,6 @@ import fr.aboucorp.variantchess.app.utils.JsonExtractor;
 import fr.aboucorp.variantchess.app.utils.VariantVars;
 import fr.aboucorp.variantchess.app.views.activities.MainActivity;
 import fr.aboucorp.variantchess.app.views.fragments.AuthentFragmentDirections;
-import fr.aboucorp.variantchess.entities.events.models.GameEvent;
 
 public class SessionManager {
     public static final String SHARED_PREFERENCE_NAME = "nakama";
@@ -158,15 +157,15 @@ public class SessionManager {
         return exists;
     }
 
-    public void sendEvent(GameEvent event, String matchId) {
+    public void sendData(Object data, String matchId, long opcode) {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ObjectOutputStream oos = null;
         try {
             oos = new ObjectOutputStream(bos);
-            oos.writeObject(event);
+            oos.writeObject(data);
             oos.flush();
-            byte[] data = bos.toByteArray();
-            this.socket.sendMatchData(matchId, event.boardEventType, data);
+            byte[] binaryData = bos.toByteArray();
+            this.socket.sendMatchData(matchId, opcode, binaryData);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -297,6 +296,10 @@ public class SessionManager {
 
     public void setMatchmakingListener(MatchmakingListener listener) {
         this.nakamaSocketListener.setMatchmakingListener(listener);
+    }
+
+    public void setMatchListener(MatchListener matchListener) {
+        this.nakamaSocketListener.setMatchListener(matchListener);
     }
 }
 

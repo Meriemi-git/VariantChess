@@ -76,6 +76,10 @@ public class Turn implements Comparable<Turn>, Serializable {
         return this.player;
     }
 
+    public void setPlayer(Player player) {
+        this.player = player;
+    }
+
     public String getFen() {
         return this.fen;
     }

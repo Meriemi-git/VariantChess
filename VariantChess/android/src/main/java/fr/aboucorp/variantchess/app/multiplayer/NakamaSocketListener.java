@@ -22,6 +22,7 @@ public class NakamaSocketListener extends AbstractSocketListener {
     private final SessionManager sessionManager;
     private MatchmakingListener matchmakingListener;
     private ChatListener chatListener;
+    private MatchListener matchListener;
 
     public NakamaSocketListener(SessionManager sessionManager) {
         this.sessionManager = sessionManager;
@@ -73,8 +74,8 @@ public class NakamaSocketListener extends AbstractSocketListener {
     public void onMatchData(MatchData matchData) {
         super.onMatchData(matchData);
         Log.i("fr.aboucorp.variantchess", "onMatchData " + matchData.getOpCode());
-        if (matchmakingListener != null) {
-            matchmakingListener.onMatchData(matchData);
+        if (matchListener != null) {
+            matchListener.onMatchData(matchData);
         }
     }
 
@@ -129,5 +130,9 @@ public class NakamaSocketListener extends AbstractSocketListener {
 
     public void setChatListener(ChatListener chatListener) {
         this.chatListener = chatListener;
+    }
+
+    public void setMatchListener(MatchListener matchListener) {
+        this.matchListener = matchListener;
     }
 }
