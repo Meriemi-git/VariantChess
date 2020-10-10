@@ -11,6 +11,8 @@ buildscript {
         def nav_version = "2.3.0"
         classpath 'com.android.tools.build:gradle:4.0.2'
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$nav_version"
+        classpath "gradle.plugin.com.exploids:plantuml-from-source:0.1.1"
+
     }
 }
 
@@ -38,7 +40,10 @@ allprojects {
 project(":android") {
     apply plugin: "android"
     apply plugin: "androidx.navigation.safeargs"
-    configurations { natives }
+    apply plugin: "com.exploids.plantumlfromsource"
+    configurations {
+        natives
+    }
 
     dependencies {
         implementation project(":core")

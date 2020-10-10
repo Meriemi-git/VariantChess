@@ -10,8 +10,9 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toolbar;
 
-import androidx.lifecycle.ViewModelProvider;
+import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModelStore;
+import androidx.lifecycle.ViewModelStoreOwner;
 import androidx.preference.PreferenceManager;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
@@ -43,7 +44,7 @@ import static fr.aboucorp.variantchess.app.utils.ArgsKey.CHESS_USER;
 import static fr.aboucorp.variantchess.app.utils.ArgsKey.GAME_RULES;
 import static fr.aboucorp.variantchess.app.utils.ArgsKey.IS_ONLINE;
 
-public class BoardActivity extends AndroidApplication implements GameEventSubscriber {
+public class BoardActivity extends AndroidApplication implements GameEventSubscriber, ViewModelStoreOwner {
 
     public FrameLayout board_panel;
     private Button btn_end_turn;
@@ -60,6 +61,7 @@ public class BoardActivity extends AndroidApplication implements GameEventSubscr
     private GameEventManager gameEventManager;
     private boolean isOnline;
     private UserViewModel userViewModel;
+    private ViewModelStore viewModelStore;
 
     @Override
     public void onConfigurationChanged(Configuration config) {
@@ -139,11 +141,17 @@ public class BoardActivity extends AndroidApplication implements GameEventSubscr
         super.exit();
     }
 
+    @NonNull
+    @Override
+    public ViewModelStore getViewModelStore() {
+        return this.viewModelStore;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.viewModelStore = new ViewModelStore();
         this.setContentView(R.layout.board_layout);
-        this.userViewModel = new ViewModelProvider(ViewModelStore::new).get(UserViewModel.class);
         if (savedInstanceState != null) {
             this.isOnline = savedInstanceState.getBoolean(IS_ONLINE);
             this.chessMatch = (ChessMatch) savedInstanceState.getSerializable(CHESS_MATCH);
@@ -159,7 +167,6 @@ public class BoardActivity extends AndroidApplication implements GameEventSubscr
         this.bindListeners();
         this.setToolbar();
         this.initializeBoard();
-        this.matchManager.startParty(this.chessMatch);
     }
 
     private void initializeBoard() {
@@ -182,5 +189,6 @@ public class BoardActivity extends AndroidApplication implements GameEventSubscr
         }
         AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
         this.board_panel.addView(this.initializeForView(this.board3dManager, config));
+        this.matchManager.startParty(this.chessMatch);
     }
 }
