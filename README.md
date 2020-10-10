@@ -6,8 +6,6 @@ Variant Chess is a chess game developed for Android offering to play the most fa
 * Multiplayer feature are implemented by using Nakama framework.
 
 @startuml
-
-skinparam shadowing true
 package fr.aboucorp.variantchess.app.db  #ffb3ba {
 	abstract class fr.aboucorp.variantchess.app.db.VariantChessDatabase {
 		+{static} databaseWriteExecutor: ExecutorService
@@ -607,60 +605,6 @@ package fr.aboucorp.variantchess.app.views.fragments {
 	}
 
 }
-
-fr.aboucorp.variantchess.app.db.adapters.GameRulesAdapter --o "*" fr.aboucorp.variantchess.app.db.entities.GameRules
-fr.aboucorp.variantchess.app.db.repositories.ChessUserRepository --* fr.aboucorp.variantchess.app.db.dao.ChessUserDao
-fr.aboucorp.variantchess.app.db.repositories.ChessUserRepository --* fr.aboucorp.variantchess.app.db.entities.ChessUser
-fr.aboucorp.variantchess.app.db.repositories.GameRulesRepository --* fr.aboucorp.variantchess.app.db.dao.GameRulesDao
-fr.aboucorp.variantchess.app.db.viewmodel.GameRulesViewModel --* fr.aboucorp.variantchess.app.db.repositories.GameRulesRepository
-fr.aboucorp.variantchess.app.db.viewmodel.UserViewModel --* fr.aboucorp.variantchess.app.db.repositories.ChessUserRepository
-fr.aboucorp.variantchess.app.exceptions.IncorrectCredentials --|> fr.aboucorp.variantchess.app.exceptions.AuthentificationException
-fr.aboucorp.variantchess.app.exceptions.MailAlreadyRegistered --|> fr.aboucorp.variantchess.app.exceptions.AuthentificationException
-fr.aboucorp.variantchess.app.exceptions.UsernameAlreadyRegistered --|> fr.aboucorp.variantchess.app.exceptions.AuthentificationException
-fr.aboucorp.variantchess.app.listeners.GDXGestureListener --* fr.aboucorp.variantchess.app.managers.boards.BoardManager
-fr.aboucorp.variantchess.app.listeners.GDXGestureListener --* fr.aboucorp.variantchess.app.listeners.TouchedModelFinder
-fr.aboucorp.variantchess.app.listeners.TouchedModelFinder --* fr.aboucorp.variantchess.app.managers.boards.BoardManager
-fr.aboucorp.variantchess.app.managers.MatchManager ..|> fr.aboucorp.variantchess.app.managers.boards.BoardManager.BoardLoadingListener
-fr.aboucorp.variantchess.app.managers.MatchManager --* fr.aboucorp.variantchess.app.managers.boards.BoardManager : boardManager
-fr.aboucorp.variantchess.app.managers.MatchManager --* fr.aboucorp.variantchess.app.managers.TurnManager : turnManager
-fr.aboucorp.variantchess.app.managers.OfflineMatchManager --|> fr.aboucorp.variantchess.app.managers.MatchManager
-fr.aboucorp.variantchess.app.managers.OnlineMatchManager --|> fr.aboucorp.variantchess.app.managers.MatchManager
-fr.aboucorp.variantchess.app.managers.OnlineMatchManager ..|> fr.aboucorp.variantchess.app.multiplayer.MatchListener
-fr.aboucorp.variantchess.app.managers.OnlineMatchManager --* fr.aboucorp.variantchess.app.multiplayer.SessionManager
-fr.aboucorp.variantchess.app.managers.OnlineMatchManager --* fr.aboucorp.variantchess.app.db.entities.ChessUser
-fr.aboucorp.variantchess.app.managers.boards.BoardManager --* fr.aboucorp.variantchess.app.managers.boards.BoardManager.BoardLoadingListener : boardLoadingListener
-fr.aboucorp.variantchess.app.managers.boards.BoardManager --* fr.aboucorp.variantchess.app.utils.fen.BoardStateBuilder : boardStateBuilder
-fr.aboucorp.variantchess.app.managers.boards.ClassicBoardManager --|> fr.aboucorp.variantchess.app.managers.boards.BoardManager
-fr.aboucorp.variantchess.app.multiplayer.NakamaSocketListener *--* fr.aboucorp.variantchess.app.multiplayer.SessionManager
-fr.aboucorp.variantchess.app.multiplayer.NakamaSocketListener --* fr.aboucorp.variantchess.app.multiplayer.MatchmakingListener
-fr.aboucorp.variantchess.app.multiplayer.NakamaSocketListener --* fr.aboucorp.variantchess.app.multiplayer.ChatListener
-fr.aboucorp.variantchess.app.multiplayer.NakamaSocketListener --* fr.aboucorp.variantchess.app.multiplayer.MatchListener
-fr.aboucorp.variantchess.app.utils.fen.ClassicBoardStateBuilder --|> fr.aboucorp.variantchess.app.utils.fen.BoardStateBuilder
-fr.aboucorp.variantchess.app.utils.validations.MailExistsValidation --* fr.aboucorp.variantchess.app.multiplayer.SessionManager
-fr.aboucorp.variantchess.app.views.activities.BoardActivity --* fr.aboucorp.variantchess.app.managers.boards.ClassicBoardManager
-fr.aboucorp.variantchess.app.views.activities.BoardActivity --* fr.aboucorp.variantchess.app.managers.MatchManager
-fr.aboucorp.variantchess.app.views.activities.BoardActivity --* fr.aboucorp.variantchess.app.db.entities.ChessUser
-fr.aboucorp.variantchess.app.views.activities.BoardActivity --* fr.aboucorp.variantchess.app.db.entities.GameRules
-fr.aboucorp.variantchess.app.views.activities.BoardActivity --* fr.aboucorp.variantchess.app.db.viewmodel.UserViewModel
-fr.aboucorp.variantchess.app.views.activities.MainActivity --* fr.aboucorp.variantchess.app.multiplayer.SessionManager
-fr.aboucorp.variantchess.app.views.activities.MainActivity --* fr.aboucorp.variantchess.app.db.viewmodel.UserViewModel
-fr.aboucorp.variantchess.app.views.fragments.AuthentFragment --|> fr.aboucorp.variantchess.app.views.fragments.VariantChessFragment
-fr.aboucorp.variantchess.app.views.fragments.GameRulesFragment --|> fr.aboucorp.variantchess.app.views.fragments.VariantChessFragment
-fr.aboucorp.variantchess.app.views.fragments.GameRulesFragment --* fr.aboucorp.variantchess.app.db.viewmodel.GameRulesViewModel
-fr.aboucorp.variantchess.app.views.fragments.GameRulesFragment --o "*" fr.aboucorp.variantchess.app.db.entities.GameRules
-fr.aboucorp.variantchess.app.views.fragments.MatchmakingFragment --|> fr.aboucorp.variantchess.app.views.fragments.VariantChessFragment
-fr.aboucorp.variantchess.app.views.fragments.MatchmakingFragment ..|> fr.aboucorp.variantchess.app.multiplayer.MatchmakingListener
-fr.aboucorp.variantchess.app.views.fragments.MatchmakingFragment --* fr.aboucorp.variantchess.app.multiplayer.SessionManager
-fr.aboucorp.variantchess.app.views.fragments.MatchmakingFragment --* fr.aboucorp.variantchess.app.db.entities.GameRules
-fr.aboucorp.variantchess.app.views.fragments.MatchmakingFragment --* fr.aboucorp.variantchess.app.db.entities.ChessUser
-fr.aboucorp.variantchess.app.views.fragments.MatchmakingFragment --* fr.aboucorp.variantchess.app.db.viewmodel.UserViewModel
-fr.aboucorp.variantchess.app.views.fragments.SettingsFragment --* fr.aboucorp.variantchess.app.multiplayer.SessionManager
-fr.aboucorp.variantchess.app.views.fragments.SignInFragment --|> fr.aboucorp.variantchess.app.views.fragments.VariantChessFragment
-fr.aboucorp.variantchess.app.views.fragments.SignInFragment --* fr.aboucorp.variantchess.app.multiplayer.SessionManager
-fr.aboucorp.variantchess.app.views.fragments.SignInFragment --* fr.aboucorp.variantchess.app.db.repositories.ChessUserRepository
-fr.aboucorp.variantchess.app.views.fragments.SignUpFragment --|> fr.aboucorp.variantchess.app.views.fragments.VariantChessFragment
-fr.aboucorp.variantchess.app.views.fragments.SignUpFragment --* fr.aboucorp.variantchess.app.multiplayer.SessionManager
-
 @enduml
 
 
