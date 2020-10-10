@@ -1,6 +1,9 @@
 package fr.aboucorp.variantchess.app.views.activities;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,45 +19,59 @@ import androidx.navigation.NavInflater;
 import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 
+import com.heroiclabs.nakama.api.Notification;
+import com.heroiclabs.nakama.api.NotificationList;
+
 import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.db.entities.ChessUser;
 import fr.aboucorp.variantchess.app.db.viewmodel.UserViewModel;
 import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
+import fr.aboucorp.variantchess.app.multiplayer.listeners.NotificationListener;
+import fr.aboucorp.variantchess.app.utils.JsonExtractor;
+import fr.aboucorp.variantchess.app.utils.VariantVars;
 import fr.aboucorp.variantchess.app.views.fragments.AuthentFragmentDirections;
 import fr.aboucorp.variantchess.app.views.fragments.SettingsFragmentDirections;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements NotificationListener {
+    public static final String SHARED_PREFERENCE_NAME = "nakama";
     private Toolbar toolbar;
     private SessionManager sessionManager;
     private UserViewModel userViewModel;
+    private SharedPreferences pref;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.pref = getSharedPreferences(SHARED_PREFERENCE_NAME, Context.MODE_PRIVATE);
         this.setContentView(R.layout.main_layout);
         this.setToolbar();
-        this.sessionManager = SessionManager.getInstance(this);
-        this.userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
-        try {
-            ChessUser user = this.sessionManager.tryReconnectUser();
-            this.userIsConnected(user);
-            NavHostFragment navHost = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
-            NavController navController = navHost.getNavController();
+        this.sessionManager = SessionManager.getInstance();
+        this.sessionManager.setNotificationListener(this);
+        userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
+        this.userViewModel.getConnected().observe(this, connected -> this.displayConnectedUser(connected));
+        manageUserConnection();
+    }
 
-            NavInflater navInflater = navController.getNavInflater();
-            NavGraph graph = navInflater.inflate(R.navigation.nav_graph);
-            if (user != null) {
-                graph.setStartDestination(R.id.gameRulesFragment);
-            } else {
-                graph.setStartDestination(R.id.authentFragment);
+    @Override
+    public void onNotifications(NotificationList notifications) {
+        Log.i("fr.aboucorp.variantchess", "onNotifications " + notifications.getNotificationsCount());
+        for (Notification notification : notifications.getNotificationsList()
+        ) {
+            if (notification.getCode() == 666) {
+                String authToken = JsonExtractor.ectractAttributeByName(notification.getContent(), VariantVars.VARIANT_CHESS_TOKEN);
+                if (!authToken.equals(this.sessionManager.getSession().getAuthToken())) {
+                    Log.i("fr.aboucorp.variantchess", "Disconnection of user with sessionID : " + authToken);
+                    sessionManager.disconnect();
+                    displayConnectedUser(null);
+                    this.pref.edit().putString("nk.authToken", null).apply();
+                    NavDirections action = AuthentFragmentDirections.actionGlobalAuthentFragment();
+                    Navigation.findNavController(this, R.id.nav_host_fragment).navigate(action);
+                }
             }
-            navController.setGraph(graph);
-        } catch (Exception e) {
-            Log.e("fr.aboucorp.variantchess", e.getMessage());
-            e.printStackTrace();
         }
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -93,11 +110,22 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void userIsConnected(ChessUser connected) {
-        if (connected != null) {
-            Toast.makeText(this, R.string.connected, Toast.LENGTH_LONG).show();
+    private void manageUserConnection() {
+        ChessUser chessUser = null;
+        String authToken = this.pref.getString("nakama.authToken", null);
+        if (!TextUtils.isEmpty(authToken)) {
+            chessUser = this.sessionManager.tryReconnectUser(authToken);
         }
-        this.userViewModel.setConnected(connected);
+        NavHostFragment navHost = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
+        NavController navController = navHost.getNavController();
+        NavInflater navInflater = navController.getNavInflater();
+        NavGraph graph = navInflater.inflate(R.navigation.nav_graph);
+        if (chessUser == null) {
+            graph.setStartDestination(R.id.authentFragment);
+        } else {
+            graph.setStartDestination(R.id.gameRulesFragment);
+        }
+        navController.setGraph(graph);
     }
 
     private void setToolbar() {
@@ -123,4 +151,12 @@ public class MainActivity extends AppCompatActivity {
         profile.setVisible(user != null);
     }
 
+    public void displayConnectedUser(ChessUser connected) {
+        if (connected != null) {
+            Toast.makeText(this, R.string.connected, Toast.LENGTH_LONG).show();
+            this.pref.edit().putString("nakama.authToken", connected.authToken).apply();
+        } else {
+            this.pref.edit().putString("nakama.authToken", null).apply();
+        }
+    }
 }

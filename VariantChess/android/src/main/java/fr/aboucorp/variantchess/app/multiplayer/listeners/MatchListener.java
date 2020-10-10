@@ -1,4 +1,4 @@
-package fr.aboucorp.variantchess.app.multiplayer;
+package fr.aboucorp.variantchess.app.multiplayer.listeners;
 
 import com.heroiclabs.nakama.MatchData;
 

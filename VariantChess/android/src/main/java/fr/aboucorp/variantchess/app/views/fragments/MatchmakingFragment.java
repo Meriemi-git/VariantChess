@@ -30,8 +30,8 @@ import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.db.entities.ChessUser;
 import fr.aboucorp.variantchess.app.db.entities.GameRules;
 import fr.aboucorp.variantchess.app.db.viewmodel.UserViewModel;
-import fr.aboucorp.variantchess.app.multiplayer.MatchmakingListener;
 import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
+import fr.aboucorp.variantchess.app.multiplayer.listeners.MatchmakingListener;
 import fr.aboucorp.variantchess.app.utils.AsyncHandler;
 import fr.aboucorp.variantchess.entities.ChessColor;
 import fr.aboucorp.variantchess.entities.ChessMatch;
@@ -90,7 +90,7 @@ public class MatchmakingFragment extends VariantChessFragment implements Matchma
         if (savedInstanceState != null) {
             this.gameRules = (GameRules) savedInstanceState.getSerializable("gamerules");
         }
-        this.sessionManager = SessionManager.getInstance(getActivity());
+        this.sessionManager = SessionManager.getInstance();
         this.sessionManager.setMatchmakingListener(this);
         this.bindViews();
         this.bindListeners();
@@ -100,8 +100,6 @@ public class MatchmakingFragment extends VariantChessFragment implements Matchma
             this.launchMatchmaking();
         });
     }
-
-
 
     @Override
     public void setArguments(@Nullable Bundle args) {
@@ -162,7 +160,7 @@ public class MatchmakingFragment extends VariantChessFragment implements Matchma
         this.img_warning.setVisibility(View.GONE);
         this.progress_bar.setVisibility(View.VISIBLE);
         try {
-            this.sessionManager.launchMatchMaking(gameRules.name);
+            this.sessionManager.launchMatchMaking(gameRules.name, this.matchmakingTicket);
         } catch (ExecutionException e) {
             e.printStackTrace();
             Log.e("fr.aboucorp.variantchess", "Error during matchmaking launch message" + e.getMessage());

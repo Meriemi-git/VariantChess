@@ -1,13 +1,7 @@
 package fr.aboucorp.variantchess.app.multiplayer;
 
-import android.app.Activity;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.text.TextUtils;
 import android.util.Log;
-
-import androidx.navigation.NavDirections;
-import androidx.navigation.Navigation;
 
 import com.heroiclabs.nakama.Client;
 import com.heroiclabs.nakama.DefaultClient;
@@ -33,41 +27,37 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
-import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.db.dto.ChessUserDto;
 import fr.aboucorp.variantchess.app.db.entities.ChessUser;
 import fr.aboucorp.variantchess.app.exceptions.AuthentificationException;
 import fr.aboucorp.variantchess.app.exceptions.IncorrectCredentials;
 import fr.aboucorp.variantchess.app.exceptions.MailAlreadyRegistered;
 import fr.aboucorp.variantchess.app.exceptions.UsernameAlreadyRegistered;
+import fr.aboucorp.variantchess.app.multiplayer.listeners.MatchListener;
+import fr.aboucorp.variantchess.app.multiplayer.listeners.MatchmakingListener;
+import fr.aboucorp.variantchess.app.multiplayer.listeners.NotificationListener;
 import fr.aboucorp.variantchess.app.utils.ExceptionCauseCode;
 import fr.aboucorp.variantchess.app.utils.JsonExtractor;
 import fr.aboucorp.variantchess.app.utils.VariantVars;
-import fr.aboucorp.variantchess.app.views.activities.MainActivity;
-import fr.aboucorp.variantchess.app.views.fragments.AuthentFragmentDirections;
 
 public class SessionManager {
-    public static final String SHARED_PREFERENCE_NAME = "nakama";
     private static SessionManager INSTANCE;
     private final Client client = new DefaultClient("defaultkey", "192.168.1.37", 7349, false);
     private Session session;
     private User user;
     private SocketClient socket;
-    private SharedPreferences pref;
     private boolean socketClosed;
-    private Activity activity;
     private final String variantChessToken;
     private NakamaSocketListener nakamaSocketListener;
 
-    private SessionManager(Activity activity) {
-        this.activity = activity;
-        this.pref = activity.getSharedPreferences(SHARED_PREFERENCE_NAME, Context.MODE_PRIVATE);
+    private SessionManager() {
         this.variantChessToken = UUID.randomUUID().toString();
+        this.nakamaSocketListener = new NakamaSocketListener(this);
     }
 
-    public static SessionManager getInstance(Activity activity) {
+    public static SessionManager getInstance() {
         if (INSTANCE == null) {
-            INSTANCE = new SessionManager(activity);
+            INSTANCE = new SessionManager();
         }
         return INSTANCE;
     }
@@ -77,42 +67,48 @@ public class SessionManager {
             this.session = this.client.authenticateEmail(mail, password, false).get(2000, TimeUnit.MILLISECONDS);
             this.user = this.client.getAccount(this.session).get(5000, TimeUnit.MILLISECONDS).getUser();
             connectSocket();
-            this.pref.edit().putString("nk.session", this.session.getAuthToken()).apply();
-            return ChessUserDto.fromUserToChessUser(this.user);
+            ChessUser chessUser = ChessUserDto.fromUserToChessUser(this.user);
+            chessUser.authToken = this.session.getAuthToken();
+            return chessUser;
         } catch (ExecutionException e) {
             if (ExceptionCauseCode.getCodeValueFromCause(e.getCause()) == ExceptionCauseCode.UNAUTHENTICATED) {
                 throw new IncorrectCredentials("Incorrect credentials during singin");
             }
+            throw new AuthentificationException("Authentification error " + e.getMessage());
         } catch (InterruptedException | TimeoutException e) {
             throw new AuthentificationException("Communication problem with getAccount nakama server  :" + e.getMessage());
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new AuthentificationException("Unknown error." + e.getMessage());
         }
-        return null;
     }
 
     public ChessUser signUpWithEmail(String mail, String password, String displayName) throws AuthentificationException {
         try {
             this.session = this.client.authenticateEmail(mail, password, true, displayName).get(2000, TimeUnit.MILLISECONDS);
             this.user = this.client.getAccount(this.session).get(5000, TimeUnit.MILLISECONDS).getUser();
+            ChessUser chessUser = ChessUserDto.fromUserToChessUser(this.user);
+            chessUser.authToken = this.session.getAuthToken();
+            return chessUser;
         } catch (ExecutionException e) {
             if (ExceptionCauseCode.getCodeValueFromCause(e.getCause()) == ExceptionCauseCode.UNAUTHENTICATED) {
                 throw new MailAlreadyRegistered("Email already registered");
             } else if (ExceptionCauseCode.getCodeValueFromCause(e.getCause()) == ExceptionCauseCode.ALREADY_EXISTS) {
                 throw new UsernameAlreadyRegistered("Username already registered");
             }
-            throw new AuthentificationException("Authentification error");
+            throw new AuthentificationException("Authentification error : " + e.getMessage());
         } catch (InterruptedException | TimeoutException e) {
             throw new AuthentificationException("Communication problem during authenticateEmail with nakama server : " + e.getMessage());
         }
-        return ChessUserDto.fromUserToChessUser(this.user);
     }
 
-    public ChessUser tryReconnectUser() {
+    public boolean isUserConnected(ChessUser chessUser) {
+        return this.session != null && !this.session.IsExpired() && this.session.getAuthToken().equals(chessUser.authToken);
+    }
+
+    public ChessUser tryReconnectUser(String authToken) {
         // Lets check if we can restore a cached session.
-        String sessionString = this.pref.getString("nk.session", null);
-        if (sessionString != null && !sessionString.isEmpty()) {
-            Session restoredSession = DefaultSession.restore(sessionString);
+        if (authToken != null && !authToken.isEmpty()) {
+            Session restoredSession = DefaultSession.restore(authToken);
             if (!restoredSession.isExpired(new Date())) {
                 // Session was valid and is restored now.
                 this.session = restoredSession;
@@ -131,7 +127,7 @@ public class SessionManager {
 
     private void connectSocket() {
         if (this.socket == null || this.socketClosed) {
-            this.nakamaSocketListener = new NakamaSocketListener(this);
+
             this.socket = this.client.createSocket();
             try {
                 socket.connect(this.session, this.nakamaSocketListener).get();
@@ -194,14 +190,10 @@ public class SessionManager {
             this.socket.disconnect();
         }
         this.socket = null;
-        this.pref.edit().putString("nk.session", null).apply();
+
         this.session = null;
         this.user = null;
-        if (this.activity instanceof MainActivity) {
-            ((MainActivity) this.activity).userIsConnected(null);
-        }
-        NavDirections action = AuthentFragmentDirections.actionGlobalAuthentFragment();
-        Navigation.findNavController(this.activity, R.id.nav_host_fragment).navigate(action);
+
     }
 
     private boolean userExist(String email, boolean searchGoogleAccount) throws InterruptedException, ExecutionException, TimeoutException {
@@ -255,14 +247,13 @@ public class SessionManager {
                 .collect(Collectors.toList())).get().getUsersList();
     }
 
-    public String launchMatchMaking(String rulesName) throws ExecutionException, InterruptedException {
+    public String launchMatchMaking(String rulesName, String ticket) throws ExecutionException, InterruptedException {
         if (this.socket == null) {
             connectSocket();
         }
-        String ticketString = this.pref.getString("nk.ticket", null);
-        if (!TextUtils.isEmpty(ticketString)) {
+        if (!TextUtils.isEmpty(ticket)) {
             try {
-                this.socket.removeMatchmaker(ticketString).get();
+                this.socket.removeMatchmaker(ticket).get();
             } catch (ExecutionException | InterruptedException e) {
                 Log.i("fr.aboucorp.variantchess", "Cannot remove matchmaking");
             }
@@ -278,7 +269,6 @@ public class SessionManager {
         int maxCount = 2;
         MatchmakerTicket matchmakerTicket = this.socket.addMatchmaker(
                 minCount, maxCount, query, stringProps, numProps).get();
-        this.pref.edit().putString("nk.ticket", matchmakerTicket.getTicket()).apply();
         return matchmakerTicket.getTicket();
     }
 
@@ -301,6 +291,12 @@ public class SessionManager {
     public void setMatchListener(MatchListener matchListener) {
         this.nakamaSocketListener.setMatchListener(matchListener);
     }
+
+    public void setNotificationListener(NotificationListener notificationListener) {
+        this.nakamaSocketListener.setNotificationListener(notificationListener);
+    }
+
+
 }
 
 

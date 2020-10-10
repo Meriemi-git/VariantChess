@@ -57,7 +57,7 @@ public class SignUpFragment extends VariantChessFragment {
                     if (user.username != this.txt_username.getText().toString()) {
                         Toast.makeText(getContext(), R.string.warn_account_exists_with_different_username, Toast.LENGTH_LONG).show();
                     }
-                    ((MainActivity) this.getActivity()).userIsConnected(user);
+                    ((MainActivity) this.getActivity()).displayConnectedUser(user);
                     NavDirections action = SignUpFragmentDirections.actionSignUpFragmentToGameRulesFragment();
                     Navigation.findNavController(getView()).navigate(action);
                 } catch (MailAlreadyRegistered e) {
@@ -82,7 +82,7 @@ public class SignUpFragment extends VariantChessFragment {
         super.onViewCreated(view, savedInstanceState);
         this.bindViews();
         this.bindListeners();
-        this.sessionManager = SessionManager.getInstance(this.getActivity());
+        this.sessionManager = SessionManager.getInstance();
         this.validator = new AwesomeValidation(COLORATION);
         this.validator.addValidation(getActivity(), R.id.signup_mail, android.util.Patterns.EMAIL_ADDRESS, R.string.err_email_invalid);
         // String regexPassword = "(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])";

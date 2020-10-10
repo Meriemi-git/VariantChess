@@ -12,17 +12,19 @@ import com.heroiclabs.nakama.StatusPresenceEvent;
 import com.heroiclabs.nakama.StreamData;
 import com.heroiclabs.nakama.StreamPresenceEvent;
 import com.heroiclabs.nakama.api.ChannelMessage;
-import com.heroiclabs.nakama.api.Notification;
 import com.heroiclabs.nakama.api.NotificationList;
 
-import fr.aboucorp.variantchess.app.utils.JsonExtractor;
-import fr.aboucorp.variantchess.app.utils.VariantVars;
+import fr.aboucorp.variantchess.app.multiplayer.listeners.ChatListener;
+import fr.aboucorp.variantchess.app.multiplayer.listeners.MatchListener;
+import fr.aboucorp.variantchess.app.multiplayer.listeners.MatchmakingListener;
+import fr.aboucorp.variantchess.app.multiplayer.listeners.NotificationListener;
 
 public class NakamaSocketListener extends AbstractSocketListener {
     private final SessionManager sessionManager;
     private MatchmakingListener matchmakingListener;
     private ChatListener chatListener;
     private MatchListener matchListener;
+    private NotificationListener notificationListener;
 
     public NakamaSocketListener(SessionManager sessionManager) {
         this.sessionManager = sessionManager;
@@ -91,16 +93,8 @@ public class NakamaSocketListener extends AbstractSocketListener {
     @Override
     public void onNotifications(NotificationList notifications) {
         super.onNotifications(notifications);
-        Log.i("fr.aboucorp.variantchess", "onNotifications " + notifications.getNotificationsCount());
-        for (Notification notification : notifications.getNotificationsList()
-        ) {
-            if (notification.getCode() == 666) {
-                String authToken = JsonExtractor.ectractAttributeByName(notification.getContent(), VariantVars.VARIANT_CHESS_TOKEN);
-                if (!authToken.equals(this.sessionManager.getSession().getAuthToken())) {
-                    Log.i("fr.aboucorp.variantchess", "Disconnection of user with sessionID : " + authToken);
-                    sessionManager.disconnect();
-                }
-            }
+        if (this.notificationListener != null) {
+
         }
 
     }
@@ -134,5 +128,9 @@ public class NakamaSocketListener extends AbstractSocketListener {
 
     public void setMatchListener(MatchListener matchListener) {
         this.matchListener = matchListener;
+    }
+
+    public void setNotificationListener(NotificationListener notificationListener) {
+        this.notificationListener = notificationListener;
     }
 }

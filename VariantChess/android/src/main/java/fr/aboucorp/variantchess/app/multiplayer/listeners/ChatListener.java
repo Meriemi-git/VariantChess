@@ -1,4 +1,4 @@
-package fr.aboucorp.variantchess.app.multiplayer;
+package fr.aboucorp.variantchess.app.multiplayer.listeners;
 
 import com.heroiclabs.nakama.ChannelPresenceEvent;
 import com.heroiclabs.nakama.api.ChannelMessage;

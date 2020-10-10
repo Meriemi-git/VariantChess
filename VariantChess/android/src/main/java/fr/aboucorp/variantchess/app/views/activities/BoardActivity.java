@@ -17,26 +17,27 @@ import androidx.preference.PreferenceManager;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
+import com.heroiclabs.nakama.api.NotificationList;
 
 import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.db.entities.ChessUser;
 import fr.aboucorp.variantchess.app.db.entities.GameRules;
 import fr.aboucorp.variantchess.app.db.viewmodel.UserViewModel;
+import fr.aboucorp.variantchess.app.exceptions.UnknownGameRulesException;
 import fr.aboucorp.variantchess.app.managers.MatchManager;
 import fr.aboucorp.variantchess.app.managers.OfflineMatchManager;
 import fr.aboucorp.variantchess.app.managers.OnlineMatchManager;
-import fr.aboucorp.variantchess.app.managers.boards.ClassicBoardManager;
+import fr.aboucorp.variantchess.app.managers.boards.BoardManager;
+import fr.aboucorp.variantchess.app.managers.boards.BoardManagerFactory;
 import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
-import fr.aboucorp.variantchess.app.utils.fen.ClassicBoardStateBuilder;
+import fr.aboucorp.variantchess.app.multiplayer.listeners.NotificationListener;
 import fr.aboucorp.variantchess.app.views.fragments.SettingsFragment;
 import fr.aboucorp.variantchess.entities.ChessMatch;
-import fr.aboucorp.variantchess.entities.boards.ClassicBoard;
 import fr.aboucorp.variantchess.entities.events.GameEventManager;
 import fr.aboucorp.variantchess.entities.events.GameEventSubscriber;
 import fr.aboucorp.variantchess.entities.events.models.BoardEvent;
 import fr.aboucorp.variantchess.entities.events.models.GameEvent;
 import fr.aboucorp.variantchess.entities.events.models.TurnEvent;
-import fr.aboucorp.variantchess.entities.rules.ClassicRuleSet;
 import fr.aboucorp.variantchess.libgdx.Board3dManager;
 
 import static fr.aboucorp.variantchess.app.utils.ArgsKey.CHESS_MATCH;
@@ -44,7 +45,7 @@ import static fr.aboucorp.variantchess.app.utils.ArgsKey.CHESS_USER;
 import static fr.aboucorp.variantchess.app.utils.ArgsKey.GAME_RULES;
 import static fr.aboucorp.variantchess.app.utils.ArgsKey.IS_ONLINE;
 
-public class BoardActivity extends AndroidApplication implements GameEventSubscriber, ViewModelStoreOwner {
+public class BoardActivity extends AndroidApplication implements GameEventSubscriber, ViewModelStoreOwner, NotificationListener {
 
     public FrameLayout board_panel;
     private Button btn_end_turn;
@@ -52,7 +53,7 @@ public class BoardActivity extends AndroidApplication implements GameEventSubscr
     private TextView lbl_turn;
     private TextView party_logs;
     private Board3dManager board3dManager;
-    private ClassicBoardManager boardManager;
+    private BoardManager boardManager;
     private MatchManager matchManager;
     private Toolbar toolbar;
     private ChessUser chessUser;
@@ -80,6 +81,43 @@ public class BoardActivity extends AndroidApplication implements GameEventSubscr
         this.lbl_turn = this.findViewById(R.id.lbl_turn);
         this.party_logs = this.findViewById(R.id.party_logs);
         this.switch_tactical = this.findViewById(R.id.switch_tactical);
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        this.setContentView(R.layout.board_layout);
+        SessionManager sessionManager = SessionManager.getInstance();
+        sessionManager.setNotificationListener(this);
+        if (savedInstanceState != null) {
+            this.isOnline = savedInstanceState.getBoolean(IS_ONLINE);
+            this.chessMatch = (ChessMatch) savedInstanceState.getSerializable(CHESS_MATCH);
+            this.chessUser = (ChessUser) savedInstanceState.getSerializable(CHESS_USER);
+            this.gameRules = (GameRules) savedInstanceState.getSerializable(GAME_RULES);
+        } else {
+            this.isOnline = this.getIntent().getExtras().getBoolean(IS_ONLINE);
+            this.chessMatch = (ChessMatch) this.getIntent().getExtras().getSerializable(CHESS_MATCH);
+            this.chessUser = (ChessUser) this.getIntent().getExtras().getSerializable(CHESS_USER);
+            this.gameRules = (GameRules) this.getIntent().getExtras().getSerializable(GAME_RULES);
+        }
+        this.bindViews();
+        this.bindListeners();
+        this.setToolbar();
+        this.initializeBoard();
+    }
+
+    @Override
+    public void onNotifications(NotificationList notifications) {
+        // TODO react on disconnect
+    }
+
+    private void bindListeners() {
+        this.btn_end_turn.setOnClickListener(v -> {
+            BoardActivity.this.matchManager.endTurn(null);
+            this.runOnUiThread(() ->
+                    BoardActivity.this.lbl_turn.setText("Turn of " + BoardActivity.this.matchManager.getPartyInfos()));
+        });
+        this.switch_tactical.setOnClickListener(v -> BoardActivity.this.boardManager.toogleTacticalView());
     }
 
 
@@ -127,14 +165,7 @@ public class BoardActivity extends AndroidApplication implements GameEventSubscr
         this.board3dManager.exit();
     }
 
-    private void bindListeners() {
-        this.btn_end_turn.setOnClickListener(v -> {
-            BoardActivity.this.matchManager.endTurn(null);
-            this.runOnUiThread(() ->
-                    BoardActivity.this.lbl_turn.setText("Turn of " + BoardActivity.this.matchManager.getPartyInfos()));
-        });
-        this.switch_tactical.setOnClickListener(v -> BoardActivity.this.boardManager.toogleTacticalView());
-    }
+
 
     @Override
     public void exit() {
@@ -147,43 +178,24 @@ public class BoardActivity extends AndroidApplication implements GameEventSubscr
         return this.viewModelStore;
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        this.viewModelStore = new ViewModelStore();
-        this.setContentView(R.layout.board_layout);
-        if (savedInstanceState != null) {
-            this.isOnline = savedInstanceState.getBoolean(IS_ONLINE);
-            this.chessMatch = (ChessMatch) savedInstanceState.getSerializable(CHESS_MATCH);
-            this.chessUser = (ChessUser) savedInstanceState.getSerializable(CHESS_USER);
-            this.gameRules = (GameRules) savedInstanceState.getSerializable(GAME_RULES);
-        } else {
-            this.isOnline = this.getIntent().getExtras().getBoolean(IS_ONLINE);
-            this.chessMatch = (ChessMatch) this.getIntent().getExtras().getSerializable(CHESS_MATCH);
-            this.chessUser = (ChessUser) this.getIntent().getExtras().getSerializable(CHESS_USER);
-            this.gameRules = (GameRules) this.getIntent().getExtras().getSerializable(GAME_RULES);
-        }
-        this.bindViews();
-        this.bindListeners();
-        this.setToolbar();
-        this.initializeBoard();
-    }
-
     private void initializeBoard() {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
         boolean isTactical = sharedPref.getBoolean(SettingsFragment.IS_TACTICAL_MODE_ON, false);
+
         this.gameEventManager = new GameEventManager();
         this.gameEventManager.subscribe(GameEvent.class, this, 1);
+
         this.board3dManager = new Board3dManager();
         this.board3dManager.setTacticalViewEnabled(isTactical);
-        ClassicBoard classicBoard = new ClassicBoard(this.gameEventManager);
-        ClassicRuleSet classicRules = new ClassicRuleSet(classicBoard, this.gameEventManager);
-        ClassicBoardStateBuilder classicBoardStateBuilder = new ClassicBoardStateBuilder(classicBoard, classicRules);
-        this.boardManager = new ClassicBoardManager(this.board3dManager, classicBoard, classicRules, this.gameEventManager, classicBoardStateBuilder);
-        SessionManager sessionManager = SessionManager.getInstance(this);
+
+        try {
+            this.boardManager = BoardManagerFactory.getBoardManagerFromGameRules(this.gameRules, board3dManager, gameEventManager);
+        } catch (UnknownGameRulesException e) {
+            e.printStackTrace();
+        }
+
         if (this.isOnline) {
-            this.matchManager = new OnlineMatchManager(this.boardManager, this.gameEventManager, sessionManager, this.chessUser);
-            sessionManager.setMatchListener((OnlineMatchManager) this.matchManager);
+            this.matchManager = new OnlineMatchManager(this.boardManager, this.gameEventManager, this.chessUser);
         } else {
             this.matchManager = new OfflineMatchManager(this.boardManager, this.gameEventManager);
         }

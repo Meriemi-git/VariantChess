@@ -20,4 +20,6 @@ public class ChessUser implements Serializable {
     public String metadata;
     @ColumnInfo(name = "is_connected")
     public boolean isConnected;
+    @ColumnInfo(name = "auth_token")
+    public String authToken;
 }
