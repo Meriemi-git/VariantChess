@@ -79,4 +79,5 @@
     <string name="content_desc_icon_gamerules">Gamerule icon</string>
     <string name="matchmaking_in_progress">Matchmaking in progress</string>
     <string name="general_lbl_retry">Retry</string>
+    <string name="err_network">Connectivity error. Check your network and retry.</string>
 </resources>

@@ -8,6 +8,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
@@ -15,11 +16,12 @@ import com.basgeekball.awesomevalidation.AwesomeValidation;
 
 import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.db.entities.ChessUser;
+import fr.aboucorp.variantchess.app.db.viewmodel.UserViewModel;
 import fr.aboucorp.variantchess.app.exceptions.AuthentificationException;
 import fr.aboucorp.variantchess.app.exceptions.MailAlreadyRegistered;
 import fr.aboucorp.variantchess.app.exceptions.UsernameAlreadyRegistered;
 import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
-import fr.aboucorp.variantchess.app.views.activities.MainActivity;
+import fr.aboucorp.variantchess.app.utils.AsyncHandler;
 
 import static com.basgeekball.awesomevalidation.ValidationStyle.COLORATION;
 
@@ -39,6 +41,9 @@ public class SignUpFragment extends VariantChessFragment {
 
     private AwesomeValidation validator;
 
+    private UserViewModel userViewModel;
+
+
     @Override
     protected void bindViews() {
         this.txt_username = this.getView().findViewById(R.id.signup_username);
@@ -52,21 +57,41 @@ public class SignUpFragment extends VariantChessFragment {
     protected void bindListeners() {
         this.btn_register.setOnClickListener(v ->{
             if(this.validator.validate()) {
-                try {
-                    ChessUser user = this.sessionManager.signUpWithEmail(this.txt_mail.getText().toString(), this.txt_pwd.getText().toString(), this.txt_username.getText().toString());
-                    if (user.username != this.txt_username.getText().toString()) {
-                        Toast.makeText(getContext(), R.string.warn_account_exists_with_different_username, Toast.LENGTH_LONG).show();
+                AsyncHandler asyncHandler = new AsyncHandler() {
+                    @Override
+                    protected Object executeAsync() throws Exception {
+                        ChessUser user = sessionManager.signUpWithEmail(txt_mail.getText().toString(), txt_pwd.getText().toString(), txt_username.getText().toString());
+                        userViewModel.setConnected(user);
+                        return user;
                     }
-                    ((MainActivity) this.getActivity()).displayConnectedUser(user);
-                    NavDirections action = SignUpFragmentDirections.actionSignUpFragmentToGameRulesFragment();
-                    Navigation.findNavController(getView()).navigate(action);
-                } catch (MailAlreadyRegistered e) {
-                    Toast.makeText(getContext(), R.string.err_mail_already_exists, Toast.LENGTH_LONG).show();
-                } catch (UsernameAlreadyRegistered e) {
-                    Toast.makeText(getContext(), R.string.err_username_already_exists, Toast.LENGTH_LONG).show();
-                } catch(AuthentificationException e1){
-                    Toast.makeText(getContext(), R.string.err_general, Toast.LENGTH_LONG).show();
-                }
+
+                    @Override
+                    protected void callbackOnUI(Object arg) {
+                        super.callbackOnUI(arg);
+                        ChessUser user = (ChessUser) arg;
+                        if (user.username != txt_username.getText().toString()) {
+                            Toast.makeText(getContext(), R.string.warn_account_exists_with_different_username, Toast.LENGTH_LONG).show();
+                        }
+                        NavDirections action = SignUpFragmentDirections.actionSignUpFragmentToGameRulesFragment(user);
+                        Navigation.findNavController(getView()).navigate(action);
+                    }
+
+                    @Override
+                    protected void error(Exception ex) {
+                        super.error(ex);
+                        if (ex instanceof MailAlreadyRegistered) {
+                            Toast.makeText(getContext(), R.string.err_mail_already_exists, Toast.LENGTH_LONG).show();
+                        } else if (ex instanceof UsernameAlreadyRegistered) {
+                            Toast.makeText(getContext(), R.string.err_username_already_exists, Toast.LENGTH_LONG).show();
+                        } else if (ex instanceof AuthentificationException) {
+                            Toast.makeText(getContext(), R.string.err_network, Toast.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(getContext(), R.string.err_general, Toast.LENGTH_LONG).show();
+                        }
+                    }
+                };
+                asyncHandler.start();
+
             }
         });
     }
@@ -80,8 +105,8 @@ public class SignUpFragment extends VariantChessFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        this.userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
         this.bindViews();
-        this.bindListeners();
         this.sessionManager = SessionManager.getInstance();
         this.validator = new AwesomeValidation(COLORATION);
         this.validator.addValidation(getActivity(), R.id.signup_mail, android.util.Patterns.EMAIL_ADDRESS, R.string.err_email_invalid);
@@ -90,5 +115,6 @@ public class SignUpFragment extends VariantChessFragment {
         String regexPassword = "[a-z]{8}[a-z]*";
         this.validator.addValidation(getActivity(), R.id.signup_pwd, regexPassword, R.string.error_wrong_password);
         this.validator.addValidation(getActivity(), R.id.signup_confirm_pwd, input -> txt_pwd.getText().toString().equals(txt_confirm_pwd.getText().toString()), R.string.error_password_match);
+        this.bindListeners();
     }
 }

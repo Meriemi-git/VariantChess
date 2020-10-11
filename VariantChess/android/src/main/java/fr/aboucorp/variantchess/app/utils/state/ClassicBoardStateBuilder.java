@@ -1,4 +1,4 @@
-package fr.aboucorp.variantchess.app.utils.fen;
+package fr.aboucorp.variantchess.app.utils.state;
 
 import java.util.List;
 

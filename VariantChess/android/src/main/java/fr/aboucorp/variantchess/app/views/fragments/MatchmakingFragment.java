@@ -112,7 +112,7 @@ public class MatchmakingFragment extends VariantChessFragment implements Matchma
         Log.i("fr.aboucorp.variantchess", "onMatchmakerMatched " + matched);
         AsyncHandler handler = new AsyncHandler() {
             @Override
-            protected void executeAsync() throws Exception {
+            protected Object executeAsync() throws Exception {
                 // TODO need entire refocto
                 Match match = sessionManager.joinMatchByToken(matched.getToken());
                 List<User> users = sessionManager.getUsersFromMatched(matched);
@@ -122,10 +122,11 @@ public class MatchmakingFragment extends VariantChessFragment implements Matchma
                 chessMatch.setWhitePlayer(white);
                 chessMatch.setBlackPlayer(black);
                 chessMatch.setMatchId(match.getMatchId());
+                return null;
             }
 
             @Override
-            protected void callbackOnUI() {
+            protected void callbackOnUI(Object arg) {
                 matchmaking_chrono.stop();
                 NavDirections action = MatchmakingFragmentDirections.actionMatchmakingFragmentToBoardActivity(true, chessMatch, chessUser, gameRules);
                 Navigation.findNavController(getView()).navigate(action);
@@ -173,13 +174,14 @@ public class MatchmakingFragment extends VariantChessFragment implements Matchma
     private void cancelMatchMaking(String ticket) {
         AsyncHandler handler = new AsyncHandler() {
             @Override
-            protected void executeAsync() {
+            protected Object executeAsync() {
                 sessionManager.cancelMatchMaking(ticket);
                 btn_cancel.setEnabled(false);
+                return null;
             }
 
             @Override
-            protected void callbackOnUI() {
+            protected void callbackOnUI(Object arg) {
                 Toast.makeText(getContext(), R.string.matchmaking_cancelled, Toast.LENGTH_LONG).show();
                 matchmakingTicket = null;
                 matchmaking_chrono.stop();

@@ -2,7 +2,7 @@ package fr.aboucorp.variantchess.app.managers.boards;
 
 import fr.aboucorp.variantchess.app.db.entities.GameRules;
 import fr.aboucorp.variantchess.app.exceptions.UnknownGameRulesException;
-import fr.aboucorp.variantchess.app.utils.fen.ClassicBoardStateBuilder;
+import fr.aboucorp.variantchess.app.utils.state.ClassicBoardStateBuilder;
 import fr.aboucorp.variantchess.entities.boards.ClassicBoard;
 import fr.aboucorp.variantchess.entities.events.GameEventManager;
 import fr.aboucorp.variantchess.entities.rules.ClassicRuleSet;

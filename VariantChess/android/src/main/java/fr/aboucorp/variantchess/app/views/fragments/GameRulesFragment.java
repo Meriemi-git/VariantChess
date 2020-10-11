@@ -8,7 +8,6 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -30,7 +29,6 @@ public class GameRulesFragment extends VariantChessFragment implements AdapterVi
     private Button btn_offline;
     private TextView txt_rule_description;
     private Spinner spinner_rules;
-    private ProgressBar progress_bar;
     private LinearLayout balance_layout;
     private LinearLayout difficulty_layout;
     private GameRulesViewModel gameRulesViewModel;
@@ -44,7 +42,6 @@ public class GameRulesFragment extends VariantChessFragment implements AdapterVi
         this.spinner_rules = this.getView().findViewById(R.id.spinner_rules);
         this.balance_layout = this.getView().findViewById(R.id.balance_layout);
         this.difficulty_layout = this.getView().findViewById(R.id.difficulty_layout);
-        this.progress_bar = this.getView().findViewById(R.id.progress_bar);
     }
 
     @Override

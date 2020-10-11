@@ -18,17 +18,17 @@ public abstract class AsyncHandler {
         executor.submit(() ->
         {
             try {
-                this.executeAsync();
-                new Handler(Looper.getMainLooper()).post(() -> this.callbackOnUI());
+                Object args = this.executeAsync();
+                new Handler(Looper.getMainLooper()).post(() -> this.callbackOnUI(args));
             } catch (Exception ex) {
                 new Handler(Looper.getMainLooper()).post(() -> this.error(ex));
             }
         });
     }
 
-    protected abstract void executeAsync() throws Exception;
+    protected abstract Object executeAsync() throws Exception;
 
-    protected void callbackOnUI() {
+    protected void callbackOnUI(Object arg) {
     }
 
     protected void error(Exception ex) {

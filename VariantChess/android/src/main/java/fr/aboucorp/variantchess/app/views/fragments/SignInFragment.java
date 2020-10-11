@@ -15,9 +15,9 @@ import androidx.navigation.Navigation;
 import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.db.entities.ChessUser;
 import fr.aboucorp.variantchess.app.db.viewmodel.UserViewModel;
-import fr.aboucorp.variantchess.app.exceptions.AuthentificationException;
 import fr.aboucorp.variantchess.app.exceptions.IncorrectCredentials;
 import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
+import fr.aboucorp.variantchess.app.utils.AsyncHandler;
 
 
 public class SignInFragment extends VariantChessFragment  {
@@ -30,18 +30,33 @@ public class SignInFragment extends VariantChessFragment  {
     @Override
     protected void bindListeners() {
         btn_mail_connect.setOnClickListener(view -> {
-            try {
-                ChessUser user = this.sessionManager.signInWithEmail(this.txt_mail.getText().toString(), this.txt_pwd.getText().toString());
-                userViewModel.setConnected(user);
-                NavDirections action = SignInFragmentDirections.actionSignInFragmentToGameRulesFragment();
-                Navigation.findNavController(getView()).navigate(action);
-            } catch (IncorrectCredentials e) {
-                Toast.makeText(getContext(), R.string.signin_credential_error, Toast.LENGTH_LONG).show();
-            } catch (AuthentificationException e) {
-                Toast.makeText(getContext(), R.string.err_general, Toast.LENGTH_LONG).show();
-            }
-        });
+            AsyncHandler handler = new AsyncHandler() {
+                @Override
+                protected Object executeAsync() throws Exception {
+                    ChessUser user = sessionManager.signInWithEmail(txt_mail.getText().toString(), txt_pwd.getText().toString());
+                    userViewModel.setConnected(user);
+                    return user;
+                }
 
+                @Override
+                protected void callbackOnUI(Object arg) {
+                    super.callbackOnUI(arg);
+                    NavDirections action = SignInFragmentDirections.actionSignInFragmentToGameRulesFragment((ChessUser) arg);
+                    Navigation.findNavController(getView()).navigate(action);
+                }
+
+                @Override
+                protected void error(Exception ex) {
+                    super.error(ex);
+                    if (ex instanceof IncorrectCredentials) {
+                        Toast.makeText(getContext(), R.string.signin_credential_error, Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(getContext(), R.string.err_network, Toast.LENGTH_LONG).show();
+                    }
+                }
+            };
+            handler.start();
+        });
     }
 
     @Override

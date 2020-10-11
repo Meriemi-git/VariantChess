@@ -61,17 +61,12 @@ public class MainActivity extends AppCompatActivity implements NotificationListe
             if (notification.getCode() == 666) {
                 String authToken = JsonExtractor.ectractAttributeByName(notification.getContent(), VariantVars.VARIANT_CHESS_TOKEN);
                 if (!authToken.equals(this.sessionManager.getSession().getAuthToken())) {
-                    Log.i("fr.aboucorp.variantchess", "Disconnection of user with sessionID : " + authToken);
-                    sessionManager.disconnect();
-                    displayConnectedUser(null);
-                    this.pref.edit().putString("nk.authToken", null).apply();
-                    NavDirections action = AuthentFragmentDirections.actionGlobalAuthentFragment();
-                    Navigation.findNavController(this, R.id.nav_host_fragment).navigate(action);
+                    Log.i("fr.aboucorp.variantchess", "Disconnection of user with authToken : " + authToken);
+                    disconnectUser();
                 }
             }
         }
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -97,9 +92,7 @@ public class MainActivity extends AppCompatActivity implements NotificationListe
                 return true;
             case R.id.menu_action_disconnect:
                 this.sessionManager.disconnect();
-                this.userViewModel.disconnectUser();
-                action = AuthentFragmentDirections.actionGlobalAuthentFragment();
-                Navigation.findNavController(this, R.id.nav_host_fragment).navigate(action);
+                disconnectUser();
                 return true;
             case R.id.menu_action_settings:
                 action = SettingsFragmentDirections.actionGlobalSettingsFragment();
@@ -121,6 +114,7 @@ public class MainActivity extends AppCompatActivity implements NotificationListe
         NavInflater navInflater = navController.getNavInflater();
         NavGraph graph = navInflater.inflate(R.navigation.nav_graph);
         if (chessUser == null) {
+            this.userViewModel.disconnectUserWithAuthToken(authToken);
             graph.setStartDestination(R.id.authentFragment);
         } else {
             graph.setStartDestination(R.id.gameRulesFragment);
@@ -158,5 +152,13 @@ public class MainActivity extends AppCompatActivity implements NotificationListe
         } else {
             this.pref.edit().putString("nakama.authToken", null).apply();
         }
+    }
+
+    private void disconnectUser() {
+        sessionManager.disconnect();
+        this.userViewModel.disconnectUser();
+        this.pref.edit().putString("nk.authToken", null).apply();
+        NavDirections action = AuthentFragmentDirections.actionGlobalAuthentFragment();
+        Navigation.findNavController(this, R.id.nav_host_fragment).navigate(action);
     }
 }

@@ -78,4 +78,6 @@
     <string name="gamerules_description_random">Le placement des pièces au début de la partie est aléatoire au sein des deux premières lignes. Le \"roc\" et le \"en passant\" sont impossible. Les autres rêgles sont identiques.</string>
     <string name="content_desc_icon_gamerules">Icone du set de rêgles</string>
     <string name="matchmaking_in_progress">Recherche de partie en cours</string>
+    <string name="general_lbl_retry">Relancer</string>
+    <string name="err_network">Erreur réseau. Vérifiez votre connexion réseau et réessayez.</string>
 </resources>

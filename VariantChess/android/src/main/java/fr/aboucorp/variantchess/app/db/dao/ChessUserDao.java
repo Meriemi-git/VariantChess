@@ -23,12 +23,17 @@ public interface ChessUserDao {
     @Query("SELECT * FROM chessuser WHERE username LIKE :username LIMIT 1")
     ChessUser findByName(String username);
 
+    @Query("UPDATE chessuser SET is_connected = 0 WHERE auth_token = :authToken")
+    void disconnectUserWithAuthToken(String authToken);
 
     @Query("SELECT * FROM chessuser WHERE is_connected = 1")
     LiveData<ChessUser> getConnected();
 
     @Query("UPDATE chessuser SET is_connected = 0 WHERE username != :username")
     void disconnectAllOthers(String username);
+
+    @Query("UPDATE chessuser SET is_connected = 0 WHERE is_connected = 1")
+    void disconnectConnectedUser();
 
     @Insert
     void insertAll(ChessUser... users);
@@ -38,4 +43,5 @@ public interface ChessUserDao {
 
     @Update
     void update(ChessUser user);
+
 }

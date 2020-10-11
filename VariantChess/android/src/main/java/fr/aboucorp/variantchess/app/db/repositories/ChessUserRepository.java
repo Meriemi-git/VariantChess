@@ -59,4 +59,15 @@ public class ChessUserRepository {
         });
     }
 
+    public void disconnectUserWithAuthToken(String authToken) {
+        VariantChessDatabase.databaseWriteExecutor.execute(() -> {
+            this.chessUserDao.disconnectUserWithAuthToken(authToken);
+        });
+    }
+
+    public void disconnectConnectedUser() {
+        VariantChessDatabase.databaseWriteExecutor.execute(() -> {
+            this.chessUserDao.disconnectConnectedUser();
+        });
+    }
 }
