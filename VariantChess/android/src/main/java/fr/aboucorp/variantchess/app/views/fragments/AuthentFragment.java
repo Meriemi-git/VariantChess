@@ -49,7 +49,8 @@ public class AuthentFragment extends VariantChessFragment {
             Navigation.findNavController(getView()).navigate(action);
         });
         this.btn_continue.setOnClickListener(v -> {
-           //TODO Set gameMode fragment
+            NavDirections action = AuthentFragmentDirections.actionAuthentFragmentToGameRulesFragment();
+            Navigation.findNavController(getView()).navigate(action);
         });
     }
 

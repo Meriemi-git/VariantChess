@@ -1,5 +1,6 @@
 package fr.aboucorp.variantchess.app.views.fragments;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,8 +22,10 @@ import java.util.List;
 
 import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.db.adapters.GameRulesAdapter;
+import fr.aboucorp.variantchess.app.db.entities.ChessUser;
 import fr.aboucorp.variantchess.app.db.entities.GameRules;
 import fr.aboucorp.variantchess.app.db.viewmodel.GameRulesViewModel;
+import fr.aboucorp.variantchess.app.utils.ArgsKey;
 
 public class GameRulesFragment extends VariantChessFragment implements AdapterView.OnItemSelectedListener {
     private Button btn_online;
@@ -33,6 +36,7 @@ public class GameRulesFragment extends VariantChessFragment implements AdapterVi
     private LinearLayout difficulty_layout;
     private GameRulesViewModel gameRulesViewModel;
     private List<GameRules> allGameRules;
+    private ChessUser chessUser;
 
     @Override
     protected void bindViews() {
@@ -42,20 +46,13 @@ public class GameRulesFragment extends VariantChessFragment implements AdapterVi
         this.spinner_rules = this.getView().findViewById(R.id.spinner_rules);
         this.balance_layout = this.getView().findViewById(R.id.balance_layout);
         this.difficulty_layout = this.getView().findViewById(R.id.difficulty_layout);
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.game_rules_layout, container, false);
         return view;
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        this.gameRulesViewModel = new GameRulesViewModel(getActivity().getApplication());
-        this.bindViews();
-        this.bindListeners();
     }
 
     @Override
@@ -68,15 +65,47 @@ public class GameRulesFragment extends VariantChessFragment implements AdapterVi
             gameRulesAdapter.setGameRules(allGameRules);
         });
         this.btn_online.setOnClickListener(v -> {
-            GameRules selected = (GameRules) spinner_rules.getSelectedItem();
-            NavDirections action = GameRulesFragmentDirections.actionGameRulesFragmentToMatchmakingFragment(selected);
-            Navigation.findNavController(getView()).navigate(action);
+            if (this.chessUser != null) {
+                GameRules selected = (GameRules) spinner_rules.getSelectedItem();
+                NavDirections action = GameRulesFragmentDirections.actionGameRulesFragmentToMatchmakingFragment(selected);
+                Navigation.findNavController(getView()).navigate(action);
+            } else {
+                this.showAuthentMessage();
+            }
         });
         this.btn_offline.setOnClickListener(v -> {
             GameRules selected = (GameRules) spinner_rules.getSelectedItem();
             NavDirections action = GameRulesFragmentDirections.actionGameRulesFragmentToBoardActivity(selected);
             Navigation.findNavController(getView()).navigate(action);
         });
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        this.gameRulesViewModel = new GameRulesViewModel(getActivity().getApplication());
+        this.bindViews();
+        this.bindListeners();
+    }
+
+    @Override
+    public void setArguments(@Nullable Bundle args) {
+        super.setArguments(args);
+        this.chessUser = (ChessUser) args.getSerializable(ArgsKey.CHESS_USER);
+    }
+
+    private void showAuthentMessage() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setMessage(R.string.warn_play_online_need_connection);
+        builder.setPositiveButton(R.string.general_connect, (dialog, id) -> {
+            NavDirections action = AuthentFragmentDirections.actionGlobalAuthentFragment();
+            Navigation.findNavController(getView()).navigate(action);
+        });
+        builder.setNegativeButton(R.string.general_lbl_cancel, (dialog, id) -> {
+            dialog.dismiss();
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
 

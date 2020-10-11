@@ -80,4 +80,6 @@
     <string name="matchmaking_in_progress">Recherche de partie en cours</string>
     <string name="general_lbl_retry">Relancer</string>
     <string name="err_network">Erreur réseau. Vérifiez votre connexion réseau et réessayez.</string>
+    <string name="general_connect">Connexion</string>
+    <string name="warn_play_online_need_connection">Si vous souhaitez jouer en ligne vous devez vous connecter à votre compte VariantChess.</string>
 </resources>

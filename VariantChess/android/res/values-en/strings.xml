@@ -80,4 +80,6 @@
     <string name="matchmaking_in_progress">Matchmaking in progress</string>
     <string name="general_lbl_retry">Retry</string>
     <string name="err_network">Connectivity error. Check your network and retry.</string>
+    <string name="general_connect">Connect</string>
+    <string name="warn_play_online_need_connection">If you want to play onlmine you need to be connected on your VariantChess account.</string>
 </resources>
