@@ -46,7 +46,6 @@ public class UserViewModel extends AndroidViewModel {
     }
 
     public void disconnectUser() {
-        //this.chessUserRepository.getConnected().observeForever(this.onGetConnected);
         this.chessUserRepository.disconnectConnectedUser();
     }
 

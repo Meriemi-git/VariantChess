@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.lifecycle.ViewModelProvider;
@@ -20,16 +21,26 @@ import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
 import fr.aboucorp.variantchess.app.utils.AsyncHandler;
 
 
-public class SignInFragment extends VariantChessFragment  {
+public class SignInFragment extends VariantChessFragment {
     private EditText txt_mail;
     private EditText txt_pwd;
     private Button btn_mail_connect;
+    private ProgressBar progressBar;
     private UserViewModel userViewModel;
     private SessionManager sessionManager;
 
     @Override
+    protected void bindViews() {
+        this.txt_mail = this.getView().findViewById(R.id.signin_txt_mail);
+        this.txt_pwd = this.getView().findViewById(R.id.signin_txt_pwd);
+        this.btn_mail_connect = this.getView().findViewById(R.id.signin_btn_mail_connect);
+        this.progressBar = this.getView().findViewById(R.id.progressBar);
+    }
+
+    @Override
     protected void bindListeners() {
         btn_mail_connect.setOnClickListener(view -> {
+            this.progressBar.setVisibility(View.VISIBLE);
             AsyncHandler handler = new AsyncHandler() {
                 @Override
                 protected Object executeAsync() throws Exception {
@@ -43,11 +54,13 @@ public class SignInFragment extends VariantChessFragment  {
                     super.callbackOnUI(arg);
                     NavDirections action = SignInFragmentDirections.actionSignInFragmentToGameRulesFragment((ChessUser) arg);
                     Navigation.findNavController(getView()).navigate(action);
+                    progressBar.setVisibility(View.GONE);
                 }
 
                 @Override
                 protected void error(Exception ex) {
                     super.error(ex);
+                    progressBar.setVisibility(View.GONE);
                     if (ex instanceof IncorrectCredentials) {
                         Toast.makeText(getContext(), R.string.signin_credential_error, Toast.LENGTH_LONG).show();
                     } else {
@@ -63,13 +76,6 @@ public class SignInFragment extends VariantChessFragment  {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.sign_in_layout, container, false);
         return view;
-    }
-
-    @Override
-    protected void bindViews() {
-        this.txt_mail = this.getView().findViewById(R.id.signin_txt_mail);
-        this.txt_pwd = this.getView().findViewById(R.id.signin_txt_pwd);
-        this.btn_mail_connect = this.getView().findViewById(R.id.signin_btn_mail_connect);
     }
 
     @Override

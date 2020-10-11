@@ -1,99 +1,135 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/linearLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="vertical">
+    android:gravity="center">
 
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:id="@+id/textView8"
+        style="@style/VariantChess.Title"
+        android:layout_marginBottom="32dp"
         android:autoSizeMaxTextSize="30sp"
         android:autoSizeMinTextSize="12sp"
         android:autoSizeStepGranularity="1sp"
         android:autoSizeTextType="uniform"
         android:gravity="center_horizontal"
-        android:text="@string/sign_in_lbl_account_creation" />
+        android:text="@string/sign_in_lbl_account_creation"
+        app:layout_constraintBottom_toTopOf="@+id/textView9"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed" />
 
 
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="25dp"
-        android:autoSizeMaxTextSize="20sp"
-        android:autoSizeMinTextSize="14sp"
-        android:autoSizeStepGranularity="1sp"
-        android:autoSizeTextType="uniform"
-        android:gravity="center_horizontal"
-        android:text="@string/sign_in_lbl_username" />
+        android:id="@+id/textView9"
+        style="@style/VariantChess.EditextLabel"
+        android:text="@string/sign_in_lbl_username"
+        app:layout_constraintBottom_toTopOf="@+id/signup_username"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView8" />
 
     <EditText
         android:id="@+id/signup_username"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:gravity="center_horizontal"
-        android:inputType="textPersonName" />
+        style="@style/VariantChess.EditText"
+        android:inputType="textPersonName"
+        app:layout_constraintBottom_toTopOf="@+id/textView10"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView9" />
 
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="25dp"
-        android:autoSizeMaxTextSize="20sp"
-        android:autoSizeMinTextSize="14sp"
-        android:autoSizeStepGranularity="1sp"
-        android:autoSizeTextType="uniform"
-        android:gravity="center_horizontal"
-        android:text="@string/signin_lbl_mail" />
+        android:id="@+id/textView10"
+        style="@style/VariantChess.EditextLabel"
+        android:text="@string/signin_lbl_mail"
+        app:layout_constraintBottom_toTopOf="@+id/signup_mail"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/signup_username" />
 
     <EditText
         android:id="@+id/signup_mail"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:gravity="center_horizontal"
+        style="@style/VariantChess.EditText"
         android:hint="@string/lbl_hint_email"
-        android:inputType="textEmailAddress" />
+        android:inputType="textEmailAddress"
+        app:layout_constraintBottom_toTopOf="@+id/textView11"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView10" />
 
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="25dp"
-        android:autoSizeMaxTextSize="20sp"
-        android:autoSizeMinTextSize="14sp"
-        android:autoSizeStepGranularity="1sp"
-        android:autoSizeTextType="uniform"
-        android:gravity="center_horizontal"
-        android:text="@string/signin_lbl_password" />
+        android:id="@+id/textView11"
+        style="@style/VariantChess.EditextLabel"
+        android:text="@string/signin_lbl_password"
+        app:layout_constraintBottom_toTopOf="@+id/signup_pwd"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/signup_mail" />
 
     <EditText
         android:id="@+id/signup_pwd"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:gravity="center_horizontal"
+        style="@style/VariantChess.EditText"
         android:hint="@string/lbl_hint_password"
-        android:inputType="textPassword" />
+        android:inputType="textPassword"
+        app:layout_constraintBottom_toTopOf="@+id/textView12"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView11" />
 
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="25dp"
-        android:autoSizeMaxTextSize="20sp"
-        android:autoSizeMinTextSize="14sp"
-        android:autoSizeStepGranularity="1sp"
-        android:autoSizeTextType="uniform"
-        android:gravity="center_horizontal"
-        android:text="@string/signin_lbl_confirm_password" />
+        android:id="@+id/textView12"
+        style="@style/VariantChess.EditextLabel"
+        android:text="@string/signin_lbl_confirm_password"
+        app:layout_constraintBottom_toTopOf="@+id/signup_confirm_pwd"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/signup_pwd" />
 
     <EditText
         android:id="@+id/signup_confirm_pwd"
+        style="@style/VariantChess.EditText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:ems="10"
-        android:gravity="center_horizontal"
         android:hint="@string/lbl_hint_password"
-        android:inputType="textPassword" />
+        android:inputType="textPassword"
+        app:layout_constraintBottom_toTopOf="@+id/register_btn_create_account"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView12" />
 
     <Button
         android:id="@+id/register_btn_create_account"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/lbl_create_account" />
-</LinearLayout>
+        android:layout_marginBottom="32dp"
+        android:text="@string/lbl_create_account"
+        app:layout_constraintBottom_toTopOf="@+id/progressBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/signup_confirm_pwd" />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/register_btn_create_account" />
+</androidx.constraintlayout.widget.ConstraintLayout>

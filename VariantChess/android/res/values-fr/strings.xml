@@ -25,7 +25,7 @@
     <string name="failed_login">Echec de la connexion</string>
     <string name="user_info_dialog_title">Informations utilisateur</string>
     <string name="general_close">Fermer</string>
-    <string name="sign_in_lbl_account_creation">Créez votre compte avec votre mail</string>
+    <string name="sign_in_lbl_account_creation">Créez votre compte</string>
     <string name="sign_in_error_duplicate_displayname">Ce nom d\'utilisateur est déjà pris</string>
     <string name="sign_in_error_duplicate_mail">Cette adresse mail est déjà prise</string>
     <string name="general_unconnected">Déconnecté</string>
@@ -82,4 +82,5 @@
     <string name="err_network">Erreur réseau. Vérifiez votre connexion réseau et réessayez.</string>
     <string name="general_connect">Connexion</string>
     <string name="warn_play_online_need_connection">Si vous souhaitez jouer en ligne vous devez vous connecter à votre compte VariantChess.</string>
+    <string name="err_reconnexion_error">Echec de la reconnexion</string>
 </resources>

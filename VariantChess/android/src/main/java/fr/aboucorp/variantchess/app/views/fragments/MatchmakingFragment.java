@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -46,6 +47,7 @@ public class MatchmakingFragment extends VariantChessFragment implements Matchma
     private Button btn_cancel;
     private Button btn_retry;
     private ImageView img_warning;
+    private TextView txt_status;
     /**
      * Nakama multiplayer session manager
      */
@@ -67,12 +69,7 @@ public class MatchmakingFragment extends VariantChessFragment implements Matchma
         this.btn_cancel = this.getView().findViewById(R.id.btn_cancel);
         this.btn_retry = this.getView().findViewById(R.id.btn_retry);
         this.img_warning = this.getView().findViewById(R.id.img_warning);
-    }
-
-    @Override
-    protected void bindListeners() {
-        this.btn_cancel.setOnClickListener(v -> cancelMatchMaking(matchmakingTicket));
-        this.btn_retry.setOnClickListener(v -> launchMatchmaking());
+        this.txt_status = this.getView().findViewById(R.id.txt_status);
     }
 
     @Override
@@ -100,6 +97,31 @@ public class MatchmakingFragment extends VariantChessFragment implements Matchma
             this.launchMatchmaking();
         });
     }
+
+    @Override
+    protected void bindListeners() {
+        this.btn_cancel.setOnClickListener(v -> cancelMatchMaking(matchmakingTicket));
+        this.btn_retry.setOnClickListener(v -> launchMatchmaking());
+    }
+
+    private void launchMatchmaking() {
+        this.matchmaking_chrono.start();
+        this.btn_cancel.setVisibility(View.VISIBLE);
+        this.btn_retry.setVisibility(View.GONE);
+        this.img_warning.setVisibility(View.GONE);
+        this.progress_bar.setVisibility(View.VISIBLE);
+        this.txt_status.setText(R.string.matchmaking_in_progress);
+        try {
+            this.sessionManager.launchMatchMaking(gameRules.name, this.matchmakingTicket);
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+            Log.e("fr.aboucorp.variantchess", "Error during matchmaking launch message" + e.getMessage());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            Log.e("fr.aboucorp.variantchess", "Error during matchmaking launch message" + e.getMessage());
+        }
+    }
+
 
     @Override
     public void setArguments(@Nullable Bundle args) {
@@ -154,22 +176,6 @@ public class MatchmakingFragment extends VariantChessFragment implements Matchma
 
     }
 
-    private void launchMatchmaking() {
-        this.matchmaking_chrono.start();
-        this.btn_cancel.setVisibility(View.VISIBLE);
-        this.btn_retry.setVisibility(View.GONE);
-        this.img_warning.setVisibility(View.GONE);
-        this.progress_bar.setVisibility(View.VISIBLE);
-        try {
-            this.sessionManager.launchMatchMaking(gameRules.name, this.matchmakingTicket);
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-            Log.e("fr.aboucorp.variantchess", "Error during matchmaking launch message" + e.getMessage());
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            Log.e("fr.aboucorp.variantchess", "Error during matchmaking launch message" + e.getMessage());
-        }
-    }
 
     private void cancelMatchMaking(String ticket) {
         AsyncHandler handler = new AsyncHandler() {

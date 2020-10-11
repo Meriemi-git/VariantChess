@@ -2,7 +2,7 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/authentFragment">
+    app:startDestination="@id/launcherFragment">
     <fragment
         android:id="@+id/authentFragment"
         android:name="fr.aboucorp.variantchess.app.views.fragments.AuthentFragment"
@@ -96,4 +96,19 @@
                 app:argType="fr.aboucorp.variantchess.app.db.entities.GameRules" />
         </action>
     </fragment>
+    <action
+        android:id="@+id/action_global_gameRulesFragment"
+        app:destination="@id/gameRulesFragment">
+        <argument
+            android:name="chess_user"
+            app:argType="fr.aboucorp.variantchess.app.db.entities.ChessUser"
+            app:nullable="true" />
+    </action>
+    <fragment
+        android:id="@+id/launcherFragment"
+        android:name="fr.aboucorp.variantchess.app.views.fragments.LauncherFragment"
+        android:label="LauncherFragment" />
+    <action
+        android:id="@+id/action_global_launcherFragment"
+        app:destination="@id/launcherFragment" />
 </navigation>

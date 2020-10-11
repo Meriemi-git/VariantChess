@@ -12,12 +12,8 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.NavController;
 import androidx.navigation.NavDirections;
-import androidx.navigation.NavGraph;
-import androidx.navigation.NavInflater;
 import androidx.navigation.Navigation;
-import androidx.navigation.fragment.NavHostFragment;
 
 import com.heroiclabs.nakama.api.Notification;
 import com.heroiclabs.nakama.api.NotificationList;
@@ -27,9 +23,11 @@ import fr.aboucorp.variantchess.app.db.entities.ChessUser;
 import fr.aboucorp.variantchess.app.db.viewmodel.UserViewModel;
 import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
 import fr.aboucorp.variantchess.app.multiplayer.listeners.NotificationListener;
+import fr.aboucorp.variantchess.app.utils.AsyncHandler;
 import fr.aboucorp.variantchess.app.utils.JsonExtractor;
 import fr.aboucorp.variantchess.app.utils.VariantVars;
 import fr.aboucorp.variantchess.app.views.fragments.AuthentFragmentDirections;
+import fr.aboucorp.variantchess.app.views.fragments.GameRulesFragmentDirections;
 import fr.aboucorp.variantchess.app.views.fragments.SettingsFragmentDirections;
 
 public class MainActivity extends AppCompatActivity implements NotificationListener {
@@ -49,8 +47,8 @@ public class MainActivity extends AppCompatActivity implements NotificationListe
         this.sessionManager = SessionManager.getInstance();
         this.sessionManager.setNotificationListener(this);
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
-        this.userViewModel.getConnected().observe(this, connected -> this.displayConnectedUser(connected));
         manageUserConnection();
+        this.userViewModel.getConnected().observe(this, connected -> this.updateConnectionUI(connected));
     }
 
     @Override
@@ -75,16 +73,6 @@ public class MainActivity extends AppCompatActivity implements NotificationListe
     }
 
     @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        this.userViewModel.getConnected().observe(this, MainActivity.this::updateConnectionUI);
-        MenuItem disconnect = this.toolbar.getMenu().findItem(R.id.menu_action_disconnect);
-        MenuItem profile = this.toolbar.getMenu().findItem(R.id.menu_action_profil);
-        disconnect.setVisible(this.userViewModel.getConnected().getValue() != null);
-        profile.setVisible(this.userViewModel.getConnected().getValue() != null);
-        return true;
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         NavDirections action;
         switch (item.getItemId()) {
@@ -104,22 +92,45 @@ public class MainActivity extends AppCompatActivity implements NotificationListe
     }
 
     private void manageUserConnection() {
-        ChessUser chessUser = null;
-        String authToken = this.pref.getString("nakama.authToken", null);
-        if (!TextUtils.isEmpty(authToken)) {
-            chessUser = this.sessionManager.tryReconnectUser(authToken);
-        }
-        NavHostFragment navHost = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
-        NavController navController = navHost.getNavController();
-        NavInflater navInflater = navController.getNavInflater();
-        NavGraph graph = navInflater.inflate(R.navigation.nav_graph);
-        if (chessUser == null) {
-            this.userViewModel.disconnectUserWithAuthToken(authToken);
-            graph.setStartDestination(R.id.authentFragment);
-        } else {
-            graph.setStartDestination(R.id.gameRulesFragment);
-        }
-        navController.setGraph(graph);
+        getSupportActionBar().hide();
+        AsyncHandler asyncHandler = new AsyncHandler() {
+            @Override
+            protected Object executeAsync() throws Exception {
+                String authToken = pref.getString("nakama.authToken", null);
+                if (!TextUtils.isEmpty(authToken)) {
+                    ChessUser chessUser = sessionManager.tryReconnectUser(authToken);
+                    return chessUser;
+                }
+                return null;
+            }
+
+            @Override
+            protected void callbackOnUI(Object arg) {
+                super.callbackOnUI(arg);
+                ChessUser chessUser = (ChessUser) arg;
+                getSupportActionBar().show();
+                if (chessUser != null) {
+                    Toast.makeText(MainActivity.this, R.string.connected, Toast.LENGTH_LONG).show();
+                    NavDirections action = GameRulesFragmentDirections.actionGlobalGameRulesFragment(chessUser);
+                    Navigation.findNavController(MainActivity.this, R.id.nav_host_fragment).navigate(action);
+                } else {
+                    NavDirections action = GameRulesFragmentDirections.actionGlobalAuthentFragment();
+                    Navigation.findNavController(MainActivity.this, R.id.nav_host_fragment).navigate(action);
+                }
+
+            }
+
+            @Override
+            protected void error(Exception ex) {
+                super.error(ex);
+                disconnectUser();
+                getSupportActionBar().show();
+                NavDirections action = GameRulesFragmentDirections.actionGlobalAuthentFragment();
+                Navigation.findNavController(MainActivity.this, R.id.nav_host_fragment).navigate(action);
+                Toast.makeText(MainActivity.this, R.string.err_reconnexion_error, Toast.LENGTH_LONG).show();
+            }
+        };
+        asyncHandler.start();
     }
 
     private void setToolbar() {
@@ -132,26 +143,18 @@ public class MainActivity extends AppCompatActivity implements NotificationListe
         this.getSupportActionBar().setHomeButtonEnabled(true);
     }
 
-    private void updateConnectionUI(ChessUser user) {
-        if (user != null) {
-            this.toolbar.setSubtitle(user.username);
-
+    private void updateConnectionUI(ChessUser connected) {
+        if (connected != null) {
+            this.pref.edit().putString("nakama.authToken", connected.authToken).apply();
+            this.toolbar.setSubtitle(connected.username);
         } else {
+            this.pref.edit().putString("nakama.authToken", null).apply();
             this.toolbar.setSubtitle("Disconnected");
         }
         MenuItem disconnect = this.toolbar.getMenu().findItem(R.id.menu_action_disconnect);
         MenuItem profile = this.toolbar.getMenu().findItem(R.id.menu_action_profil);
-        disconnect.setVisible(user != null);
-        profile.setVisible(user != null);
-    }
-
-    public void displayConnectedUser(ChessUser connected) {
-        if (connected != null) {
-            Toast.makeText(this, R.string.connected, Toast.LENGTH_LONG).show();
-            this.pref.edit().putString("nakama.authToken", connected.authToken).apply();
-        } else {
-            this.pref.edit().putString("nakama.authToken", null).apply();
-        }
+        disconnect.setVisible(connected != null);
+        profile.setVisible(connected != null);
     }
 
     private void disconnectUser() {

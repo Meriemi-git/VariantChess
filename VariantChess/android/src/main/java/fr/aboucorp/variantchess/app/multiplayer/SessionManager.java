@@ -160,20 +160,16 @@ public class SessionManager {
      * @param authToken the auth token (comming from sharedpreferences)
      * @return the chess user connected
      */
-    public ChessUser tryReconnectUser(String authToken) {
+    public ChessUser tryReconnectUser(String authToken) throws InterruptedException, ExecutionException, TimeoutException {
         // Lets check if we can restore a cached session.
         if (authToken != null && !authToken.isEmpty()) {
             Session restoredSession = DefaultSession.restore(authToken);
             if (!restoredSession.isExpired(new Date())) {
                 // Session was valid and is restored now.
                 this.session = restoredSession;
-                try {
-                    User user = this.client.getAccount(this.session).get(5000, TimeUnit.MILLISECONDS).getUser();
-                    connectSocket();
-                    return ChessUserDto.fromUserToChessUser(user);
-                } catch (ExecutionException | TimeoutException | InterruptedException e) {
-                    Log.i("fr.aboucorp.variantchess", e.getMessage());
-                }
+                User user = this.client.getAccount(this.session).get(5000, TimeUnit.MILLISECONDS).getUser();
+                connectSocket();
+                return ChessUserDto.fromUserToChessUser(user);
             }
         }
         return null;
