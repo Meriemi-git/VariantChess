@@ -34,13 +34,14 @@ public class SignInFragment extends VariantChessFragment {
         this.txt_mail = this.getView().findViewById(R.id.signin_txt_mail);
         this.txt_pwd = this.getView().findViewById(R.id.signin_txt_pwd);
         this.btn_mail_connect = this.getView().findViewById(R.id.signin_btn_mail_connect);
-        this.progressBar = this.getView().findViewById(R.id.progressBar);
+        this.progressBar = this.getView().findViewById(R.id.progress_bar);
     }
 
     @Override
     protected void bindListeners() {
         btn_mail_connect.setOnClickListener(view -> {
             this.progressBar.setVisibility(View.VISIBLE);
+            this.btn_mail_connect.setVisibility(View.GONE);
             AsyncHandler handler = new AsyncHandler() {
                 @Override
                 protected Object executeAsync() throws Exception {
@@ -61,6 +62,7 @@ public class SignInFragment extends VariantChessFragment {
                 protected void error(Exception ex) {
                     super.error(ex);
                     progressBar.setVisibility(View.GONE);
+                    btn_mail_connect.setVisibility(View.VISIBLE);
                     if (ex instanceof IncorrectCredentials) {
                         Toast.makeText(getContext(), R.string.signin_credential_error, Toast.LENGTH_LONG).show();
                     } else {

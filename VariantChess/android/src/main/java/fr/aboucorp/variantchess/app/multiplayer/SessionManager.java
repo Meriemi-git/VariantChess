@@ -55,10 +55,7 @@ public class SessionManager {
      * Singleton instance
      */
     private static SessionManager INSTANCE;
-    /**
-     * Nakama client
-     */
-    private final Client client = new DefaultClient("defaultkey", "192.168.1.37", 7349, false);
+    private final int TIMEOUT_IN_SEC = 3000;
     /**
      * Token used to identify this session on this device
      */
@@ -79,11 +76,16 @@ public class SessionManager {
      * Generic listener for all Nakama events send on the socket
      */
     private NakamaSocketListener nakamaSocketListener;
-
+    /**
+     * Nakama client
+     */
+    private Client client;
+    private int timeoutErrorCounter = 0;
 
     private SessionManager() {
         this.variantChessToken = UUID.randomUUID().toString();
         this.nakamaSocketListener = new NakamaSocketListener(this);
+        this.client = new DefaultClient("defaultkey", "192.168.1.37", 7349, false);
     }
 
     /**
@@ -108,8 +110,8 @@ public class SessionManager {
      */
     public ChessUser signInWithEmail(String mail, String password) throws AuthentificationException {
         try {
-            this.session = this.client.authenticateEmail(mail, password, false).get(5000, TimeUnit.MILLISECONDS);
-            User user = this.client.getAccount(this.session).get(5000, TimeUnit.MILLISECONDS).getUser();
+            this.session = this.client.authenticateEmail(mail, password, false).get(TIMEOUT_IN_SEC, TimeUnit.MILLISECONDS);
+            User user = this.client.getAccount(this.session).get(TIMEOUT_IN_SEC, TimeUnit.MILLISECONDS).getUser();
             connectSocket();
             ChessUser chessUser = ChessUserDto.fromUserToChessUser(user);
             chessUser.authToken = this.session.getAuthToken();
@@ -117,13 +119,22 @@ public class SessionManager {
         } catch (ExecutionException e) {
             if (ExceptionCauseCode.getCodeValueFromCause(e.getCause()) == ExceptionCauseCode.UNAUTHENTICATED) {
                 throw new IncorrectCredentials("Incorrect credentials during singin");
+            } else if (ExceptionCauseCode.getCodeValueFromCause(e.getCause()) == ExceptionCauseCode.UNAVAILABLE) {
+                resetClientConnection();
+                throw new AuthentificationException("Communication problem with getAccount nakama server  :" + e.getMessage());
             }
             throw new AuthentificationException("Authentification error " + e.getMessage());
         } catch (InterruptedException | TimeoutException e) {
-            throw new AuthentificationException("Communication problem with getAccount nakama server  :" + e.getMessage());
+            resetClientConnection();
+            throw new AuthentificationException("Communication problem with nakama server  :" + e.getMessage());
         } catch (Exception e) {
             throw new AuthentificationException("Unknown error." + e.getMessage());
         }
+    }
+
+    private void resetClientConnection() {
+        this.client.disconnect();
+        this.client = new DefaultClient("defaultkey", "192.168.1.37", 7349, false);
     }
 
     /**
@@ -137,8 +148,8 @@ public class SessionManager {
      */
     public ChessUser signUpWithEmail(String mail, String password, String username) throws AuthentificationException {
         try {
-            this.session = this.client.authenticateEmail(mail, password, true, username).get(2000, TimeUnit.MILLISECONDS);
-            User user = this.client.getAccount(this.session).get(5000, TimeUnit.MILLISECONDS).getUser();
+            this.session = this.client.authenticateEmail(mail, password, true, username).get(TIMEOUT_IN_SEC, TimeUnit.MILLISECONDS);
+            User user = this.client.getAccount(this.session).get(TIMEOUT_IN_SEC, TimeUnit.MILLISECONDS).getUser();
             ChessUser chessUser = ChessUserDto.fromUserToChessUser(user);
             chessUser.authToken = this.session.getAuthToken();
             return chessUser;
@@ -147,10 +158,16 @@ public class SessionManager {
                 throw new MailAlreadyRegistered("Email already registered");
             } else if (ExceptionCauseCode.getCodeValueFromCause(e.getCause()) == ExceptionCauseCode.ALREADY_EXISTS) {
                 throw new UsernameAlreadyRegistered("Username already registered");
+            } else if (ExceptionCauseCode.getCodeValueFromCause(e.getCause()) == ExceptionCauseCode.UNAVAILABLE) {
+                resetClientConnection();
+                throw new AuthentificationException("Communication problem with getAccount nakama server  :" + e.getMessage());
             }
             throw new AuthentificationException("Authentification error : " + e.getMessage());
         } catch (InterruptedException | TimeoutException e) {
-            throw new AuthentificationException("Communication problem during authenticateEmail with nakama server : " + e.getMessage());
+            resetClientConnection();
+            throw new AuthentificationException("Communication problem with nakama server  :" + e.getMessage());
+        } catch (Exception e) {
+            throw new AuthentificationException("Unknown error." + e.getMessage());
         }
     }
 
@@ -167,7 +184,7 @@ public class SessionManager {
             if (!restoredSession.isExpired(new Date())) {
                 // Session was valid and is restored now.
                 this.session = restoredSession;
-                User user = this.client.getAccount(this.session).get(5000, TimeUnit.MILLISECONDS).getUser();
+                User user = this.client.getAccount(this.session).get(TIMEOUT_IN_SEC, TimeUnit.MILLISECONDS).getUser();
                 connectSocket();
                 return ChessUserDto.fromUserToChessUser(user);
             }
@@ -208,7 +225,7 @@ public class SessionManager {
         Metadata data = new Metadata();
         data.put(VariantVars.VARIANT_CHESS_TOKEN, this.variantChessToken);
         Rpc userExistsRpc = null;
-        userExistsRpc = socket.rpc(RPCMethods.CHECK_IF_USER_EXISTS, data.getJsonFromMetadata()).get(5000, TimeUnit.MILLISECONDS);
+        userExistsRpc = socket.rpc(RPCMethods.CHECK_IF_USER_EXISTS, data.getJsonFromMetadata()).get(TIMEOUT_IN_SEC, TimeUnit.MILLISECONDS);
         boolean exists = JsonExtractor.ectractAttributeByName(userExistsRpc.getPayload(), "already_connected");
         return exists;
     }

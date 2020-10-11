@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.lifecycle.ViewModelProvider;
@@ -37,6 +38,8 @@ public class SignUpFragment extends VariantChessFragment {
 
     private EditText txt_confirm_pwd;
 
+    private ProgressBar progress_bar;
+
     private SessionManager sessionManager;
 
     private AwesomeValidation validator;
@@ -51,12 +54,15 @@ public class SignUpFragment extends VariantChessFragment {
         this.txt_pwd = this.getView().findViewById(R.id.signup_pwd);
         this.txt_confirm_pwd = this.getView().findViewById(R.id.signup_confirm_pwd);
         this.btn_register = this.getView().findViewById(R.id.register_btn_create_account);
+        this.progress_bar = this.getView().findViewById(R.id.progress_bar);
     }
 
     @Override
     protected void bindListeners() {
         this.btn_register.setOnClickListener(v ->{
             if(this.validator.validate()) {
+                this.progress_bar.setVisibility(View.VISIBLE);
+                this.btn_register.setVisibility(View.GONE);
                 AsyncHandler asyncHandler = new AsyncHandler() {
                     @Override
                     protected Object executeAsync() throws Exception {
@@ -79,6 +85,8 @@ public class SignUpFragment extends VariantChessFragment {
                     @Override
                     protected void error(Exception ex) {
                         super.error(ex);
+                        progress_bar.setVisibility(View.GONE);
+                        btn_register.setVisibility(View.VISIBLE);
                         if (ex instanceof MailAlreadyRegistered) {
                             Toast.makeText(getContext(), R.string.err_mail_already_exists, Toast.LENGTH_LONG).show();
                         } else if (ex instanceof UsernameAlreadyRegistered) {
