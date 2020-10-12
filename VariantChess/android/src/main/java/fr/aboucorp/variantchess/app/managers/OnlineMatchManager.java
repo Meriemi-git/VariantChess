@@ -11,8 +11,8 @@ import java.io.ObjectInputStream;
 
 import fr.aboucorp.variantchess.app.db.entities.ChessUser;
 import fr.aboucorp.variantchess.app.managers.boards.BoardManager;
-import fr.aboucorp.variantchess.app.multiplayer.MatchListener;
 import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
+import fr.aboucorp.variantchess.app.multiplayer.listeners.MatchListener;
 import fr.aboucorp.variantchess.app.utils.OPCode;
 import fr.aboucorp.variantchess.entities.ChessMatch;
 import fr.aboucorp.variantchess.entities.Turn;
@@ -25,23 +25,38 @@ public class OnlineMatchManager extends MatchManager implements MatchListener {
     private SessionManager sessionManager;
     private ChessUser currentPlayer;
 
-    public OnlineMatchManager(BoardManager boardManager, GameEventManager gameEventManager, SessionManager sessionManager, ChessUser currentPlayer) {
+    public OnlineMatchManager(BoardManager boardManager, GameEventManager gameEventManager, ChessUser currentPlayer) {
         super(boardManager, gameEventManager);
-        this.sessionManager = sessionManager;
         this.currentPlayer = currentPlayer;
+        this.sessionManager = SessionManager.getInstance();
+        this.sessionManager.setMatchListener(this);
     }
 
     @Override
     public void onMatchData(MatchData matchData) {
         ObjectInputStream ois = null;
-        try {
-            ois = new ObjectInputStream(new ByteArrayInputStream(matchData.getData()));
-            String boardState = (String) ois.readObject();
-            Log.i("fr.aboucorp.variantchess", String.format("New fen received in matchData : %s", boardState));
-            playOppositeMove(boardState);
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
+        switch ((int) matchData.getOpCode()) {
+            case OPCode.SEND_NEW_FEN:
+                try {
+                    ois = new ObjectInputStream(new ByteArrayInputStream(matchData.getData()));
+                    String boardState = (String) ois.readObject();
+                    Log.i("fr.aboucorp.variantchess", String.format("New fen received in matchData : %s", boardState));
+                    playOppositeMove(boardState);
+                } catch (IOException | ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+                break;
+            case OPCode.SEND_WHITE_PLAYER:
+                try {
+                    ois = new ObjectInputStream(new ByteArrayInputStream(matchData.getData()));
+                    String matchState = (String) ois.readObject();
+                    Log.i("fr.aboucorp.variantchess", String.format("Send matchState : %s", matchState));
+                } catch (IOException | ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+                break;
         }
+
     }
 
     @Override

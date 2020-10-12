@@ -1,4 +1,4 @@
-package fr.aboucorp.variantchess.app.utils;
+package fr.aboucorp.variantchess.app.exceptions;
 
 import io.grpc.StatusRuntimeException;
 

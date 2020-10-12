@@ -34,9 +34,11 @@ public class ChessUserRepository {
                 ChessUser user = this.chessUserDao.findByName(connecting.username);
                 if (user != null) {
                     user.isConnected = true;
+                    user.authToken = connecting.authToken;
                     this.chessUserDao.update(user);
 
                 } else {
+                    connecting.isConnected = true;
                     this.chessUserDao.insertAll(connecting);
                 }
                 this.chessUserDao.disconnectAllOthers(connecting.username);
@@ -52,7 +54,20 @@ public class ChessUserRepository {
     }
 
     public void update(ChessUser chessUser) {
-        this.chessUserDao.update(chessUser);
+        VariantChessDatabase.databaseWriteExecutor.execute(() -> {
+            this.chessUserDao.update(chessUser);
+        });
     }
 
+    public void disconnectUserWithAuthToken(String authToken) {
+        VariantChessDatabase.databaseWriteExecutor.execute(() -> {
+            this.chessUserDao.disconnectUserWithAuthToken(authToken);
+        });
+    }
+
+    public void disconnectConnectedUser() {
+        VariantChessDatabase.databaseWriteExecutor.execute(() -> {
+            this.chessUserDao.disconnectConnectedUser();
+        });
+    }
 }

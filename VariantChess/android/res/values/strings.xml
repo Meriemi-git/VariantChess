@@ -27,7 +27,7 @@
     <string name="server_client_id" translatable="false">737891246568-lrqnd68abhib2c1lo8egqa2ofvp1lk0u.apps.googleusercontent.com</string>
     <string name="user_info_dialog_title">User infos</string>
     <string name="general_close">Close</string>
-    <string name="sign_in_lbl_account_creation">Create your account with your email</string>
+    <string name="sign_in_lbl_account_creation">Create your account</string>
     <string name="username_hint_username">Username</string>
     <string name="sign_in_error_duplicate_displayname">Username already taken</string>
     <string name="sign_in_error_duplicate_mail">This email is already taken</string>
@@ -81,5 +81,9 @@
     <string name="content_desc_icon_gamerules">Gamerule icon</string>
     <string name="matchmaking_in_progress">Matchmaking in progress</string>
     <string name="general_lbl_retry">Retry</string>
+    <string name="err_network">Connectivity error. Check your network and retry.</string>
+    <string name="general_connect">Connect</string>
+    <string name="warn_play_online_need_connection">If you want to play online you need to be connected on your VariantChess account.</string>
+    <string name="err_reconnexion_error">Failed to recconnect</string>
 
 </resources>

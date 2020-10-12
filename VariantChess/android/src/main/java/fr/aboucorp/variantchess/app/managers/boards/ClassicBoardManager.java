@@ -1,7 +1,7 @@
 package fr.aboucorp.variantchess.app.managers.boards;
 
 import fr.aboucorp.variantchess.app.utils.GdxPostRunner;
-import fr.aboucorp.variantchess.app.utils.fen.ClassicBoardStateBuilder;
+import fr.aboucorp.variantchess.app.utils.state.ClassicBoardStateBuilder;
 import fr.aboucorp.variantchess.entities.ChessColor;
 import fr.aboucorp.variantchess.entities.ChessMatch;
 import fr.aboucorp.variantchess.entities.Location;

@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -30,12 +31,14 @@ import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.db.entities.ChessUser;
 import fr.aboucorp.variantchess.app.db.entities.GameRules;
 import fr.aboucorp.variantchess.app.db.viewmodel.UserViewModel;
-import fr.aboucorp.variantchess.app.multiplayer.MatchmakingListener;
 import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
+import fr.aboucorp.variantchess.app.multiplayer.listeners.MatchmakingListener;
 import fr.aboucorp.variantchess.app.utils.AsyncHandler;
 import fr.aboucorp.variantchess.entities.ChessColor;
 import fr.aboucorp.variantchess.entities.ChessMatch;
 import fr.aboucorp.variantchess.entities.Player;
+
+import static fr.aboucorp.variantchess.app.utils.ArgsKey.GAME_RULES;
 
 public class MatchmakingFragment extends VariantChessFragment implements MatchmakingListener {
     /**
@@ -46,6 +49,7 @@ public class MatchmakingFragment extends VariantChessFragment implements Matchma
     private Button btn_cancel;
     private Button btn_retry;
     private ImageView img_warning;
+    private TextView txt_status;
     /**
      * Nakama multiplayer session manager
      */
@@ -67,12 +71,7 @@ public class MatchmakingFragment extends VariantChessFragment implements Matchma
         this.btn_cancel = this.getView().findViewById(R.id.btn_cancel);
         this.btn_retry = this.getView().findViewById(R.id.btn_retry);
         this.img_warning = this.getView().findViewById(R.id.img_warning);
-    }
-
-    @Override
-    protected void bindListeners() {
-        this.btn_cancel.setOnClickListener(v -> cancelMatchMaking(matchmakingTicket));
-        this.btn_retry.setOnClickListener(v -> launchMatchmaking());
+        this.txt_status = this.getView().findViewById(R.id.txt_status);
     }
 
     @Override
@@ -90,7 +89,7 @@ public class MatchmakingFragment extends VariantChessFragment implements Matchma
         if (savedInstanceState != null) {
             this.gameRules = (GameRules) savedInstanceState.getSerializable("gamerules");
         }
-        this.sessionManager = SessionManager.getInstance(getActivity());
+        this.sessionManager = SessionManager.getInstance();
         this.sessionManager.setMatchmakingListener(this);
         this.bindViews();
         this.bindListeners();
@@ -101,22 +100,39 @@ public class MatchmakingFragment extends VariantChessFragment implements Matchma
         });
     }
 
-
-
     @Override
-    public void setArguments(@Nullable Bundle args) {
-        super.setArguments(args);
-        this.gameRules = (GameRules) args.getSerializable("gamerules");
+    protected void bindListeners() {
+        this.btn_cancel.setOnClickListener(v -> cancelMatchMaking(matchmakingTicket));
+        this.btn_retry.setOnClickListener(v -> launchMatchmaking());
     }
+
+    private void launchMatchmaking() {
+        this.matchmaking_chrono.start();
+        this.btn_cancel.setVisibility(View.VISIBLE);
+        this.btn_retry.setVisibility(View.GONE);
+        this.img_warning.setVisibility(View.GONE);
+        this.progress_bar.setVisibility(View.VISIBLE);
+        this.txt_status.setText(R.string.matchmaking_in_progress);
+        try {
+            this.sessionManager.launchMatchMaking(gameRules.name, this.matchmakingTicket);
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+            Log.e("fr.aboucorp.variantchess", "Error during matchmaking launch message" + e.getMessage());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            Log.e("fr.aboucorp.variantchess", "Error during matchmaking launch message" + e.getMessage());
+        }
+    }
+
 
     @Override
     public void onMatchmakerMatched(MatchmakerMatched matched) {
         Log.i("fr.aboucorp.variantchess", "onMatchmakerMatched " + matched);
         AsyncHandler handler = new AsyncHandler() {
             @Override
-            protected void executeAsync() throws Exception {
+            protected Object executeAsync() throws Exception {
                 // TODO need entire refocto
-                Match match = sessionManager.joinMatchByToken(matched.getToken());
+                Match match = sessionManager.joinMatchById(matched.getMatchId());
                 List<User> users = sessionManager.getUsersFromMatched(matched);
                 Player white = new Player(users.get(0).getUsername(), ChessColor.WHITE, users.get(0).getId());
                 Player black = new Player(users.get(1).getUsername(), ChessColor.BLACK, users.get(1).getId());
@@ -124,10 +140,11 @@ public class MatchmakingFragment extends VariantChessFragment implements Matchma
                 chessMatch.setWhitePlayer(white);
                 chessMatch.setBlackPlayer(black);
                 chessMatch.setMatchId(match.getMatchId());
+                return null;
             }
 
             @Override
-            protected void callbackOnUI() {
+            protected void callbackOnUI(Object arg) {
                 matchmaking_chrono.stop();
                 NavDirections action = MatchmakingFragmentDirections.actionMatchmakingFragmentToBoardActivity(true, chessMatch, chessUser, gameRules);
                 Navigation.findNavController(getView()).navigate(action);
@@ -146,6 +163,12 @@ public class MatchmakingFragment extends VariantChessFragment implements Matchma
     }
 
     @Override
+    public void setArguments(@Nullable Bundle args) {
+        super.setArguments(args);
+        this.gameRules = (GameRules) args.getSerializable(GAME_RULES);
+    }
+
+    @Override
     public void onMatchPresence(MatchPresenceEvent matchPresence) {
         for (UserPresence userPresence : matchPresence.getJoins()
         ) {
@@ -155,33 +178,18 @@ public class MatchmakingFragment extends VariantChessFragment implements Matchma
 
     }
 
-    private void launchMatchmaking() {
-        this.matchmaking_chrono.start();
-        this.btn_cancel.setVisibility(View.VISIBLE);
-        this.btn_retry.setVisibility(View.GONE);
-        this.img_warning.setVisibility(View.GONE);
-        this.progress_bar.setVisibility(View.VISIBLE);
-        try {
-            this.sessionManager.launchMatchMaking(gameRules.name);
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-            Log.e("fr.aboucorp.variantchess", "Error during matchmaking launch message" + e.getMessage());
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            Log.e("fr.aboucorp.variantchess", "Error during matchmaking launch message" + e.getMessage());
-        }
-    }
 
     private void cancelMatchMaking(String ticket) {
         AsyncHandler handler = new AsyncHandler() {
             @Override
-            protected void executeAsync() {
+            protected Object executeAsync() {
                 sessionManager.cancelMatchMaking(ticket);
                 btn_cancel.setEnabled(false);
+                return null;
             }
 
             @Override
-            protected void callbackOnUI() {
+            protected void callbackOnUI(Object arg) {
                 Toast.makeText(getContext(), R.string.matchmaking_cancelled, Toast.LENGTH_LONG).show();
                 matchmakingTicket = null;
                 matchmaking_chrono.stop();

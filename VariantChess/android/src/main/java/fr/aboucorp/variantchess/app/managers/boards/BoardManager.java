@@ -8,7 +8,7 @@ import java.util.Optional;
 import fr.aboucorp.variantchess.app.listeners.GDXGestureListener;
 import fr.aboucorp.variantchess.app.listeners.GDXInputAdapter;
 import fr.aboucorp.variantchess.app.utils.GdxPostRunner;
-import fr.aboucorp.variantchess.app.utils.fen.BoardStateBuilder;
+import fr.aboucorp.variantchess.app.utils.state.BoardStateBuilder;
 import fr.aboucorp.variantchess.entities.ChessColor;
 import fr.aboucorp.variantchess.entities.ChessMatch;
 import fr.aboucorp.variantchess.entities.Location;
