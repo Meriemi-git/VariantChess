@@ -38,6 +38,8 @@ import fr.aboucorp.variantchess.entities.ChessColor;
 import fr.aboucorp.variantchess.entities.ChessMatch;
 import fr.aboucorp.variantchess.entities.Player;
 
+import static fr.aboucorp.variantchess.app.utils.ArgsKey.GAME_RULES;
+
 public class MatchmakingFragment extends VariantChessFragment implements MatchmakingListener {
     /**
      * Widgets
@@ -124,19 +126,13 @@ public class MatchmakingFragment extends VariantChessFragment implements Matchma
 
 
     @Override
-    public void setArguments(@Nullable Bundle args) {
-        super.setArguments(args);
-        this.gameRules = (GameRules) args.getSerializable("gamerules");
-    }
-
-    @Override
     public void onMatchmakerMatched(MatchmakerMatched matched) {
         Log.i("fr.aboucorp.variantchess", "onMatchmakerMatched " + matched);
         AsyncHandler handler = new AsyncHandler() {
             @Override
             protected Object executeAsync() throws Exception {
                 // TODO need entire refocto
-                Match match = sessionManager.joinMatchByToken(matched.getToken());
+                Match match = sessionManager.joinMatchById(matched.getMatchId());
                 List<User> users = sessionManager.getUsersFromMatched(matched);
                 Player white = new Player(users.get(0).getUsername(), ChessColor.WHITE, users.get(0).getId());
                 Player black = new Player(users.get(1).getUsername(), ChessColor.BLACK, users.get(1).getId());
@@ -164,6 +160,12 @@ public class MatchmakingFragment extends VariantChessFragment implements Matchma
             }
         };
         handler.start();
+    }
+
+    @Override
+    public void setArguments(@Nullable Bundle args) {
+        super.setArguments(args);
+        this.gameRules = (GameRules) args.getSerializable(GAME_RULES);
     }
 
     @Override

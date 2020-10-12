@@ -14,7 +14,7 @@ public class BoardManagerFactory {
         switch (gameRules.name.toLowerCase()) {
             case "random":
                 // TODO implements radmoRules
-            case "classic":
+            case "gamerules_name_classic":
                 ClassicBoard classicBoard = new ClassicBoard(gameEventManager);
                 ClassicRuleSet classicRules = new ClassicRuleSet(classicBoard, gameEventManager);
                 ClassicBoardStateBuilder classicBoardStateBuilder = new ClassicBoardStateBuilder(classicBoard, classicRules);

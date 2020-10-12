@@ -317,8 +317,10 @@ public class SessionManager {
      * @throws ExecutionException   the execution exception if Nakama backend return an error
      * @throws InterruptedException the interrupted exception if some network error occured
      */
-    public Match joinMatchByToken(String matchId) throws ExecutionException, InterruptedException {
-        return this.socket.joinMatchToken(matchId).get();
+    public Match joinMatchById(String matchId) throws ExecutionException, InterruptedException {
+        Log.i("fr.aboucorp.variantchess", String.format("Joining match with id : %s", matchId));
+        Match match = this.socket.joinMatch(matchId).get();
+        return match;
     }
 
     /**

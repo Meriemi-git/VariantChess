@@ -48,7 +48,13 @@ public class MainActivity extends AppCompatActivity implements NotificationListe
         this.sessionManager.setNotificationListener(this);
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
         manageUserConnection();
-        this.userViewModel.getConnected().observe(this, connected -> this.updateConnectionUI(connected));
+        this.userViewModel.getConnected().observe(this, connected -> {
+            if (connected != null) {
+                this.pref.edit().putString("nakama.authToken", connected.authToken).apply();
+            } else {
+                this.pref.edit().putString("nakama.authToken", null).apply();
+            }
+        });
     }
 
     @Override
@@ -142,6 +148,13 @@ public class MainActivity extends AppCompatActivity implements NotificationListe
         this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         this.getSupportActionBar().setHomeButtonEnabled(true);
     }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        this.userViewModel.getConnected().observe(this, MainActivity.this::updateConnectionUI);
+        return true;
+    }
+
 
     private void updateConnectionUI(ChessUser connected) {
         if (connected != null) {

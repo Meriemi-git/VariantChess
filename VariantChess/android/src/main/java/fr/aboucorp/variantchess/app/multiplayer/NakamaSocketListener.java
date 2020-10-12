@@ -76,6 +76,7 @@ public class NakamaSocketListener extends AbstractSocketListener {
     public void onMatchData(MatchData matchData) {
         super.onMatchData(matchData);
         Log.i("fr.aboucorp.variantchess", "onMatchData " + matchData.getOpCode());
+        Log.i("fr.aboucorp.variantchess", "matchListener : " + matchListener);
         if (matchListener != null) {
             matchListener.onMatchData(matchData);
         }
@@ -93,10 +94,10 @@ public class NakamaSocketListener extends AbstractSocketListener {
     @Override
     public void onNotifications(NotificationList notifications) {
         super.onNotifications(notifications);
+        Log.i("fr.aboucorp.variantchess", "onNotifications notif numbers :" + notifications.getNotificationsCount());
         if (this.notificationListener != null) {
-
+            this.notificationListener.onNotifications(notifications);
         }
-
     }
 
     @Override
