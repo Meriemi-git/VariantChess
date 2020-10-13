@@ -150,7 +150,13 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
     public Piece moveToSquare(Square square) {
         Piece eated = this.eat(square);
         this.selectedPiece.move(square);
-        this.board3dManager.moveSelected(square);
+        GdxPostRunner runner = new GdxPostRunner() {
+            @Override
+            protected void execute() {
+                board3dManager.moveSelected(square);
+            }
+        };
+        runner.startAsync();
         ((ClassicRuleSet) this.ruleSet).isKingInCheck(this.selectedPiece);
         ((ClassicRuleSet) this.ruleSet).checkIfCastling(square);
         this.resetHighlited();
@@ -195,8 +201,14 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
     }
 
     private void resetHighlited() {
-        this.board3dManager.unHighlightSquares(this.possiblesMoves);
-        this.board3dManager.resetSelection();
+        GdxPostRunner runner = new GdxPostRunner() {
+            @Override
+            protected void execute() {
+                board3dManager.unHighlightSquares(possiblesMoves);
+                board3dManager.resetSelection();
+            }
+        };
+        runner.startAsync();
         this.possiblesMoves = null;
     }
 

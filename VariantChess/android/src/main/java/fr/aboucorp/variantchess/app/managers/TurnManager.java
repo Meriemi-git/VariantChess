@@ -14,8 +14,6 @@ import fr.aboucorp.variantchess.entities.events.models.TurnStartEvent;
 public class TurnManager implements PartyLifeCycle {
 
     private GameEventManager gameEventManager;
-    private Player whitePlayer;
-    private Player blackPlayer;
     private ChessMatch chessMatch;
     private Turn current;
 
@@ -26,8 +24,6 @@ public class TurnManager implements PartyLifeCycle {
     @Override
     public void startParty(ChessMatch chessMatch) {
         this.chessMatch = chessMatch;
-        this.whitePlayer = chessMatch.getWhitePlayer();
-        this.blackPlayer = chessMatch.getBlackPlayer();
         this.startTurn();
     }
 
@@ -56,9 +52,9 @@ public class TurnManager implements PartyLifeCycle {
         Turn nextTurn;
         Player player = null;
         if (this.chessMatch.getTurns().size() > 0 && this.chessMatch.getTurns().getLast().getTurnColor() == ChessColor.WHITE) {
-            player = this.blackPlayer;
+            player = chessMatch.getBlackPlayer();
         } else {
-            player = this.whitePlayer;
+            player = chessMatch.getWhitePlayer();
         }
         nextTurn = new Turn(this.chessMatch.getTurns().size() + 1, player);
         this.current = nextTurn;

@@ -39,7 +39,6 @@ import fr.aboucorp.variantchess.app.multiplayer.listeners.MatchmakingListener;
 import fr.aboucorp.variantchess.app.multiplayer.listeners.NotificationListener;
 import fr.aboucorp.variantchess.app.utils.JsonExtractor;
 import fr.aboucorp.variantchess.app.utils.RPCMethods;
-import fr.aboucorp.variantchess.app.utils.SignedData;
 import fr.aboucorp.variantchess.app.utils.VariantVars;
 
 
@@ -240,13 +239,10 @@ public class SessionManager {
      */
     public void sendData(Object data, String matchId, long opcode) {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        SignedData signedData = new SignedData();
-        signedData.variantChessToken = this.variantChessToken;
-        signedData.data = data;
         ObjectOutputStream oos = null;
         try {
             oos = new ObjectOutputStream(bos);
-            oos.writeObject(signedData);
+            oos.writeObject(data);
             oos.flush();
             byte[] binaryData = bos.toByteArray();
             this.socket.sendMatchData(matchId, opcode, binaryData);

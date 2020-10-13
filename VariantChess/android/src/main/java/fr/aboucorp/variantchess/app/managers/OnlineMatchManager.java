@@ -1,16 +1,19 @@
 package fr.aboucorp.variantchess.app.managers;
 
 
-import android.util.Log;
-
+import com.heroiclabs.nakama.MatchData;
 import com.heroiclabs.nakama.MatchPresenceEvent;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 
 import fr.aboucorp.variantchess.app.db.entities.ChessUser;
 import fr.aboucorp.variantchess.app.managers.boards.BoardManager;
 import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
 import fr.aboucorp.variantchess.app.multiplayer.listeners.MatchListener;
+import fr.aboucorp.variantchess.app.utils.LogUtil;
 import fr.aboucorp.variantchess.app.utils.OPCode;
-import fr.aboucorp.variantchess.app.utils.SignedData;
 import fr.aboucorp.variantchess.entities.ChessColor;
 import fr.aboucorp.variantchess.entities.ChessMatch;
 import fr.aboucorp.variantchess.entities.Turn;
@@ -31,23 +34,31 @@ public class OnlineMatchManager extends MatchManager implements MatchListener {
     }
 
     @Override
-    public void onMatchData(long opCode, SignedData signedData) {
-        switch ((int) opCode) {
-            case OPCode.SEND_NEW_FEN:
-                String boardState = (String) signedData.data;
-                Log.i("fr.aboucorp.variantchess", String.format("Sending whitePlayer : %s", boardState));
-                playOppositeMove(boardState);
-                break;
-            case OPCode.SEND_WHITE_PLAYER:
-                String matchState = (String) signedData.data;
-                Log.i("fr.aboucorp.variantchess", String.format("Sending whitePlayer : %s", matchState));
-                break;
+    public void onMatchData(MatchData matchData) {
+
+        try {
+            ObjectInputStream ois;
+            ois = new ObjectInputStream(new ByteArrayInputStream(matchData.getData()));
+            switch ((int) matchData.getOpCode()) {
+                case OPCode.SEND_NEW_FEN:
+                    String boardState = (String) ois.readObject();
+                    LogUtil.i("fr.aboucorp.variantchess", String.format("Receiving FEN : %s", boardState));
+                    playOppositeMove(boardState);
+                    break;
+                case OPCode.SEND_WHITE_PLAYER:
+                    String matchState = (String) ois.readObject();
+                    LogUtil.i("fr.aboucorp.variantchess", String.format("Receving whitePlayer : %s", matchState));
+                    break;
+            }
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+            LogUtil.e("fr.aboucorp.variantchess", String.format("Error when receiving match data opeCode: %s", matchData.getOpCode()));
         }
     }
 
     @Override
     public void onMatchPresence(MatchPresenceEvent matchPresence) {
-        Log.i("fr.aboucorp.variantchess", String.format("onMatchPresence : %s", matchPresence));
+        LogUtil.i("fr.aboucorp.variantchess", String.format("onMatchPresence : %s", matchPresence));
     }
 
     @Override
@@ -69,21 +80,20 @@ public class OnlineMatchManager extends MatchManager implements MatchListener {
         super.receiveGameEvent(event);
         if (event instanceof TurnEndEvent && this.currentPlayer.userId.equals(((TurnEndEvent) event).turn.getPlayer().getUserID())) {
             String boardState = this.boardManager.getBoardState();
-            Log.i("fr.aboucorp.variantchess", String.format("New state send in matchData : %s", boardState));
+            LogUtil.i("fr.aboucorp.variantchess", String.format("New state send in matchData : %s", boardState));
             this.sessionManager.sendData(boardState, this.chessMatch.getMatchId(), OPCode.SEND_NEW_FEN);
         }
     }
 
     public void playOppositeMove(String boardState) {
-        // TODO set player in turn.
         Turn opposantTurn = this.boardManager.playTheOpposantMove(boardState);
         if (this.turnManager.getTurnColor() == ChessColor.WHITE) {
-            opposantTurn.setPlayer(this.chessMatch.blackPlayer);
-        } else {
             opposantTurn.setPlayer(this.chessMatch.whitePlayer);
+        } else {
+            opposantTurn.setPlayer(this.chessMatch.blackPlayer);
         }
         this.turnManager.appendTurn(opposantTurn);
         this.boardManager.stopWaitForNextTurn();
-        //this.turnManager.startTurn();
+        this.turnManager.startTurn();
     }
 }
