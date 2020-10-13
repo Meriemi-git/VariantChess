@@ -1,5 +1,7 @@
 package fr.aboucorp.variantchess.app.managers.boards;
 
+import android.util.Log;
+
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 
 import java.util.ArrayList;
@@ -61,7 +63,7 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
     }
 
     @Override
-    public void receiveGameEvent(GameEvent event) {
+    public void receiveEvent(GameEvent event) {
         if (event instanceof TurnStartEvent) {
             this.manageTurnStart((TurnStartEvent) event);
         } else if (event instanceof TurnEndEvent) {
@@ -126,19 +128,17 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
         this.gameState = this.gameState == GameState.WAIT_FOR_NEXT_TURN ? GameState.WAIT_FOR_NEXT_TURN : GameState.SQUARE_SELECTION;
     }
 
-    public Piece selectSquare(Square to) {
+    public void selectSquare(Square to) {
         Square from = this.selectedPiece.getSquare();
         Piece deadPiece = this.moveToSquare(to);
         String message = String.format("Move %s from %s to %s", this.selectedPiece, from, to);
-        if (this.gameState != GameState.WAIT_FOR_NEXT_TURN) {
-            this.gameEventManager.sendMessage(new MoveEvent(
-                    message
-                    , from.getLocation()
-                    , to.getLocation()
-                    , this.selectedPiece.getPieceId()
-                    , deadPiece != null ? deadPiece.getPieceId() : null));
-        }
-        return deadPiece;
+        this.gameEventManager.sendEvent(new MoveEvent(
+                message
+                , from.getLocation()
+                , to.getLocation()
+                , this.selectedPiece.getPieceId()
+                , deadPiece != null ? deadPiece.getPieceId() : null));
+
     }
 
     public void setBoardLoadingListener(BoardLoadingListener boardLoadingListener) {
@@ -163,28 +163,23 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
         void OnBoardLoaded();
     }
 
-    public Turn playTheOpposantMove(String fenState) {
+    public void playTheOppositeMove(String fenState) {
         PieceId played = this.boardStateBuilder.getPiecePlayedFromState(fenState);
-        Location from = this.boardStateBuilder.getFrom(fenState);
         Location to = this.boardStateBuilder.getTo(fenState);
         this.selectPiece(this.board.getPieceById(played));
         Square selectedSquare = (Square) this.board.getSquares().getItemByLocation(to);
-        Piece deadPiece = this.selectSquare(selectedSquare);
-        Turn opposantTurn = new Turn();
-        opposantTurn.setFrom(from);
-        opposantTurn.setTo(to);
-        opposantTurn.setPlayed(played);
-        opposantTurn.setDuration(null);
-        if (deadPiece != null) {
-            opposantTurn.setDeadPiece(deadPiece.getPieceId());
-        }
-        // TODO missing player
-        return opposantTurn;
+        this.selectSquare(selectedSquare);
     }
 
 
     public void waitForNextTurn() {
+        Log.i("fr.aboucorp.variantchess", "Wainting for next turn");
         this.gameState = GameState.WAIT_FOR_NEXT_TURN;
+    }
+
+    public void stopWaitingForNextTurn() {
+        Log.i("fr.aboucorp.variantchess", "Wainting for next turn");
+        this.gameState = GameState.PIECE_SELECTION;
     }
 
     public void stopWaitForNextTurn() {

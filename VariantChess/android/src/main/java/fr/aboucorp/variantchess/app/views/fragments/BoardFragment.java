@@ -35,9 +35,7 @@ import fr.aboucorp.variantchess.entities.ChessMatch;
 import fr.aboucorp.variantchess.entities.Player;
 import fr.aboucorp.variantchess.entities.events.GameEventManager;
 import fr.aboucorp.variantchess.entities.events.GameEventSubscriber;
-import fr.aboucorp.variantchess.entities.events.models.BoardEvent;
 import fr.aboucorp.variantchess.entities.events.models.GameEvent;
-import fr.aboucorp.variantchess.entities.events.models.TurnEvent;
 import fr.aboucorp.variantchess.libgdx.Board3dManager;
 
 import static fr.aboucorp.variantchess.app.utils.ArgsKey.BLACK;
@@ -71,12 +69,11 @@ public class BoardFragment extends AndroidFragmentApplication implements GameEve
     private Player black;
 
     @Override
-    public void receiveGameEvent(GameEvent event) {
+    public void receiveEvent(GameEvent event) {
         this.runOnUiThread(() -> {
-            if (event instanceof BoardEvent || event instanceof TurnEvent) {
-                party_logs.setText(party_logs.getText() + "\n" + event.message);
-            }
+            party_logs.setText(party_logs.getText() + "\n" + event.message);
             lbl_turn.setText("Turn of " + matchManager.getPartyInfos());
+            Log.i("fr.aboucorp.variantchess", String.format("GameEvent Color : %s Message : %s", matchManager.getPartyInfos(), event.message));
         });
     }
 

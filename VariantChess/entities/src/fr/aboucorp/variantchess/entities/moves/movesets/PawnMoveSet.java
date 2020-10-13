@@ -78,7 +78,7 @@ public class PawnMoveSet extends AbstractMoveSet {
 
     private boolean enPassantRightIsPossible(Square diagRight) {
         if (this.enPassantIsPossible() && diagRight.getLocation().getX() == this.previousTurn.getTo().getX()) {
-            this.eventManager.sendMessage(new EnPassantEvent("En passant", EventType.EN_PASSANT, diagRight));
+            this.eventManager.sendEvent(new EnPassantEvent("En passant", EventType.EN_PASSANT, diagRight));
             return true;
         }
         return false;
@@ -86,7 +86,7 @@ public class PawnMoveSet extends AbstractMoveSet {
 
     private boolean enPassantLeftIsPossible(Square diagLeft) {
         if (this.enPassantIsPossible() && diagLeft.getLocation().getX() == this.previousTurn.getTo().getX()) {
-            this.eventManager.sendMessage(new EnPassantEvent("En passant", EventType.EN_PASSANT, diagLeft));
+            this.eventManager.sendEvent(new EnPassantEvent("En passant", EventType.EN_PASSANT, diagLeft));
             return true;
         }
         return false;

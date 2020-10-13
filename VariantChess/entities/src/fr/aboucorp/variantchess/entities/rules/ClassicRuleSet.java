@@ -58,7 +58,7 @@ public class ClassicRuleSet extends AbstractRuleSet implements GameEventSubscrib
     }
 
     @Override
-    public void receiveGameEvent(GameEvent event) {
+    public void receiveEvent(GameEvent event) {
         if (event instanceof EnPassantEvent) {
             if (((EnPassantEvent) event).boardEventType == EventType.EN_PASSANT) {
                 this.enPassant = ((EnPassantEvent) event).destination;
@@ -81,7 +81,7 @@ public class ClassicRuleSet extends AbstractRuleSet implements GameEventSubscrib
 
     public void isKingInCheck(Piece piece) {
         if (this.kingIsInCheck) {
-            this.gameEventManager.sendMessage(new CheckOutEvent("King out of check", EventType.CHECK_OUT, piece.getPieceId()));
+            this.gameEventManager.sendEvent(new CheckOutEvent("King out of check", EventType.CHECK_OUT, piece.getPieceId()));
             this.kingIsInCheck = false;
         }
         GameElementList<Piece> causingCheck = piece.getMoveSet().moveCauseCheck(this.actualTurn.getTurnColor());
@@ -90,7 +90,7 @@ public class ClassicRuleSet extends AbstractRuleSet implements GameEventSubscrib
             Piece kingInCheck = this.previousTurn.getTurnColor() == ChessColor.WHITE
                     ? this.board.getWhitePieces().getPieceById(PieceId.WK)
                     : this.board.getBlackPieces().getPieceById(PieceId.BK);
-            this.gameEventManager.sendMessage(new CheckInEvent("King is in check", EventType.CHECK_IN, kingInCheck.getPieceId(), causingCheck));
+            this.gameEventManager.sendEvent(new CheckInEvent("King is in check", EventType.CHECK_IN, kingInCheck.getPieceId(), causingCheck));
         }
     }
 
@@ -126,7 +126,7 @@ public class ClassicRuleSet extends AbstractRuleSet implements GameEventSubscrib
             castlingType = EventType.CASTLE_KING;
         }
         if (rookToMove != null && destination != null) {
-            this.gameEventManager.sendMessage(new CastlingEvent("Castling", castlingType, rookToMove.getPieceId(), destination));
+            this.gameEventManager.sendEvent(new CastlingEvent("Castling", castlingType, rookToMove.getPieceId(), destination));
         }
     }
 
@@ -158,25 +158,25 @@ public class ClassicRuleSet extends AbstractRuleSet implements GameEventSubscrib
     private void canCastle() {
         if (this.whiteCanCastleKingNow()) {
             this.whiteCanCastleKing = true;
-            this.gameEventManager.sendMessage(new PieceEvent("White can castle on king side", EventType.CASTLE_KING, PieceId.WK));
+            this.gameEventManager.sendEvent(new PieceEvent("White can castle on king side", EventType.CASTLE_KING, PieceId.WK));
         } else {
             this.whiteCanCastleKing = false;
         }
         if (this.whiteCanCastleQueenNow()) {
             this.whiteCanCastleQueen = true;
-            this.gameEventManager.sendMessage(new PieceEvent("White can castle on queen side", EventType.CASTLE_QUEEN, PieceId.WK));
+            this.gameEventManager.sendEvent(new PieceEvent("White can castle on queen side", EventType.CASTLE_QUEEN, PieceId.WK));
         } else {
             this.whiteCanCastleQueen = false;
         }
         if (this.blackCanCastleKingNow()) {
             this.blackCanCastleKing = true;
-            this.gameEventManager.sendMessage(new PieceEvent("Black can castle on king side", EventType.CASTLE_KING, PieceId.BK));
+            this.gameEventManager.sendEvent(new PieceEvent("Black can castle on king side", EventType.CASTLE_KING, PieceId.BK));
         } else {
             this.blackCanCastleKing = false;
         }
         if (this.blackCanCastleQueenNow()) {
             this.blackCanCastleQueen = true;
-            this.gameEventManager.sendMessage(new PieceEvent("Black can castle on queen side", EventType.CASTLE_QUEEN, PieceId.BK));
+            this.gameEventManager.sendEvent(new PieceEvent("Black can castle on queen side", EventType.CASTLE_QUEEN, PieceId.BK));
         } else {
             this.blackCanCastleQueen = false;
         }
@@ -192,9 +192,9 @@ public class ClassicRuleSet extends AbstractRuleSet implements GameEventSubscrib
             }
             if (cantMove) {
                 if (this.kingIsInCheck) {
-                    this.gameEventManager.sendMessage(new BoardEvent("Game is finished", EventType.MATE));
+                    this.gameEventManager.sendEvent(new BoardEvent("Game is finished", EventType.MATE));
                 } else {
-                    this.gameEventManager.sendMessage(new BoardEvent("Game is finished", EventType.DRAW));
+                    this.gameEventManager.sendEvent(new BoardEvent("Game is finished", EventType.DRAW));
                 }
             }
         }
@@ -209,7 +209,7 @@ public class ClassicRuleSet extends AbstractRuleSet implements GameEventSubscrib
             }
         }
         if (this.fiftyMoveCounter >= FIFTY_MOVE_RULE_NUMBER * 2) {
-            this.gameEventManager.sendMessage(new PartyEvent("Player can claim a draw following the fifty move rule ", EventType.CAN_CLAIM_DRAW));
+            this.gameEventManager.sendEvent(new PartyEvent("Player can claim a draw following the fifty move rule ", EventType.CAN_CLAIM_DRAW));
         }
     }
 

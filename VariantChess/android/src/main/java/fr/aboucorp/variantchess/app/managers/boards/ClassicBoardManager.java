@@ -32,7 +32,7 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
     }
 
     @Override
-    public void receiveGameEvent(GameEvent event) {
+    public void receiveEvent(GameEvent event) {
         if (event instanceof TurnStartEvent) {
             this.manageTurnStart((TurnStartEvent) event);
         } else if (event instanceof TurnEndEvent) {
@@ -150,7 +150,13 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
     public Piece moveToSquare(Square square) {
         Piece eated = this.eat(square);
         this.selectedPiece.move(square);
-        this.board3dManager.moveSelected(square);
+        GdxPostRunner runner = new GdxPostRunner() {
+            @Override
+            protected void execute() {
+                board3dManager.moveSelected(square);
+            }
+        };
+        runner.startAsync();
         ((ClassicRuleSet) this.ruleSet).isKingInCheck(this.selectedPiece);
         ((ClassicRuleSet) this.ruleSet).checkIfCastling(square);
         this.resetHighlited();
@@ -188,15 +194,21 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
             }
             this.board3dManager.moveToEven(toBeEaten);
             String eventMessage = String.format("Piece %s die on %s", toBeEaten.getPieceId().name(), toBeEaten.getLocation());
-            this.gameEventManager.sendMessage(new PieceEvent(eventMessage, EventType.DEATH, toBeEaten.getPieceId()));
+            this.gameEventManager.sendEvent(new PieceEvent(eventMessage, EventType.DEATH, toBeEaten.getPieceId()));
             toBeEaten.die();
         }
         return toBeEaten;
     }
 
     private void resetHighlited() {
-        this.board3dManager.unHighlightSquares(this.possiblesMoves);
-        this.board3dManager.resetSelection();
+        GdxPostRunner runner = new GdxPostRunner() {
+            @Override
+            protected void execute() {
+                board3dManager.unHighlightSquares(possiblesMoves);
+                board3dManager.resetSelection();
+            }
+        };
+        runner.startAsync();
         this.possiblesMoves = null;
     }
 
