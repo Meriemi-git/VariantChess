@@ -170,12 +170,6 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
         this.selectPiece(this.board.getPieceById(played));
         Square selectedSquare = (Square) this.board.getSquares().getItemByLocation(to);
         Piece deadPiece = this.selectSquare(selectedSquare);
-/*        this.gameEventManager.sendMessage(new MoveEvent(
-                getFenFromBoard()
-                , from
-                , to
-                , this.selectedPiece.getPieceId()
-                , deadPiece != null ? deadPiece.getPieceId() : null));*/
         Turn opposantTurn = new Turn();
         opposantTurn.setFrom(from);
         opposantTurn.setTo(to);

@@ -14,10 +14,15 @@ import com.heroiclabs.nakama.StreamPresenceEvent;
 import com.heroiclabs.nakama.api.ChannelMessage;
 import com.heroiclabs.nakama.api.NotificationList;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+
 import fr.aboucorp.variantchess.app.multiplayer.listeners.ChatListener;
 import fr.aboucorp.variantchess.app.multiplayer.listeners.MatchListener;
 import fr.aboucorp.variantchess.app.multiplayer.listeners.MatchmakingListener;
 import fr.aboucorp.variantchess.app.multiplayer.listeners.NotificationListener;
+import fr.aboucorp.variantchess.app.utils.SignedData;
 
 public class NakamaSocketListener extends AbstractSocketListener {
     private final SessionManager sessionManager;
@@ -40,7 +45,7 @@ public class NakamaSocketListener extends AbstractSocketListener {
     @Override
     public void onError(Error error) {
         super.onError(error);
-        Log.i("fr.aboucorp.variantchess", "onError " + error.getMessage());
+        Log.e("fr.aboucorp.variantchess", "onError " + error.getMessage());
 
     }
 
@@ -50,8 +55,9 @@ public class NakamaSocketListener extends AbstractSocketListener {
         Log.i("fr.aboucorp.variantchess", "onChannelMessage " + message.getContent());
         if (chatListener != null) {
             chatListener.onChannelMessage(message);
+        } else {
+            Log.e("fr.aboucorp.variantchess", "Missing chatListener.");
         }
-
     }
 
     @Override
@@ -60,25 +66,39 @@ public class NakamaSocketListener extends AbstractSocketListener {
         Log.i("fr.aboucorp.variantchess", "onChannelPresence " + presence.getRoomName());
         if (chatListener != null) {
             chatListener.onChannelPresence(presence);
+        } else {
+            Log.e("fr.aboucorp.variantchess", "Missing chatListener.");
         }
     }
 
     @Override
     public void onMatchmakerMatched(MatchmakerMatched matched) {
         super.onMatchmakerMatched(matched);
-        Log.i("fr.aboucorp.variantchess", "onMatchmakerMatched " + matched.getMatchId());
         if (matchmakingListener != null) {
             matchmakingListener.onMatchmakerMatched(matched);
+        } else {
+            Log.e("fr.aboucorp.variantchess", "Missing matchmakingListener.");
         }
     }
 
     @Override
     public void onMatchData(MatchData matchData) {
         super.onMatchData(matchData);
-        Log.i("fr.aboucorp.variantchess", "onMatchData " + matchData.getOpCode());
-        Log.i("fr.aboucorp.variantchess", "matchListener : " + matchListener);
+        Log.i("fr.aboucorp.variantchess", String.format("onMatchData opCode : %s", matchData.getOpCode()));
         if (matchListener != null) {
-            matchListener.onMatchData(matchData);
+            try {
+                ObjectInputStream ois;
+                ois = new ObjectInputStream(new ByteArrayInputStream(matchData.getData()));
+                SignedData signedData = (SignedData) ois.readObject();
+                if (!signedData.variantChessToken.equals(this.sessionManager.getVariantChessToken())) {
+                    matchListener.onMatchData(matchData.getOpCode(), signedData);
+                }
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+                Log.e("fr.aboucorp.variantchess", String.format("Error when receiving match data opeCode: %s", matchData.getOpCode()));
+            }
+        } else {
+            Log.e("fr.aboucorp.variantchess", "Missing matchListener.");
         }
     }
 
@@ -86,8 +106,10 @@ public class NakamaSocketListener extends AbstractSocketListener {
     public void onMatchPresence(MatchPresenceEvent matchPresence) {
         super.onMatchPresence(matchPresence);
         Log.i("fr.aboucorp.variantchess", "onMatchPresence " + matchPresence.getMatchId());
-        if (matchmakingListener != null) {
-            matchmakingListener.onMatchPresence(matchPresence);
+        if (matchListener != null) {
+            matchListener.onMatchPresence(matchPresence);
+        } else {
+            Log.e("fr.aboucorp.variantchess", "Missing matchListener.");
         }
     }
 
@@ -97,6 +119,8 @@ public class NakamaSocketListener extends AbstractSocketListener {
         Log.i("fr.aboucorp.variantchess", "onNotifications notif numbers :" + notifications.getNotificationsCount());
         if (this.notificationListener != null) {
             this.notificationListener.onNotifications(notifications);
+        } else {
+            Log.e("fr.aboucorp.variantchess", "Missing notificationListener.");
         }
     }
 

@@ -32,6 +32,7 @@ public abstract class AsyncHandler {
     }
 
     protected void error(Exception ex) {
-        Log.e("fr.aboucorp.variantchess", ex.getMessage());
+        ex.printStackTrace();
+        Log.e("fr.aboucorp.variantchess", String.format("Error in handler message : %s", ex.getMessage()));
     }
 }

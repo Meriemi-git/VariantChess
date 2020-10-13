@@ -3,17 +3,15 @@ package fr.aboucorp.variantchess.app.managers;
 
 import android.util.Log;
 
-import com.heroiclabs.nakama.MatchData;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
+import com.heroiclabs.nakama.MatchPresenceEvent;
 
 import fr.aboucorp.variantchess.app.db.entities.ChessUser;
 import fr.aboucorp.variantchess.app.managers.boards.BoardManager;
 import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
 import fr.aboucorp.variantchess.app.multiplayer.listeners.MatchListener;
 import fr.aboucorp.variantchess.app.utils.OPCode;
+import fr.aboucorp.variantchess.app.utils.SignedData;
+import fr.aboucorp.variantchess.entities.ChessColor;
 import fr.aboucorp.variantchess.entities.ChessMatch;
 import fr.aboucorp.variantchess.entities.Turn;
 import fr.aboucorp.variantchess.entities.events.GameEventManager;
@@ -33,30 +31,23 @@ public class OnlineMatchManager extends MatchManager implements MatchListener {
     }
 
     @Override
-    public void onMatchData(MatchData matchData) {
-        ObjectInputStream ois = null;
-        switch ((int) matchData.getOpCode()) {
+    public void onMatchData(long opCode, SignedData signedData) {
+        switch ((int) opCode) {
             case OPCode.SEND_NEW_FEN:
-                try {
-                    ois = new ObjectInputStream(new ByteArrayInputStream(matchData.getData()));
-                    String boardState = (String) ois.readObject();
-                    Log.i("fr.aboucorp.variantchess", String.format("New fen received in matchData : %s", boardState));
-                    playOppositeMove(boardState);
-                } catch (IOException | ClassNotFoundException e) {
-                    e.printStackTrace();
-                }
+                String boardState = (String) signedData.data;
+                Log.i("fr.aboucorp.variantchess", String.format("Sending whitePlayer : %s", boardState));
+                playOppositeMove(boardState);
                 break;
             case OPCode.SEND_WHITE_PLAYER:
-                try {
-                    ois = new ObjectInputStream(new ByteArrayInputStream(matchData.getData()));
-                    String matchState = (String) ois.readObject();
-                    Log.i("fr.aboucorp.variantchess", String.format("Send matchState : %s", matchState));
-                } catch (IOException | ClassNotFoundException e) {
-                    e.printStackTrace();
-                }
+                String matchState = (String) signedData.data;
+                Log.i("fr.aboucorp.variantchess", String.format("Sending whitePlayer : %s", matchState));
                 break;
         }
+    }
 
+    @Override
+    public void onMatchPresence(MatchPresenceEvent matchPresence) {
+        Log.i("fr.aboucorp.variantchess", String.format("onMatchPresence : %s", matchPresence));
     }
 
     @Override
@@ -86,8 +77,13 @@ public class OnlineMatchManager extends MatchManager implements MatchListener {
     public void playOppositeMove(String boardState) {
         // TODO set player in turn.
         Turn opposantTurn = this.boardManager.playTheOpposantMove(boardState);
+        if (this.turnManager.getTurnColor() == ChessColor.WHITE) {
+            opposantTurn.setPlayer(this.chessMatch.blackPlayer);
+        } else {
+            opposantTurn.setPlayer(this.chessMatch.whitePlayer);
+        }
         this.turnManager.appendTurn(opposantTurn);
         this.boardManager.stopWaitForNextTurn();
-        this.turnManager.startTurn();
+        //this.turnManager.startTurn();
     }
 }

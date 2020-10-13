@@ -39,6 +39,7 @@ import fr.aboucorp.variantchess.app.multiplayer.listeners.MatchmakingListener;
 import fr.aboucorp.variantchess.app.multiplayer.listeners.NotificationListener;
 import fr.aboucorp.variantchess.app.utils.JsonExtractor;
 import fr.aboucorp.variantchess.app.utils.RPCMethods;
+import fr.aboucorp.variantchess.app.utils.SignedData;
 import fr.aboucorp.variantchess.app.utils.VariantVars;
 
 
@@ -55,7 +56,7 @@ public class SessionManager {
      * Singleton instance
      */
     private static SessionManager INSTANCE;
-    private final int TIMEOUT_IN_SEC = 3000;
+    private final int TIMEOUT_IN_MS = 3000;
     /**
      * Token used to identify this session on this device
      */
@@ -80,7 +81,6 @@ public class SessionManager {
      * Nakama client
      */
     private Client client;
-    private int timeoutErrorCounter = 0;
 
     private SessionManager() {
         this.variantChessToken = UUID.randomUUID().toString();
@@ -110,8 +110,8 @@ public class SessionManager {
      */
     public ChessUser signInWithEmail(String mail, String password) throws AuthentificationException {
         try {
-            this.session = this.client.authenticateEmail(mail, password, false).get(TIMEOUT_IN_SEC, TimeUnit.MILLISECONDS);
-            User user = this.client.getAccount(this.session).get(TIMEOUT_IN_SEC, TimeUnit.MILLISECONDS).getUser();
+            this.session = this.client.authenticateEmail(mail, password, false).get(TIMEOUT_IN_MS, TimeUnit.MILLISECONDS);
+            User user = this.client.getAccount(this.session).get(TIMEOUT_IN_MS, TimeUnit.MILLISECONDS).getUser();
             connectSocket();
             ChessUser chessUser = ChessUserDto.fromUserToChessUser(user);
             chessUser.authToken = this.session.getAuthToken();
@@ -148,8 +148,8 @@ public class SessionManager {
      */
     public ChessUser signUpWithEmail(String mail, String password, String username) throws AuthentificationException {
         try {
-            this.session = this.client.authenticateEmail(mail, password, true, username).get(TIMEOUT_IN_SEC, TimeUnit.MILLISECONDS);
-            User user = this.client.getAccount(this.session).get(TIMEOUT_IN_SEC, TimeUnit.MILLISECONDS).getUser();
+            this.session = this.client.authenticateEmail(mail, password, true, username).get(TIMEOUT_IN_MS, TimeUnit.MILLISECONDS);
+            User user = this.client.getAccount(this.session).get(TIMEOUT_IN_MS, TimeUnit.MILLISECONDS).getUser();
             ChessUser chessUser = ChessUserDto.fromUserToChessUser(user);
             chessUser.authToken = this.session.getAuthToken();
             return chessUser;
@@ -184,7 +184,7 @@ public class SessionManager {
             if (!restoredSession.isExpired(new Date())) {
                 // Session was valid and is restored now.
                 this.session = restoredSession;
-                User user = this.client.getAccount(this.session).get(TIMEOUT_IN_SEC, TimeUnit.MILLISECONDS).getUser();
+                User user = this.client.getAccount(this.session).get(TIMEOUT_IN_MS, TimeUnit.MILLISECONDS).getUser();
                 connectSocket();
                 return ChessUserDto.fromUserToChessUser(user);
             }
@@ -199,7 +199,7 @@ public class SessionManager {
         if (this.socket == null || this.socketClosed) {
             this.socket = this.client.createSocket();
             try {
-                socket.connect(this.session, this.nakamaSocketListener).get();
+                socket.connect(this.session, this.nakamaSocketListener).get(TIMEOUT_IN_MS, TimeUnit.MILLISECONDS);
                 this.checkIfSessionExists(this.socket);
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -225,7 +225,7 @@ public class SessionManager {
         Metadata data = new Metadata();
         data.put(VariantVars.VARIANT_CHESS_TOKEN, this.variantChessToken);
         Rpc userExistsRpc = null;
-        userExistsRpc = socket.rpc(RPCMethods.CHECK_IF_USER_EXISTS, data.getJsonFromMetadata()).get(TIMEOUT_IN_SEC, TimeUnit.MILLISECONDS);
+        userExistsRpc = socket.rpc(RPCMethods.CHECK_IF_USER_EXISTS, data.getJsonFromMetadata()).get(TIMEOUT_IN_MS, TimeUnit.MILLISECONDS);
         boolean exists = JsonExtractor.ectractAttributeByName(userExistsRpc.getPayload(), "already_connected");
         return exists;
     }
@@ -240,10 +240,13 @@ public class SessionManager {
      */
     public void sendData(Object data, String matchId, long opcode) {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        SignedData signedData = new SignedData();
+        signedData.variantChessToken = this.variantChessToken;
+        signedData.data = data;
         ObjectOutputStream oos = null;
         try {
             oos = new ObjectOutputStream(bos);
-            oos.writeObject(data);
+            oos.writeObject(signedData);
             oos.flush();
             byte[] binaryData = bos.toByteArray();
             this.socket.sendMatchData(matchId, opcode, binaryData);
@@ -281,8 +284,8 @@ public class SessionManager {
         data.put("timeZone", timeZone);
         data.put("langTag", langTag);
         try {
-            this.client.rpc(this.session, RPCMethods.UPDATE_USER_INFOS, data.getJsonFromMetadata()).get();
-            return ChessUserDto.fromUserToChessUser(this.client.getAccount(this.session).get().getUser());
+            this.client.rpc(this.session, RPCMethods.UPDATE_USER_INFOS, data.getJsonFromMetadata()).get(TIMEOUT_IN_MS, TimeUnit.MILLISECONDS);
+            return ChessUserDto.fromUserToChessUser(this.client.getAccount(this.session).get(TIMEOUT_IN_MS, TimeUnit.MILLISECONDS).getUser());
         } catch (ExecutionException e) {
             if (ExceptionCauseCode.getCodeValueFromCause(e.getCause()) == ExceptionCauseCode.ALREADY_EXISTS) {
                 throw new UsernameAlreadyRegistered("This username is already taken");
@@ -290,6 +293,8 @@ public class SessionManager {
         } catch (InterruptedException e) {
             Log.e("fr.aboucorp.variantchess", "Error during updating account");
             return null;
+        } catch (TimeoutException e) {
+            Log.e("fr.aboucorp.variantchess", "Error during updating account tiemout");
         }
         return null;
     }
@@ -301,8 +306,8 @@ public class SessionManager {
      */
     public void cancelMatchMaking(String ticket) {
         try {
-            this.socket.removeMatchmaker(ticket).get();
-        } catch (ExecutionException | InterruptedException e) {
+            this.socket.removeMatchmaker(ticket).get(TIMEOUT_IN_MS, TimeUnit.MILLISECONDS);
+        } catch (ExecutionException | InterruptedException | TimeoutException e) {
             Log.i("fr.aboucorp.variantchess", "Cannot remove matchmaking");
         } finally {
             this.socket.disconnect();
@@ -317,9 +322,9 @@ public class SessionManager {
      * @throws ExecutionException   the execution exception if Nakama backend return an error
      * @throws InterruptedException the interrupted exception if some network error occured
      */
-    public Match joinMatchById(String matchId) throws ExecutionException, InterruptedException {
+    public Match joinMatchById(String matchId) throws ExecutionException, InterruptedException, TimeoutException {
         Log.i("fr.aboucorp.variantchess", String.format("Joining match with id : %s", matchId));
-        Match match = this.socket.joinMatch(matchId).get();
+        Match match = this.socket.joinMatch(matchId).get(TIMEOUT_IN_MS, TimeUnit.MILLISECONDS);
         return match;
     }
 
@@ -331,9 +336,9 @@ public class SessionManager {
      * @throws ExecutionException   the execution exception if Nakama backend return an error
      * @throws InterruptedException the interrupted exception if some network error occured
      */
-    public List<User> getUsersFromMatched(MatchmakerMatched matched) throws ExecutionException, InterruptedException {
+    public List<User> getUsersFromMatched(MatchmakerMatched matched) throws ExecutionException, InterruptedException, TimeoutException {
         return this.client.getUsers(this.session, matched.getUsers().stream().map(u -> u.getPresence().getUserId())
-                .collect(Collectors.toList())).get().getUsersList();
+                .collect(Collectors.toList())).get(TIMEOUT_IN_MS, TimeUnit.MILLISECONDS).getUsersList();
     }
 
 
@@ -346,14 +351,14 @@ public class SessionManager {
      * @throws ExecutionException   the execution exception if Nakama backend return an error
      * @throws InterruptedException the interrupted exception if some network error occured
      */
-    public String launchMatchMaking(String rulesName, String ticket) throws ExecutionException, InterruptedException {
+    public String launchMatchMaking(String rulesName, String ticket) throws ExecutionException, InterruptedException, TimeoutException {
         if (this.socket == null) {
             connectSocket();
         }
         if (!TextUtils.isEmpty(ticket)) {
             try {
-                this.socket.removeMatchmaker(ticket).get();
-            } catch (ExecutionException | InterruptedException e) {
+                this.socket.removeMatchmaker(ticket).get(TIMEOUT_IN_MS, TimeUnit.MILLISECONDS);
+            } catch (ExecutionException | InterruptedException | TimeoutException e) {
                 Log.i("fr.aboucorp.variantchess", "Cannot remove matchmaking");
             }
         }
@@ -367,7 +372,7 @@ public class SessionManager {
         int minCount = 2;
         int maxCount = 2;
         MatchmakerTicket matchmakerTicket = this.socket.addMatchmaker(
-                minCount, maxCount, query, stringProps, numProps).get();
+                minCount, maxCount, query, stringProps, numProps).get(TIMEOUT_IN_MS, TimeUnit.MILLISECONDS);
         return matchmakerTicket.getTicket();
     }
 
@@ -395,7 +400,9 @@ public class SessionManager {
         this.nakamaSocketListener.setNotificationListener(notificationListener);
     }
 
-
+    public String getVariantChessToken() {
+        return this.variantChessToken;
+    }
 }
 
 

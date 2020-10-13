@@ -46,25 +46,27 @@
         android:name="fr.aboucorp.variantchess.app.views.fragments.GameRulesFragment"
         android:label="GameRulesFragment">
         <action
-            android:id="@+id/action_gameRulesFragment_to_boardActivity"
-            app:destination="@id/boardActivity">
-            <argument
-                android:name="game_rules"
-                app:argType="fr.aboucorp.variantchess.app.db.entities.GameRules" />
-        </action>
-        <action
             android:id="@+id/action_gameRulesFragment_to_matchmakingFragment"
             app:destination="@id/matchmakingFragment">
             <argument
                 android:name="game_rules"
                 app:argType="fr.aboucorp.variantchess.app.db.entities.GameRules" />
         </action>
+        <action
+            android:id="@+id/action_gameRulesFragment_to_boardFragment"
+            app:destination="@id/boardFragment">
+            <argument
+                android:name="is_online"
+                app:argType="boolean" />
+            <argument
+                android:name="game_rules"
+                app:argType="fr.aboucorp.variantchess.app.db.entities.GameRules" />
+            <argument
+                android:name="chess_match"
+                app:argType="fr.aboucorp.variantchess.entities.ChessMatch" />
+        </action>
 
     </fragment>
-    <activity
-        android:id="@+id/boardActivity"
-        android:name="fr.aboucorp.variantchess.app.views.activities.BoardActivity"
-        android:label="BoardActivity" />
     <fragment
         android:id="@+id/settingsFragment"
         android:name="fr.aboucorp.variantchess.app.views.fragments.SettingsFragment"
@@ -80,20 +82,26 @@
         android:name="fr.aboucorp.variantchess.app.views.fragments.MatchmakingFragment"
         android:label="MatchmakingFragment">
         <action
-            android:id="@+id/action_matchmakingFragment_to_boardActivity"
-            app:destination="@id/boardActivity">
+            android:id="@+id/action_matchmakingFragment_to_boardFragment"
+            app:destination="@id/boardFragment">
             <argument
                 android:name="is_online"
                 app:argType="boolean" />
             <argument
-                android:name="chess_match"
-                app:argType="fr.aboucorp.variantchess.entities.ChessMatch" />
+                android:name="match_id"
+                app:argType="string" />
             <argument
                 android:name="chess_user"
                 app:argType="fr.aboucorp.variantchess.app.db.entities.ChessUser" />
             <argument
                 android:name="game_rules"
                 app:argType="fr.aboucorp.variantchess.app.db.entities.GameRules" />
+            <argument
+                android:name="white"
+                app:argType="fr.aboucorp.variantchess.entities.Player" />
+            <argument
+                android:name="black"
+                app:argType="fr.aboucorp.variantchess.entities.Player" />
         </action>
     </fragment>
     <action
@@ -111,4 +119,8 @@
     <action
         android:id="@+id/action_global_launcherFragment"
         app:destination="@id/launcherFragment" />
+    <fragment
+        android:id="@+id/boardFragment"
+        android:name="fr.aboucorp.variantchess.app.views.fragments.BoardFragment"
+        android:label="BoardFragment" />
 </navigation>

@@ -26,6 +26,9 @@ import fr.aboucorp.variantchess.app.db.entities.ChessUser;
 import fr.aboucorp.variantchess.app.db.entities.GameRules;
 import fr.aboucorp.variantchess.app.db.viewmodel.GameRulesViewModel;
 import fr.aboucorp.variantchess.app.utils.ArgsKey;
+import fr.aboucorp.variantchess.entities.ChessColor;
+import fr.aboucorp.variantchess.entities.ChessMatch;
+import fr.aboucorp.variantchess.entities.Player;
 
 public class GameRulesFragment extends VariantChessFragment implements AdapterView.OnItemSelectedListener {
     private Button btn_online;
@@ -75,7 +78,12 @@ public class GameRulesFragment extends VariantChessFragment implements AdapterVi
         });
         this.btn_offline.setOnClickListener(v -> {
             GameRules selected = (GameRules) spinner_rules.getSelectedItem();
-            NavDirections action = GameRulesFragmentDirections.actionGameRulesFragmentToBoardActivity(selected);
+            Player white = new Player("White", ChessColor.WHITE, null);
+            Player black = new Player("Black", ChessColor.BLACK, null);
+            ChessMatch chessMatch = new ChessMatch();
+            chessMatch.setWhitePlayer(white);
+            chessMatch.setBlackPlayer(black);
+            NavDirections action = GameRulesFragmentDirections.actionGameRulesFragmentToBoardFragment(false, selected, chessMatch);
             Navigation.findNavController(getView()).navigate(action);
         });
     }

@@ -26,8 +26,6 @@ import fr.aboucorp.variantchess.libgdx.utils.GraphicGameArray;
 
 public class ClassicBoardManager extends BoardManager implements GameEventSubscriber {
 
-    private ChessMatch chessMatch;
-
     public ClassicBoardManager(Board3dManager board3dManager, Board board, ClassicRuleSet ruleSet, GameEventManager gameEventManager, ClassicBoardStateBuilder classicFenBuilder) {
         super(board, board3dManager, ruleSet, gameEventManager, classicFenBuilder);
         this.gameEventManager.subscribe(EnPassantEvent.class, this, 1);
@@ -48,7 +46,6 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
 
     @Override
     public void startParty(ChessMatch chessMatch) {
-        this.chessMatch = chessMatch;
         super.startParty(chessMatch);
         if (chessMatch.turns.size() == 0) {
             this.board.initBoard();

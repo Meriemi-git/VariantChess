@@ -1,4 +1,4 @@
-package fr.aboucorp.variantchess.app.views.activities;
+package fr.aboucorp.variantchess.app.views;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -15,6 +15,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
+import com.badlogic.gdx.backends.android.AndroidFragmentApplication;
 import com.heroiclabs.nakama.api.Notification;
 import com.heroiclabs.nakama.api.NotificationList;
 
@@ -30,7 +31,7 @@ import fr.aboucorp.variantchess.app.views.fragments.AuthentFragmentDirections;
 import fr.aboucorp.variantchess.app.views.fragments.GameRulesFragmentDirections;
 import fr.aboucorp.variantchess.app.views.fragments.SettingsFragmentDirections;
 
-public class MainActivity extends AppCompatActivity implements NotificationListener {
+public class MainActivity extends AppCompatActivity implements NotificationListener, AndroidFragmentApplication.Callbacks {
     public static final String SHARED_PREFERENCE_NAME = "nakama";
     private Toolbar toolbar;
     private SessionManager sessionManager;
@@ -176,5 +177,10 @@ public class MainActivity extends AppCompatActivity implements NotificationListe
         this.pref.edit().putString("nk.authToken", null).apply();
         NavDirections action = AuthentFragmentDirections.actionGlobalAuthentFragment();
         Navigation.findNavController(this, R.id.nav_host_fragment).navigate(action);
+    }
+
+    @Override
+    public void exit() {
+
     }
 }

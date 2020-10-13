@@ -139,7 +139,7 @@ task run(type: Exec) {
     }
 
     def adb = path + "/platform-tools/adb"
-    commandLine "$adb", 'shell', 'am', 'start', '-n', 'fr.aboucorp.variantchess/fr.aboucorp.variantchess.app.views.activities.MainActivity'
+    commandLine "$adb", 'shell', 'am', 'start', '-n', 'fr.aboucorp.variantchess/fr.aboucorp.variantchess.app.views.MainActivity'
 }
 
 repositories {

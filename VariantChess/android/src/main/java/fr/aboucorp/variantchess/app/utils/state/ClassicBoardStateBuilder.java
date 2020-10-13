@@ -20,8 +20,8 @@ public class ClassicBoardStateBuilder extends BoardStateBuilder {
     @Override
     public String getStateFromBoard(Turn actualTurn) {
         StringBuilder state = new StringBuilder();
-        state.append(getFenFromBoard(actualTurn));
-        state.append(" [")
+        state.append(getFenFromBoard(actualTurn))
+                .append(" [")
                 .append(actualTurn.getFrom().toString())
                 .append("|")
                 .append(actualTurn.getPlayed())
@@ -104,7 +104,7 @@ public class ClassicBoardStateBuilder extends BoardStateBuilder {
     private String[] getInfosFromState(String fenState) throws IllegalStateException {
         int startIndex = fenState.indexOf('[');
         int endIndex = fenState.indexOf(']');
-        String[] infos = fenState.substring(startIndex + 1, endIndex).split("\\|");
+        String[] infos = fenState.substring(startIndex + 1, endIndex).trim().split("\\|");
         if (infos.length != 3) {
             throw new IllegalStateException("Invalid format for state informations");
         }
