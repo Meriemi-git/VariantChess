@@ -32,13 +32,13 @@ public class GameEventManager {
                 .forEach(subs -> subs.removeIf(sub -> sub.subscriber == subscriber));
     }
 
-    public void sendMessage(GameEvent event) {
+    public void sendEvent(GameEvent event) {
         List<Subscription> subscriptions = new ArrayList();
         this.getSubscriptionsRec(event.getClass(), subscriptions);
         subscriptions
                 .stream()
                 .sorted(Comparator.naturalOrder())
-                .forEachOrdered(sub -> sub.subscriber.receiveGameEvent(event));
+                .forEachOrdered(sub -> sub.subscriber.receiveEvent(event));
     }
 
     private List<Subscription> getSubscriptionsRec(Class eventClass, List<Subscription> subscription) {

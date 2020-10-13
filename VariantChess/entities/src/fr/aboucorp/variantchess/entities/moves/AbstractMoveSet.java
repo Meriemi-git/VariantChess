@@ -44,7 +44,7 @@ public abstract class AbstractMoveSet implements GameEventSubscriber {
     }
 
     @Override
-    public void receiveGameEvent(GameEvent event) {
+    public void receiveEvent(GameEvent event) {
         if (event instanceof PieceEvent) {
             if (event instanceof CheckInEvent && PieceId.getColor(((CheckInEvent) event).played) == this.piece.getChessColor()) {
                 this.isChecking = true;

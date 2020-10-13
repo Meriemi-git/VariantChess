@@ -26,8 +26,8 @@ public class KingMoveSet extends AbstractMoveSet implements GameEventSubscriber 
     }
 
     @Override
-    public void receiveGameEvent(GameEvent event) {
-        super.receiveGameEvent(event);
+    public void receiveEvent(GameEvent event) {
+        super.receiveEvent(event);
         if (event instanceof PieceEvent && this.piece.getChessColor() == PieceId.getColor(((PieceEvent) event).played)) {
             this.canCastleQueenSide = ((PieceEvent) event).boardEventType == EventType.CASTLE_QUEEN;
             this.canCastleKingSide = ((PieceEvent) event).boardEventType == EventType.CASTLE_KING;

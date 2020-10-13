@@ -32,7 +32,7 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
     }
 
     @Override
-    public void receiveGameEvent(GameEvent event) {
+    public void receiveEvent(GameEvent event) {
         if (event instanceof TurnStartEvent) {
             this.manageTurnStart((TurnStartEvent) event);
         } else if (event instanceof TurnEndEvent) {
@@ -194,7 +194,7 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
             }
             this.board3dManager.moveToEven(toBeEaten);
             String eventMessage = String.format("Piece %s die on %s", toBeEaten.getPieceId().name(), toBeEaten.getLocation());
-            this.gameEventManager.sendMessage(new PieceEvent(eventMessage, EventType.DEATH, toBeEaten.getPieceId()));
+            this.gameEventManager.sendEvent(new PieceEvent(eventMessage, EventType.DEATH, toBeEaten.getPieceId()));
             toBeEaten.die();
         }
         return toBeEaten;
