@@ -10,13 +10,18 @@ import fr.aboucorp.variantchess.entities.Square;
 import fr.aboucorp.variantchess.entities.Turn;
 import fr.aboucorp.variantchess.entities.boards.Board;
 import fr.aboucorp.variantchess.entities.enums.EventType;
+import fr.aboucorp.variantchess.entities.enums.GameState;
+import fr.aboucorp.variantchess.entities.enums.PieceId;
 import fr.aboucorp.variantchess.entities.events.GameEventManager;
 import fr.aboucorp.variantchess.entities.events.GameEventSubscriber;
 import fr.aboucorp.variantchess.entities.events.models.CastlingEvent;
 import fr.aboucorp.variantchess.entities.events.models.EnPassantEvent;
 import fr.aboucorp.variantchess.entities.events.models.GameEvent;
+import fr.aboucorp.variantchess.entities.events.models.MoveEvent;
+import fr.aboucorp.variantchess.entities.events.models.PartyEvent;
 import fr.aboucorp.variantchess.entities.events.models.PieceEvent;
 import fr.aboucorp.variantchess.entities.events.models.TurnEndEvent;
+import fr.aboucorp.variantchess.entities.events.models.TurnEvent;
 import fr.aboucorp.variantchess.entities.events.models.TurnStartEvent;
 import fr.aboucorp.variantchess.entities.exceptions.FenStringBadFormatException;
 import fr.aboucorp.variantchess.entities.rules.ClassicRuleSet;
@@ -46,7 +51,9 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
 
     @Override
     public void startParty(ChessMatch chessMatch) {
-        super.startParty(chessMatch);
+        this.gameEventManager.subscribe(PartyEvent.class, this, 1);
+        this.gameEventManager.subscribe(TurnEvent.class, this, 1);
+        this.gameEventManager.subscribe(PieceEvent.class, this, 1);
         if (chessMatch.turns.size() == 0) {
             this.board.initBoard();
         } else {
@@ -66,6 +73,16 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
             }
         };
         postRunner.startAsync();
+    }
+
+    @Override
+    public void stopParty() {
+        this.gameState = GameState.PIECE_SELECTION;
+        this.selectedPiece = null;
+        this.previousTurn = null;
+        this.actualTurn = null;
+        this.board.clearBoard();
+        this.ruleSet.moveNumber = 0;
     }
 
     @Override
@@ -98,7 +115,7 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
             @Override
             public void execute() {
                 try {
-                    ClassicBoardManager.super.stopParty();
+                    ClassicBoardManager.this.stopParty();
                     ClassicBoardManager.this.board.loadBoard(parts[0]);
                     ClassicBoardManager.this.board3dManager.createPieces(ClassicBoardManager.this.board.getWhitePieces());
                     ClassicBoardManager.this.board3dManager.createPieces(ClassicBoardManager.this.board.getBlackPieces());
@@ -137,13 +154,13 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
             this.previousTurn = this.actualTurn;
         }
         this.actualTurn = event.turn;
-        GdxPostRunner runner = new GdxPostRunner() {
+/*        GdxPostRunner runner = new GdxPostRunner() {
             @Override
             public void execute() {
-                //ClassicBoardManager.this.board3dManager.moveCameraOnNewTurn(ClassicBoardManager.this.actualTurn.getTurnColor());
+                ClassicBoardManager.this.board3dManager.moveCameraOnNewTurn(ClassicBoardManager.this.actualTurn.getTurnColor());
             }
         };
-        runner.startAsync();
+        runner.startAsync();*/
     }
 
     @Override
@@ -153,7 +170,7 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
         GdxPostRunner runner = new GdxPostRunner() {
             @Override
             protected void execute() {
-                board3dManager.moveSelected(square);
+                ClassicBoardManager.this.board3dManager.moveSelected(square);
             }
         };
         runner.startAsync();
@@ -165,11 +182,35 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
 
     @Override
     public void selectPiece(Piece touched) {
-        super.selectPiece(touched);
         this.selectedPiece = touched;
+        this.gameState = this.gameState == GameState.WAIT_FOR_NEXT_TURN ? GameState.WAIT_FOR_NEXT_TURN : GameState.SQUARE_SELECTION;
         this.board3dManager.selectPiece(touched);
         this.possiblesMoves = touched.getMoveSet().getNextMoves();
         this.hightLightPossibleMoves(this.possiblesMoves);
+    }
+
+    @Override
+    public void selectSquare(Square to) {
+        Square from = this.selectedPiece.getSquare();
+        Piece deadPiece = this.moveToSquare(to);
+        String message = String.format("Move %s from %s to %s", this.selectedPiece, from, to);
+        this.gameEventManager.sendEvent(new MoveEvent(
+                message
+                , from.getLocation()
+                , to.getLocation()
+                , this.selectedPiece.getPieceId()
+                , deadPiece != null ? deadPiece.getPieceId() : null));
+    }
+
+    @Override
+    public void toogleTacticalView() {
+        GdxPostRunner runner = new GdxPostRunner() {
+            @Override
+            public void execute() {
+                ClassicBoardManager.this.board3dManager.toogleTacticalView();
+            }
+        };
+        runner.startAsync();
     }
 
     @Override
@@ -178,6 +219,27 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
         this.board3dManager.resetSelection();
         if (this.possiblesMoves != null) {
             this.board3dManager.unHighlightSquares(this.possiblesMoves);
+        }
+    }
+
+    @Override
+    public void playTheOppositeMove(String fenState) {
+        PieceId played = this.boardStateBuilder.getPiecePlayedFromState(fenState);
+        Location to = this.boardStateBuilder.getTo(fenState);
+        this.selectPiece(this.board.getPieceById(played));
+        Square selectedSquare = (Square) this.board.getSquares().getItemByLocation(to);
+        this.selectSquare(selectedSquare);
+    }
+
+    private void hightLightPossibleMoves(SquareList possibleMoves) {
+        if (possibleMoves != null) {
+            for (Square square : possibleMoves) {
+                if (square.getPiece() == null) {
+                    this.board3dManager.highlightEmpty(square);
+                } else {
+                    this.board3dManager.highlightOccupied(square);
+                }
+            }
         }
     }
 
@@ -204,23 +266,13 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
         GdxPostRunner runner = new GdxPostRunner() {
             @Override
             protected void execute() {
-                board3dManager.unHighlightSquares(possiblesMoves);
-                board3dManager.resetSelection();
+                ClassicBoardManager.this.board3dManager.unHighlightSquares(ClassicBoardManager.this.possiblesMoves);
+                ClassicBoardManager.this.board3dManager.resetSelection();
             }
         };
         runner.startAsync();
         this.possiblesMoves = null;
     }
 
-    private void hightLightPossibleMoves(SquareList possibleMoves) {
-        if (possibleMoves != null) {
-            for (Square square : possibleMoves) {
-                if (square.getPiece() == null) {
-                    this.board3dManager.highlightEmpty(square);
-                } else {
-                    this.board3dManager.highlightOccupied(square);
-                }
-            }
-        }
-    }
+
 }

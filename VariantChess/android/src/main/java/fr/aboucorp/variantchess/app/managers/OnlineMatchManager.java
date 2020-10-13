@@ -69,6 +69,12 @@ public class OnlineMatchManager extends MatchManager implements MatchListener {
     }
 
     @Override
+    public void OnBoardLoaded() {
+        this.gameEventManager.subscribe(GameEvent.class, this, 1);
+        startTurn();
+    }
+
+    @Override
     public void receiveEvent(GameEvent event) {
         if (event instanceof BoardEvent && ((BoardEvent) event).boardEventType == EventType.CHECKMATE) {
             ChessColor winner = this.boardManager.getWinner();
@@ -81,10 +87,17 @@ public class OnlineMatchManager extends MatchManager implements MatchListener {
 
     @Override
     public void startParty(ChessMatch chessMatch) {
-        super.startParty(chessMatch);
+        this.chessMatch = chessMatch;
+        this.boardManager.startParty(chessMatch);
         if (!chessMatch.whitePlayer.getUserID().equals(this.chessUser.userId)) {
             this.boardManager.waitForNextTurn();
         }
+    }
+
+    @Override
+    public void stopParty() {
+        this.boardManager.stopParty();
+        this.chessMatch = null;
     }
 
     @Override
@@ -124,6 +137,11 @@ public class OnlineMatchManager extends MatchManager implements MatchListener {
         this.currentTurn = nextTurn;
         String eventMessage = String.format("Turn %s, color : %s", nextTurn.getTurnNumber(), nextTurn.getTurnColor());
         this.gameEventManager.sendEvent(new TurnStartEvent(eventMessage, nextTurn));
+    }
+
+    @Override
+    public String getPartyInfos() {
+        return this.currentTurn.getTurnColor().name();
     }
 
     public void playOppositeMove(String boardState) {

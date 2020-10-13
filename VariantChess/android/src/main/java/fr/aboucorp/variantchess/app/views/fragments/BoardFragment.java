@@ -31,6 +31,7 @@ import fr.aboucorp.variantchess.app.managers.boards.BoardManager;
 import fr.aboucorp.variantchess.app.managers.boards.BoardManagerFactory;
 import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
 import fr.aboucorp.variantchess.app.utils.AsyncHandler;
+import fr.aboucorp.variantchess.entities.ChessColor;
 import fr.aboucorp.variantchess.entities.ChessMatch;
 import fr.aboucorp.variantchess.entities.Player;
 import fr.aboucorp.variantchess.entities.events.GameEventManager;
@@ -69,6 +70,29 @@ public class BoardFragment extends AndroidFragmentApplication implements GameEve
     private Player black;
 
     @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.board_layout, container, false);
+        this.bindViews(view);
+        this.sessionManager = SessionManager.getInstance();
+        this.initializeBoard();
+        if (isOnline) {
+            joinMatch(this.matchId);
+        } else {
+            ChessMatch chessMatch = new ChessMatch();
+            chessMatch.setWhitePlayer(new Player("Player 1", ChessColor.WHITE, null));
+            chessMatch.setBlackPlayer(new Player("Player 2", ChessColor.BLACK, null));
+            matchManager.startParty(chessMatch);
+        }
+        return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        this.bindListeners();
+    }
+
+    @Override
     public void receiveEvent(GameEvent event) {
         this.runOnUiThread(() -> {
             party_logs.setText(party_logs.getText() + "\n" + event.message);
@@ -89,21 +113,7 @@ public class BoardFragment extends AndroidFragmentApplication implements GameEve
         }
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.board_layout, container, false);
-        this.bindViews(view);
-        this.sessionManager = SessionManager.getInstance();
-        this.initializeBoard();
-        joinMatch(this.matchId);
-        return view;
-    }
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        this.bindListeners();
-    }
 
     private void bindViews(View view) {
         this.board_panel = view.findViewById(R.id.board);
@@ -128,7 +138,6 @@ public class BoardFragment extends AndroidFragmentApplication implements GameEve
             @Override
             protected Object executeAsync() throws Exception {
                 Match match = sessionManager.joinMatchById(matchID);
-
                 ChessMatch chessMatch = new ChessMatch();
                 chessMatch.setWhitePlayer(white);
                 chessMatch.setBlackPlayer(black);
