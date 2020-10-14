@@ -38,7 +38,7 @@ allprojects {
 }
 
 project(":android") {
-    apply plugin: "android"
+    apply plugin: "com.android.application"
     apply plugin: "androidx.navigation.safeargs"
     apply plugin: "com.exploids.plantumlfromsource"
     configurations {

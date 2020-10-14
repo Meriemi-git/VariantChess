@@ -16,6 +16,9 @@ import fr.aboucorp.variantchess.entities.events.models.PartyEvent;
 import fr.aboucorp.variantchess.entities.events.models.TurnEndEvent;
 import fr.aboucorp.variantchess.entities.events.models.TurnStartEvent;
 
+import static fr.aboucorp.variantchess.entities.ChessColor.BLACK;
+import static fr.aboucorp.variantchess.entities.ChessColor.WHITE;
+
 public class OfflineMatchManager extends MatchManager {
     public OfflineMatchManager(BoardManager boardManager, GameEventManager gameEventManager) {
         super(boardManager, gameEventManager);
@@ -68,9 +71,9 @@ public class OfflineMatchManager extends MatchManager {
         Turn nextTurn;
         Player player = null;
         if (this.chessMatch.getTurns().size() > 0 && this.chessMatch.getTurns().getLast().getTurnColor() == ChessColor.WHITE) {
-            player = chessMatch.getBlackPlayer();
+            player = chessMatch.getPlayerByColor(BLACK);
         } else {
-            player = chessMatch.getWhitePlayer();
+            player = chessMatch.getPlayerByColor(WHITE);
         }
         nextTurn = new Turn(this.chessMatch.getTurns().size() + 1, player);
         this.currentTurn = nextTurn;

@@ -81,8 +81,6 @@ public class GameRulesFragment extends VariantChessFragment implements AdapterVi
             Player white = new Player("White", ChessColor.WHITE, null);
             Player black = new Player("Black", ChessColor.BLACK, null);
             ChessMatch chessMatch = new ChessMatch();
-            chessMatch.setWhitePlayer(white);
-            chessMatch.setBlackPlayer(black);
             NavDirections action = GameRulesFragmentDirections.actionGameRulesFragmentToBoardFragment(false, selected, chessMatch);
             Navigation.findNavController(getView()).navigate(action);
         });
