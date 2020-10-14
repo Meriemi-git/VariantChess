@@ -13,10 +13,15 @@ public class GraphicGameArray extends Array<GraphicsGameElement> {
 
     public GraphicsGameElement getByLocation(Location location) {
         for (Iterator<GraphicsGameElement> iter = this.iterator(); iter.hasNext(); ) {
-            GraphicsGameElement model = iter.next();
-            if (model.getLocation().equals(location)) {
-                return model;
+            try {
+                GraphicsGameElement model = iter.next();
+                if (model != null && model.getLocation().equals(location)) {
+                    return model;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+
         }
         return null;
     }

@@ -1,6 +1,8 @@
 package fr.aboucorp.variantchess.app.managers.boards;
 
-import fr.aboucorp.variantchess.app.utils.GdxPostRunner;
+import android.util.Log;
+
+import fr.aboucorp.variantchess.app.utils.GdxAsyncHandler;
 import fr.aboucorp.variantchess.app.utils.state.ClassicBoardStateBuilder;
 import fr.aboucorp.variantchess.entities.ChessColor;
 import fr.aboucorp.variantchess.entities.ChessMatch;
@@ -10,13 +12,18 @@ import fr.aboucorp.variantchess.entities.Square;
 import fr.aboucorp.variantchess.entities.Turn;
 import fr.aboucorp.variantchess.entities.boards.Board;
 import fr.aboucorp.variantchess.entities.enums.EventType;
+import fr.aboucorp.variantchess.entities.enums.GameState;
+import fr.aboucorp.variantchess.entities.enums.PieceId;
 import fr.aboucorp.variantchess.entities.events.GameEventManager;
 import fr.aboucorp.variantchess.entities.events.GameEventSubscriber;
 import fr.aboucorp.variantchess.entities.events.models.CastlingEvent;
 import fr.aboucorp.variantchess.entities.events.models.EnPassantEvent;
 import fr.aboucorp.variantchess.entities.events.models.GameEvent;
+import fr.aboucorp.variantchess.entities.events.models.MoveEvent;
+import fr.aboucorp.variantchess.entities.events.models.PartyEvent;
 import fr.aboucorp.variantchess.entities.events.models.PieceEvent;
 import fr.aboucorp.variantchess.entities.events.models.TurnEndEvent;
+import fr.aboucorp.variantchess.entities.events.models.TurnEvent;
 import fr.aboucorp.variantchess.entities.events.models.TurnStartEvent;
 import fr.aboucorp.variantchess.entities.exceptions.FenStringBadFormatException;
 import fr.aboucorp.variantchess.entities.rules.ClassicRuleSet;
@@ -28,7 +35,7 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
 
     public ClassicBoardManager(Board3dManager board3dManager, Board board, ClassicRuleSet ruleSet, GameEventManager gameEventManager, ClassicBoardStateBuilder classicFenBuilder) {
         super(board, board3dManager, ruleSet, gameEventManager, classicFenBuilder);
-        this.gameEventManager.subscribe(EnPassantEvent.class, this, 1);
+        this.gameEventManager.subscribe(EnPassantEvent.class, this, 1, "ClassicBoardManager => EnPassantEvent");
     }
 
     @Override
@@ -46,7 +53,9 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
 
     @Override
     public void startParty(ChessMatch chessMatch) {
-        super.startParty(chessMatch);
+        this.gameEventManager.subscribe(PartyEvent.class, this, 1, "ClassicBoardManager => PartyEvent");
+        this.gameEventManager.subscribe(TurnEvent.class, this, 1, "ClassicBoardManager => TurnEvent");
+        this.gameEventManager.subscribe(PieceEvent.class, this, 1, "ClassicBoardManager => PieceEvent");
         if (chessMatch.turns.size() == 0) {
             this.board.initBoard();
         } else {
@@ -56,16 +65,32 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
                 e.printStackTrace();
             }
         }
-        GdxPostRunner postRunner = new GdxPostRunner() {
+        GdxAsyncHandler gdxAsyncHandler = new GdxAsyncHandler() {
             @Override
-            public void execute() {
-                ClassicBoardManager.this.board3dManager.createSquares(ClassicBoardManager.this.board.getSquares());
-                ClassicBoardManager.this.board3dManager.createPieces(ClassicBoardManager.this.board.getWhitePieces());
-                ClassicBoardManager.this.board3dManager.createPieces(ClassicBoardManager.this.board.getBlackPieces());
-                ClassicBoardManager.this.boardLoadingListener.OnBoardLoaded();
+            public Object execute() {
+                board3dManager.createSquares(ClassicBoardManager.this.board.getSquares());
+                board3dManager.createPieces(ClassicBoardManager.this.board.getWhitePieces());
+                board3dManager.createPieces(ClassicBoardManager.this.board.getBlackPieces());
+                boardLoadingListener.OnBoardLoaded();
+                return null;
+            }
+
+            @Override
+            public void error(Exception ex) {
+                Log.e("fr.aboucorp.variantchess", String.format("Error during libgdx threadin startParty message : %s", ex.getMessage()));
             }
         };
-        postRunner.startAsync();
+        gdxAsyncHandler.start();
+    }
+
+    @Override
+    public void stopParty() {
+        this.gameState = GameState.PIECE_SELECTION;
+        this.selectedPiece = null;
+        this.previousTurn = null;
+        this.actualTurn = null;
+        this.board.clearBoard();
+        this.ruleSet.moveNumber = 0;
     }
 
     @Override
@@ -94,20 +119,23 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
         if (parts.length < 5 || parts.length > 6) {
             throw new FenStringBadFormatException("Cannot load game from fen string, fen string doesn't contains enought parts");
         }
-        GdxPostRunner runner = new GdxPostRunner() {
+        stopParty();
+
+        GdxAsyncHandler gdxAsyncHandler = new GdxAsyncHandler() {
             @Override
-            public void execute() {
-                try {
-                    ClassicBoardManager.super.stopParty();
-                    ClassicBoardManager.this.board.loadBoard(parts[0]);
-                    ClassicBoardManager.this.board3dManager.createPieces(ClassicBoardManager.this.board.getWhitePieces());
-                    ClassicBoardManager.this.board3dManager.createPieces(ClassicBoardManager.this.board.getBlackPieces());
-                } catch (FenStringBadFormatException e) {
-                    e.printStackTrace();
-                }
+            public Object execute() throws Exception {
+                board.loadBoard(parts[0]);
+                board3dManager.createPieces(board.getWhitePieces());
+                board3dManager.createPieces(board.getBlackPieces());
+                return null;
+            }
+
+            @Override
+            public void error(Exception ex) {
+                Log.e("fr.aboucorp.variantchess", String.format("Error in libgdx thread during loadBoard. Message : %s", ex.getMessage()));
             }
         };
-        runner.start();
+        gdxAsyncHandler.startAndWait();
 
         ((ClassicRuleSet) this.ruleSet).whiteCanCastleKing = parts[2].contains("K");
         ((ClassicRuleSet) this.ruleSet).whiteCanCastleQueen = parts[2].contains("Q");
@@ -127,8 +155,8 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
 
     @Override
     protected void manageTurnEnd() {
-        this.selectedPiece = null;
-        this.possiblesMoves = null;
+/*        this.selectedPiece = null;
+        this.possiblesMoves = null;*/
     }
 
     @Override
@@ -137,39 +165,158 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
             this.previousTurn = this.actualTurn;
         }
         this.actualTurn = event.turn;
-        GdxPostRunner runner = new GdxPostRunner() {
+/*        GdxPostRunner runner = new GdxPostRunner() {
             @Override
             public void execute() {
-                //ClassicBoardManager.this.board3dManager.moveCameraOnNewTurn(ClassicBoardManager.this.actualTurn.getTurnColor());
+                ClassicBoardManager.this.board3dManager.moveCameraOnNewTurn(ClassicBoardManager.this.actualTurn.getTurnColor());
             }
         };
-        runner.startAsync();
+        runner.startAsync();*/
     }
+
 
     @Override
     public Piece moveToSquare(Square square) {
         Piece eated = this.eat(square);
         this.selectedPiece.move(square);
-        GdxPostRunner runner = new GdxPostRunner() {
+        GdxAsyncHandler gdxAsyncHandler = new GdxAsyncHandler() {
             @Override
-            protected void execute() {
+            public Object execute() {
                 board3dManager.moveSelected(square);
+                // Reset highlighted moves
+                board3dManager.unHighlightSquares(possiblesMoves);
+                board3dManager.resetSelection();
+                possiblesMoves = null;
+                return null;
+            }
+
+            @Override
+            public void error(Exception ex) {
+                Log.e("fr.aboucorp.variantchess", String.format("Error in libgdx thread during moveToSquare. Message : %s", ex.getMessage()));
             }
         };
-        runner.startAsync();
+        gdxAsyncHandler.start();
         ((ClassicRuleSet) this.ruleSet).isKingInCheck(this.selectedPiece);
         ((ClassicRuleSet) this.ruleSet).checkIfCastling(square);
-        this.resetHighlited();
         return eated;
     }
 
     @Override
-    public void selectPiece(Piece touched) {
-        super.selectPiece(touched);
+    public void onPieceSelected(Piece touched) {
         this.selectedPiece = touched;
-        this.board3dManager.selectPiece(touched);
+        this.gameState = GameState.SQUARE_SELECTION;
         this.possiblesMoves = touched.getMoveSet().getNextMoves();
-        this.hightLightPossibleMoves(this.possiblesMoves);
+        GdxAsyncHandler gdxAsyncHandler = new GdxAsyncHandler() {
+            @Override
+            public Object execute() {
+                gestureListener.isSelectingPiece.set(true);
+                board3dManager.selectPiece(touched);
+                hightLightPossibleMoves(possiblesMoves);
+                return null;
+            }
+
+            @Override
+            public void callbackOnUI(Object arg) {
+                gestureListener.isSelectingPiece.set(false);
+            }
+
+            @Override
+            public void error(Exception ex) {
+                Log.e("fr.aboucorp.variantchess", String.format("Error in libgdx thread during selectPiece. Message : %s", ex.getMessage()));
+            }
+        };
+        gdxAsyncHandler.start();
+    }
+
+    @Override
+    public void onSquareSelected(Square to) {
+        // TODO implements waiting for selectPiece to end
+        Square from = this.selectedPiece.getSquare();
+        Piece deadPiece = this.moveToSquare(to);
+        String message = String.format("Move %s from %s to %s", this.selectedPiece, from, to);
+        this.gameEventManager.sendEvent(new MoveEvent(
+                message
+                , from.getLocation()
+                , to.getLocation()
+                , this.selectedPiece.getPieceId()
+                , deadPiece != null ? deadPiece.getPieceId() : null));
+        this.selectedPiece = null;
+    }
+
+
+    @Override
+    public void toogleTacticalView() {
+        GdxAsyncHandler gdxAsyncHandler = new GdxAsyncHandler() {
+            @Override
+            public Object execute() {
+                board3dManager.toogleTacticalView();
+                return null;
+            }
+
+            @Override
+            public void error(Exception ex) {
+                Log.e("fr.aboucorp.variantchess", String.format("Error in libgdx thread during toogleTacticalView. Message : %s", ex.getMessage()));
+            }
+        };
+        gdxAsyncHandler.start();
+    }
+
+    @Override
+    public void playTheOppositeMove(String fenState) {
+        PieceId playedID = this.boardStateBuilder.getPiecePlayedFromState(fenState);
+        if (playedID != null) {
+            Location to = this.boardStateBuilder.getTo(fenState);
+            Square selectedSquare = (Square) this.board.getSquares().getItemByLocation(to);
+            Piece played = this.board.getPieceById(playedID);
+            Log.i("fr.aboucorp.variantchess", String.format("Piece played by the opposite : %s", played));
+            this.selectOpponentPiece(played, selectedSquare);
+        } else {
+            // Opponent pass his turn
+            Log.i("fr.aboucorp.variantchess", String.format("Opponent pass his turn"));
+            this.gameEventManager.sendEvent(new MoveEvent(
+                    "Turn passed"
+                    , null
+                    , null
+                    , null
+                    , null));
+        }
+
+    }
+
+    public void selectOpponentPiece(Piece touched, Square selectedSquare) {
+        this.selectedPiece = touched;
+        this.possiblesMoves = touched.getMoveSet().getNextMoves();
+        GdxAsyncHandler gdxAsyncHandler = new GdxAsyncHandler() {
+            @Override
+            public Object execute() {
+                board3dManager.selectPiece(touched);
+                return null;
+            }
+
+            @Override
+            public void callbackOnUI(Object arg) {
+                selectOpponentSquare(selectedSquare);
+            }
+
+            @Override
+            public void error(Exception ex) {
+                Log.e("fr.aboucorp.variantchess", String.format("Error in libgdx thread during selectPiece. Message : %s", ex.getMessage()));
+            }
+        };
+        gdxAsyncHandler.start();
+    }
+
+    public void selectOpponentSquare(Square to) {
+        Square from = this.selectedPiece.getSquare();
+        Piece deadPiece = this.moveToSquare(to);
+        String message = String.format("Move %s from %s to %s", this.selectedPiece, from, to);
+        this.gameEventManager.sendEvent(new MoveEvent(
+                message
+                , from.getLocation()
+                , to.getLocation()
+                , this.selectedPiece.getPieceId()
+                , deadPiece != null ? deadPiece.getPieceId() : null));
+        this.selectedPiece = null;
     }
 
     @Override
@@ -178,6 +325,19 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
         this.board3dManager.resetSelection();
         if (this.possiblesMoves != null) {
             this.board3dManager.unHighlightSquares(this.possiblesMoves);
+        }
+    }
+
+
+    private void hightLightPossibleMoves(SquareList possibleMoves) {
+        if (possibleMoves != null) {
+            for (Square square : possibleMoves) {
+                if (square.getPiece() == null) {
+                    this.board3dManager.highlightEmpty(square);
+                } else {
+                    this.board3dManager.highlightOccupied(square);
+                }
+            }
         }
     }
 
@@ -200,27 +360,5 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
         return toBeEaten;
     }
 
-    private void resetHighlited() {
-        GdxPostRunner runner = new GdxPostRunner() {
-            @Override
-            protected void execute() {
-                board3dManager.unHighlightSquares(possiblesMoves);
-                board3dManager.resetSelection();
-            }
-        };
-        runner.startAsync();
-        this.possiblesMoves = null;
-    }
 
-    private void hightLightPossibleMoves(SquareList possibleMoves) {
-        if (possibleMoves != null) {
-            for (Square square : possibleMoves) {
-                if (square.getPiece() == null) {
-                    this.board3dManager.highlightEmpty(square);
-                } else {
-                    this.board3dManager.highlightOccupied(square);
-                }
-            }
-        }
-    }
 }

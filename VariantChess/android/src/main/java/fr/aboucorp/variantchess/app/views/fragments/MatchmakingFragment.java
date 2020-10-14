@@ -24,10 +24,10 @@ import com.heroiclabs.nakama.api.User;
 import java.util.List;
 
 import fr.aboucorp.variantchess.R;
-import fr.aboucorp.variantchess.app.db.entities.ChessUser;
 import fr.aboucorp.variantchess.app.db.entities.GameRules;
-import fr.aboucorp.variantchess.app.db.viewmodel.UserViewModel;
-import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
+import fr.aboucorp.variantchess.app.db.entities.VariantUser;
+import fr.aboucorp.variantchess.app.db.viewmodel.VariantUserViewModel;
+import fr.aboucorp.variantchess.app.multiplayer.NakamaManager;
 import fr.aboucorp.variantchess.app.multiplayer.listeners.MatchmakingListener;
 import fr.aboucorp.variantchess.app.utils.AsyncHandler;
 import fr.aboucorp.variantchess.entities.ChessColor;
@@ -48,15 +48,15 @@ public class MatchmakingFragment extends VariantChessFragment implements Matchma
     /**
      * Nakama multiplayer session manager
      */
-    private SessionManager sessionManager;
+    private NakamaManager nakamaManager;
     /**
      * Nakama multiplayer session manager
      */
     private String matchmakingTicket;
 
     private GameRules gameRules;
-    private ChessUser chessUser;
-    private UserViewModel userViewModel;
+    private VariantUser variantUser;
+    private VariantUserViewModel variantUserViewModel;
 
     @Override
     protected void bindViews() {
@@ -83,13 +83,13 @@ public class MatchmakingFragment extends VariantChessFragment implements Matchma
         if (savedInstanceState != null) {
             this.gameRules = (GameRules) savedInstanceState.getSerializable("game_rules");
         }
-        this.sessionManager = SessionManager.getInstance();
-        this.sessionManager.setMatchmakingListener(this);
+        this.nakamaManager = NakamaManager.getInstance();
+        this.nakamaManager.setMatchmakingListener(this);
         this.bindViews();
         this.bindListeners();
-        this.userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
-        this.userViewModel.getConnected().observe(this.getViewLifecycleOwner(), connected -> {
-            chessUser = connected;
+        this.variantUserViewModel = new ViewModelProvider(this).get(VariantUserViewModel.class);
+        this.variantUserViewModel.getConnected().observe(this.getViewLifecycleOwner(), connected -> {
+            variantUser = connected;
             this.launchMatchmaking();
         });
     }
@@ -107,7 +107,7 @@ public class MatchmakingFragment extends VariantChessFragment implements Matchma
         AsyncHandler asyncHandler = new AsyncHandler() {
             @Override
             protected Object executeAsync() throws Exception {
-                List<User> users = sessionManager.getUsersFromMatched(matched);
+                List<User> users = nakamaManager.getUsersFromMatched(matched);
                 return users;
             }
 
@@ -117,7 +117,7 @@ public class MatchmakingFragment extends VariantChessFragment implements Matchma
                 List<User> users = (List<User>) arg;
                 Player white = new Player(users.get(0).getUsername(), ChessColor.WHITE, users.get(0).getId());
                 Player black = new Player(users.get(1).getUsername(), ChessColor.BLACK, users.get(1).getId());
-                NavDirections action = MatchmakingFragmentDirections.actionMatchmakingFragmentToBoardFragment(true, matched.getMatchId(), chessUser, gameRules, white, black);
+                NavDirections action = MatchmakingFragmentDirections.actionMatchmakingFragmentToBoardFragment(true, matched.getMatchId(), variantUser, gameRules, white, black);
                 Navigation.findNavController(getView()).navigate(action);
             }
 
@@ -141,7 +141,7 @@ public class MatchmakingFragment extends VariantChessFragment implements Matchma
         AsyncHandler asyncHandler = new AsyncHandler() {
             @Override
             protected Object executeAsync() throws Exception {
-                matchmakingTicket = sessionManager.launchMatchMaking(gameRules.name, matchmakingTicket);
+                matchmakingTicket = nakamaManager.launchMatchMaking(gameRules.name, matchmakingTicket);
                 return null;
             }
 
@@ -166,7 +166,7 @@ public class MatchmakingFragment extends VariantChessFragment implements Matchma
         AsyncHandler handler = new AsyncHandler() {
             @Override
             protected Object executeAsync() {
-                sessionManager.cancelMatchMaking(ticket);
+                nakamaManager.cancelMatchMaking(ticket);
                 btn_cancel.setEnabled(false);
                 return null;
             }

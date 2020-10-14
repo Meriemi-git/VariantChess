@@ -2,10 +2,10 @@
   "formatVersion": 1,
   "database": {
     "version": 3,
-    "identityHash": "f5588fed548446f12c48f845e07c0774",
+    "identityHash": "c8b5d3a1476cf96b06fd90a919136131",
     "entities": [
       {
-        "tableName": "chessuser",
+        "tableName": "variant_user",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `username` TEXT, `user_id` TEXT, `metadata` TEXT, `is_connected` INTEGER NOT NULL, `auth_token` TEXT)",
         "fields": [
           {
@@ -53,13 +53,13 @@
         },
         "indices": [
           {
-            "name": "index_chessuser_username_user_id",
+            "name": "index_variant_user_username_user_id",
             "unique": true,
             "columnNames": [
               "username",
               "user_id"
             ],
-            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_chessuser_username_user_id` ON `${TABLE_NAME}` (`username`, `user_id`)"
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_variant_user_username_user_id` ON `${TABLE_NAME}` (`username`, `user_id`)"
           }
         ],
         "foreignKeys": []
@@ -118,7 +118,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f5588fed548446f12c48f845e07c0774')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c8b5d3a1476cf96b06fd90a919136131')"
     ]
   }
 }

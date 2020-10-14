@@ -13,10 +13,10 @@ import java.util.concurrent.Executors;
 
 import fr.aboucorp.variantchess.app.db.dao.ChessUserDao;
 import fr.aboucorp.variantchess.app.db.dao.GameRulesDao;
-import fr.aboucorp.variantchess.app.db.entities.ChessUser;
 import fr.aboucorp.variantchess.app.db.entities.GameRules;
+import fr.aboucorp.variantchess.app.db.entities.VariantUser;
 
-@Database(entities = {ChessUser.class, GameRules.class}, version = 3)
+@Database(entities = {VariantUser.class, GameRules.class}, version = 3)
 public abstract class VariantChessDatabase extends RoomDatabase {
     private static final int NUMBER_OF_THREADS = 4;
     public static final ExecutorService databaseWriteExecutor =

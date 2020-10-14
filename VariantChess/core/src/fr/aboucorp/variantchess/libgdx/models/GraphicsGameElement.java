@@ -13,7 +13,6 @@ public class GraphicsGameElement {
     private ChessModel model3d;
     private Sprite model2d;
     private Location location;
-    private boolean useShader;
 
     public GraphicsGameElement(Location location, PieceId id, ChessColor color) {
         this.location = location;
@@ -47,14 +46,6 @@ public class GraphicsGameElement {
 
     public void setModel3d(ChessModel model3d) {
         this.model3d = model3d;
-    }
-
-    public boolean isUseShader() {
-        return this.useShader;
-    }
-
-    public void setUseShader(boolean useShader) {
-        this.useShader = useShader;
     }
 
     public boolean isVisible(Camera camera, boolean isTacticalView) {

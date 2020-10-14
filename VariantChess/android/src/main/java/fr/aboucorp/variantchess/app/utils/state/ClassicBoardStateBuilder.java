@@ -20,14 +20,17 @@ public class ClassicBoardStateBuilder extends BoardStateBuilder {
     @Override
     public String getStateFromBoard(Turn actualTurn) {
         StringBuilder state = new StringBuilder();
-        state.append(getFenFromBoard(actualTurn))
-                .append(" [")
-                .append(actualTurn.getFrom().toString())
-                .append("|")
-                .append(actualTurn.getPlayed())
-                .append("|")
-                .append(actualTurn.getTo().toString())
-                .append("]");
+        state.append(getFenFromBoard(actualTurn));
+        if (actualTurn.getPlayed() != null) {
+            state.append(" [")
+                    .append(actualTurn.getFrom().toString())
+                    .append("|")
+                    .append(actualTurn.getPlayed())
+                    .append("|")
+                    .append(actualTurn.getTo().toString())
+                    .append("]");
+        }
+
         return state.toString();
     }
 
@@ -86,28 +89,31 @@ public class ClassicBoardStateBuilder extends BoardStateBuilder {
     @Override
     public PieceId getPiecePlayedFromState(String fenState) throws IllegalStateException {
         String[] infos = getInfosFromState(fenState);
-        return PieceId.valueOf(infos[1]);
+        return infos != null ? PieceId.valueOf(infos[1]) : null;
     }
 
     @Override
     public Location getFrom(String fenState) throws IllegalStateException {
         String[] infos = getInfosFromState(fenState);
-        return Location.fromShortString(infos[0]);
+        return infos != null ? Location.fromShortString(infos[0]) : null;
     }
 
     @Override
     public Location getTo(String fenState) throws IllegalStateException {
         String[] infos = getInfosFromState(fenState);
-        return Location.fromShortString(infos[2]);
+        return infos != null ? Location.fromShortString(infos[2]) : null;
     }
 
     private String[] getInfosFromState(String fenState) throws IllegalStateException {
         int startIndex = fenState.indexOf('[');
         int endIndex = fenState.indexOf(']');
-        String[] infos = fenState.substring(startIndex + 1, endIndex).trim().split("\\|");
-        if (infos.length != 3) {
-            throw new IllegalStateException("Invalid format for state informations");
+        if (startIndex != -1 && endIndex != -1) {
+            String[] infos = fenState.substring(startIndex + 1, endIndex).trim().split("\\|");
+            if (infos.length != 3) {
+                throw new IllegalStateException("Invalid format for state informations");
+            }
+            return infos;
         }
-        return infos;
+        return null;
     }
 }

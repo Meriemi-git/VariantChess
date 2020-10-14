@@ -22,8 +22,8 @@ import java.util.List;
 
 import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.db.adapters.GameRulesAdapter;
-import fr.aboucorp.variantchess.app.db.entities.ChessUser;
 import fr.aboucorp.variantchess.app.db.entities.GameRules;
+import fr.aboucorp.variantchess.app.db.entities.VariantUser;
 import fr.aboucorp.variantchess.app.db.viewmodel.GameRulesViewModel;
 import fr.aboucorp.variantchess.app.utils.ArgsKey;
 import fr.aboucorp.variantchess.entities.ChessColor;
@@ -39,7 +39,7 @@ public class GameRulesFragment extends VariantChessFragment implements AdapterVi
     private LinearLayout difficulty_layout;
     private GameRulesViewModel gameRulesViewModel;
     private List<GameRules> allGameRules;
-    private ChessUser chessUser;
+    private VariantUser variantUser;
 
     @Override
     protected void bindViews() {
@@ -68,7 +68,7 @@ public class GameRulesFragment extends VariantChessFragment implements AdapterVi
             gameRulesAdapter.setGameRules(allGameRules);
         });
         this.btn_online.setOnClickListener(v -> {
-            if (this.chessUser != null) {
+            if (this.variantUser != null) {
                 GameRules selected = (GameRules) spinner_rules.getSelectedItem();
                 NavDirections action = GameRulesFragmentDirections.actionGameRulesFragmentToMatchmakingFragment(selected);
                 Navigation.findNavController(getView()).navigate(action);
@@ -99,7 +99,7 @@ public class GameRulesFragment extends VariantChessFragment implements AdapterVi
     @Override
     public void setArguments(@Nullable Bundle args) {
         super.setArguments(args);
-        this.chessUser = (ChessUser) args.getSerializable(ArgsKey.CHESS_USER);
+        this.variantUser = (VariantUser) args.getSerializable(ArgsKey.VARIANT_USER);
     }
 
     private void showAuthentMessage() {

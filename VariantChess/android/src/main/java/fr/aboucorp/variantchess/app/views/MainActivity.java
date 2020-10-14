@@ -20,9 +20,9 @@ import com.heroiclabs.nakama.api.Notification;
 import com.heroiclabs.nakama.api.NotificationList;
 
 import fr.aboucorp.variantchess.R;
-import fr.aboucorp.variantchess.app.db.entities.ChessUser;
-import fr.aboucorp.variantchess.app.db.viewmodel.UserViewModel;
-import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
+import fr.aboucorp.variantchess.app.db.entities.VariantUser;
+import fr.aboucorp.variantchess.app.db.viewmodel.VariantUserViewModel;
+import fr.aboucorp.variantchess.app.multiplayer.NakamaManager;
 import fr.aboucorp.variantchess.app.multiplayer.listeners.NotificationListener;
 import fr.aboucorp.variantchess.app.utils.AsyncHandler;
 import fr.aboucorp.variantchess.app.utils.JsonExtractor;
@@ -34,8 +34,8 @@ import fr.aboucorp.variantchess.app.views.fragments.SettingsFragmentDirections;
 public class MainActivity extends AppCompatActivity implements NotificationListener, AndroidFragmentApplication.Callbacks {
     public static final String SHARED_PREFERENCE_NAME = "nakama";
     private Toolbar toolbar;
-    private SessionManager sessionManager;
-    private UserViewModel userViewModel;
+    private NakamaManager nakamaManager;
+    private VariantUserViewModel variantUserViewModel;
     private SharedPreferences pref;
 
 
@@ -45,11 +45,11 @@ public class MainActivity extends AppCompatActivity implements NotificationListe
         this.pref = getSharedPreferences(SHARED_PREFERENCE_NAME, Context.MODE_PRIVATE);
         this.setContentView(R.layout.main_layout);
         this.setToolbar();
-        this.sessionManager = SessionManager.getInstance();
-        this.sessionManager.setNotificationListener(this);
-        userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
+        this.nakamaManager = NakamaManager.getInstance();
+        this.nakamaManager.setNotificationListener(this);
+        variantUserViewModel = new ViewModelProvider(this).get(VariantUserViewModel.class);
         manageUserConnection();
-        this.userViewModel.getConnected().observe(this, connected -> {
+        this.variantUserViewModel.getConnected().observe(this, connected -> {
             if (connected != null) {
                 this.pref.edit().putString("nakama.authToken", connected.authToken).apply();
             } else {
@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements NotificationListe
         ) {
             if (notification.getCode() == 666) {
                 String authToken = JsonExtractor.ectractAttributeByName(notification.getContent(), VariantVars.VARIANT_CHESS_TOKEN);
-                if (!authToken.equals(this.sessionManager.getSession().getAuthToken())) {
+                if (!authToken.equals(this.nakamaManager.getSession().getAuthToken())) {
                     Log.i("fr.aboucorp.variantchess", "Disconnection of user with authToken : " + authToken);
                     disconnectUser();
                 }
@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements NotificationListe
             case R.id.menu_action_profil:
                 return true;
             case R.id.menu_action_disconnect:
-                this.sessionManager.disconnect();
+                this.nakamaManager.disconnect();
                 disconnectUser();
                 return true;
             case R.id.menu_action_settings:
@@ -105,8 +105,8 @@ public class MainActivity extends AppCompatActivity implements NotificationListe
             protected Object executeAsync() throws Exception {
                 String authToken = pref.getString("nakama.authToken", null);
                 if (!TextUtils.isEmpty(authToken)) {
-                    ChessUser chessUser = sessionManager.tryReconnectUser(authToken);
-                    return chessUser;
+                    VariantUser variantUser = nakamaManager.tryReconnectUser(authToken);
+                    return variantUser;
                 }
                 return null;
             }
@@ -114,11 +114,11 @@ public class MainActivity extends AppCompatActivity implements NotificationListe
             @Override
             protected void callbackOnUI(Object arg) {
                 super.callbackOnUI(arg);
-                ChessUser chessUser = (ChessUser) arg;
+                VariantUser variantUser = (VariantUser) arg;
                 getSupportActionBar().show();
-                if (chessUser != null) {
+                if (variantUser != null) {
                     Toast.makeText(MainActivity.this, R.string.connected, Toast.LENGTH_LONG).show();
-                    NavDirections action = GameRulesFragmentDirections.actionGlobalGameRulesFragment(chessUser);
+                    NavDirections action = GameRulesFragmentDirections.actionGlobalGameRulesFragment(variantUser);
                     Navigation.findNavController(MainActivity.this, R.id.nav_host_fragment).navigate(action);
                 } else {
                     NavDirections action = GameRulesFragmentDirections.actionGlobalAuthentFragment();
@@ -152,12 +152,12 @@ public class MainActivity extends AppCompatActivity implements NotificationListe
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        this.userViewModel.getConnected().observe(this, MainActivity.this::updateConnectionUI);
+        this.variantUserViewModel.getConnected().observe(this, MainActivity.this::updateConnectionUI);
         return true;
     }
 
 
-    private void updateConnectionUI(ChessUser connected) {
+    private void updateConnectionUI(VariantUser connected) {
         if (connected != null) {
             this.pref.edit().putString("nakama.authToken", connected.authToken).apply();
             this.toolbar.setSubtitle(connected.username);
@@ -172,8 +172,8 @@ public class MainActivity extends AppCompatActivity implements NotificationListe
     }
 
     private void disconnectUser() {
-        sessionManager.disconnect();
-        this.userViewModel.disconnectUser();
+        nakamaManager.disconnect();
+        this.variantUserViewModel.disconnectUser();
         this.pref.edit().putString("nk.authToken", null).apply();
         NavDirections action = AuthentFragmentDirections.actionGlobalAuthentFragment();
         Navigation.findNavController(this, R.id.nav_host_fragment).navigate(action);

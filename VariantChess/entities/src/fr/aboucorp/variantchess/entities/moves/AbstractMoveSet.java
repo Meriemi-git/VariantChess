@@ -39,8 +39,8 @@ public abstract class AbstractMoveSet implements GameEventSubscriber {
         this.piece = piece;
         this.classicBoard = classicBoard;
         this.eventManager = gameEventManager;
-        this.eventManager.subscribe(PieceEvent.class, this, 1);
-        this.eventManager.subscribe(TurnEvent.class, this, 1);
+        this.eventManager.subscribe(PieceEvent.class, this, 1, "AbstractMoveSet => PieceEvent");
+        this.eventManager.subscribe(TurnEvent.class, this, 1, "AbstractMoveSet => TurnEvent");
     }
 
     @Override

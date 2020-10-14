@@ -1,5 +1,6 @@
 package fr.aboucorp.variantchess.app.managers;
 
+import fr.aboucorp.variantchess.app.managers.boards.BoardLoadingListener;
 import fr.aboucorp.variantchess.app.managers.boards.BoardManager;
 import fr.aboucorp.variantchess.entities.ChessMatch;
 import fr.aboucorp.variantchess.entities.PartyLifeCycle;
@@ -9,7 +10,7 @@ import fr.aboucorp.variantchess.entities.events.GameEventSubscriber;
 import fr.aboucorp.variantchess.entities.events.models.GameEvent;
 import fr.aboucorp.variantchess.entities.events.models.MoveEvent;
 
-public abstract class MatchManager implements GameEventSubscriber, BoardManager.BoardLoadingListener, PartyLifeCycle {
+public abstract class MatchManager implements GameEventSubscriber, BoardLoadingListener, PartyLifeCycle {
     protected final BoardManager boardManager;
     protected GameEventManager gameEventManager;
     protected ChessMatch chessMatch;
@@ -23,33 +24,24 @@ public abstract class MatchManager implements GameEventSubscriber, BoardManager.
     }
 
     @Override
-    public void OnBoardLoaded() {
-        this.gameEventManager.subscribe(GameEvent.class, this, 1);
-        startTurn();
-    }
+    public abstract void OnBoardLoaded();
 
     @Override
     public abstract void receiveEvent(GameEvent event);
 
     @Override
-    public void startParty(ChessMatch chessMatch) {
-        this.chessMatch = chessMatch;
-        this.boardManager.startParty(chessMatch);
-    }
+    public abstract void startParty(ChessMatch chessMatch);
 
     @Override
-    public void stopParty() {
-        this.boardManager.stopParty();
-        this.chessMatch = null;
-    }
-
-
-    public String getPartyInfos() {
-        return this.currentTurn.getTurnColor().name();
-    }
-
+    public abstract void stopParty();
 
     public abstract void endTurn(MoveEvent event);
 
     public abstract void startTurn();
+
+    public abstract String getPartyInfos();
+
+    public abstract void passTurn();
+
+    public abstract boolean isMyTurn();
 }

@@ -16,12 +16,12 @@ import androidx.navigation.Navigation;
 import com.basgeekball.awesomevalidation.AwesomeValidation;
 
 import fr.aboucorp.variantchess.R;
-import fr.aboucorp.variantchess.app.db.entities.ChessUser;
-import fr.aboucorp.variantchess.app.db.viewmodel.UserViewModel;
+import fr.aboucorp.variantchess.app.db.entities.VariantUser;
+import fr.aboucorp.variantchess.app.db.viewmodel.VariantUserViewModel;
 import fr.aboucorp.variantchess.app.exceptions.AuthentificationException;
 import fr.aboucorp.variantchess.app.exceptions.MailAlreadyRegistered;
 import fr.aboucorp.variantchess.app.exceptions.UsernameAlreadyRegistered;
-import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
+import fr.aboucorp.variantchess.app.multiplayer.NakamaManager;
 import fr.aboucorp.variantchess.app.utils.AsyncHandler;
 
 import static com.basgeekball.awesomevalidation.ValidationStyle.COLORATION;
@@ -40,11 +40,11 @@ public class SignUpFragment extends VariantChessFragment {
 
     private ProgressBar progress_bar;
 
-    private SessionManager sessionManager;
+    private NakamaManager nakamaManager;
 
     private AwesomeValidation validator;
 
-    private UserViewModel userViewModel;
+    private VariantUserViewModel variantUserViewModel;
 
 
     @Override
@@ -66,15 +66,15 @@ public class SignUpFragment extends VariantChessFragment {
                 AsyncHandler asyncHandler = new AsyncHandler() {
                     @Override
                     protected Object executeAsync() throws Exception {
-                        ChessUser user = sessionManager.signUpWithEmail(txt_mail.getText().toString(), txt_pwd.getText().toString(), txt_username.getText().toString());
-                        userViewModel.setConnected(user);
+                        VariantUser user = nakamaManager.signUpWithEmail(txt_mail.getText().toString(), txt_pwd.getText().toString(), txt_username.getText().toString());
+                        variantUserViewModel.setConnected(user);
                         return user;
                     }
 
                     @Override
                     protected void callbackOnUI(Object arg) {
                         super.callbackOnUI(arg);
-                        ChessUser user = (ChessUser) arg;
+                        VariantUser user = (VariantUser) arg;
                         if (user.username != txt_username.getText().toString()) {
                             Toast.makeText(getContext(), R.string.warn_account_exists_with_different_username, Toast.LENGTH_LONG).show();
                         }
@@ -113,9 +113,9 @@ public class SignUpFragment extends VariantChessFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        this.userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
+        this.variantUserViewModel = new ViewModelProvider(this).get(VariantUserViewModel.class);
         this.bindViews();
-        this.sessionManager = SessionManager.getInstance();
+        this.nakamaManager = NakamaManager.getInstance();
         this.validator = new AwesomeValidation(COLORATION);
         this.validator.addValidation(getActivity(), R.id.signup_mail, android.util.Patterns.EMAIL_ADDRESS, R.string.err_email_invalid);
         // String regexPassword = "(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])";

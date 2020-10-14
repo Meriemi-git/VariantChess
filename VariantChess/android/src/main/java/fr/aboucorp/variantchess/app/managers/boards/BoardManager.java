@@ -9,7 +9,6 @@ import java.util.Optional;
 
 import fr.aboucorp.variantchess.app.listeners.GDXGestureListener;
 import fr.aboucorp.variantchess.app.listeners.GDXInputAdapter;
-import fr.aboucorp.variantchess.app.utils.GdxPostRunner;
 import fr.aboucorp.variantchess.app.utils.state.BoardStateBuilder;
 import fr.aboucorp.variantchess.entities.ChessColor;
 import fr.aboucorp.variantchess.entities.ChessMatch;
@@ -20,15 +19,9 @@ import fr.aboucorp.variantchess.entities.Square;
 import fr.aboucorp.variantchess.entities.Turn;
 import fr.aboucorp.variantchess.entities.boards.Board;
 import fr.aboucorp.variantchess.entities.enums.GameState;
-import fr.aboucorp.variantchess.entities.enums.PieceId;
 import fr.aboucorp.variantchess.entities.events.GameEventManager;
 import fr.aboucorp.variantchess.entities.events.GameEventSubscriber;
 import fr.aboucorp.variantchess.entities.events.models.GameEvent;
-import fr.aboucorp.variantchess.entities.events.models.MoveEvent;
-import fr.aboucorp.variantchess.entities.events.models.PartyEvent;
-import fr.aboucorp.variantchess.entities.events.models.PieceEvent;
-import fr.aboucorp.variantchess.entities.events.models.TurnEndEvent;
-import fr.aboucorp.variantchess.entities.events.models.TurnEvent;
 import fr.aboucorp.variantchess.entities.events.models.TurnStartEvent;
 import fr.aboucorp.variantchess.entities.exceptions.FenStringBadFormatException;
 import fr.aboucorp.variantchess.entities.rules.AbstractRuleSet;
@@ -48,6 +41,7 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
     protected BoardLoadingListener boardLoadingListener;
     protected GameState gameState;
     protected BoardStateBuilder boardStateBuilder;
+    protected GDXGestureListener gestureListener;
 
     BoardManager(Board board, Board3dManager board3dManager, AbstractRuleSet ruleSet, GameEventManager gameEventManager, BoardStateBuilder boardStateBuilder) {
         this.board = board;
@@ -55,7 +49,7 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
         this.ruleSet = ruleSet;
         GDXInputAdapter inputAdapter = new GDXInputAdapter(board3dManager);
         board3dManager.setAndroidInputAdapter(inputAdapter);
-        GDXGestureListener gestureListener = new GDXGestureListener(this);
+        this.gestureListener = new GDXGestureListener(this);
         board3dManager.setAndroidListener(gestureListener);
         this.gameState = GameState.PIECE_SELECTION;
         this.gameEventManager = gameEventManager;
@@ -63,31 +57,13 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
     }
 
     @Override
-    public void receiveEvent(GameEvent event) {
-        if (event instanceof TurnStartEvent) {
-            this.manageTurnStart((TurnStartEvent) event);
-        } else if (event instanceof TurnEndEvent) {
-            this.manageTurnEnd();
-        }
-    }
+    public abstract void receiveEvent(GameEvent event);
 
     @Override
-    public void startParty(ChessMatch chessMatch) {
-        this.gameEventManager.subscribe(PartyEvent.class, this, 1);
-        this.gameEventManager.subscribe(TurnEvent.class, this, 1);
-        this.gameEventManager.subscribe(PieceEvent.class, this, 1);
-    }
+    public abstract void startParty(ChessMatch chessMatch);
 
     @Override
-    public void stopParty() {
-        this.gameState = GameState.PIECE_SELECTION;
-        this.selectedPiece = null;
-        this.previousTurn = null;
-        this.actualTurn = null;
-        this.board.clearBoard();
-        this.ruleSet.moveNumber = 0;
-    }
-
+    public abstract void stopParty();
 
 
     public GraphicGameArray getModelsForTurn() {
@@ -123,53 +99,21 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
 
     protected abstract Piece moveToSquare(Square to);
 
-    public void selectPiece(Piece touched) {
-        this.selectedPiece = touched;
-        this.gameState = this.gameState == GameState.WAIT_FOR_NEXT_TURN ? GameState.WAIT_FOR_NEXT_TURN : GameState.SQUARE_SELECTION;
-    }
+    public abstract void onPieceSelected(Piece touched);
 
-    public void selectSquare(Square to) {
-        Square from = this.selectedPiece.getSquare();
-        Piece deadPiece = this.moveToSquare(to);
-        String message = String.format("Move %s from %s to %s", this.selectedPiece, from, to);
-        this.gameEventManager.sendEvent(new MoveEvent(
-                message
-                , from.getLocation()
-                , to.getLocation()
-                , this.selectedPiece.getPieceId()
-                , deadPiece != null ? deadPiece.getPieceId() : null));
-
-    }
+    public abstract void onSquareSelected(Square to);
 
     public void setBoardLoadingListener(BoardLoadingListener boardLoadingListener) {
         this.boardLoadingListener = boardLoadingListener;
     }
 
-    public void toogleTacticalView() {
-        GdxPostRunner runner = new GdxPostRunner() {
-            @Override
-            public void execute() {
-                BoardManager.this.board3dManager.toogleTacticalView();
-            }
-        };
-        runner.startAsync();
-    }
+    public abstract void toogleTacticalView();
 
     public void unHighlight() {
         this.gameState = this.gameState == GameState.WAIT_FOR_NEXT_TURN ? GameState.WAIT_FOR_NEXT_TURN : GameState.PIECE_SELECTION;
     }
 
-    public interface BoardLoadingListener {
-        void OnBoardLoaded();
-    }
-
-    public void playTheOppositeMove(String fenState) {
-        PieceId played = this.boardStateBuilder.getPiecePlayedFromState(fenState);
-        Location to = this.boardStateBuilder.getTo(fenState);
-        this.selectPiece(this.board.getPieceById(played));
-        Square selectedSquare = (Square) this.board.getSquares().getItemByLocation(to);
-        this.selectSquare(selectedSquare);
-    }
+    public abstract void playTheOppositeMove(String fenState);
 
 
     public void waitForNextTurn() {
@@ -179,10 +123,6 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
 
     public void stopWaitingForNextTurn() {
         Log.i("fr.aboucorp.variantchess", "Wainting for next turn");
-        this.gameState = GameState.PIECE_SELECTION;
-    }
-
-    public void stopWaitForNextTurn() {
         this.gameState = GameState.PIECE_SELECTION;
     }
 

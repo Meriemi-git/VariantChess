@@ -25,8 +25,8 @@
             android:id="@+id/action_signInFragment_to_gameRulesFragment"
             app:destination="@id/gameRulesFragment">
             <argument
-                android:name="chess_user"
-                app:argType="fr.aboucorp.variantchess.app.db.entities.ChessUser" />
+                android:name="variant_user"
+                app:argType="fr.aboucorp.variantchess.app.db.entities.VariantUser" />
         </action>
     </fragment>
     <fragment
@@ -37,8 +37,8 @@
             android:id="@+id/action_signUpFragment_to_gameRulesFragment"
             app:destination="@id/gameRulesFragment">
             <argument
-                android:name="chess_user"
-                app:argType="fr.aboucorp.variantchess.app.db.entities.ChessUser" />
+                android:name="variant_user"
+                app:argType="fr.aboucorp.variantchess.app.db.entities.VariantUser" />
         </action>
     </fragment>
     <fragment
@@ -91,8 +91,8 @@
                 android:name="match_id"
                 app:argType="string" />
             <argument
-                android:name="chess_user"
-                app:argType="fr.aboucorp.variantchess.app.db.entities.ChessUser" />
+                android:name="variant_user"
+                app:argType="fr.aboucorp.variantchess.app.db.entities.VariantUser" />
             <argument
                 android:name="game_rules"
                 app:argType="fr.aboucorp.variantchess.app.db.entities.GameRules" />
@@ -108,8 +108,8 @@
         android:id="@+id/action_global_gameRulesFragment"
         app:destination="@id/gameRulesFragment">
         <argument
-            android:name="chess_user"
-            app:argType="fr.aboucorp.variantchess.app.db.entities.ChessUser"
+            android:name="variant_user"
+            app:argType="fr.aboucorp.variantchess.app.db.entities.VariantUser"
             app:nullable="true" />
     </action>
     <fragment
