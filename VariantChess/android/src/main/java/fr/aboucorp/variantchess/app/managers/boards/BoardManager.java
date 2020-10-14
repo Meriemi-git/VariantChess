@@ -41,6 +41,7 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
     protected BoardLoadingListener boardLoadingListener;
     protected GameState gameState;
     protected BoardStateBuilder boardStateBuilder;
+    protected GDXGestureListener gestureListener;
 
     BoardManager(Board board, Board3dManager board3dManager, AbstractRuleSet ruleSet, GameEventManager gameEventManager, BoardStateBuilder boardStateBuilder) {
         this.board = board;
@@ -48,7 +49,7 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
         this.ruleSet = ruleSet;
         GDXInputAdapter inputAdapter = new GDXInputAdapter(board3dManager);
         board3dManager.setAndroidInputAdapter(inputAdapter);
-        GDXGestureListener gestureListener = new GDXGestureListener(this);
+        this.gestureListener = new GDXGestureListener(this);
         board3dManager.setAndroidListener(gestureListener);
         this.gameState = GameState.PIECE_SELECTION;
         this.gameEventManager = gameEventManager;

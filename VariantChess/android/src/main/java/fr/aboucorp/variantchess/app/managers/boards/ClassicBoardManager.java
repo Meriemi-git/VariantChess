@@ -174,6 +174,7 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
         runner.startAsync();*/
     }
 
+
     @Override
     public Piece moveToSquare(Square square) {
         Piece eated = this.eat(square);
@@ -208,9 +209,15 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
         GdxAsyncHandler gdxAsyncHandler = new GdxAsyncHandler() {
             @Override
             public Object execute() {
+                gestureListener.isSelectingPiece.set(true);
                 board3dManager.selectPiece(touched);
                 hightLightPossibleMoves(possiblesMoves);
                 return null;
+            }
+
+            @Override
+            public void callbackOnUI(Object arg) {
+                gestureListener.isSelectingPiece.set(false);
             }
 
             @Override
@@ -223,6 +230,7 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
 
     @Override
     public void onSquareSelected(Square to) {
+        // TODO implements waiting for selectPiece to end
         Square from = this.selectedPiece.getSquare();
         Piece deadPiece = this.moveToSquare(to);
         String message = String.format("Move %s from %s to %s", this.selectedPiece, from, to);
@@ -234,6 +242,7 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
                 , deadPiece != null ? deadPiece.getPieceId() : null));
         this.selectedPiece = null;
     }
+
 
     @Override
     public void toogleTacticalView() {

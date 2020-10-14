@@ -5,7 +5,10 @@ import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import fr.aboucorp.variantchess.app.managers.boards.BoardManager;
+import fr.aboucorp.variantchess.app.utils.AsyncHandler;
 import fr.aboucorp.variantchess.entities.Piece;
 import fr.aboucorp.variantchess.entities.Square;
 import fr.aboucorp.variantchess.entities.enums.GameState;
@@ -21,6 +24,8 @@ public class GDXGestureListener implements GestureDetector.GestureListener {
     private TouchedModelFinder touchedModelFinder;
     private float elapsed = 0f;
     private boolean zoomIn;
+    public AtomicBoolean isSelectingPiece = new AtomicBoolean(false);
+
 
     public GDXGestureListener(BoardManager boardManager) {
         this.boardManager = boardManager;
@@ -62,7 +67,7 @@ public class GDXGestureListener implements GestureDetector.GestureListener {
                 if (square != null) {
                     Square touchedSquare = this.boardManager.getSquareFromLocation(square.getLocation());
                     if (touchedSquare != null) {
-                        this.boardManager.onSquareSelected(touchedSquare);
+                        this.waitForSelectSquare(touchedSquare);
                     }
                 } else {
                     this.boardManager.unHighlight();
@@ -70,6 +75,19 @@ public class GDXGestureListener implements GestureDetector.GestureListener {
             }
         }
         return this.boardManager.IsTacticalViewOn();
+    }
+
+    private void waitForSelectSquare(Square touchedSquare) {
+        AsyncHandler asyncHandler = new AsyncHandler() {
+            @Override
+            protected Object executeAsync() {
+                while (isSelectingPiece.get()) {
+                }
+                boardManager.onSquareSelected(touchedSquare);
+                return null;
+            }
+        };
+        asyncHandler.start();
     }
 
     @Override
@@ -124,7 +142,6 @@ public class GDXGestureListener implements GestureDetector.GestureListener {
 
     @Override
     public boolean zoom(float initialDistance, float distance) {
-        //if (this.boardManager.IsTacticalViewOn()) {
         PerspectiveCamera camera = this.boardManager.getCamera();
         float progress = 0f;
         float min = Math.abs(distance - initialDistance);
