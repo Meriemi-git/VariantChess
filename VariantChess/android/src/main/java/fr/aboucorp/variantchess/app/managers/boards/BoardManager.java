@@ -98,9 +98,9 @@ public abstract class BoardManager implements GameEventSubscriber, PartyLifeCycl
 
     protected abstract Piece moveToSquare(Square to);
 
-    public abstract void selectPiece(Piece touched);
+    public abstract void onPieceSelected(Piece touched);
 
-    public abstract void selectSquare(Square to);
+    public abstract void onSquareSelected(Square to);
 
     public void setBoardLoadingListener(BoardLoadingListener boardLoadingListener) {
         this.boardLoadingListener = boardLoadingListener;

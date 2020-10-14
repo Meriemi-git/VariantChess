@@ -22,7 +22,7 @@ import com.heroiclabs.nakama.api.NotificationList;
 import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.db.entities.ChessUser;
 import fr.aboucorp.variantchess.app.db.viewmodel.UserViewModel;
-import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
+import fr.aboucorp.variantchess.app.multiplayer.NakamaManager;
 import fr.aboucorp.variantchess.app.multiplayer.listeners.NotificationListener;
 import fr.aboucorp.variantchess.app.utils.AsyncHandler;
 import fr.aboucorp.variantchess.app.utils.JsonExtractor;
@@ -34,7 +34,7 @@ import fr.aboucorp.variantchess.app.views.fragments.SettingsFragmentDirections;
 public class MainActivity extends AppCompatActivity implements NotificationListener, AndroidFragmentApplication.Callbacks {
     public static final String SHARED_PREFERENCE_NAME = "nakama";
     private Toolbar toolbar;
-    private SessionManager sessionManager;
+    private NakamaManager nakamaManager;
     private UserViewModel userViewModel;
     private SharedPreferences pref;
 
@@ -45,8 +45,8 @@ public class MainActivity extends AppCompatActivity implements NotificationListe
         this.pref = getSharedPreferences(SHARED_PREFERENCE_NAME, Context.MODE_PRIVATE);
         this.setContentView(R.layout.main_layout);
         this.setToolbar();
-        this.sessionManager = SessionManager.getInstance();
-        this.sessionManager.setNotificationListener(this);
+        this.nakamaManager = NakamaManager.getInstance();
+        this.nakamaManager.setNotificationListener(this);
         userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
         manageUserConnection();
         this.userViewModel.getConnected().observe(this, connected -> {
@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements NotificationListe
         ) {
             if (notification.getCode() == 666) {
                 String authToken = JsonExtractor.ectractAttributeByName(notification.getContent(), VariantVars.VARIANT_CHESS_TOKEN);
-                if (!authToken.equals(this.sessionManager.getSession().getAuthToken())) {
+                if (!authToken.equals(this.nakamaManager.getSession().getAuthToken())) {
                     Log.i("fr.aboucorp.variantchess", "Disconnection of user with authToken : " + authToken);
                     disconnectUser();
                 }
@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements NotificationListe
             case R.id.menu_action_profil:
                 return true;
             case R.id.menu_action_disconnect:
-                this.sessionManager.disconnect();
+                this.nakamaManager.disconnect();
                 disconnectUser();
                 return true;
             case R.id.menu_action_settings:
@@ -105,7 +105,7 @@ public class MainActivity extends AppCompatActivity implements NotificationListe
             protected Object executeAsync() throws Exception {
                 String authToken = pref.getString("nakama.authToken", null);
                 if (!TextUtils.isEmpty(authToken)) {
-                    ChessUser chessUser = sessionManager.tryReconnectUser(authToken);
+                    ChessUser chessUser = nakamaManager.tryReconnectUser(authToken);
                     return chessUser;
                 }
                 return null;
@@ -172,7 +172,7 @@ public class MainActivity extends AppCompatActivity implements NotificationListe
     }
 
     private void disconnectUser() {
-        sessionManager.disconnect();
+        nakamaManager.disconnect();
         this.userViewModel.disconnectUser();
         this.pref.edit().putString("nk.authToken", null).apply();
         NavDirections action = AuthentFragmentDirections.actionGlobalAuthentFragment();

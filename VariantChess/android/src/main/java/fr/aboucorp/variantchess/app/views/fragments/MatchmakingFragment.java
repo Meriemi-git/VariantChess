@@ -27,7 +27,7 @@ import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.db.entities.ChessUser;
 import fr.aboucorp.variantchess.app.db.entities.GameRules;
 import fr.aboucorp.variantchess.app.db.viewmodel.UserViewModel;
-import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
+import fr.aboucorp.variantchess.app.multiplayer.NakamaManager;
 import fr.aboucorp.variantchess.app.multiplayer.listeners.MatchmakingListener;
 import fr.aboucorp.variantchess.app.utils.AsyncHandler;
 import fr.aboucorp.variantchess.entities.ChessColor;
@@ -48,7 +48,7 @@ public class MatchmakingFragment extends VariantChessFragment implements Matchma
     /**
      * Nakama multiplayer session manager
      */
-    private SessionManager sessionManager;
+    private NakamaManager nakamaManager;
     /**
      * Nakama multiplayer session manager
      */
@@ -83,8 +83,8 @@ public class MatchmakingFragment extends VariantChessFragment implements Matchma
         if (savedInstanceState != null) {
             this.gameRules = (GameRules) savedInstanceState.getSerializable("game_rules");
         }
-        this.sessionManager = SessionManager.getInstance();
-        this.sessionManager.setMatchmakingListener(this);
+        this.nakamaManager = NakamaManager.getInstance();
+        this.nakamaManager.setMatchmakingListener(this);
         this.bindViews();
         this.bindListeners();
         this.userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
@@ -107,7 +107,7 @@ public class MatchmakingFragment extends VariantChessFragment implements Matchma
         AsyncHandler asyncHandler = new AsyncHandler() {
             @Override
             protected Object executeAsync() throws Exception {
-                List<User> users = sessionManager.getUsersFromMatched(matched);
+                List<User> users = nakamaManager.getUsersFromMatched(matched);
                 return users;
             }
 
@@ -141,7 +141,7 @@ public class MatchmakingFragment extends VariantChessFragment implements Matchma
         AsyncHandler asyncHandler = new AsyncHandler() {
             @Override
             protected Object executeAsync() throws Exception {
-                matchmakingTicket = sessionManager.launchMatchMaking(gameRules.name, matchmakingTicket);
+                matchmakingTicket = nakamaManager.launchMatchMaking(gameRules.name, matchmakingTicket);
                 return null;
             }
 
@@ -166,7 +166,7 @@ public class MatchmakingFragment extends VariantChessFragment implements Matchma
         AsyncHandler handler = new AsyncHandler() {
             @Override
             protected Object executeAsync() {
-                sessionManager.cancelMatchMaking(ticket);
+                nakamaManager.cancelMatchMaking(ticket);
                 btn_cancel.setEnabled(false);
                 return null;
             }

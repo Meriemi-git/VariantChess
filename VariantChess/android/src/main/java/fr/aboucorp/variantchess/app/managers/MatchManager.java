@@ -40,4 +40,8 @@ public abstract class MatchManager implements GameEventSubscriber, BoardLoadingL
     public abstract void startTurn();
 
     public abstract String getPartyInfos();
+
+    public abstract void passTurn();
+
+    public abstract boolean isMyTurn();
 }

@@ -40,7 +40,7 @@ public class ClassicRuleSet extends AbstractRuleSet implements GameEventSubscrib
     public ClassicRuleSet(Board board, GameEventManager gameEventManager) {
         this.board = board;
         this.gameEventManager = gameEventManager;
-        this.gameEventManager.subscribe(TurnEvent.class, this, 1);
+        this.gameEventManager.subscribe(TurnEvent.class, this, 1, "ClassicRuleSet => TurnEvent");
     }
 
     @Override

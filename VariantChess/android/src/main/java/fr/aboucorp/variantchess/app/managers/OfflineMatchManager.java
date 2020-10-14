@@ -23,7 +23,7 @@ public class OfflineMatchManager extends MatchManager {
 
     @Override
     public void OnBoardLoaded() {
-        this.gameEventManager.subscribe(GameEvent.class, this, 1);
+        this.gameEventManager.subscribe(GameEvent.class, this, 1, "OfflineMatchManager => GameEvent");
         startTurn();
     }
 
@@ -81,5 +81,15 @@ public class OfflineMatchManager extends MatchManager {
     @Override
     public String getPartyInfos() {
         return this.currentTurn.getTurnColor().name();
+    }
+
+    @Override
+    public void passTurn() {
+
+    }
+
+    @Override
+    public boolean isMyTurn() {
+        return true;
     }
 }

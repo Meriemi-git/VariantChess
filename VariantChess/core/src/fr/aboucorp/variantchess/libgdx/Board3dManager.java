@@ -551,6 +551,7 @@ public class Board3dManager extends ApplicationAdapter {
     }
 
     public void highlightOccupied(Square square) {
+        //TODO use pieceId instead of location
         this.material3dManager.setOccupiedMaterial(this.chessSquareModels.getByLocation(square.getLocation()));
         if (square.getPiece().getChessColor() == ChessColor.WHITE) {
             this.material3dManager.setOccupiedMaterial(this.getWhitePieceModels().getByLocation(square.getPiece().getLocation()));
@@ -594,7 +595,6 @@ public class Board3dManager extends ApplicationAdapter {
     }
 
     private void move(GraphicsGameElement element, Location location) {
-        Gdx.app.log("fr.aboucorp.variantchess", String.format("[GDX] Move piece %s to %s ", element.getPieceId(), location));
         element.move(location);
     }
 
@@ -645,12 +645,12 @@ public class Board3dManager extends ApplicationAdapter {
         if (this.selectedModel != null) {
             this.material3dManager.resetMaterial(this.selectedModel);
         }
+        Gdx.app.log("fr.aboucorp.variantchess", String.format("Piece touched location : %s", touched.getLocation()));
         GraphicsGameElement element;
         if (touched.getChessColor() == ChessColor.BLACK) {
-            element = this.blackPieceModels.getByLocation(touched.getLocation());
-
+            element = this.blackPieceModels.getElementById(touched.getPieceId());
         } else {
-            element = this.whitePieceModels.getByLocation(touched.getLocation());
+            element = this.whitePieceModels.getElementById(touched.getPieceId());
         }
         this.material3dManager.setSelectedMaterial(element);
         this.selectedModel = element;

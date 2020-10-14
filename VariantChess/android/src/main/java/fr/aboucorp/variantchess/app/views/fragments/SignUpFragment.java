@@ -21,7 +21,7 @@ import fr.aboucorp.variantchess.app.db.viewmodel.UserViewModel;
 import fr.aboucorp.variantchess.app.exceptions.AuthentificationException;
 import fr.aboucorp.variantchess.app.exceptions.MailAlreadyRegistered;
 import fr.aboucorp.variantchess.app.exceptions.UsernameAlreadyRegistered;
-import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
+import fr.aboucorp.variantchess.app.multiplayer.NakamaManager;
 import fr.aboucorp.variantchess.app.utils.AsyncHandler;
 
 import static com.basgeekball.awesomevalidation.ValidationStyle.COLORATION;
@@ -40,7 +40,7 @@ public class SignUpFragment extends VariantChessFragment {
 
     private ProgressBar progress_bar;
 
-    private SessionManager sessionManager;
+    private NakamaManager nakamaManager;
 
     private AwesomeValidation validator;
 
@@ -66,7 +66,7 @@ public class SignUpFragment extends VariantChessFragment {
                 AsyncHandler asyncHandler = new AsyncHandler() {
                     @Override
                     protected Object executeAsync() throws Exception {
-                        ChessUser user = sessionManager.signUpWithEmail(txt_mail.getText().toString(), txt_pwd.getText().toString(), txt_username.getText().toString());
+                        ChessUser user = nakamaManager.signUpWithEmail(txt_mail.getText().toString(), txt_pwd.getText().toString(), txt_username.getText().toString());
                         userViewModel.setConnected(user);
                         return user;
                     }
@@ -115,7 +115,7 @@ public class SignUpFragment extends VariantChessFragment {
         super.onViewCreated(view, savedInstanceState);
         this.userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
         this.bindViews();
-        this.sessionManager = SessionManager.getInstance();
+        this.nakamaManager = NakamaManager.getInstance();
         this.validator = new AwesomeValidation(COLORATION);
         this.validator.addValidation(getActivity(), R.id.signup_mail, android.util.Patterns.EMAIL_ADDRESS, R.string.err_email_invalid);
         // String regexPassword = "(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])";

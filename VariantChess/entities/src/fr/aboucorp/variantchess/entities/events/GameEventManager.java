@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import fr.aboucorp.variantchess.entities.events.models.GameEvent;
 
@@ -14,12 +15,12 @@ public class GameEventManager {
         SUBSCRIPTIONS = new Hashtable();
     }
 
-    public void subscribe(Class gameEventType, GameEventSubscriber subscriber, int priority) {
+    public void subscribe(Class gameEventType, GameEventSubscriber subscriber, int priority, String subscriptionName) {
         List<Subscription> subsribers = SUBSCRIPTIONS.get(gameEventType);
         if (subsribers == null) {
             subsribers = new ArrayList<>();
         }
-        subsribers.add(new Subscription(subscriber, priority));
+        subsribers.add(new Subscription(subscriber, priority, subscriptionName));
         SUBSCRIPTIONS.put(gameEventType, subsribers);
     }
 
@@ -32,13 +33,14 @@ public class GameEventManager {
                 .forEach(subs -> subs.removeIf(sub -> sub.subscriber == subscriber));
     }
 
-    public void sendEvent(GameEvent event) {
+    public List<String> sendEvent(GameEvent event) {
         List<Subscription> subscriptions = new ArrayList();
         this.getSubscriptionsRec(event.getClass(), subscriptions);
         subscriptions
                 .stream()
                 .sorted(Comparator.naturalOrder())
                 .forEachOrdered(sub -> sub.subscriber.receiveEvent(event));
+        return subscriptions.stream().map(x -> x.subscriptionName).collect(Collectors.toList());
     }
 
     private List<Subscription> getSubscriptionsRec(Class eventClass, List<Subscription> subscription) {

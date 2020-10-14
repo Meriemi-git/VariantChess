@@ -1,20 +1,21 @@
 package fr.aboucorp.variantchess.app.utils;
 
-import android.util.Log;
+import android.os.Handler;
+import android.os.Looper;
 
 import com.badlogic.gdx.Gdx;
 
-public abstract class GdxPostRunner {
+public abstract class GdxAsyncHandler {
     private final Object lock1 = new Object();
     private final Object lock2 = new Object();
 
-    public void start() {
+    public void startAndWait() {
         new Thread(() -> {
             Gdx.app.postRunnable(() -> {
                 try {
                     this.execute();
                 } catch (Exception ex) {
-                    Log.e("fr.aboucorp.variantchess", ex.getMessage());
+                    this.error(ex);
                 } finally {
                     synchronized (this.lock2) {
                         this.lock2.notify();
@@ -24,8 +25,8 @@ public abstract class GdxPostRunner {
             synchronized (this.lock2) {
                 try {
                     this.lock2.wait();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                } catch (InterruptedException ex) {
+                    this.error(ex);
                 }
             }
             synchronized (this.lock1) {
@@ -35,22 +36,29 @@ public abstract class GdxPostRunner {
         synchronized (this.lock1) {
             try {
                 this.lock1.wait();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            } catch (InterruptedException ex) {
+                this.error(ex);
             }
         }
     }
 
-    protected abstract void execute();
+    public abstract Object execute() throws Exception;
 
-    public void startAsync() {
+    public void start() {
         new Thread(() -> Gdx.app.postRunnable(() -> {
             try {
-                this.execute();
+                Object args = this.execute();
+                new Handler(Looper.getMainLooper()).post(() -> this.callbackOnUI(args));
             } catch (Exception ex) {
-                Log.e("fr.aboucorp.variantchess", ex.getMessage());
+                new Handler(Looper.getMainLooper()).post(() -> this.error(ex));
                 ex.printStackTrace();
             }
         })).start();
+    }
+
+    public void callbackOnUI(Object arg) {
+    }
+
+    public void error(Exception ex) {
     }
 }

@@ -17,7 +17,7 @@ import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.db.entities.ChessUser;
 import fr.aboucorp.variantchess.app.db.viewmodel.UserViewModel;
 import fr.aboucorp.variantchess.app.exceptions.IncorrectCredentials;
-import fr.aboucorp.variantchess.app.multiplayer.SessionManager;
+import fr.aboucorp.variantchess.app.multiplayer.NakamaManager;
 import fr.aboucorp.variantchess.app.utils.AsyncHandler;
 
 
@@ -27,7 +27,7 @@ public class SignInFragment extends VariantChessFragment {
     private Button btn_mail_connect;
     private ProgressBar progressBar;
     private UserViewModel userViewModel;
-    private SessionManager sessionManager;
+    private NakamaManager nakamaManager;
 
     @Override
     protected void bindViews() {
@@ -45,7 +45,7 @@ public class SignInFragment extends VariantChessFragment {
             AsyncHandler handler = new AsyncHandler() {
                 @Override
                 protected Object executeAsync() throws Exception {
-                    ChessUser user = sessionManager.signInWithEmail(txt_mail.getText().toString(), txt_pwd.getText().toString());
+                    ChessUser user = nakamaManager.signInWithEmail(txt_mail.getText().toString(), txt_pwd.getText().toString());
                     userViewModel.setConnected(user);
                     return user;
                 }
@@ -83,7 +83,7 @@ public class SignInFragment extends VariantChessFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        this.sessionManager = SessionManager.getInstance();
+        this.nakamaManager = NakamaManager.getInstance();
         this.userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
         this.bindViews();
         this.bindListeners();

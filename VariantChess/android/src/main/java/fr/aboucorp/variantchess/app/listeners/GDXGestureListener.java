@@ -39,7 +39,7 @@ public class GDXGestureListener implements GestureDetector.GestureListener {
             if (piece != null) {
                 Piece touchedPiece = this.boardManager.getPieceFromLocation(piece.getLocation());
                 if (touchedPiece != null) {
-                    this.boardManager.selectPiece(touchedPiece);
+                    this.boardManager.onPieceSelected(touchedPiece);
                 } else {
                     this.boardManager.unHighlight();
                 }
@@ -55,14 +55,14 @@ public class GDXGestureListener implements GestureDetector.GestureListener {
                 Piece otherTouchedPiece = this.boardManager.getPieceFromLocation(otherPiece.getLocation());
                 if (otherTouchedPiece != null) {
                     this.boardManager.unHighlight();
-                    this.boardManager.selectPiece(otherTouchedPiece);
+                    this.boardManager.onPieceSelected(otherTouchedPiece);
                 }
             } else {
                 GraphicsGameElement square = this.touchedModelFinder.getTouched3DModel(screenX, screenY, this.boardManager.getPossibleSquareModels());
                 if (square != null) {
                     Square touchedSquare = this.boardManager.getSquareFromLocation(square.getLocation());
                     if (touchedSquare != null) {
-                        this.boardManager.selectSquare(touchedSquare);
+                        this.boardManager.onSquareSelected(touchedSquare);
                     }
                 } else {
                     this.boardManager.unHighlight();

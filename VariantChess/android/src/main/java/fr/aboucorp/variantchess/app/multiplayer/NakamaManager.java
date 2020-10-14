@@ -50,11 +50,11 @@ import fr.aboucorp.variantchess.app.utils.VariantVars;
  *     <li>Nakama RPC management</li>
  * </ul>
  */
-public class SessionManager {
+public class NakamaManager {
     /**
      * Singleton instance
      */
-    private static SessionManager INSTANCE;
+    private static NakamaManager INSTANCE;
     private final int TIMEOUT_IN_MS = 3000;
     /**
      * Token used to identify this session on this device
@@ -81,7 +81,7 @@ public class SessionManager {
      */
     private Client client;
 
-    private SessionManager() {
+    private NakamaManager() {
         this.variantChessToken = UUID.randomUUID().toString();
         this.nakamaSocketListener = new NakamaSocketListener(this);
         this.client = new DefaultClient("defaultkey", "192.168.1.37", 7349, false);
@@ -92,9 +92,9 @@ public class SessionManager {
      *
      * @return the instance
      */
-    public static SessionManager getInstance() {
+    public static NakamaManager getInstance() {
         if (INSTANCE == null) {
-            INSTANCE = new SessionManager();
+            INSTANCE = new NakamaManager();
         }
         return INSTANCE;
     }

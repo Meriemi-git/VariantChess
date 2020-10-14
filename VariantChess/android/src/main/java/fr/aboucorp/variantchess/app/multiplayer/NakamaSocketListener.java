@@ -20,20 +20,20 @@ import fr.aboucorp.variantchess.app.multiplayer.listeners.MatchmakingListener;
 import fr.aboucorp.variantchess.app.multiplayer.listeners.NotificationListener;
 
 public class NakamaSocketListener extends AbstractSocketListener {
-    private final SessionManager sessionManager;
+    private final NakamaManager nakamaManager;
     private MatchmakingListener matchmakingListener;
     private ChatListener chatListener;
     private MatchListener matchListener;
     private NotificationListener notificationListener;
 
-    public NakamaSocketListener(SessionManager sessionManager) {
-        this.sessionManager = sessionManager;
+    public NakamaSocketListener(NakamaManager nakamaManager) {
+        this.nakamaManager = nakamaManager;
     }
 
     @Override
     public void onDisconnect(Throwable t) {
         super.onDisconnect(t);
-        this.sessionManager.setSocketClosed(true);
+        this.nakamaManager.setSocketClosed(true);
         Log.i("fr.aboucorp.variantchess", "onDisconnect ");
     }
 
