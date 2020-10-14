@@ -24,9 +24,9 @@ import com.heroiclabs.nakama.api.User;
 import java.util.List;
 
 import fr.aboucorp.variantchess.R;
-import fr.aboucorp.variantchess.app.db.entities.ChessUser;
 import fr.aboucorp.variantchess.app.db.entities.GameRules;
-import fr.aboucorp.variantchess.app.db.viewmodel.UserViewModel;
+import fr.aboucorp.variantchess.app.db.entities.VariantUser;
+import fr.aboucorp.variantchess.app.db.viewmodel.VariantUserViewModel;
 import fr.aboucorp.variantchess.app.multiplayer.NakamaManager;
 import fr.aboucorp.variantchess.app.multiplayer.listeners.MatchmakingListener;
 import fr.aboucorp.variantchess.app.utils.AsyncHandler;
@@ -55,8 +55,8 @@ public class MatchmakingFragment extends VariantChessFragment implements Matchma
     private String matchmakingTicket;
 
     private GameRules gameRules;
-    private ChessUser chessUser;
-    private UserViewModel userViewModel;
+    private VariantUser variantUser;
+    private VariantUserViewModel variantUserViewModel;
 
     @Override
     protected void bindViews() {
@@ -87,9 +87,9 @@ public class MatchmakingFragment extends VariantChessFragment implements Matchma
         this.nakamaManager.setMatchmakingListener(this);
         this.bindViews();
         this.bindListeners();
-        this.userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
-        this.userViewModel.getConnected().observe(this.getViewLifecycleOwner(), connected -> {
-            chessUser = connected;
+        this.variantUserViewModel = new ViewModelProvider(this).get(VariantUserViewModel.class);
+        this.variantUserViewModel.getConnected().observe(this.getViewLifecycleOwner(), connected -> {
+            variantUser = connected;
             this.launchMatchmaking();
         });
     }
@@ -117,7 +117,7 @@ public class MatchmakingFragment extends VariantChessFragment implements Matchma
                 List<User> users = (List<User>) arg;
                 Player white = new Player(users.get(0).getUsername(), ChessColor.WHITE, users.get(0).getId());
                 Player black = new Player(users.get(1).getUsername(), ChessColor.BLACK, users.get(1).getId());
-                NavDirections action = MatchmakingFragmentDirections.actionMatchmakingFragmentToBoardFragment(true, matched.getMatchId(), chessUser, gameRules, white, black);
+                NavDirections action = MatchmakingFragmentDirections.actionMatchmakingFragmentToBoardFragment(true, matched.getMatchId(), variantUser, gameRules, white, black);
                 Navigation.findNavController(getView()).navigate(action);
             }
 

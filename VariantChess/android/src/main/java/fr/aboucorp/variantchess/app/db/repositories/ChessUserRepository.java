@@ -8,14 +8,14 @@ import androidx.lifecycle.MutableLiveData;
 
 import fr.aboucorp.variantchess.app.db.VariantChessDatabase;
 import fr.aboucorp.variantchess.app.db.dao.ChessUserDao;
-import fr.aboucorp.variantchess.app.db.entities.ChessUser;
+import fr.aboucorp.variantchess.app.db.entities.VariantUser;
 
 public class ChessUserRepository {
 
     private ChessUserDao chessUserDao;
 
     @NonNull
-    private MutableLiveData<ChessUser> chessUser = new MutableLiveData<>();
+    private MutableLiveData<VariantUser> chessUser = new MutableLiveData<>();
 
     public ChessUserRepository(Application application) {
         VariantChessDatabase db = VariantChessDatabase.getDatabase(application);
@@ -23,15 +23,15 @@ public class ChessUserRepository {
     }
 
     @NonNull
-    public LiveData<ChessUser> getConnected() {
+    public LiveData<VariantUser> getConnected() {
         return this.chessUserDao.getConnected();
     }
 
-    public void setConnected(ChessUser connecting) {
+    public void setConnected(VariantUser connecting) {
         if (connecting != null) {
             connecting.isConnected = true;
             VariantChessDatabase.databaseWriteExecutor.execute(() -> {
-                ChessUser user = this.chessUserDao.findByName(connecting.username);
+                VariantUser user = this.chessUserDao.findByName(connecting.username);
                 if (user != null) {
                     user.isConnected = true;
                     user.authToken = connecting.authToken;
@@ -47,15 +47,15 @@ public class ChessUserRepository {
         }
     }
 
-    public void insert(ChessUser chessUser) {
+    public void insert(VariantUser variantUser) {
         VariantChessDatabase.databaseWriteExecutor.execute(() -> {
-            this.chessUserDao.insertAll(chessUser);
+            this.chessUserDao.insertAll(variantUser);
         });
     }
 
-    public void update(ChessUser chessUser) {
+    public void update(VariantUser variantUser) {
         VariantChessDatabase.databaseWriteExecutor.execute(() -> {
-            this.chessUserDao.update(chessUser);
+            this.chessUserDao.update(variantUser);
         });
     }
 

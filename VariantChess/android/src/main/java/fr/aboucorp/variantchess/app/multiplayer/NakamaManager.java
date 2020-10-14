@@ -28,7 +28,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 import fr.aboucorp.variantchess.app.db.dto.ChessUserDto;
-import fr.aboucorp.variantchess.app.db.entities.ChessUser;
+import fr.aboucorp.variantchess.app.db.entities.VariantUser;
 import fr.aboucorp.variantchess.app.exceptions.AuthentificationException;
 import fr.aboucorp.variantchess.app.exceptions.ExceptionCauseCode;
 import fr.aboucorp.variantchess.app.exceptions.IncorrectCredentials;
@@ -107,14 +107,14 @@ public class NakamaManager {
      * @return the chess user authentificated
      * @throws AuthentificationException the authentification exception if provided credetnials are wrong
      */
-    public ChessUser signInWithEmail(String mail, String password) throws AuthentificationException {
+    public VariantUser signInWithEmail(String mail, String password) throws AuthentificationException {
         try {
             this.session = this.client.authenticateEmail(mail, password, false).get(TIMEOUT_IN_MS, TimeUnit.MILLISECONDS);
             User user = this.client.getAccount(this.session).get(TIMEOUT_IN_MS, TimeUnit.MILLISECONDS).getUser();
             connectSocket();
-            ChessUser chessUser = ChessUserDto.fromUserToChessUser(user);
-            chessUser.authToken = this.session.getAuthToken();
-            return chessUser;
+            VariantUser variantUser = ChessUserDto.fromUserToChessUser(user);
+            variantUser.authToken = this.session.getAuthToken();
+            return variantUser;
         } catch (ExecutionException e) {
             if (ExceptionCauseCode.getCodeValueFromCause(e.getCause()) == ExceptionCauseCode.UNAUTHENTICATED) {
                 throw new IncorrectCredentials("Incorrect credentials during singin");
@@ -145,13 +145,13 @@ public class NakamaManager {
      * @return the chess user
      * @throws AuthentificationException the authentification exception
      */
-    public ChessUser signUpWithEmail(String mail, String password, String username) throws AuthentificationException {
+    public VariantUser signUpWithEmail(String mail, String password, String username) throws AuthentificationException {
         try {
             this.session = this.client.authenticateEmail(mail, password, true, username).get(TIMEOUT_IN_MS, TimeUnit.MILLISECONDS);
             User user = this.client.getAccount(this.session).get(TIMEOUT_IN_MS, TimeUnit.MILLISECONDS).getUser();
-            ChessUser chessUser = ChessUserDto.fromUserToChessUser(user);
-            chessUser.authToken = this.session.getAuthToken();
-            return chessUser;
+            VariantUser variantUser = ChessUserDto.fromUserToChessUser(user);
+            variantUser.authToken = this.session.getAuthToken();
+            return variantUser;
         } catch (ExecutionException e) {
             if (ExceptionCauseCode.getCodeValueFromCause(e.getCause()) == ExceptionCauseCode.UNAUTHENTICATED) {
                 throw new MailAlreadyRegistered("Email already registered");
@@ -176,7 +176,7 @@ public class NakamaManager {
      * @param authToken the auth token (comming from sharedpreferences)
      * @return the chess user connected
      */
-    public ChessUser tryReconnectUser(String authToken) throws InterruptedException, ExecutionException, TimeoutException {
+    public VariantUser tryReconnectUser(String authToken) throws InterruptedException, ExecutionException, TimeoutException {
         // Lets check if we can restore a cached session.
         if (authToken != null && !authToken.isEmpty()) {
             Session restoredSession = DefaultSession.restore(authToken);
@@ -272,7 +272,7 @@ public class NakamaManager {
      * @return the chess user
      * @throws UsernameAlreadyRegistered if the username is already registered
      */
-    public ChessUser updateDisplayName(String username) throws UsernameAlreadyRegistered {
+    public VariantUser updateDisplayName(String username) throws UsernameAlreadyRegistered {
         Metadata data = new Metadata();
         String timeZone = TimeZone.getDefault().getDisplayName();
         String langTag = Locale.getDefault().getDisplayLanguage();

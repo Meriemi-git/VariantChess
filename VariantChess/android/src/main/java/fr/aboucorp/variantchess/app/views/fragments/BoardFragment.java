@@ -21,8 +21,8 @@ import com.badlogic.gdx.backends.android.AndroidFragmentApplication;
 import com.heroiclabs.nakama.Match;
 
 import fr.aboucorp.variantchess.R;
-import fr.aboucorp.variantchess.app.db.entities.ChessUser;
 import fr.aboucorp.variantchess.app.db.entities.GameRules;
+import fr.aboucorp.variantchess.app.db.entities.VariantUser;
 import fr.aboucorp.variantchess.app.exceptions.UnknownGameRulesException;
 import fr.aboucorp.variantchess.app.managers.MatchManager;
 import fr.aboucorp.variantchess.app.managers.OfflineMatchManager;
@@ -41,10 +41,10 @@ import fr.aboucorp.variantchess.entities.events.models.TurnStartEvent;
 import fr.aboucorp.variantchess.libgdx.Board3dManager;
 
 import static fr.aboucorp.variantchess.app.utils.ArgsKey.BLACK;
-import static fr.aboucorp.variantchess.app.utils.ArgsKey.CHESS_USER;
 import static fr.aboucorp.variantchess.app.utils.ArgsKey.GAME_RULES;
 import static fr.aboucorp.variantchess.app.utils.ArgsKey.IS_ONLINE;
 import static fr.aboucorp.variantchess.app.utils.ArgsKey.MATCH_ID;
+import static fr.aboucorp.variantchess.app.utils.ArgsKey.VARIANT_USER;
 import static fr.aboucorp.variantchess.app.utils.ArgsKey.WHITE;
 
 public class BoardFragment extends AndroidFragmentApplication implements GameEventSubscriber, AndroidFragmentApplication.Callbacks {
@@ -63,7 +63,7 @@ public class BoardFragment extends AndroidFragmentApplication implements GameEve
 
     private NakamaManager nakamaManager;
 
-    private ChessUser chessUser;
+    private VariantUser variantUser;
     private GameRules gameRules;
     private boolean isOnline;
     private String matchId;
@@ -110,7 +110,7 @@ public class BoardFragment extends AndroidFragmentApplication implements GameEve
         if (args != null) {
             this.isOnline = args.getBoolean(IS_ONLINE);
             this.matchId = args.getString(MATCH_ID);
-            this.chessUser = (ChessUser) args.getSerializable(CHESS_USER);
+            this.variantUser = (VariantUser) args.getSerializable(VARIANT_USER);
             this.gameRules = (GameRules) args.getSerializable(GAME_RULES);
             this.white = (Player) args.getSerializable(WHITE);
             this.black = (Player) args.getSerializable(BLACK);
@@ -182,7 +182,7 @@ public class BoardFragment extends AndroidFragmentApplication implements GameEve
         }
 
         if (this.isOnline) {
-            this.matchManager = new OnlineMatchManager(this.boardManager, this.gameEventManager, this.chessUser);
+            this.matchManager = new OnlineMatchManager(this.boardManager, this.gameEventManager, this.variantUser);
         } else {
             this.matchManager = new OfflineMatchManager(this.boardManager, this.gameEventManager);
         }

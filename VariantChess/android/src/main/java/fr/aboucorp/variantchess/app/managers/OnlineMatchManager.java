@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.List;
 
-import fr.aboucorp.variantchess.app.db.entities.ChessUser;
+import fr.aboucorp.variantchess.app.db.entities.VariantUser;
 import fr.aboucorp.variantchess.app.managers.boards.BoardManager;
 import fr.aboucorp.variantchess.app.multiplayer.NakamaManager;
 import fr.aboucorp.variantchess.app.multiplayer.listeners.MatchListener;
@@ -33,11 +33,11 @@ import static fr.aboucorp.variantchess.entities.enums.GameState.WAIT_FOR_NEXT_TU
 
 public class OnlineMatchManager extends MatchManager implements MatchListener {
     private final NakamaManager nakamaManager;
-    private final ChessUser chessUser;
+    private final VariantUser variantUser;
 
-    public OnlineMatchManager(BoardManager boardManager, GameEventManager gameEventManager, ChessUser chessUser) {
+    public OnlineMatchManager(BoardManager boardManager, GameEventManager gameEventManager, VariantUser variantUser) {
         super(boardManager, gameEventManager);
-        this.chessUser = chessUser;
+        this.variantUser = variantUser;
         this.nakamaManager = NakamaManager.getInstance();
         this.nakamaManager.setMatchListener(this);
     }
@@ -89,7 +89,7 @@ public class OnlineMatchManager extends MatchManager implements MatchListener {
     public void startParty(ChessMatch chessMatch) {
         this.chessMatch = chessMatch;
         this.boardManager.startParty(chessMatch);
-        if (!chessMatch.whitePlayer.getUserID().equals(this.chessUser.userId)) {
+        if (!chessMatch.whitePlayer.getUserID().equals(this.variantUser.userId)) {
             this.boardManager.waitForNextTurn();
         }
     }
@@ -160,7 +160,7 @@ public class OnlineMatchManager extends MatchManager implements MatchListener {
 
     @Override
     public boolean isMyTurn() {
-        return this.currentTurn.getPlayer().getUsername().equals(this.chessUser.username);
+        return this.currentTurn.getPlayer().getUsername().equals(this.variantUser.username);
     }
 
 

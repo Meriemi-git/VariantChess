@@ -7,19 +7,19 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 
-import fr.aboucorp.variantchess.app.db.entities.ChessUser;
+import fr.aboucorp.variantchess.app.db.entities.VariantUser;
 import fr.aboucorp.variantchess.app.db.repositories.ChessUserRepository;
 
-public class UserViewModel extends AndroidViewModel {
+public class VariantUserViewModel extends AndroidViewModel {
 
     private ChessUserRepository chessUserRepository;
 
     private Observer onGetConnected;
 
-    public UserViewModel(@NonNull Application application) {
+    public VariantUserViewModel(@NonNull Application application) {
         super(application);
         this.chessUserRepository = new ChessUserRepository(application);
-        this.onGetConnected = (Observer<ChessUser>) user -> {
+        this.onGetConnected = (Observer<VariantUser>) user -> {
             if (user != null) {
                 user.isConnected = false;
                 this.chessUserRepository.update(user);
@@ -33,23 +33,23 @@ public class UserViewModel extends AndroidViewModel {
         this.chessUserRepository.getConnected().removeObserver(this.onGetConnected);
     }
 
-    public void setConnected(ChessUser connected) {
-        this.chessUserRepository.setConnected(connected);
+    public void insert(VariantUser variantUser) {
+        this.chessUserRepository.insert(variantUser);
     }
 
-    public void insert(ChessUser chessUser) {
-        this.chessUserRepository.insert(chessUser);
-    }
-
-    public LiveData<ChessUser> getConnected() {
+    public LiveData<VariantUser> getConnected() {
         return this.chessUserRepository.getConnected();
+    }
+
+    public void setConnected(VariantUser connected) {
+        this.chessUserRepository.setConnected(connected);
     }
 
     public void disconnectUser() {
         this.chessUserRepository.disconnectConnectedUser();
     }
 
-    public void updateUser(ChessUser connected) {
+    public void updateUser(VariantUser connected) {
         this.chessUserRepository.update(connected);
     }
 

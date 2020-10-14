@@ -9,39 +9,39 @@ import androidx.room.Update;
 
 import java.util.List;
 
-import fr.aboucorp.variantchess.app.db.entities.ChessUser;
+import fr.aboucorp.variantchess.app.db.entities.VariantUser;
 
 @Dao
 public interface ChessUserDao {
 
-    @Query("SELECT * FROM chessuser")
-    List<ChessUser> getAll();
+    @Query("SELECT * FROM variant_user")
+    List<VariantUser> getAll();
 
-    @Query("SELECT * FROM chessuser WHERE user_id IN (:userIds)")
-    List<ChessUser> loadAllByIds(int[] userIds);
+    @Query("SELECT * FROM variant_user WHERE user_id IN (:userIds)")
+    List<VariantUser> loadAllByIds(int[] userIds);
 
-    @Query("SELECT * FROM chessuser WHERE username LIKE :username LIMIT 1")
-    ChessUser findByName(String username);
+    @Query("SELECT * FROM variant_user WHERE username LIKE :username LIMIT 1")
+    VariantUser findByName(String username);
 
-    @Query("UPDATE chessuser SET is_connected = 0 WHERE auth_token = :authToken")
+    @Query("UPDATE variant_user SET is_connected = 0 WHERE auth_token = :authToken")
     void disconnectUserWithAuthToken(String authToken);
 
-    @Query("SELECT * FROM chessuser WHERE is_connected = 1")
-    LiveData<ChessUser> getConnected();
+    @Query("SELECT * FROM variant_user WHERE is_connected = 1")
+    LiveData<VariantUser> getConnected();
 
-    @Query("UPDATE chessuser SET is_connected = 0 WHERE username != :username")
+    @Query("UPDATE variant_user SET is_connected = 0 WHERE username != :username")
     void disconnectAllOthers(String username);
 
-    @Query("UPDATE chessuser SET is_connected = 0 WHERE is_connected = 1")
+    @Query("UPDATE variant_user SET is_connected = 0 WHERE is_connected = 1")
     void disconnectConnectedUser();
 
     @Insert
-    void insertAll(ChessUser... users);
+    void insertAll(VariantUser... users);
 
     @Delete
-    void delete(ChessUser user);
+    void delete(VariantUser user);
 
     @Update
-    void update(ChessUser user);
+    void update(VariantUser user);
 
 }

@@ -7,9 +7,9 @@ import androidx.room.PrimaryKey;
 
 import java.io.Serializable;
 
-@Entity(tableName = "chessuser", indices = {@Index(value = {"username", "user_id"},
+@Entity(tableName = "variant_user", indices = {@Index(value = {"username", "user_id"},
         unique = true)})
-public class ChessUser implements Serializable {
+public class VariantUser implements Serializable {
     @PrimaryKey(autoGenerate = true)
     public int id;
     @ColumnInfo(name = "username")
