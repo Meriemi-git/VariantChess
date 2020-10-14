@@ -6,9 +6,14 @@ import android.util.Log;
 import com.heroiclabs.nakama.MatchData;
 import com.heroiclabs.nakama.MatchPresenceEvent;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import fr.aboucorp.variantchess.app.db.entities.VariantUser;
@@ -45,23 +50,34 @@ public class OnlineMatchManager extends MatchManager implements MatchListener {
     @Override
     public void onMatchData(MatchData matchData) {
         try {
-            ObjectInputStream ois;
-            ois = new ObjectInputStream(new ByteArrayInputStream(matchData.getData()));
+            String text = this.getTextFromBytes(matchData.getData());
             switch ((int) matchData.getOpCode()) {
                 case OPCode.SEND_NEW_FEN:
-                    String boardState = (String) ois.readObject();
-                    Log.i("fr.aboucorp.variantchess", String.format("Receiving FEN : %s", boardState));
-                    this.playOppositeMove(boardState);
+                    Log.i("fr.aboucorp.variantchess", String.format("Receiving board state : %s", text));
+                    this.playOppositeMove(text);
                     break;
                 case OPCode.SEND_WHITE_PLAYER:
-                    String matchState = (String) ois.readObject();
-                    Log.i("fr.aboucorp.variantchess", String.format("Receving whitePlayer : %s", matchState));
+                    Log.i("fr.aboucorp.variantchess", String.format("Sending SEND_WHITE_PLAYER id : %s", text));
+
                     break;
             }
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (IOException e) {
             e.printStackTrace();
             Log.e("fr.aboucorp.variantchess", String.format("Error when receiving match data opeCode: %s", matchData.getOpCode()));
         }
+    }
+
+    private String getTextFromBytes(byte[] data) throws IOException {
+        InputStream inputStream = new ByteArrayInputStream(data);
+        StringBuilder textBuilder = new StringBuilder();
+        try (Reader reader = new BufferedReader(new InputStreamReader
+                (inputStream, Charset.forName(StandardCharsets.UTF_8.name())))) {
+            int character;
+            while ((character = reader.read()) != -1) {
+                textBuilder.append((char) character);
+            }
+        }
+        return textBuilder.toString();
     }
 
     @Override
@@ -127,7 +143,7 @@ public class OnlineMatchManager extends MatchManager implements MatchListener {
     public void startTurn() {
         Log.i("fr.aboucorp.variantchess", "StartTurn");
         Turn nextTurn;
-        Player player = null;
+        Player player;
         if (this.chessMatch.getTurns().size() > 0 && this.chessMatch.getTurns().getLast().getTurnColor() == ChessColor.WHITE) {
             player = this.chessMatch.getBlackPlayer();
         } else {
@@ -146,7 +162,7 @@ public class OnlineMatchManager extends MatchManager implements MatchListener {
 
     @Override
     public void passTurn() {
-        Log.i("fr.aboucorp.variantchess", String.format("Passing Turn"));
+        Log.i("fr.aboucorp.variantchess", "Passing Turn");
         this.currentTurn.setFen(this.boardManager.getFenFromBoard());
         this.chessMatch.getTurns().add(this.currentTurn);
         List<String> receiversName = this.gameEventManager.sendEvent(new TurnEndEvent("Ending turn", this.chessMatch.getTurns().getLast()));
