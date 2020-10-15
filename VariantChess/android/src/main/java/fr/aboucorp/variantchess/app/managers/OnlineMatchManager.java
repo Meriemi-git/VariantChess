@@ -1,6 +1,8 @@
 package fr.aboucorp.variantchess.app.managers;
 
 
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -15,6 +17,7 @@ import fr.aboucorp.variantchess.app.multiplayer.JsonPlayer;
 import fr.aboucorp.variantchess.app.multiplayer.NakamaManager;
 import fr.aboucorp.variantchess.app.multiplayer.listeners.MatchListener;
 import fr.aboucorp.variantchess.app.utils.OPCode;
+import fr.aboucorp.variantchess.app.views.fragments.BoardFragment;
 import fr.aboucorp.variantchess.entities.ChessColor;
 import fr.aboucorp.variantchess.entities.ChessMatch;
 import fr.aboucorp.variantchess.entities.Player;
@@ -36,8 +39,8 @@ public class OnlineMatchManager extends MatchManager implements MatchListener {
     private final NakamaManager nakamaManager;
     private final VariantUser variantUser;
 
-    public OnlineMatchManager(BoardManager boardManager, GameEventManager gameEventManager, VariantUser variantUser) {
-        super(boardManager, gameEventManager);
+    public OnlineMatchManager(BoardFragment boardFragment, BoardManager boardManager, GameEventManager gameEventManager, VariantUser variantUser) {
+        super(boardFragment, boardManager, gameEventManager);
         this.variantUser = variantUser;
         this.nakamaManager = NakamaManager.getInstance();
         this.nakamaManager.setMatchListener(this);
@@ -51,24 +54,27 @@ public class OnlineMatchManager extends MatchManager implements MatchListener {
                 this.playOppositeMove(matchData);
                 break;
             case OPCode.SEND_WHITE_PLAYER:
-                ChessMatch chessMatch = new ChessMatch();
-                chessMatch.setMatchId(matchId);
-                Gson gson = new Gson();
-                List<JsonPlayer> jsonPlayers = gson.fromJson(matchData, new TypeToken<List<JsonPlayer>>() {
-                }.getType());
-                jsonPlayers.stream().forEach(jsonPlayer -> {
-                    if (jsonPlayer.Color.toLowerCase().equals(BLACK.name().toLowerCase())) {
-                        chessMatch.getPlayers().add(new Player(jsonPlayer.Username, BLACK, jsonPlayer.UserID));
-                    } else {
-                        chessMatch.getPlayers().add(new Player(jsonPlayer.Username, WHITE, jsonPlayer.UserID));
-                    }
-                });
-                startParty(chessMatch);
+                Log.i("fr.aboucorp.variantchess", String.format("Receiving players state : %s", matchData));
+                this.managePlayerDefinition(matchId, matchData);
                 break;
         }
     }
 
-
+    private void managePlayerDefinition(String matchId, String matchData) {
+        ChessMatch chessMatch = new ChessMatch();
+        chessMatch.setMatchId(matchId);
+        Gson gson = new Gson();
+        List<JsonPlayer> jsonPlayers = gson.fromJson(matchData, new TypeToken<List<JsonPlayer>>() {
+        }.getType());
+        jsonPlayers.stream().forEach(jsonPlayer -> {
+            if (jsonPlayer.Color.toLowerCase().equals(BLACK.name().toLowerCase())) {
+                chessMatch.getPlayers().add(new Player(jsonPlayer.Username, BLACK, jsonPlayer.UserID));
+            } else {
+                chessMatch.getPlayers().add(new Player(jsonPlayer.Username, WHITE, jsonPlayer.UserID));
+            }
+        });
+        startParty(chessMatch);
+    }
 
     @Override
     public void onMatchPresence(MatchPresenceEvent matchPresence) {
@@ -95,6 +101,9 @@ public class OnlineMatchManager extends MatchManager implements MatchListener {
     public void startParty(ChessMatch chessMatch) {
         Log.i("fr.aboucorp.variantchess", "OnlineManager startParty()");
         this.chessMatch = chessMatch;
+        String selfUsername = this.variantUser.username;
+        String opponentUsername = this.getOpponent().getUsername();
+        new Handler(Looper.getMainLooper()).post(() -> this.boardFragment.setPlayerLabels(selfUsername, opponentUsername));
         this.boardManager.startParty(chessMatch);
         if (!chessMatch.getPlayerByColor(WHITE).getUserID().equals(this.variantUser.userId)) {
             this.boardManager.waitForNextTurn();
@@ -170,11 +179,23 @@ public class OnlineMatchManager extends MatchManager implements MatchListener {
         return this.currentTurn.getPlayer().getUsername().equals(this.variantUser.username);
     }
 
+    @Override
+    public Player getOpponent() {
+        if (this.chessMatch != null) {
+            return chessMatch
+                    .getPlayers()
+                    .stream()
+                    .filter(player -> !player.getUsername().equals(this.variantUser.username))
+                    .findFirst()
+                    .get();
+        }
+        return null;
+    }
+
 
     public void playOppositeMove(String boardState) {
         Log.i("fr.aboucorp.variantchess", String.format("playOppositeMove"));
         this.boardManager.playTheOppositeMove(boardState);
     }
-
 
 }

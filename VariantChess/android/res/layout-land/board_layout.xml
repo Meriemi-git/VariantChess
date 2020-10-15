@@ -11,17 +11,17 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="TextView"
-        app:layout_constraintEnd_toStartOf="@+id/board"
+        app:layout_constraintEnd_toStartOf="@+id/board_panel"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/main_toolbar" />
 
     <Button
-        android:id="@+id/btn_end_turn"
+        android:id="@+id/btn_surrend"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="@string/btn_end_turn"
-        app:layout_constraintEnd_toStartOf="@+id/board"
+        app:layout_constraintEnd_toStartOf="@+id/board_panel"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/lbl_turn" />
 
@@ -31,13 +31,13 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="Switch"
-        app:layout_constraintEnd_toStartOf="@+id/board"
+        app:layout_constraintEnd_toStartOf="@+id/board_panel"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btn_end_turn"
+        app:layout_constraintTop_toBottomOf="@+id/btn_surrend"
         tools:text="Tactical View" />
 
     <FrameLayout
-        android:id="@+id/board"
+        android:id="@+id/board_panel"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
@@ -58,7 +58,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/board"
+        app:layout_constraintEnd_toStartOf="@+id/board_panel"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/switch_tactical">
 
