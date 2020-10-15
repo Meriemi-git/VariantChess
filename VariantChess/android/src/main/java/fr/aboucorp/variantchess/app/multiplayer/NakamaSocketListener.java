@@ -14,6 +14,15 @@ import com.heroiclabs.nakama.StreamPresenceEvent;
 import com.heroiclabs.nakama.api.ChannelMessage;
 import com.heroiclabs.nakama.api.NotificationList;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+
 import fr.aboucorp.variantchess.app.multiplayer.listeners.ChatListener;
 import fr.aboucorp.variantchess.app.multiplayer.listeners.MatchListener;
 import fr.aboucorp.variantchess.app.multiplayer.listeners.MatchmakingListener;
@@ -81,7 +90,14 @@ public class NakamaSocketListener extends AbstractSocketListener {
         super.onMatchData(matchData);
         Log.i("fr.aboucorp.variantchess", String.format("onMatchData opCode : %s", matchData.getOpCode()));
         if (matchListener != null) {
-            matchListener.onMatchData(matchData);
+            try {
+                String text = getTextFromBytes(matchData.getData());
+                matchListener.onMatchData(matchData.getMatchId(), matchData.getOpCode(), text);
+            } catch (IOException e) {
+                e.printStackTrace();
+                Log.e("fr.aboucorp.variantchess", "Error when reading matchData");
+            }
+
         } else {
             Log.e("fr.aboucorp.variantchess", "Missing matchListener.");
         }
@@ -142,5 +158,18 @@ public class NakamaSocketListener extends AbstractSocketListener {
 
     public void setNotificationListener(NotificationListener notificationListener) {
         this.notificationListener = notificationListener;
+    }
+
+    private String getTextFromBytes(byte[] data) throws IOException {
+        InputStream inputStream = new ByteArrayInputStream(data);
+        StringBuilder textBuilder = new StringBuilder();
+        try (Reader reader = new BufferedReader(new InputStreamReader
+                (inputStream, Charset.forName(StandardCharsets.UTF_8.name())))) {
+            int character;
+            while ((character = reader.read()) != -1) {
+                textBuilder.append((char) character);
+            }
+        }
+        return textBuilder.toString();
     }
 }

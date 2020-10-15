@@ -3,16 +3,15 @@ package fr.aboucorp.variantchess.app.managers;
 
 import android.util.Log;
 
-import com.heroiclabs.nakama.MatchData;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.heroiclabs.nakama.MatchPresenceEvent;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.util.List;
 
 import fr.aboucorp.variantchess.app.db.entities.VariantUser;
 import fr.aboucorp.variantchess.app.managers.boards.BoardManager;
+import fr.aboucorp.variantchess.app.multiplayer.JsonPlayer;
 import fr.aboucorp.variantchess.app.multiplayer.NakamaManager;
 import fr.aboucorp.variantchess.app.multiplayer.listeners.MatchListener;
 import fr.aboucorp.variantchess.app.utils.OPCode;
@@ -29,6 +28,8 @@ import fr.aboucorp.variantchess.entities.events.models.PartyEvent;
 import fr.aboucorp.variantchess.entities.events.models.TurnEndEvent;
 import fr.aboucorp.variantchess.entities.events.models.TurnStartEvent;
 
+import static fr.aboucorp.variantchess.entities.ChessColor.BLACK;
+import static fr.aboucorp.variantchess.entities.ChessColor.WHITE;
 import static fr.aboucorp.variantchess.entities.enums.GameState.WAIT_FOR_NEXT_TURN;
 
 public class OnlineMatchManager extends MatchManager implements MatchListener {
@@ -43,26 +44,31 @@ public class OnlineMatchManager extends MatchManager implements MatchListener {
     }
 
     @Override
-    public void onMatchData(MatchData matchData) {
-        try {
-            ObjectInputStream ois;
-            ois = new ObjectInputStream(new ByteArrayInputStream(matchData.getData()));
-            switch ((int) matchData.getOpCode()) {
-                case OPCode.SEND_NEW_FEN:
-                    String boardState = (String) ois.readObject();
-                    Log.i("fr.aboucorp.variantchess", String.format("Receiving FEN : %s", boardState));
-                    this.playOppositeMove(boardState);
-                    break;
-                case OPCode.SEND_WHITE_PLAYER:
-                    String matchState = (String) ois.readObject();
-                    Log.i("fr.aboucorp.variantchess", String.format("Receving whitePlayer : %s", matchState));
-                    break;
-            }
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-            Log.e("fr.aboucorp.variantchess", String.format("Error when receiving match data opeCode: %s", matchData.getOpCode()));
+    public void onMatchData(String matchId, long opCode, String matchData) {
+        switch ((int) opCode) {
+            case OPCode.SEND_NEW_FEN:
+                Log.i("fr.aboucorp.variantchess", String.format("Receiving board state : %s", matchData));
+                this.playOppositeMove(matchData);
+                break;
+            case OPCode.SEND_WHITE_PLAYER:
+                ChessMatch chessMatch = new ChessMatch();
+                chessMatch.setMatchId(matchId);
+                Gson gson = new Gson();
+                List<JsonPlayer> jsonPlayers = gson.fromJson(matchData, new TypeToken<List<JsonPlayer>>() {
+                }.getType());
+                jsonPlayers.stream().forEach(jsonPlayer -> {
+                    if (jsonPlayer.Color.toLowerCase().equals(BLACK.name().toLowerCase())) {
+                        chessMatch.getPlayers().add(new Player(jsonPlayer.Username, BLACK, jsonPlayer.UserID));
+                    } else {
+                        chessMatch.getPlayers().add(new Player(jsonPlayer.Username, WHITE, jsonPlayer.UserID));
+                    }
+                });
+                startParty(chessMatch);
+                break;
         }
     }
+
+
 
     @Override
     public void onMatchPresence(MatchPresenceEvent matchPresence) {
@@ -87,9 +93,10 @@ public class OnlineMatchManager extends MatchManager implements MatchListener {
 
     @Override
     public void startParty(ChessMatch chessMatch) {
+        Log.i("fr.aboucorp.variantchess", "OnlineManager startParty()");
         this.chessMatch = chessMatch;
         this.boardManager.startParty(chessMatch);
-        if (!chessMatch.whitePlayer.getUserID().equals(this.variantUser.userId)) {
+        if (!chessMatch.getPlayerByColor(WHITE).getUserID().equals(this.variantUser.userId)) {
             this.boardManager.waitForNextTurn();
         }
     }
@@ -127,11 +134,11 @@ public class OnlineMatchManager extends MatchManager implements MatchListener {
     public void startTurn() {
         Log.i("fr.aboucorp.variantchess", "StartTurn");
         Turn nextTurn;
-        Player player = null;
-        if (this.chessMatch.getTurns().size() > 0 && this.chessMatch.getTurns().getLast().getTurnColor() == ChessColor.WHITE) {
-            player = this.chessMatch.getBlackPlayer();
+        fr.aboucorp.variantchess.entities.Player player;
+        if (this.chessMatch.getTurns().size() > 0 && this.chessMatch.getTurns().getLast().getTurnColor() == WHITE) {
+            player = this.chessMatch.getPlayerByColor(BLACK);
         } else {
-            player = this.chessMatch.getWhitePlayer();
+            player = this.chessMatch.getPlayerByColor(WHITE);
         }
         nextTurn = new Turn(this.chessMatch.getTurns().size() + 1, player);
         this.currentTurn = nextTurn;
@@ -146,7 +153,7 @@ public class OnlineMatchManager extends MatchManager implements MatchListener {
 
     @Override
     public void passTurn() {
-        Log.i("fr.aboucorp.variantchess", String.format("Passing Turn"));
+        Log.i("fr.aboucorp.variantchess", "Passing Turn");
         this.currentTurn.setFen(this.boardManager.getFenFromBoard());
         this.chessMatch.getTurns().add(this.currentTurn);
         List<String> receiversName = this.gameEventManager.sendEvent(new TurnEndEvent("Ending turn", this.chessMatch.getTurns().getLast()));
@@ -168,4 +175,6 @@ public class OnlineMatchManager extends MatchManager implements MatchListener {
         Log.i("fr.aboucorp.variantchess", String.format("playOppositeMove"));
         this.boardManager.playTheOppositeMove(boardState);
     }
+
+
 }

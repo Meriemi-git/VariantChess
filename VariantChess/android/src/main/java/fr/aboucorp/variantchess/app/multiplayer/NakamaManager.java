@@ -319,7 +319,6 @@ public class NakamaManager {
      * @throws InterruptedException the interrupted exception if some network error occured
      */
     public Match joinMatchById(String matchId) throws ExecutionException, InterruptedException, TimeoutException {
-        Log.i("fr.aboucorp.variantchess", String.format("Joining match with id : %s", matchId));
         Match match = this.socket.joinMatch(matchId).get(TIMEOUT_IN_MS, TimeUnit.MILLISECONDS);
         return match;
     }

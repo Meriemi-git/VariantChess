@@ -5,8 +5,13 @@ import java.io.Serializable;
 
 public class Player implements Serializable {
     private final String username;
-    private final ChessColor color;
+    private ChessColor color;
     private final String userID;
+
+    public Player(String username, String userID) {
+        this.username = username;
+        this.userID = userID;
+    }
 
     public Player(String username, ChessColor color, String userID) {
         this.username = username;
@@ -27,4 +32,7 @@ public class Player implements Serializable {
         return this.userID;
     }
 
+    public void setColor(ChessColor color) {
+        this.color = color;
+    }
 }

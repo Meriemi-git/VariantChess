@@ -1,29 +1,21 @@
 package fr.aboucorp.variantchess.entities;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 public class ChessMatch implements Serializable {
-    public LinkedList turns = new LinkedList<>();
-    public Player whitePlayer;
-    public Player blackPlayer;
+    private LinkedList turns = new LinkedList<>();
+    private List<Player> players;
     private String matchId;
-    private Player currentPlayer;
 
-    public Player getBlackPlayer() {
-        return this.blackPlayer;
+    public ChessMatch() {
+        this.players = new ArrayList<>();
     }
 
-    public void setBlackPlayer(Player blackPlayer) {
-        this.blackPlayer = blackPlayer;
-    }
-
-    public Player getWhitePlayer() {
-        return this.whitePlayer;
-    }
-
-    public void setWhitePlayer(Player whitePlayer) {
-        this.whitePlayer = whitePlayer;
+    public Player getPlayerByColor(ChessColor color) {
+        return this.players.stream().filter(player -> player.getColor() == color).findFirst().get();
     }
 
     public LinkedList<Turn> getTurns() {
@@ -42,11 +34,7 @@ public class ChessMatch implements Serializable {
         this.matchId = matchId;
     }
 
-    public Player getCurrentPlayer() {
-        return this.currentPlayer;
-    }
-
-    public void setCurrentPlayer(Player currentPlayer) {
-        this.currentPlayer = currentPlayer;
+    public List<Player> getPlayers() {
+        return this.players;
     }
 }

@@ -56,11 +56,13 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
         this.gameEventManager.subscribe(PartyEvent.class, this, 1, "ClassicBoardManager => PartyEvent");
         this.gameEventManager.subscribe(TurnEvent.class, this, 1, "ClassicBoardManager => TurnEvent");
         this.gameEventManager.subscribe(PieceEvent.class, this, 1, "ClassicBoardManager => PieceEvent");
-        if (chessMatch.turns.size() == 0) {
+        if (chessMatch.getTurns().size() == 0) {
+            Log.i("fr.aboucorp.variantchess", "Init board");
             this.board.initBoard();
         } else {
             try {
-                this.board.loadBoard(((Turn) chessMatch.turns.getLast()).getFen());
+                Log.i("fr.aboucorp.variantchess", "Load Board from last fen pos");
+                this.board.loadBoard(((Turn) chessMatch.getTurns().getLast()).getFen());
             } catch (FenStringBadFormatException e) {
                 e.printStackTrace();
             }
@@ -68,9 +70,9 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
         GdxAsyncHandler gdxAsyncHandler = new GdxAsyncHandler() {
             @Override
             public Object execute() {
-                board3dManager.createSquares(ClassicBoardManager.this.board.getSquares());
-                board3dManager.createPieces(ClassicBoardManager.this.board.getWhitePieces());
-                board3dManager.createPieces(ClassicBoardManager.this.board.getBlackPieces());
+                board3dManager.createSquares(board.getSquares());
+                board3dManager.createPieces(board.getWhitePieces());
+                board3dManager.createPieces(board.getBlackPieces());
                 boardLoadingListener.OnBoardLoaded();
                 return null;
             }

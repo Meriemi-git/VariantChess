@@ -80,8 +80,8 @@ public class BoardFragment extends AndroidFragmentApplication implements GameEve
             joinMatch(this.matchId);
         } else {
             ChessMatch chessMatch = new ChessMatch();
-            chessMatch.setWhitePlayer(new Player("Player 1", ChessColor.WHITE, null));
-            chessMatch.setBlackPlayer(new Player("Player 2", ChessColor.BLACK, null));
+            chessMatch.getPlayers().add(new Player("Player 1", ChessColor.WHITE, null));
+            chessMatch.getPlayers().add(new Player("Player 2", ChessColor.BLACK, null));
             matchManager.startParty(chessMatch);
         }
         return view;
@@ -142,18 +142,12 @@ public class BoardFragment extends AndroidFragmentApplication implements GameEve
             @Override
             protected Object executeAsync() throws Exception {
                 Match match = nakamaManager.joinMatchById(matchID);
-                ChessMatch chessMatch = new ChessMatch();
-                chessMatch.setWhitePlayer(white);
-                chessMatch.setBlackPlayer(black);
-                chessMatch.setMatchId(match.getMatchId());
-                return chessMatch;
+                return null;
             }
 
             @Override
             protected void callbackOnUI(Object arg) {
-                ChessMatch chessMatch = (ChessMatch) arg;
-                Log.i("fr.aboucorp.variantchess", "Starting party");
-                matchManager.startParty(chessMatch);
+
             }
 
             @Override
