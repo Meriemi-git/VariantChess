@@ -1,6 +1,7 @@
 package fr.aboucorp.variantchess.app.views.fragments;
 
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -8,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,12 +32,15 @@ import fr.aboucorp.variantchess.app.managers.boards.BoardManager;
 import fr.aboucorp.variantchess.app.managers.boards.BoardManagerFactory;
 import fr.aboucorp.variantchess.app.multiplayer.NakamaManager;
 import fr.aboucorp.variantchess.app.utils.AsyncHandler;
+import fr.aboucorp.variantchess.app.utils.PieceIconFactory;
 import fr.aboucorp.variantchess.entities.ChessColor;
 import fr.aboucorp.variantchess.entities.ChessMatch;
 import fr.aboucorp.variantchess.entities.Player;
+import fr.aboucorp.variantchess.entities.enums.PieceId;
 import fr.aboucorp.variantchess.entities.events.GameEventManager;
 import fr.aboucorp.variantchess.entities.events.GameEventSubscriber;
 import fr.aboucorp.variantchess.entities.events.models.GameEvent;
+import fr.aboucorp.variantchess.entities.events.models.MoveEvent;
 import fr.aboucorp.variantchess.entities.events.models.TurnStartEvent;
 import fr.aboucorp.variantchess.libgdx.Board3dManager;
 
@@ -99,9 +104,23 @@ public class BoardFragment extends AndroidFragmentApplication implements GameEve
                 } else {
                     this.lbl_turn.setText("Turn of " + this.matchManager.getOpponent().getUsername());
                 }
+            } else if (event instanceof MoveEvent) {
+                PieceId pieceId = ((MoveEvent) event).deadPiece;
+                if (pieceId != null) {
+                    addIconForDeadPiece(pieceId);
+                }
             }
             Log.i("fr.aboucorp.variantchess", String.format("GameEvent Color : %s Message : %s", this.matchManager.getPartyInfos(), event.message));
         });
+    }
+
+    private void addIconForDeadPiece(PieceId pieceId) {
+        ImageView piece = new ImageView(getContext());
+        Drawable drawable = PieceIconFactory.getDrawableForPieceID(getContext(), pieceId);
+        piece.setImageDrawable(drawable);
+        if (matchManager.isMyTurn()) {
+            this.self_dead_pieces_list_layout.addView(piece);
+        }
     }
 
     @Override

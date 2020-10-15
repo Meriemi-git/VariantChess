@@ -31,13 +31,13 @@ public abstract class VariantChessDatabase extends RoomDatabase {
                 INSTANCE.gameRulesDao().deleteAll();
                 GameRules classicGameRules = new GameRules();
                 classicGameRules.name = "gamerules_name_classic";
-                classicGameRules.icon = "ic_chess_qlt45";
+                classicGameRules.icon = "ic_chess_bq";
                 classicGameRules.description = "gamerules_description_classic";
                 classicGameRules.balance = 5;
                 classicGameRules.difficulty = 3;
                 GameRules randomGameRules = new GameRules();
                 randomGameRules.name = "gamerules_name_random";
-                randomGameRules.icon = "ic_chess_qlt45";
+                randomGameRules.icon = "ic_chess_wq";
                 randomGameRules.description = "gamerules_description_random";
                 randomGameRules.balance = 1;
                 randomGameRules.difficulty = 5;

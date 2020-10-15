@@ -26,9 +26,7 @@ import fr.aboucorp.variantchess.app.db.entities.GameRules;
 import fr.aboucorp.variantchess.app.db.entities.VariantUser;
 import fr.aboucorp.variantchess.app.db.viewmodel.GameRulesViewModel;
 import fr.aboucorp.variantchess.app.utils.ArgsKey;
-import fr.aboucorp.variantchess.entities.ChessColor;
 import fr.aboucorp.variantchess.entities.ChessMatch;
-import fr.aboucorp.variantchess.entities.Player;
 
 public class GameRulesFragment extends VariantChessFragment implements AdapterView.OnItemSelectedListener {
     private Button btn_online;
@@ -78,8 +76,6 @@ public class GameRulesFragment extends VariantChessFragment implements AdapterVi
         });
         this.btn_offline.setOnClickListener(v -> {
             GameRules selected = (GameRules) spinner_rules.getSelectedItem();
-            Player white = new Player("White", ChessColor.WHITE, null);
-            Player black = new Player("Black", ChessColor.BLACK, null);
             ChessMatch chessMatch = new ChessMatch();
             NavDirections action = GameRulesFragmentDirections.actionGameRulesFragmentToBoardFragment(false, selected, chessMatch);
             Navigation.findNavController(getView()).navigate(action);
@@ -124,17 +120,17 @@ public class GameRulesFragment extends VariantChessFragment implements AdapterVi
         for (int i = 1; i <= 5; i++) {
             ImageView difficulty = new ImageView(getContext());
             if (gameRules.difficulty < i) {
-                difficulty.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_chess_qdt45));
+                difficulty.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_chess_bq));
             } else {
-                difficulty.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_chess_qlt45));
+                difficulty.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_chess_wq));
             }
             difficulty_layout.addView(difficulty);
 
             ImageView balance = new ImageView(getContext());
             if (gameRules.balance < i) {
-                balance.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_chess_qdt45));
+                balance.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_chess_bq));
             } else {
-                balance.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_chess_qlt45));
+                balance.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.ic_chess_wq));
             }
             balance_layout.addView(balance);
         }

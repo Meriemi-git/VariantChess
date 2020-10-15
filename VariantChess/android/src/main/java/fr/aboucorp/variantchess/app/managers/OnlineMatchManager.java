@@ -13,9 +13,9 @@ import java.util.List;
 
 import fr.aboucorp.variantchess.app.db.entities.VariantUser;
 import fr.aboucorp.variantchess.app.managers.boards.BoardManager;
-import fr.aboucorp.variantchess.app.multiplayer.JsonPlayer;
 import fr.aboucorp.variantchess.app.multiplayer.NakamaManager;
 import fr.aboucorp.variantchess.app.multiplayer.listeners.MatchListener;
+import fr.aboucorp.variantchess.app.multiplayer.matchdata.JsonPlayer;
 import fr.aboucorp.variantchess.app.utils.OPCode;
 import fr.aboucorp.variantchess.app.views.fragments.BoardFragment;
 import fr.aboucorp.variantchess.entities.ChessColor;

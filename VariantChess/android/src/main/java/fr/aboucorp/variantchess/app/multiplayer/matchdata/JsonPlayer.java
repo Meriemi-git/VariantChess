@@ -1,4 +1,4 @@
-package fr.aboucorp.variantchess.app.multiplayer;
+package fr.aboucorp.variantchess.app.multiplayer.matchdata;
 
 public class JsonPlayer {
     public String UserID;

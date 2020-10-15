@@ -354,7 +354,22 @@ public class ClassicBoardManager extends BoardManager implements GameEventSubscr
             } else {
                 this.board.getBlackPieces().removeByLocation(toBeEaten.getLocation());
             }
-            this.board3dManager.moveToEven(toBeEaten);
+            Piece finalToBeEaten = toBeEaten;
+            GdxAsyncHandler handler = new GdxAsyncHandler() {
+                @Override
+                public Object execute() {
+                    board3dManager.moveToEven(finalToBeEaten);
+                    return null;
+                }
+
+                @Override
+                public void error(Exception ex) {
+                    ex.printStackTrace();
+                    Log.e("fr.variantchess.aboucorp", "Error on move piuece to even message: " + ex.getMessage());
+                }
+            };
+            handler.start();
+
             String eventMessage = String.format("Piece %s die on %s", toBeEaten.getPieceId().name(), toBeEaten.getLocation());
             this.gameEventManager.sendEvent(new PieceEvent(eventMessage, EventType.DEATH, toBeEaten.getPieceId()));
             toBeEaten.die();
