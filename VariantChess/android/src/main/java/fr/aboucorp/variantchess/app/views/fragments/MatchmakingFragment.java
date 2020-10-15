@@ -30,8 +30,6 @@ import fr.aboucorp.variantchess.app.db.viewmodel.VariantUserViewModel;
 import fr.aboucorp.variantchess.app.multiplayer.NakamaManager;
 import fr.aboucorp.variantchess.app.multiplayer.listeners.MatchmakingListener;
 import fr.aboucorp.variantchess.app.utils.AsyncHandler;
-import fr.aboucorp.variantchess.entities.ChessColor;
-import fr.aboucorp.variantchess.entities.Player;
 
 import static fr.aboucorp.variantchess.app.utils.ArgsKey.GAME_RULES;
 
@@ -114,10 +112,7 @@ public class MatchmakingFragment extends VariantChessFragment implements Matchma
             @Override
             protected void callbackOnUI(Object arg) {
                 super.callbackOnUI(arg);
-                List<User> users = (List<User>) arg;
-                Player white = new Player(users.get(0).getUsername(), ChessColor.WHITE, users.get(0).getId());
-                Player black = new Player(users.get(1).getUsername(), ChessColor.BLACK, users.get(1).getId());
-                NavDirections action = MatchmakingFragmentDirections.actionMatchmakingFragmentToBoardFragment(true, matched.getMatchId(), variantUser, gameRules, white, black);
+                NavDirections action = MatchmakingFragmentDirections.actionMatchmakingFragmentToBoardFragment(true, matched.getMatchId(), variantUser, gameRules);
                 Navigation.findNavController(getView()).navigate(action);
             }
 

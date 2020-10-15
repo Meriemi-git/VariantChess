@@ -83,4 +83,5 @@
     <string name="general_connect">Connexion</string>
     <string name="warn_play_online_need_connection">Si vous souhaitez jouer en ligne vous devez vous connecter à votre compte VariantChess.</string>
     <string name="err_reconnexion_error">Echec de la reconnexion</string>
+    <string name="surrend">Abandonner</string>
 </resources>

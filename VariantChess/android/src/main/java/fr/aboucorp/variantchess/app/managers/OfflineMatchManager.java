@@ -3,6 +3,7 @@ package fr.aboucorp.variantchess.app.managers;
 import android.util.Log;
 
 import fr.aboucorp.variantchess.app.managers.boards.BoardManager;
+import fr.aboucorp.variantchess.app.views.fragments.BoardFragment;
 import fr.aboucorp.variantchess.entities.ChessColor;
 import fr.aboucorp.variantchess.entities.ChessMatch;
 import fr.aboucorp.variantchess.entities.Player;
@@ -20,8 +21,8 @@ import static fr.aboucorp.variantchess.entities.ChessColor.BLACK;
 import static fr.aboucorp.variantchess.entities.ChessColor.WHITE;
 
 public class OfflineMatchManager extends MatchManager {
-    public OfflineMatchManager(BoardManager boardManager, GameEventManager gameEventManager) {
-        super(boardManager, gameEventManager);
+    public OfflineMatchManager(BoardFragment boardFragment, BoardManager boardManager, GameEventManager gameEventManager) {
+        super(boardFragment, boardManager, gameEventManager);
     }
 
     @Override
@@ -94,5 +95,10 @@ public class OfflineMatchManager extends MatchManager {
     @Override
     public boolean isMyTurn() {
         return true;
+    }
+
+    @Override
+    public Player getOpponent() {
+        return null;
     }
 }

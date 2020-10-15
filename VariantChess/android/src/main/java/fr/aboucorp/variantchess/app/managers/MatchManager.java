@@ -2,8 +2,10 @@ package fr.aboucorp.variantchess.app.managers;
 
 import fr.aboucorp.variantchess.app.managers.boards.BoardLoadingListener;
 import fr.aboucorp.variantchess.app.managers.boards.BoardManager;
+import fr.aboucorp.variantchess.app.views.fragments.BoardFragment;
 import fr.aboucorp.variantchess.entities.ChessMatch;
 import fr.aboucorp.variantchess.entities.PartyLifeCycle;
+import fr.aboucorp.variantchess.entities.Player;
 import fr.aboucorp.variantchess.entities.Turn;
 import fr.aboucorp.variantchess.entities.events.GameEventManager;
 import fr.aboucorp.variantchess.entities.events.GameEventSubscriber;
@@ -11,13 +13,15 @@ import fr.aboucorp.variantchess.entities.events.models.GameEvent;
 import fr.aboucorp.variantchess.entities.events.models.MoveEvent;
 
 public abstract class MatchManager implements GameEventSubscriber, BoardLoadingListener, PartyLifeCycle {
+    protected final BoardFragment boardFragment;
     protected final BoardManager boardManager;
-    protected GameEventManager gameEventManager;
+    protected final GameEventManager gameEventManager;
     protected ChessMatch chessMatch;
     protected Turn currentTurn;
 
 
-    public MatchManager(BoardManager boardManager, GameEventManager gameEventManager) {
+    public MatchManager(BoardFragment boardFragment, BoardManager boardManager, GameEventManager gameEventManager) {
+        this.boardFragment = boardFragment;
         this.gameEventManager = gameEventManager;
         this.boardManager = boardManager;
         this.boardManager.setBoardLoadingListener(this);
@@ -44,4 +48,6 @@ public abstract class MatchManager implements GameEventSubscriber, BoardLoadingL
     public abstract void passTurn();
 
     public abstract boolean isMyTurn();
+
+    public abstract Player getOpponent();
 }
