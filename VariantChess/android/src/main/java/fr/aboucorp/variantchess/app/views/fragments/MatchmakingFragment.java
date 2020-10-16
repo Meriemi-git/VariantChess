@@ -1,5 +1,6 @@
 package fr.aboucorp.variantchess.app.views.fragments;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,6 +24,9 @@ import com.heroiclabs.nakama.api.User;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
+import dagger.android.support.AndroidSupportInjection;
 import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.db.entities.GameRules;
 import fr.aboucorp.variantchess.app.db.entities.VariantUser;
@@ -46,7 +50,8 @@ public class MatchmakingFragment extends VariantChessFragment implements Matchma
     /**
      * Nakama multiplayer session manager
      */
-    private NakamaManager nakamaManager;
+    @Inject
+    public NakamaManager nakamaManager;
     /**
      * Nakama multiplayer session manager
      */
@@ -81,7 +86,6 @@ public class MatchmakingFragment extends VariantChessFragment implements Matchma
         if (savedInstanceState != null) {
             this.gameRules = (GameRules) savedInstanceState.getSerializable("game_rules");
         }
-        this.nakamaManager = NakamaManager.getInstance();
         this.nakamaManager.setMatchmakingListener(this);
         this.bindViews();
         this.bindListeners();
@@ -188,5 +192,11 @@ public class MatchmakingFragment extends VariantChessFragment implements Matchma
             }
         };
         handler.start();
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        AndroidSupportInjection.inject(this);
+        super.onAttach(context);
     }
 }

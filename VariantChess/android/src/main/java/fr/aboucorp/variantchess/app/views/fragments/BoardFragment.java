@@ -1,5 +1,6 @@
 package fr.aboucorp.variantchess.app.views.fragments;
 
+import android.app.Activity;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -21,6 +22,7 @@ import androidx.preference.PreferenceManager;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.badlogic.gdx.backends.android.AndroidFragmentApplication;
 
+import dagger.android.support.AndroidSupportInjection;
 import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.db.entities.GameRules;
 import fr.aboucorp.variantchess.app.db.entities.VariantUser;
@@ -64,7 +66,7 @@ public class BoardFragment extends AndroidFragmentApplication implements GameEve
     private BoardManager boardManager;
     private MatchManager matchManager;
 
-    private NakamaManager nakamaManager;
+    public NakamaManager nakamaManager;
 
     private VariantUser variantUser;
     private GameRules gameRules;
@@ -75,7 +77,7 @@ public class BoardFragment extends AndroidFragmentApplication implements GameEve
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.board_layout, container, false);
         this.bindViews(view);
-        this.nakamaManager = NakamaManager.getInstance();
+        /*  this.nakamaManager = NakamaManager.getInstance();*/
         this.initializeBoard();
         if (this.isOnline) {
             this.joinMatch(this.matchId);
@@ -120,6 +122,8 @@ public class BoardFragment extends AndroidFragmentApplication implements GameEve
         piece.setImageDrawable(drawable);
         if (matchManager.isMyTurn()) {
             this.self_dead_pieces_list_layout.addView(piece);
+        } else {
+            this.opponent_dead_pieces_list_layout.addView(piece);
         }
     }
 
@@ -211,5 +215,11 @@ public class BoardFragment extends AndroidFragmentApplication implements GameEve
     public void setPlayerLabels(String selfUsername, String opponentUsername) {
         this.lbl_self.setText(selfUsername);
         this.lbl_opponent.setText(opponentUsername);
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        AndroidSupportInjection.inject(this);
+        super.onAttach(activity);
     }
 }

@@ -9,7 +9,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
@@ -19,6 +18,10 @@ import com.badlogic.gdx.backends.android.AndroidFragmentApplication;
 import com.heroiclabs.nakama.api.Notification;
 import com.heroiclabs.nakama.api.NotificationList;
 
+import javax.inject.Inject;
+
+import dagger.android.AndroidInjection;
+import dagger.android.support.DaggerAppCompatActivity;
 import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.db.entities.VariantUser;
 import fr.aboucorp.variantchess.app.db.viewmodel.VariantUserViewModel;
@@ -31,21 +34,22 @@ import fr.aboucorp.variantchess.app.views.fragments.AuthentFragmentDirections;
 import fr.aboucorp.variantchess.app.views.fragments.GameRulesFragmentDirections;
 import fr.aboucorp.variantchess.app.views.fragments.SettingsFragmentDirections;
 
-public class MainActivity extends AppCompatActivity implements NotificationListener, AndroidFragmentApplication.Callbacks {
+public class MainActivity extends DaggerAppCompatActivity implements NotificationListener, AndroidFragmentApplication.Callbacks {
     public static final String SHARED_PREFERENCE_NAME = "nakama";
     private Toolbar toolbar;
-    private NakamaManager nakamaManager;
+    @Inject
+    public NakamaManager nakamaManager;
     private VariantUserViewModel variantUserViewModel;
     private SharedPreferences pref;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
         this.pref = getSharedPreferences(SHARED_PREFERENCE_NAME, Context.MODE_PRIVATE);
         this.setContentView(R.layout.main_layout);
         this.setToolbar();
-        this.nakamaManager = NakamaManager.getInstance();
         this.nakamaManager.setNotificationListener(this);
         variantUserViewModel = new ViewModelProvider(this).get(VariantUserViewModel.class);
         manageUserConnection();

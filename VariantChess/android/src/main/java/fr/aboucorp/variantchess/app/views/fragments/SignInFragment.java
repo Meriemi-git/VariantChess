@@ -1,5 +1,6 @@
 package fr.aboucorp.variantchess.app.views.fragments;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +14,9 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
+import javax.inject.Inject;
+
+import dagger.android.support.AndroidSupportInjection;
 import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.db.entities.VariantUser;
 import fr.aboucorp.variantchess.app.db.viewmodel.VariantUserViewModel;
@@ -27,7 +31,8 @@ public class SignInFragment extends VariantChessFragment {
     private Button btn_mail_connect;
     private ProgressBar progressBar;
     private VariantUserViewModel variantUserViewModel;
-    private NakamaManager nakamaManager;
+    @Inject
+    public NakamaManager nakamaManager;
 
     @Override
     protected void bindViews() {
@@ -83,11 +88,15 @@ public class SignInFragment extends VariantChessFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        this.nakamaManager = NakamaManager.getInstance();
         this.variantUserViewModel = new ViewModelProvider(this).get(VariantUserViewModel.class);
         this.bindViews();
         this.bindListeners();
     }
 
+    @Override
+    public void onAttach(Context context) {
+        AndroidSupportInjection.inject(this);
+        super.onAttach(context);
+    }
 
 }

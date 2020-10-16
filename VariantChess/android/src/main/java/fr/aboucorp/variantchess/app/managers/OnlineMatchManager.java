@@ -11,6 +11,8 @@ import com.heroiclabs.nakama.MatchPresenceEvent;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import fr.aboucorp.variantchess.app.db.entities.VariantUser;
 import fr.aboucorp.variantchess.app.managers.boards.BoardManager;
 import fr.aboucorp.variantchess.app.multiplayer.NakamaManager;
@@ -36,13 +38,13 @@ import static fr.aboucorp.variantchess.entities.ChessColor.WHITE;
 import static fr.aboucorp.variantchess.entities.enums.GameState.WAIT_FOR_NEXT_TURN;
 
 public class OnlineMatchManager extends MatchManager implements MatchListener {
-    private final NakamaManager nakamaManager;
+    @Inject
+    public NakamaManager nakamaManager;
     private final VariantUser variantUser;
 
     public OnlineMatchManager(BoardFragment boardFragment, BoardManager boardManager, GameEventManager gameEventManager, VariantUser variantUser) {
         super(boardFragment, boardManager, gameEventManager);
         this.variantUser = variantUser;
-        this.nakamaManager = NakamaManager.getInstance();
         this.nakamaManager.setMatchListener(this);
     }
 

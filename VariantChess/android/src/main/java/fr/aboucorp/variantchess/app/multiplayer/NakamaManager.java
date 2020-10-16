@@ -27,6 +27,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
+import javax.inject.Singleton;
+
 import fr.aboucorp.variantchess.app.db.dto.ChessUserDto;
 import fr.aboucorp.variantchess.app.db.entities.VariantUser;
 import fr.aboucorp.variantchess.app.exceptions.AuthentificationException;
@@ -50,11 +52,11 @@ import fr.aboucorp.variantchess.app.utils.VariantVars;
  *     <li>Nakama RPC management</li>
  * </ul>
  */
+@Singleton
 public class NakamaManager {
     /**
      * Singleton instance
      */
-    private static NakamaManager INSTANCE;
     private final int TIMEOUT_IN_MS = 3000;
     /**
      * Token used to identify this session on this device
@@ -81,22 +83,11 @@ public class NakamaManager {
      */
     private Client client;
 
-    private NakamaManager() {
+    public NakamaManager() {
         this.variantChessToken = UUID.randomUUID().toString();
         this.nakamaSocketListener = new NakamaSocketListener(this);
         this.client = new DefaultClient("defaultkey", "192.168.1.37", 7349, false);
-    }
-
-    /**
-     * Gets singleton instance
-     *
-     * @return the instance
-     */
-    public static NakamaManager getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new NakamaManager();
-        }
-        return INSTANCE;
+        Log.i("fr.aboucorp.variantchess", "Nakama manahger instanciation");
     }
 
     /**

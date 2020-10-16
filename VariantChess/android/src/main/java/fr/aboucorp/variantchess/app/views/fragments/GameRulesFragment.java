@@ -1,6 +1,7 @@
 package fr.aboucorp.variantchess.app.views.fragments;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,11 +16,13 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
 import java.util.List;
 
+import dagger.android.support.AndroidSupportInjection;
 import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.db.adapters.GameRulesAdapter;
 import fr.aboucorp.variantchess.app.db.entities.GameRules;
@@ -28,7 +31,7 @@ import fr.aboucorp.variantchess.app.db.viewmodel.GameRulesViewModel;
 import fr.aboucorp.variantchess.app.utils.ArgsKey;
 import fr.aboucorp.variantchess.entities.ChessMatch;
 
-public class GameRulesFragment extends VariantChessFragment implements AdapterView.OnItemSelectedListener {
+public class GameRulesFragment extends Fragment implements AdapterView.OnItemSelectedListener {
     private Button btn_online;
     private Button btn_offline;
     private TextView txt_rule_description;
@@ -39,7 +42,6 @@ public class GameRulesFragment extends VariantChessFragment implements AdapterVi
     private List<GameRules> allGameRules;
     private VariantUser variantUser;
 
-    @Override
     protected void bindViews() {
         this.btn_online = this.getView().findViewById(R.id.btn_online);
         this.btn_offline = this.getView().findViewById(R.id.btn_offline);
@@ -56,7 +58,6 @@ public class GameRulesFragment extends VariantChessFragment implements AdapterVi
         return view;
     }
 
-    @Override
     protected void bindListeners() {
         GameRulesAdapter gameRulesAdapter = new GameRulesAdapter(getContext(), R.id.spinner_rules);
         this.spinner_rules.setAdapter(gameRulesAdapter);
@@ -139,6 +140,12 @@ public class GameRulesFragment extends VariantChessFragment implements AdapterVi
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) {
 
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        AndroidSupportInjection.inject(this);
+        super.onAttach(context);
     }
 }
 

@@ -1,5 +1,6 @@
 package fr.aboucorp.variantchess.app.views.fragments;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +16,9 @@ import androidx.navigation.Navigation;
 
 import com.basgeekball.awesomevalidation.AwesomeValidation;
 
+import javax.inject.Inject;
+
+import dagger.android.support.AndroidSupportInjection;
 import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.db.entities.VariantUser;
 import fr.aboucorp.variantchess.app.db.viewmodel.VariantUserViewModel;
@@ -40,7 +44,8 @@ public class SignUpFragment extends VariantChessFragment {
 
     private ProgressBar progress_bar;
 
-    private NakamaManager nakamaManager;
+    @Inject
+    public NakamaManager nakamaManager;
 
     private AwesomeValidation validator;
 
@@ -115,7 +120,6 @@ public class SignUpFragment extends VariantChessFragment {
         super.onViewCreated(view, savedInstanceState);
         this.variantUserViewModel = new ViewModelProvider(this).get(VariantUserViewModel.class);
         this.bindViews();
-        this.nakamaManager = NakamaManager.getInstance();
         this.validator = new AwesomeValidation(COLORATION);
         this.validator.addValidation(getActivity(), R.id.signup_mail, android.util.Patterns.EMAIL_ADDRESS, R.string.err_email_invalid);
         // String regexPassword = "(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])";
@@ -124,5 +128,11 @@ public class SignUpFragment extends VariantChessFragment {
         this.validator.addValidation(getActivity(), R.id.signup_pwd, regexPassword, R.string.error_wrong_password);
         this.validator.addValidation(getActivity(), R.id.signup_confirm_pwd, input -> txt_pwd.getText().toString().equals(txt_confirm_pwd.getText().toString()), R.string.error_password_match);
         this.bindListeners();
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        AndroidSupportInjection.inject(this);
+        super.onAttach(context);
     }
 }
