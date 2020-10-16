@@ -1,6 +1,7 @@
 package fr.aboucorp.variantchess.app.views.fragments;
 
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -8,7 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.Switch;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,7 +20,6 @@ import androidx.preference.PreferenceManager;
 
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.badlogic.gdx.backends.android.AndroidFragmentApplication;
-import com.heroiclabs.nakama.Match;
 
 import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.db.entities.GameRules;
@@ -31,35 +32,37 @@ import fr.aboucorp.variantchess.app.managers.boards.BoardManager;
 import fr.aboucorp.variantchess.app.managers.boards.BoardManagerFactory;
 import fr.aboucorp.variantchess.app.multiplayer.NakamaManager;
 import fr.aboucorp.variantchess.app.utils.AsyncHandler;
+import fr.aboucorp.variantchess.app.utils.PieceIconFactory;
 import fr.aboucorp.variantchess.entities.ChessColor;
 import fr.aboucorp.variantchess.entities.ChessMatch;
 import fr.aboucorp.variantchess.entities.Player;
+import fr.aboucorp.variantchess.entities.enums.PieceId;
 import fr.aboucorp.variantchess.entities.events.GameEventManager;
 import fr.aboucorp.variantchess.entities.events.GameEventSubscriber;
 import fr.aboucorp.variantchess.entities.events.models.GameEvent;
+import fr.aboucorp.variantchess.entities.events.models.MoveEvent;
 import fr.aboucorp.variantchess.entities.events.models.TurnStartEvent;
 import fr.aboucorp.variantchess.libgdx.Board3dManager;
 
-import static fr.aboucorp.variantchess.app.utils.ArgsKey.BLACK;
 import static fr.aboucorp.variantchess.app.utils.ArgsKey.GAME_RULES;
 import static fr.aboucorp.variantchess.app.utils.ArgsKey.IS_ONLINE;
 import static fr.aboucorp.variantchess.app.utils.ArgsKey.MATCH_ID;
 import static fr.aboucorp.variantchess.app.utils.ArgsKey.VARIANT_USER;
-import static fr.aboucorp.variantchess.app.utils.ArgsKey.WHITE;
 
 public class BoardFragment extends AndroidFragmentApplication implements GameEventSubscriber, AndroidFragmentApplication.Callbacks {
 
     public FrameLayout board_panel;
-    private Button btn_end_turn;
-    private Switch switch_tactical;
-    private TextView lbl_turn;
-    private TextView party_logs;
+    private LinearLayout opponent_dead_pieces_list_layout;
+    private LinearLayout self_dead_pieces_list_layout;
 
-    private Board3dManager board3dManager;
+    private Button btn_end_turn;
+    private Button btn_surrend;
+    private TextView lbl_turn;
+    private TextView lbl_opponent;
+    private TextView lbl_self;
+
     private BoardManager boardManager;
     private MatchManager matchManager;
-
-    private GameEventManager gameEventManager;
 
     private NakamaManager nakamaManager;
 
@@ -67,8 +70,6 @@ public class BoardFragment extends AndroidFragmentApplication implements GameEve
     private GameRules gameRules;
     private boolean isOnline;
     private String matchId;
-    private Player white;
-    private Player black;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -76,13 +77,13 @@ public class BoardFragment extends AndroidFragmentApplication implements GameEve
         this.bindViews(view);
         this.nakamaManager = NakamaManager.getInstance();
         this.initializeBoard();
-        if (isOnline) {
-            joinMatch(this.matchId);
+        if (this.isOnline) {
+            this.joinMatch(this.matchId);
         } else {
             ChessMatch chessMatch = new ChessMatch();
             chessMatch.getPlayers().add(new Player("Player 1", ChessColor.WHITE, null));
             chessMatch.getPlayers().add(new Player("Player 2", ChessColor.BLACK, null));
-            matchManager.startParty(chessMatch);
+            this.matchManager.startParty(chessMatch);
         }
         return view;
     }
@@ -98,11 +99,28 @@ public class BoardFragment extends AndroidFragmentApplication implements GameEve
         this.runOnUiThread(() -> {
             if (event instanceof TurnStartEvent) {
                 this.btn_end_turn.setEnabled(this.matchManager.isMyTurn());
+                if (matchManager.isMyTurn()) {
+                    this.lbl_turn.setText("Your turn");
+                } else {
+                    this.lbl_turn.setText("Turn of " + this.matchManager.getOpponent().getUsername());
+                }
+            } else if (event instanceof MoveEvent) {
+                PieceId pieceId = ((MoveEvent) event).deadPiece;
+                if (pieceId != null) {
+                    addIconForDeadPiece(pieceId);
+                }
             }
-            party_logs.setText(party_logs.getText() + "\n" + event.message);
-            lbl_turn.setText("Turn of " + matchManager.getPartyInfos());
-            Log.i("fr.aboucorp.variantchess", String.format("GameEvent Color : %s Message : %s", matchManager.getPartyInfos(), event.message));
+            Log.i("fr.aboucorp.variantchess", String.format("GameEvent Color : %s Message : %s", this.matchManager.getPartyInfos(), event.message));
         });
+    }
+
+    private void addIconForDeadPiece(PieceId pieceId) {
+        ImageView piece = new ImageView(getContext());
+        Drawable drawable = PieceIconFactory.getDrawableForPieceID(getContext(), pieceId);
+        piece.setImageDrawable(drawable);
+        if (matchManager.isMyTurn()) {
+            this.self_dead_pieces_list_layout.addView(piece);
+        }
     }
 
     @Override
@@ -112,28 +130,33 @@ public class BoardFragment extends AndroidFragmentApplication implements GameEve
             this.matchId = args.getString(MATCH_ID);
             this.variantUser = (VariantUser) args.getSerializable(VARIANT_USER);
             this.gameRules = (GameRules) args.getSerializable(GAME_RULES);
-            this.white = (Player) args.getSerializable(WHITE);
-            this.black = (Player) args.getSerializable(BLACK);
         }
     }
 
 
 
     private void bindViews(View view) {
-        this.board_panel = view.findViewById(R.id.board);
+        this.board_panel = view.findViewById(R.id.board_panel);
+        this.opponent_dead_pieces_list_layout = view.findViewById(R.id.opponent_dead_pieces_list_layout);
+        this.self_dead_pieces_list_layout = view.findViewById(R.id.self_dead_pieces_list_layout);
+
         this.btn_end_turn = view.findViewById(R.id.btn_end_turn);
+        this.btn_surrend = view.findViewById(R.id.btn_surrend);
+
         this.lbl_turn = view.findViewById(R.id.lbl_turn);
-        this.party_logs = view.findViewById(R.id.party_logs);
-        this.switch_tactical = view.findViewById(R.id.switch_tactical);
+        this.lbl_self = view.findViewById(R.id.lbl_self);
+        this.lbl_opponent = view.findViewById(R.id.lbl_opponent);
     }
 
     private void bindListeners() {
         this.btn_end_turn.setOnClickListener(v -> {
             matchManager.passTurn();
             this.runOnUiThread(() ->
-                    lbl_turn.setText("Turn of " + matchManager.getPartyInfos()));
+                    lbl_turn.setText("Turn of " + this.matchManager.getPartyInfos()));
         });
-        this.switch_tactical.setOnClickListener(v -> boardManager.toogleTacticalView());
+        this.btn_surrend.setOnClickListener(v -> {
+
+        });
     }
 
     private void joinMatch(String matchID) {
@@ -141,13 +164,13 @@ public class BoardFragment extends AndroidFragmentApplication implements GameEve
         AsyncHandler handler = new AsyncHandler() {
             @Override
             protected Object executeAsync() throws Exception {
-                Match match = nakamaManager.joinMatchById(matchID);
+                BoardFragment.this.nakamaManager.joinMatchById(matchID);
                 return null;
             }
 
             @Override
             protected void callbackOnUI(Object arg) {
-
+                BoardFragment.this.board_panel.setVisibility(View.VISIBLE);
             }
 
             @Override
@@ -156,18 +179,19 @@ public class BoardFragment extends AndroidFragmentApplication implements GameEve
                 Toast.makeText(getContext(), R.string.matchmaking_cannot_join_match, Toast.LENGTH_LONG).show();
             }
         };
+        this.board_panel.setVisibility(View.INVISIBLE);
         handler.start();
     }
 
     private void initializeBoard() {
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this.requireActivity());
         boolean isTactical = sharedPref.getBoolean(SettingsFragment.IS_TACTICAL_MODE_ON, false);
 
-        this.gameEventManager = new GameEventManager();
-        this.gameEventManager.subscribe(GameEvent.class, this, 1, "BoardFragment => GameEvent");
+        GameEventManager gameEventManager = new GameEventManager();
+        gameEventManager.subscribe(GameEvent.class, this, 1, "BoardFragment => GameEvent");
 
-        this.board3dManager = new Board3dManager();
-        this.board3dManager.setTacticalViewEnabled(isTactical);
+        Board3dManager board3dManager = new Board3dManager();
+        board3dManager.setTacticalViewEnabled(isTactical);
 
         try {
             this.boardManager = BoardManagerFactory.getBoardManagerFromGameRules(this.gameRules, board3dManager, gameEventManager);
@@ -176,11 +200,16 @@ public class BoardFragment extends AndroidFragmentApplication implements GameEve
         }
 
         if (this.isOnline) {
-            this.matchManager = new OnlineMatchManager(this.boardManager, this.gameEventManager, this.variantUser);
+            this.matchManager = new OnlineMatchManager(this, this.boardManager, gameEventManager, this.variantUser);
         } else {
-            this.matchManager = new OfflineMatchManager(this.boardManager, this.gameEventManager);
+            this.matchManager = new OfflineMatchManager(this, this.boardManager, gameEventManager);
         }
         AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
-        this.board_panel.addView(this.initializeForView(this.board3dManager, config));
+        this.board_panel.addView(this.initializeForView(board3dManager, config));
+    }
+
+    public void setPlayerLabels(String selfUsername, String opponentUsername) {
+        this.lbl_self.setText(selfUsername);
+        this.lbl_opponent.setText(opponentUsername);
     }
 }

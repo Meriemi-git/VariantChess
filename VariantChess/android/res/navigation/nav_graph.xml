@@ -96,12 +96,6 @@
             <argument
                 android:name="game_rules"
                 app:argType="fr.aboucorp.variantchess.app.db.entities.GameRules" />
-            <argument
-                android:name="white"
-                app:argType="fr.aboucorp.variantchess.entities.Player" />
-            <argument
-                android:name="black"
-                app:argType="fr.aboucorp.variantchess.entities.Player" />
         </action>
     </fragment>
     <action

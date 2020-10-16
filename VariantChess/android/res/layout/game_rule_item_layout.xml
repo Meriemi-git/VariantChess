@@ -12,7 +12,7 @@
         android:layout_height="30dp"
         android:layout_weight="1"
         android:contentDescription="@string/content_desc_icon_gamerules"
-        app:srcCompat="@drawable/ic_chess_qlt45" />
+        app:srcCompat="@drawable/ic_chess_wq" />
 
     <TextView
         android:id="@+id/txt_gamerules_name"
