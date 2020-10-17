@@ -23,20 +23,23 @@ import java.io.Reader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
+import javax.inject.Inject;
+
 import fr.aboucorp.variantchess.app.multiplayer.listeners.ChatListener;
 import fr.aboucorp.variantchess.app.multiplayer.listeners.MatchListener;
 import fr.aboucorp.variantchess.app.multiplayer.listeners.MatchmakingListener;
 import fr.aboucorp.variantchess.app.multiplayer.listeners.NotificationListener;
 
 public class NakamaSocketListener extends AbstractSocketListener {
-    private final NakamaManager nakamaManager;
+    private NakamaManager nakamaManager;
     private MatchmakingListener matchmakingListener;
     private ChatListener chatListener;
     private MatchListener matchListener;
     private NotificationListener notificationListener;
 
-    public NakamaSocketListener(NakamaManager nakamaManager) {
-        this.nakamaManager = nakamaManager;
+    @Inject
+    public NakamaSocketListener() {
+        Log.i("fr.aboucorp.variantchess", "NakamaSocketListener instanciation");
     }
 
     @Override
@@ -99,7 +102,7 @@ public class NakamaSocketListener extends AbstractSocketListener {
             }
 
         } else {
-            Log.e("fr.aboucorp.variantchess", "Missing matchListener.");
+            Log.e("fr.aboucorp.variantchess", "Missing matchListener on matchData.");
         }
     }
 
@@ -110,7 +113,7 @@ public class NakamaSocketListener extends AbstractSocketListener {
         if (matchListener != null) {
             matchListener.onMatchPresence(matchPresence);
         } else {
-            Log.e("fr.aboucorp.variantchess", "Missing matchListener.");
+            Log.e("fr.aboucorp.variantchess", "Missing matchListener  on matchPresence..");
         }
     }
 
@@ -142,6 +145,10 @@ public class NakamaSocketListener extends AbstractSocketListener {
     public void onStreamData(StreamData data) {
         super.onStreamData(data);
         Log.i("fr.aboucorp.variantchess", "onStreamData " + data.getData());
+    }
+
+    public void setNakamaManager(NakamaManager nakamaManager) {
+        this.nakamaManager = nakamaManager;
     }
 
     public void setMatchmakingListener(MatchmakingListener matchmakingListener) {

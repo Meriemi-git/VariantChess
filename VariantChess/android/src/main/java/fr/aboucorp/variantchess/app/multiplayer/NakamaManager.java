@@ -3,7 +3,6 @@ package fr.aboucorp.variantchess.app.multiplayer;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.heroiclabs.nakama.Client;
 import com.heroiclabs.nakama.DefaultClient;
 import com.heroiclabs.nakama.DefaultSession;
 import com.heroiclabs.nakama.Match;
@@ -27,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
-import javax.inject.Singleton;
+import javax.inject.Inject;
 
 import fr.aboucorp.variantchess.app.db.dto.ChessUserDto;
 import fr.aboucorp.variantchess.app.db.entities.VariantUser;
@@ -52,7 +51,6 @@ import fr.aboucorp.variantchess.app.utils.VariantVars;
  *     <li>Nakama RPC management</li>
  * </ul>
  */
-@Singleton
 public class NakamaManager {
     /**
      * Singleton instance
@@ -81,13 +79,14 @@ public class NakamaManager {
     /**
      * Nakama client
      */
-    private Client client;
+    private DefaultClient client;
 
-    public NakamaManager() {
+    @Inject
+    public NakamaManager(NakamaSocketListener nakamaSocketListener, DefaultClient client) {
+        this.nakamaSocketListener = nakamaSocketListener;
+        this.client = client;
         this.variantChessToken = UUID.randomUUID().toString();
-        this.nakamaSocketListener = new NakamaSocketListener(this);
-        this.client = new DefaultClient("defaultkey", "192.168.1.37", 7349, false);
-        Log.i("fr.aboucorp.variantchess", "Nakama manahger instanciation");
+        Log.i("fr.aboucorp.variantchess", "NakamaManager instanciation");
     }
 
     /**

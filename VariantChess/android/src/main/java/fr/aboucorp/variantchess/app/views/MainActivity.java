@@ -39,15 +39,16 @@ public class MainActivity extends DaggerAppCompatActivity implements Notificatio
     private Toolbar toolbar;
     @Inject
     public NakamaManager nakamaManager;
+    //@Inject
+    public SharedPreferences sharedPreferences;
     private VariantUserViewModel variantUserViewModel;
-    private SharedPreferences pref;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         AndroidInjection.inject(this);
         super.onCreate(savedInstanceState);
-        this.pref = getSharedPreferences(SHARED_PREFERENCE_NAME, Context.MODE_PRIVATE);
+        this.sharedPreferences = getSharedPreferences(SHARED_PREFERENCE_NAME, Context.MODE_PRIVATE);
         this.setContentView(R.layout.main_layout);
         this.setToolbar();
         this.nakamaManager.setNotificationListener(this);
@@ -55,9 +56,9 @@ public class MainActivity extends DaggerAppCompatActivity implements Notificatio
         manageUserConnection();
         this.variantUserViewModel.getConnected().observe(this, connected -> {
             if (connected != null) {
-                this.pref.edit().putString("nakama.authToken", connected.authToken).apply();
+                this.sharedPreferences.edit().putString("nakama.authToken", connected.authToken).apply();
             } else {
-                this.pref.edit().putString("nakama.authToken", null).apply();
+                this.sharedPreferences.edit().putString("nakama.authToken", null).apply();
             }
         });
     }
@@ -107,7 +108,7 @@ public class MainActivity extends DaggerAppCompatActivity implements Notificatio
         AsyncHandler asyncHandler = new AsyncHandler() {
             @Override
             protected Object executeAsync() throws Exception {
-                String authToken = pref.getString("nakama.authToken", null);
+                String authToken = sharedPreferences.getString("nakama.authToken", null);
                 if (!TextUtils.isEmpty(authToken)) {
                     VariantUser variantUser = nakamaManager.tryReconnectUser(authToken);
                     return variantUser;
@@ -163,10 +164,10 @@ public class MainActivity extends DaggerAppCompatActivity implements Notificatio
 
     private void updateConnectionUI(VariantUser connected) {
         if (connected != null) {
-            this.pref.edit().putString("nakama.authToken", connected.authToken).apply();
+            this.sharedPreferences.edit().putString("nakama.authToken", connected.authToken).apply();
             this.toolbar.setSubtitle(connected.username);
         } else {
-            this.pref.edit().putString("nakama.authToken", null).apply();
+            this.sharedPreferences.edit().putString("nakama.authToken", null).apply();
             this.toolbar.setSubtitle("Disconnected");
         }
         MenuItem disconnect = this.toolbar.getMenu().findItem(R.id.menu_action_disconnect);
@@ -178,7 +179,7 @@ public class MainActivity extends DaggerAppCompatActivity implements Notificatio
     private void disconnectUser() {
         nakamaManager.disconnect();
         this.variantUserViewModel.disconnectUser();
-        this.pref.edit().putString("nk.authToken", null).apply();
+        this.sharedPreferences.edit().putString("nk.authToken", null).apply();
         NavDirections action = AuthentFragmentDirections.actionGlobalAuthentFragment();
         Navigation.findNavController(this, R.id.nav_host_fragment).navigate(action);
     }

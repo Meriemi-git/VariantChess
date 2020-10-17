@@ -22,6 +22,8 @@ import androidx.preference.PreferenceManager;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.badlogic.gdx.backends.android.AndroidFragmentApplication;
 
+import javax.inject.Inject;
+
 import dagger.android.support.AndroidSupportInjection;
 import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.db.entities.GameRules;
@@ -65,7 +67,7 @@ public class BoardFragment extends AndroidFragmentApplication implements GameEve
 
     private BoardManager boardManager;
     private MatchManager matchManager;
-
+    @Inject
     public NakamaManager nakamaManager;
 
     private VariantUser variantUser;
@@ -203,10 +205,11 @@ public class BoardFragment extends AndroidFragmentApplication implements GameEve
             e.printStackTrace();
         }
 
+
         if (this.isOnline) {
-            this.matchManager = new OnlineMatchManager(this, this.boardManager, gameEventManager, this.variantUser);
+            this.matchManager = new OnlineMatchManager(this.boardManager, gameEventManager, this.variantUser);
         } else {
-            this.matchManager = new OfflineMatchManager(this, this.boardManager, gameEventManager);
+            this.matchManager = new OfflineMatchManager(this.boardManager, gameEventManager);
         }
         AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
         this.board_panel.addView(this.initializeForView(board3dManager, config));
