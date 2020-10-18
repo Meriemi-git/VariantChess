@@ -13,6 +13,9 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.db.entities.VariantUser;
 import fr.aboucorp.variantchess.app.db.viewmodel.VariantUserViewModel;
@@ -20,14 +23,15 @@ import fr.aboucorp.variantchess.app.exceptions.IncorrectCredentials;
 import fr.aboucorp.variantchess.app.multiplayer.NakamaManager;
 import fr.aboucorp.variantchess.app.utils.AsyncHandler;
 
-
+@AndroidEntryPoint
 public class SignInFragment extends VariantChessFragment {
     private EditText txt_mail;
     private EditText txt_pwd;
     private Button btn_mail_connect;
     private ProgressBar progressBar;
     private VariantUserViewModel variantUserViewModel;
-    private NakamaManager nakamaManager;
+    @Inject
+    public NakamaManager nakamaManager;
 
     @Override
     protected void bindViews() {
@@ -83,7 +87,6 @@ public class SignInFragment extends VariantChessFragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        this.nakamaManager = NakamaManager.getInstance();
         this.variantUserViewModel = new ViewModelProvider(this).get(VariantUserViewModel.class);
         this.bindViews();
         this.bindListeners();

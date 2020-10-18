@@ -15,7 +15,6 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
-        android:id="@+id/progress_layout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:gravity="center"

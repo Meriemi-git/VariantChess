@@ -23,6 +23,9 @@ import com.heroiclabs.nakama.api.User;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.db.entities.GameRules;
 import fr.aboucorp.variantchess.app.db.entities.VariantUser;
@@ -33,6 +36,7 @@ import fr.aboucorp.variantchess.app.utils.AsyncHandler;
 
 import static fr.aboucorp.variantchess.app.utils.ArgsKey.GAME_RULES;
 
+@AndroidEntryPoint
 public class MatchmakingFragment extends VariantChessFragment implements MatchmakingListener {
     /**
      * Widgets
@@ -46,7 +50,8 @@ public class MatchmakingFragment extends VariantChessFragment implements Matchma
     /**
      * Nakama multiplayer session manager
      */
-    private NakamaManager nakamaManager;
+    @Inject
+    public NakamaManager nakamaManager;
     /**
      * Nakama multiplayer session manager
      */
@@ -81,7 +86,6 @@ public class MatchmakingFragment extends VariantChessFragment implements Matchma
         if (savedInstanceState != null) {
             this.gameRules = (GameRules) savedInstanceState.getSerializable("game_rules");
         }
-        this.nakamaManager = NakamaManager.getInstance();
         this.nakamaManager.setMatchmakingListener(this);
         this.bindViews();
         this.bindListeners();

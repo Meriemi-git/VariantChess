@@ -20,6 +20,7 @@ import androidx.navigation.Navigation;
 
 import java.util.List;
 
+import dagger.hilt.android.AndroidEntryPoint;
 import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.db.adapters.GameRulesAdapter;
 import fr.aboucorp.variantchess.app.db.entities.GameRules;
@@ -28,6 +29,7 @@ import fr.aboucorp.variantchess.app.db.viewmodel.GameRulesViewModel;
 import fr.aboucorp.variantchess.app.utils.ArgsKey;
 import fr.aboucorp.variantchess.entities.ChessMatch;
 
+@AndroidEntryPoint
 public class GameRulesFragment extends VariantChessFragment implements AdapterView.OnItemSelectedListener {
     private Button btn_online;
     private Button btn_offline;

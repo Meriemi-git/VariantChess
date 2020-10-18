@@ -42,6 +42,7 @@ public class GameRulesAdapter extends ArrayAdapter<GameRules> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup viewGroup) {
+        // TODO add check if res exists
         LayoutInflater layoutInflater = LayoutInflater.from(context);
         convertView = layoutInflater.inflate(R.layout.game_rule_item_layout, null);
         ImageView imgGamerules = convertView.findViewById(R.id.img_gamerules);

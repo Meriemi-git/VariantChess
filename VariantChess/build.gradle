@@ -9,10 +9,11 @@ buildscript {
     }
     dependencies {
         def nav_version = "2.3.0"
+        def dagger_version = "2.29.1-alpha"
         classpath 'com.android.tools.build:gradle:4.1.0'
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$nav_version"
         classpath "gradle.plugin.com.exploids:plantuml-from-source:0.1.1"
-
+        classpath "com.google.dagger:hilt-android-gradle-plugin:$dagger_version"
     }
 }
 
@@ -41,6 +42,7 @@ project(":android") {
     apply plugin: "com.android.application"
     apply plugin: "androidx.navigation.safeargs"
     apply plugin: "com.exploids.plantumlfromsource"
+    apply plugin: 'dagger.hilt.android.plugin'
     configurations {
         natives
     }

@@ -21,13 +21,14 @@ import androidx.preference.PreferenceManager;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
 import com.badlogic.gdx.backends.android.AndroidFragmentApplication;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.db.entities.GameRules;
 import fr.aboucorp.variantchess.app.db.entities.VariantUser;
 import fr.aboucorp.variantchess.app.exceptions.UnknownGameRulesException;
 import fr.aboucorp.variantchess.app.managers.MatchManager;
-import fr.aboucorp.variantchess.app.managers.OfflineMatchManager;
-import fr.aboucorp.variantchess.app.managers.OnlineMatchManager;
 import fr.aboucorp.variantchess.app.managers.boards.BoardManager;
 import fr.aboucorp.variantchess.app.managers.boards.BoardManagerFactory;
 import fr.aboucorp.variantchess.app.multiplayer.NakamaManager;
@@ -49,6 +50,7 @@ import static fr.aboucorp.variantchess.app.utils.ArgsKey.IS_ONLINE;
 import static fr.aboucorp.variantchess.app.utils.ArgsKey.MATCH_ID;
 import static fr.aboucorp.variantchess.app.utils.ArgsKey.VARIANT_USER;
 
+@AndroidEntryPoint
 public class BoardFragment extends AndroidFragmentApplication implements GameEventSubscriber, AndroidFragmentApplication.Callbacks {
 
     public FrameLayout board_panel;
@@ -61,10 +63,11 @@ public class BoardFragment extends AndroidFragmentApplication implements GameEve
     private TextView lbl_opponent;
     private TextView lbl_self;
 
-    private BoardManager boardManager;
-    private MatchManager matchManager;
+    public BoardManager boardManager;
+    public MatchManager matchManager;
 
-    private NakamaManager nakamaManager;
+    @Inject
+    public NakamaManager nakamaManager;
 
     private VariantUser variantUser;
     private GameRules gameRules;
@@ -75,7 +78,6 @@ public class BoardFragment extends AndroidFragmentApplication implements GameEve
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.board_layout, container, false);
         this.bindViews(view);
-        this.nakamaManager = NakamaManager.getInstance();
         this.initializeBoard();
         if (this.isOnline) {
             this.joinMatch(this.matchId);
@@ -199,11 +201,7 @@ public class BoardFragment extends AndroidFragmentApplication implements GameEve
             e.printStackTrace();
         }
 
-        if (this.isOnline) {
-            this.matchManager = new OnlineMatchManager(this, this.boardManager, gameEventManager, this.variantUser);
-        } else {
-            this.matchManager = new OfflineMatchManager(this, this.boardManager, gameEventManager);
-        }
+
         AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
         this.board_panel.addView(this.initializeForView(board3dManager, config));
     }

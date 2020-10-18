@@ -23,26 +23,31 @@ import java.io.Reader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
+import javax.inject.Inject;
+
+import dagger.Lazy;
 import fr.aboucorp.variantchess.app.multiplayer.listeners.ChatListener;
 import fr.aboucorp.variantchess.app.multiplayer.listeners.MatchListener;
 import fr.aboucorp.variantchess.app.multiplayer.listeners.MatchmakingListener;
 import fr.aboucorp.variantchess.app.multiplayer.listeners.NotificationListener;
 
 public class NakamaSocketListener extends AbstractSocketListener {
-    private final NakamaManager nakamaManager;
+    @Inject
+    public Lazy<NakamaManager> nakamaManager;
     private MatchmakingListener matchmakingListener;
     private ChatListener chatListener;
     private MatchListener matchListener;
     private NotificationListener notificationListener;
 
-    public NakamaSocketListener(NakamaManager nakamaManager) {
+    @Inject
+    public NakamaSocketListener(Lazy<NakamaManager> nakamaManager) {
         this.nakamaManager = nakamaManager;
     }
 
     @Override
     public void onDisconnect(Throwable t) {
         super.onDisconnect(t);
-        this.nakamaManager.setSocketClosed(true);
+        this.nakamaManager.get().setSocketClosed(true);
         Log.i("fr.aboucorp.variantchess", "onDisconnect ");
     }
 

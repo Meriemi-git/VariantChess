@@ -1,8 +1,6 @@
 package fr.aboucorp.variantchess.app.managers;
 
 
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -17,7 +15,6 @@ import fr.aboucorp.variantchess.app.multiplayer.NakamaManager;
 import fr.aboucorp.variantchess.app.multiplayer.listeners.MatchListener;
 import fr.aboucorp.variantchess.app.multiplayer.matchdata.JsonPlayer;
 import fr.aboucorp.variantchess.app.utils.OPCode;
-import fr.aboucorp.variantchess.app.views.fragments.BoardFragment;
 import fr.aboucorp.variantchess.entities.ChessColor;
 import fr.aboucorp.variantchess.entities.ChessMatch;
 import fr.aboucorp.variantchess.entities.Player;
@@ -39,10 +36,10 @@ public class OnlineMatchManager extends MatchManager implements MatchListener {
     private final NakamaManager nakamaManager;
     private final VariantUser variantUser;
 
-    public OnlineMatchManager(BoardFragment boardFragment, BoardManager boardManager, GameEventManager gameEventManager, VariantUser variantUser) {
-        super(boardFragment, boardManager, gameEventManager);
+    public OnlineMatchManager(BoardManager boardManager, GameEventManager gameEventManager, VariantUser variantUser, NakamaManager nakamaManager) {
+        super(boardManager, gameEventManager);
         this.variantUser = variantUser;
-        this.nakamaManager = NakamaManager.getInstance();
+        this.nakamaManager = nakamaManager;
         this.nakamaManager.setMatchListener(this);
     }
 
@@ -103,7 +100,8 @@ public class OnlineMatchManager extends MatchManager implements MatchListener {
         this.chessMatch = chessMatch;
         String selfUsername = this.variantUser.username;
         String opponentUsername = this.getOpponent().getUsername();
-        new Handler(Looper.getMainLooper()).post(() -> this.boardFragment.setPlayerLabels(selfUsername, opponentUsername));
+        // TODO dont do this here
+        //new Handler(Looper.getMainLooper()).post(() -> this.boardFragment.setPlayerLabels(selfUsername, opponentUsername));
         this.boardManager.startParty(chessMatch);
         if (!chessMatch.getPlayerByColor(WHITE).getUserID().equals(this.variantUser.userId)) {
             this.boardManager.waitForNextTurn();

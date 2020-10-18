@@ -8,9 +8,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
@@ -19,6 +19,9 @@ import com.badlogic.gdx.backends.android.AndroidFragmentApplication;
 import com.heroiclabs.nakama.api.Notification;
 import com.heroiclabs.nakama.api.NotificationList;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.db.entities.VariantUser;
 import fr.aboucorp.variantchess.app.db.viewmodel.VariantUserViewModel;
@@ -31,10 +34,12 @@ import fr.aboucorp.variantchess.app.views.fragments.AuthentFragmentDirections;
 import fr.aboucorp.variantchess.app.views.fragments.GameRulesFragmentDirections;
 import fr.aboucorp.variantchess.app.views.fragments.SettingsFragmentDirections;
 
-public class MainActivity extends AppCompatActivity implements NotificationListener, AndroidFragmentApplication.Callbacks {
+@AndroidEntryPoint
+public class MainActivity extends FragmentActivity implements NotificationListener, AndroidFragmentApplication.Callbacks {
     public static final String SHARED_PREFERENCE_NAME = "nakama";
     private Toolbar toolbar;
-    private NakamaManager nakamaManager;
+    @Inject
+    public NakamaManager nakamaManager;
     private VariantUserViewModel variantUserViewModel;
     private SharedPreferences pref;
 
@@ -45,7 +50,6 @@ public class MainActivity extends AppCompatActivity implements NotificationListe
         this.pref = getSharedPreferences(SHARED_PREFERENCE_NAME, Context.MODE_PRIVATE);
         this.setContentView(R.layout.main_layout);
         this.setToolbar();
-        this.nakamaManager = NakamaManager.getInstance();
         this.nakamaManager.setNotificationListener(this);
         variantUserViewModel = new ViewModelProvider(this).get(VariantUserViewModel.class);
         manageUserConnection();
@@ -99,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements NotificationListe
     }
 
     private void manageUserConnection() {
-        getSupportActionBar().hide();
+        getActionBar().hide();
         AsyncHandler asyncHandler = new AsyncHandler() {
             @Override
             protected Object executeAsync() throws Exception {
@@ -115,7 +119,7 @@ public class MainActivity extends AppCompatActivity implements NotificationListe
             protected void callbackOnUI(Object arg) {
                 super.callbackOnUI(arg);
                 VariantUser variantUser = (VariantUser) arg;
-                getSupportActionBar().show();
+                getActionBar().show();
                 if (variantUser != null) {
                     Toast.makeText(MainActivity.this, R.string.connected, Toast.LENGTH_LONG).show();
                     NavDirections action = GameRulesFragmentDirections.actionGlobalGameRulesFragment(variantUser);
@@ -131,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements NotificationListe
             protected void error(Exception ex) {
                 super.error(ex);
                 disconnectUser();
-                getSupportActionBar().show();
+                getActionBar().show();
                 NavDirections action = GameRulesFragmentDirections.actionGlobalAuthentFragment();
                 Navigation.findNavController(MainActivity.this, R.id.nav_host_fragment).navigate(action);
                 Toast.makeText(MainActivity.this, R.string.err_reconnexion_error, Toast.LENGTH_LONG).show();
@@ -144,10 +148,10 @@ public class MainActivity extends AppCompatActivity implements NotificationListe
         this.toolbar = this.findViewById(R.id.main_toolbar);
         this.toolbar.setTitle(this.getString(R.string.app_name));
         this.toolbar.setSubtitle("Disconnected");
-        this.setSupportActionBar(this.toolbar);
+        this.setActionBar(this.toolbar);
         this.toolbar.setNavigationOnClickListener(v -> this.onBackPressed());
-        this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        this.getSupportActionBar().setHomeButtonEnabled(true);
+        this.getActionBar().setDisplayHomeAsUpEnabled(true);
+        this.getActionBar().setHomeButtonEnabled(true);
     }
 
     @Override

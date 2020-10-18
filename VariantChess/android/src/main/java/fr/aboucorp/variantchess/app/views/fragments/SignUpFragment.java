@@ -15,6 +15,9 @@ import androidx.navigation.Navigation;
 
 import com.basgeekball.awesomevalidation.AwesomeValidation;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import fr.aboucorp.variantchess.R;
 import fr.aboucorp.variantchess.app.db.entities.VariantUser;
 import fr.aboucorp.variantchess.app.db.viewmodel.VariantUserViewModel;
@@ -26,6 +29,7 @@ import fr.aboucorp.variantchess.app.utils.AsyncHandler;
 
 import static com.basgeekball.awesomevalidation.ValidationStyle.COLORATION;
 
+@AndroidEntryPoint
 public class SignUpFragment extends VariantChessFragment {
 
     private Button btn_register;
@@ -40,7 +44,8 @@ public class SignUpFragment extends VariantChessFragment {
 
     private ProgressBar progress_bar;
 
-    private NakamaManager nakamaManager;
+    @Inject
+    public NakamaManager nakamaManager;
 
     private AwesomeValidation validator;
 
@@ -115,7 +120,6 @@ public class SignUpFragment extends VariantChessFragment {
         super.onViewCreated(view, savedInstanceState);
         this.variantUserViewModel = new ViewModelProvider(this).get(VariantUserViewModel.class);
         this.bindViews();
-        this.nakamaManager = NakamaManager.getInstance();
         this.validator = new AwesomeValidation(COLORATION);
         this.validator.addValidation(getActivity(), R.id.signup_mail, android.util.Patterns.EMAIL_ADDRESS, R.string.err_email_invalid);
         // String regexPassword = "(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])";

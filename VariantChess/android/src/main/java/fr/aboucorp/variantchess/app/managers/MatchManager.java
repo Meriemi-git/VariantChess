@@ -2,7 +2,6 @@ package fr.aboucorp.variantchess.app.managers;
 
 import fr.aboucorp.variantchess.app.managers.boards.BoardLoadingListener;
 import fr.aboucorp.variantchess.app.managers.boards.BoardManager;
-import fr.aboucorp.variantchess.app.views.fragments.BoardFragment;
 import fr.aboucorp.variantchess.entities.ChessMatch;
 import fr.aboucorp.variantchess.entities.PartyLifeCycle;
 import fr.aboucorp.variantchess.entities.Player;
@@ -13,15 +12,13 @@ import fr.aboucorp.variantchess.entities.events.models.GameEvent;
 import fr.aboucorp.variantchess.entities.events.models.MoveEvent;
 
 public abstract class MatchManager implements GameEventSubscriber, BoardLoadingListener, PartyLifeCycle {
-    protected final BoardFragment boardFragment;
     protected final BoardManager boardManager;
     protected final GameEventManager gameEventManager;
     protected ChessMatch chessMatch;
     protected Turn currentTurn;
 
 
-    public MatchManager(BoardFragment boardFragment, BoardManager boardManager, GameEventManager gameEventManager) {
-        this.boardFragment = boardFragment;
+    public MatchManager(BoardManager boardManager, GameEventManager gameEventManager) {
         this.gameEventManager = gameEventManager;
         this.boardManager = boardManager;
         this.boardManager.setBoardLoadingListener(this);

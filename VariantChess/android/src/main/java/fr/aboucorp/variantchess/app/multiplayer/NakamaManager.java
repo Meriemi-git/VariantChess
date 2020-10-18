@@ -27,6 +27,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import fr.aboucorp.variantchess.app.db.dto.ChessUserDto;
 import fr.aboucorp.variantchess.app.db.entities.VariantUser;
 import fr.aboucorp.variantchess.app.exceptions.AuthentificationException;
@@ -50,11 +53,9 @@ import fr.aboucorp.variantchess.app.utils.VariantVars;
  *     <li>Nakama RPC management</li>
  * </ul>
  */
+@Singleton
 public class NakamaManager {
-    /**
-     * Singleton instance
-     */
-    private static NakamaManager INSTANCE;
+
     private final int TIMEOUT_IN_MS = 3000;
     /**
      * Token used to identify this session on this device
@@ -79,24 +80,14 @@ public class NakamaManager {
     /**
      * Nakama client
      */
-    private Client client;
+    private Client defaultClient;
 
-    private NakamaManager() {
+    @Inject
+    public NakamaManager(DefaultClient defaultClient, NakamaSocketListener nakamaSocketListener) {
         this.variantChessToken = UUID.randomUUID().toString();
-        this.nakamaSocketListener = new NakamaSocketListener(this);
-        this.client = new DefaultClient("defaultkey", "192.168.1.37", 7349, false);
-    }
-
-    /**
-     * Gets singleton instance
-     *
-     * @return the instance
-     */
-    public static NakamaManager getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new NakamaManager();
-        }
-        return INSTANCE;
+        this.defaultClient = defaultClient;
+        this.nakamaSocketListener = nakamaSocketListener;
+        Log.i("fr.aboucorp.variantchess", String.format("NakamaManager initialisation defaultClient : %s nakamaSockerListenerr: %s", defaultClient, nakamaSocketListener));
     }
 
     /**
@@ -109,8 +100,8 @@ public class NakamaManager {
      */
     public VariantUser signInWithEmail(String mail, String password) throws AuthentificationException {
         try {
-            this.session = this.client.authenticateEmail(mail, password, false).get(TIMEOUT_IN_MS, TimeUnit.MILLISECONDS);
-            User user = this.client.getAccount(this.session).get(TIMEOUT_IN_MS, TimeUnit.MILLISECONDS).getUser();
+            this.session = this.defaultClient.authenticateEmail(mail, password, false).get(TIMEOUT_IN_MS, TimeUnit.MILLISECONDS);
+            User user = this.defaultClient.getAccount(this.session).get(TIMEOUT_IN_MS, TimeUnit.MILLISECONDS).getUser();
             connectSocket();
             VariantUser variantUser = ChessUserDto.fromUserToChessUser(user);
             variantUser.authToken = this.session.getAuthToken();
@@ -132,8 +123,8 @@ public class NakamaManager {
     }
 
     private void resetClientConnection() {
-        this.client.disconnect();
-        this.client = new DefaultClient("defaultkey", "192.168.1.37", 7349, false);
+        this.defaultClient.disconnect();
+        this.defaultClient = new DefaultClient("defaultkey", "192.168.1.37", 7349, false);
     }
 
     /**
@@ -147,8 +138,8 @@ public class NakamaManager {
      */
     public VariantUser signUpWithEmail(String mail, String password, String username) throws AuthentificationException {
         try {
-            this.session = this.client.authenticateEmail(mail, password, true, username).get(TIMEOUT_IN_MS, TimeUnit.MILLISECONDS);
-            User user = this.client.getAccount(this.session).get(TIMEOUT_IN_MS, TimeUnit.MILLISECONDS).getUser();
+            this.session = this.defaultClient.authenticateEmail(mail, password, true, username).get(TIMEOUT_IN_MS, TimeUnit.MILLISECONDS);
+            User user = this.defaultClient.getAccount(this.session).get(TIMEOUT_IN_MS, TimeUnit.MILLISECONDS).getUser();
             VariantUser variantUser = ChessUserDto.fromUserToChessUser(user);
             variantUser.authToken = this.session.getAuthToken();
             return variantUser;
@@ -183,7 +174,7 @@ public class NakamaManager {
             if (!restoredSession.isExpired(new Date())) {
                 // Session was valid and is restored now.
                 this.session = restoredSession;
-                User user = this.client.getAccount(this.session).get(TIMEOUT_IN_MS, TimeUnit.MILLISECONDS).getUser();
+                User user = this.defaultClient.getAccount(this.session).get(TIMEOUT_IN_MS, TimeUnit.MILLISECONDS).getUser();
                 connectSocket();
                 return ChessUserDto.fromUserToChessUser(user);
             }
@@ -196,8 +187,9 @@ public class NakamaManager {
      */
     private void connectSocket() {
         if (this.socket == null || this.socketClosed) {
-            this.socket = this.client.createSocket();
+            this.socket = this.defaultClient.createSocket();
             try {
+                Log.i("fr.aboucorp.variantchess", "Creating socket.");
                 socket.connect(this.session, this.nakamaSocketListener).get(TIMEOUT_IN_MS, TimeUnit.MILLISECONDS);
                 this.checkIfSessionExists(this.socket);
             } catch (InterruptedException e) {
@@ -280,8 +272,8 @@ public class NakamaManager {
         data.put("timeZone", timeZone);
         data.put("langTag", langTag);
         try {
-            this.client.rpc(this.session, RPCMethods.UPDATE_USER_INFOS, data.getJsonFromMetadata()).get(TIMEOUT_IN_MS, TimeUnit.MILLISECONDS);
-            return ChessUserDto.fromUserToChessUser(this.client.getAccount(this.session).get(TIMEOUT_IN_MS, TimeUnit.MILLISECONDS).getUser());
+            this.defaultClient.rpc(this.session, RPCMethods.UPDATE_USER_INFOS, data.getJsonFromMetadata()).get(TIMEOUT_IN_MS, TimeUnit.MILLISECONDS);
+            return ChessUserDto.fromUserToChessUser(this.defaultClient.getAccount(this.session).get(TIMEOUT_IN_MS, TimeUnit.MILLISECONDS).getUser());
         } catch (ExecutionException e) {
             if (ExceptionCauseCode.getCodeValueFromCause(e.getCause()) == ExceptionCauseCode.ALREADY_EXISTS) {
                 throw new UsernameAlreadyRegistered("This username is already taken");
@@ -332,7 +324,7 @@ public class NakamaManager {
      * @throws InterruptedException the interrupted exception if some network error occured
      */
     public List<User> getUsersFromMatched(MatchmakerMatched matched) throws ExecutionException, InterruptedException, TimeoutException {
-        return this.client.getUsers(this.session, matched.getUsers().stream().map(u -> u.getPresence().getUserId())
+        return this.defaultClient.getUsers(this.session, matched.getUsers().stream().map(u -> u.getPresence().getUserId())
                 .collect(Collectors.toList())).get(TIMEOUT_IN_MS, TimeUnit.MILLISECONDS).getUsersList();
     }
 
